@@ -1,0 +1,325 @@
+<div class="grid grid-cols-12 gap-8">
+    <div class="col-span-12">
+        <!-- Header con gradiente -->
+        <div class="card mb-0 overflow-hidden">
+            <div class="flex align-items-center justify-content-between p-4">
+                <div class="flex align-items-center">
+                    <i class="pi pi-user text-white text-3xl mr-3"></i>
+                    <div>
+                        <h2 class="text-white m-0 font-bold">Mi Perfil</h2>
+                        <p class="text-white-alpha-70 m-0">Gestiona tu información personal</p>
+                    </div>
+                </div>
+                <div *ngIf="!editMode && profileData">
+                    <button pButton 
+                            label="Editar Perfil" 
+                            icon="pi pi-user-edit" 
+                            class="p-button-outlined p-button-rounded"
+                            (click)="toggleEditMode()"></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div *ngIf="loading" class="card">
+            <div class="flex justify-content-center align-items-center" style="min-height: 400px;">
+                <div class="text-center">
+                    <p-progressSpinner strokeWidth="3" animationDuration="1s"></p-progressSpinner>
+                    <p class="text-600 mt-3">Cargando información del perfil...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error State -->
+         @if(error && !loading) {
+        <div class="card">
+            <div class="flex align-items-center justify-content-center p-6 border-round-lg" 
+                style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 1px solid #f87171;">
+                <div class="text-center">
+                    <i class="pi pi-exclamation-triangle text-red-500 text-4xl mb-3"></i>
+                    <h4 class="text-red-800 m-0 mb-2">Error al cargar el perfil</h4>
+                    <p class="text-red-600 m-0">{{ error }}</p>
+                </div>
+            </div>
+        </div>
+         }
+        
+        <!-- Modo visualización -->
+        <div *ngIf="profileData && !loading && !editMode" class="grid grid-cols-12 col-span-12 gap-6">
+            <!-- Tarjeta de perfil principal -->
+            <div class="col-span-6">
+                <div class="card text-center h-full">
+                    <div class="relative inline-block mb-4">
+                        <img [src]="profileData.urlAvatar" 
+                             class="border-circle shadow-4" 
+                             style="width: 180px; height: 180px; object-fit: cover; border: 4px solid var(--surface-border);"
+                             alt="Avatar de usuario">
+                        <div class="absolute bg-green-500 border-circle shadow-2" 
+                             style="width: 24px; height: 24px; bottom: 10px; right: 10px; border: 3px solid white;"></div>
+                    </div>
+                    
+                    <h2 class="text-900 font-bold text-2xl m-0 mb-2">{{ profileData.firstName }} {{ profileData.lastName }}</h2>
+                    <p class="text-600 text-lg mb-4">{{ profileData.email }}</p>
+                    
+                    <div class="surface-100 border-round-lg p-3 mb-4">
+                        <div class="flex align-items-center justify-content-center mb-2">
+                            <i class="pi pi-calendar text-primary mr-2"></i>
+                            <span class="text-700 font-medium">Miembro desde</span>
+                        </div>
+                        <span class="text-900 font-bold">{{ formatDate(profileData.createdAt) }}</span>
+                    </div>
+                    
+                    <div *ngIf="profileData.birthday" class="surface-100 border-round-lg p-3 mb-4">
+                        <div class="flex align-items-center justify-content-center mb-2">
+                            <i class="pi pi-gift text-pink-500 mr-2"></i>
+                            <span class="text-700 font-medium">Cumpleaños</span>
+                        </div>
+                        <span class="text-900 font-bold">{{ formatDate(profileData.birthday) }}</span>
+                    </div>
+                    
+                    <div *ngIf="profileData.whatsApp" class="surface-100 border-round-lg p-3">
+                        <div class="flex align-items-center justify-content-center mb-2">
+                            <i class="pi pi-whatsapp text-green-500 mr-2"></i>
+                            <span class="text-700 font-medium">WhatsApp</span>
+                        </div>
+                        <span class="text-900 font-bold">{{ profileData.whatsApp }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Estadísticas del Usuario -->
+            <div class="col-span-6">
+                <div class="card h-full">
+                    <div class="flex mb-4 gap-4 items-center w-full">
+                        <i class="pi pi-chart-bar text-primary text-2xl"></i>
+                        <h3 class="text-900 font-bold text-xl m-0">Estadísticas del Usuario</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-3">
+                        <div class="col-span-1">
+                            <div class="surface-card border-round-lg p-4 text-center shadow-1 hover:shadow-3 transition-all transition-duration-300">
+                                <div class="bg-blue-100 border-circle inline-flex items-center justify-center mb-3" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="pi pi-users text-blue-600 text-xl"></i>
+                                </div>
+                                <div class="text-900 font-bold text-2xl mb-1">{{ profileData.followers }}</div>
+                                <div class="text-600 font-medium text-sm mb-2">Seguidores</div>
+                                <div class="text-green-500 font-bold text-xs">
+                                    <i class="pi pi-arrow-up mr-1"></i>+12% este mes
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-span-1">
+                            <div class="surface-card border-round-lg p-4 text-center shadow-1 hover:shadow-3 transition-all transition-duration-300">
+                                <div class="bg-orange-100 border-circle inline-flex items-center justify-center mb-3" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="pi pi-star text-orange-600 text-xl"></i>
+                                </div>
+                                <div class="text-900 font-bold text-2xl mb-1">{{ profileData.score }}</div>
+                                <div class="text-600 font-medium text-sm mb-2">Puntuación</div>
+                                <div class="text-green-500 font-bold text-xs">
+                                    <i class="pi pi-arrow-up mr-1"></i>+5% esta semana
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-span-1">
+                            <div class="surface-card border-round-lg p-4 text-center shadow-1 hover:shadow-3 transition-all transition-duration-300">
+                                <div class="bg-purple-100 border-circle inline-flex items-center justify-center mb-3" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="pi pi-bitcoin text-purple-600 text-xl"></i>
+                                </div>
+                                <div class="text-900 font-bold text-2xl mb-1">{{ profileData.gem }}</div>
+                                <div class="text-600 font-medium text-sm mb-2">Gemas</div>
+                                <div class="text-blue-500 font-bold text-xs">
+                                    <i class="pi pi-minus mr-1"></i>Sin cambios
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progreso del perfil integrado -->
+                    <div class="mt-4 pt-4 border-top-1 surface-border">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="text-900 font-bold m-0">Progreso del Perfil</h4>
+                            <span class="text-900 font-bold">85%</span>
+                        </div>
+                        <div class="bg-gray-200 border-round-lg overflow-hidden mb-3" style="height: 8px;">
+                            <div class="bg-primary border-round-lg h-full transition-all transition-duration-1000" 
+                                 style="width: 85%;"></div>
+                        </div>
+                        <p class="text-600 text-sm m-0">¡Completa tu información para desbloquear más funciones!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modo edición mejorado -->
+        <div *ngIf="profileData && !loading && editMode" class="grid">
+            <div class="col-12">
+                <div class="card">
+                    <div class="flex align-items-center justify-content-between mb-4 pb-3 border-bottom-1 surface-border">
+                        <div class="flex align-items-center">
+                            <i class="pi pi-user-edit text-primary text-2xl mr-3"></i>
+                            <div>
+                                <h3 class="text-900 font-bold m-0">Editar Perfil</h3>
+                                <p class="text-600 m-0">Actualiza tu información personal</p>
+                            </div>
+                        </div>
+                        <button pButton 
+                                type="button"
+                                icon="pi pi-times" 
+                                class="p-button-rounded p-button-text p-button-plain"
+                                (click)="cancelEdit()"></button>
+                    </div>
+                    
+                    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="p-fluid">
+                        <div class="grid">
+                            <!-- Sección de Avatar -->
+                            <div class="col-12 lg:col-4">
+                                <div class="surface-50 border-round-lg p-4 text-center h-full">
+                                    <h4 class="text-900 font-bold mb-4">Foto de Perfil</h4>
+                                    
+                                    <div class="relative inline-block mb-4">
+                                        <img [src]="profileForm.get('urlAvatar')?.value || 'https://via.placeholder.com/180x180/e2e8f0/64748b?text=Avatar'" 
+                                             class="border-circle shadow-3" 
+                                             style="width: 180px; height: 180px; object-fit: cover; border: 4px solid white;"
+                                             alt="Avatar de usuario">
+                                        <div class="absolute bg-primary border-circle shadow-2 flex align-items-center justify-content-center cursor-pointer hover:bg-primary-reverse transition-colors transition-duration-200" 
+                                             style="width: 40px; height: 40px; bottom: 10px; right: 10px; border: 3px solid white;">
+                                            <i class="pi pi-camera text-white"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="field">
+                                        <label for="urlAvatar" class="font-medium text-900">URL de Avatar</label>
+                                        <input id="urlAvatar" 
+                                               type="text" 
+                                               pInputText 
+                                               formControlName="urlAvatar"
+                                               class="mt-2"
+                                               placeholder="https://ejemplo.com/mi-avatar.jpg">
+                                        <small *ngIf="profileForm.get('urlAvatar')?.invalid && profileForm.get('urlAvatar')?.touched" 
+                                               class="p-error block mt-1">
+                                            <i class="pi pi-exclamation-circle mr-1"></i>URL de avatar es requerida
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Formulario de datos personales -->
+                            <div class="col-12 lg:col-8">
+                                <div class="surface-50 border-round-lg p-4 h-full">
+                                    <h4 class="text-900 font-bold mb-4">Información Personal</h4>
+                                    
+                                    <div class="grid">
+                                        <div class="col-12 md:col-6">
+                                            <div class="field">
+                                                <label for="firstName" class="font-medium text-900">
+                                                    <i class="pi pi-user mr-2 text-primary"></i>Nombre
+                                                </label>
+                                                <input id="firstName" 
+                                                       type="text" 
+                                                       pInputText 
+                                                       formControlName="firstName"
+                                                       class="mt-2"
+                                                       placeholder="Ingresa tu nombre">
+                                                <small *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" 
+                                                       class="p-error block mt-1">
+                                                    <i class="pi pi-exclamation-circle mr-1"></i>Nombre es requerido
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 md:col-6">
+                                            <div class="field">
+                                                <label for="lastName" class="font-medium text-900">
+                                                    <i class="pi pi-user mr-2 text-primary"></i>Apellido
+                                                </label>
+                                                <input id="lastName" 
+                                                       type="text" 
+                                                       pInputText 
+                                                       formControlName="lastName"
+                                                       class="mt-2"
+                                                       placeholder="Ingresa tu apellido">
+                                                <small *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" 
+                                                       class="p-error block mt-1">
+                                                    <i class="pi pi-exclamation-circle mr-1"></i>Apellido es requerido
+                                                </small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 md:col-6">
+                                            <div class="field">
+                                                <label for="birthday" class="font-medium text-900">
+                                                    <i class="pi pi-calendar mr-2 text-pink-500"></i>Fecha de Nacimiento
+                                                </label>
+                                                <input id="birthday" 
+                                                       type="text" 
+                                                       pInputText 
+                                                       formControlName="birthday" 
+                                                       class="mt-2"
+                                                       placeholder="DD/MM/YYYY">
+                                                <small class="text-600 block mt-1">Formato: DD/MM/YYYY</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 md:col-6">
+                                            <div class="field">
+                                                <label for="whatsApp" class="font-medium text-900">
+                                                    <i class="pi pi-whatsapp mr-2 text-green-500"></i>WhatsApp
+                                                </label>
+                                                <p-inputMask id="whatsApp" 
+                                                            mask="(999) 999-9999" 
+                                                            formControlName="whatsApp" 
+                                                            class="mt-2"
+                                                            placeholder="(123) 456-7890">
+                                                </p-inputMask>
+                                                <small class="text-600 block mt-1">Opcional - Para contacto directo</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <div class="field">
+                                                <label class="font-medium text-900">
+                                                    <i class="pi pi-envelope mr-2 text-blue-500"></i>Email
+                                                </label>
+                                                <input type="text" 
+                                                       pInputText 
+                                                       [value]="profileData.email" 
+                                                       disabled
+                                                       class="mt-2">
+                                                <small class="text-600 block mt-1">
+                                                    <i class="pi pi-lock mr-1"></i>El email no se puede modificar por seguridad
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="flex justify-content-end gap-3 mt-4 pt-4 border-top-1 surface-border">
+                            <button pButton 
+                                    type="button" 
+                                    label="Cancelar" 
+                                    icon="pi pi-times" 
+                                    class="p-button-outlined p-button-secondary"
+                                    (click)="cancelEdit()"></button>
+                                    
+                            <button pButton 
+                                    type="submit" 
+                                    label="Guardar Cambios" 
+                                    icon="pi pi-check" 
+                                    [disabled]="profileForm.invalid || savingChanges"
+                                    [loading]="savingChanges"
+                                    class="px-4"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

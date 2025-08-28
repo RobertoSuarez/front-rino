@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { ApiResponse, AuthData } from '../../core/models';
+import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -13,7 +17,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, DividerModule, TooltipModule, AppFloatingConfigurator],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, DividerModule, TooltipModule, AppFloatingConfigurator, NgIf],
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
@@ -60,7 +64,8 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 <a class="font-medium no-underline text-sm cursor-pointer text-primary hover:underline">¿Olvidaste tu contraseña?</a>
                             </div>
                             
-                            <button pButton pRipple label="Iniciar sesión" icon="pi pi-lock-open" class="w-full p-3 text-lg bg-gradient-to-r from-blue-600 to-purple-700 border-none" routerLink="/"></button>
+                            <button pButton pRipple label="Iniciar sesión" icon="pi pi-lock-open" class="w-full p-3 text-lg bg-gradient-to-r from-blue-600 to-purple-700 border-none" [loading]="loading" (click)="onSubmit()"></button>
+            <div *ngIf="errorMessage" class="mt-3 text-red-500 text-center">{{ errorMessage }}</div>
                             
                             <div class="mt-4 text-center">
                                 <span class="text-surface-600 dark:text-surface-400 text-sm">¿No tienes una cuenta? </span>
@@ -75,8 +80,50 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 })
 export class Login {
     email: string = '';
-
     password: string = '';
-
     checked: boolean = false;
+    loading: boolean = false;
+    errorMessage: string = '';
+
+    constructor(private authService: AuthService, private router: Router) {}
+
+    onSubmit(): void {
+        this.loading = true;
+        this.errorMessage = '';
+        
+        this.authService.login(this.email, this.password).subscribe({
+            next: (response: ApiResponse<AuthData>) => {
+                this.loading = false;
+                
+                if (response.statusCode === 200) {
+                    // Verificar si es el primer login para posible redirección especial
+                    const isFirstLogin = response.data.firstLogin;
+                    
+                    if (this.checked) {
+                        // Lógica para recordar sesión si es necesario
+                    }
+                    
+                    // Si el usuario requiere actualización, redirigir a la página de actualización de perfil
+                    if (response.data.user.requiredUpdate) {
+                        this.router.navigate(['/profile/update']);
+                    } else {
+                        this.router.navigate(['/']);
+                    }
+                } else {
+                    this.errorMessage = response.message || 'Error al iniciar sesión';
+                }
+            },
+            error: (error) => {
+                this.loading = false;
+                
+                if (error.error && error.error.message) {
+                    this.errorMessage = error.error.message;
+                } else {
+                    this.errorMessage = 'Error al iniciar sesión. Por favor, verifica tus credenciales.';
+                }
+                
+                console.error('Error de login:', error);
+            }
+        });
+    }
 }

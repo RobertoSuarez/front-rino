@@ -4,17 +4,21 @@ import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
+import { authGuard } from './app/core/guards';
+import { ProfileComponent } from './app/pages/profile/profile.component';
 
 export const appRoutes: Routes = [
-    { path: '', pathMatch: 'full', redirectTo: 'landing' },
+    { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     {
         path: '',
         component: AppLayout,
+        canActivate: [() => authGuard()],
         children: [
-            { path: '', component: Dashboard },
+            { path: 'dashboard', component: Dashboard },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
-            { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
+            { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
+            { path: 'profile', component: ProfileComponent }
         ]
     },
     { path: 'landing', component: Landing },

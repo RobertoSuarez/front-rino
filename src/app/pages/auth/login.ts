@@ -105,9 +105,9 @@ export class Login {
                     
                     // Si el usuario requiere actualización, redirigir a la página de actualización de perfil
                     if (response.data.user.requiredUpdate) {
-                        this.router.navigate(['/profile/update']);
+                        this.router.navigate(['/profile']);
                     } else {
-                        this.router.navigate(['/']);
+                        this.router.navigate(['/dashboard']);
                     }
                 } else {
                     this.errorMessage = response.message || 'Error al iniciar sesión';

@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
+import { ToastModule } from 'primeng/toast';
 
 interface ProfileData {
   id: number;
@@ -38,7 +39,8 @@ interface ProfileData {
     ProgressSpinnerModule,
     ReactiveFormsModule,
     InputTextModule,
-    InputMaskModule
+    InputMaskModule,
+    ToastModule
   ],
   providers: [MessageService],
   templateUrl: './profile.component.html',
@@ -162,7 +164,8 @@ export class ProfileComponent implements OnInit {
     }
   }
   
-  saveProfile(): void {
+  saveProfile(event: Event): void {
+    event.preventDefault();
     if (this.profileForm.invalid) {
       this.messageService.add({
         severity: 'error',
@@ -183,8 +186,9 @@ export class ProfileComponent implements OnInit {
     
     this.savingChanges = true;
     const updatedData = this.profileForm.value;
+  
     
-    this.apiService.put(`users/${this.userId}/profile`, updatedData).subscribe({
+    this.apiService.put(`users`, updatedData).subscribe({
       next: (response: any) => {
         if (response && response.data) {
           this.profileData = response.data;

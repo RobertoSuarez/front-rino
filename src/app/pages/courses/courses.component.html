@@ -1,0 +1,117 @@
+<p-toast></p-toast>
+<div class="card">
+    <div class="font-semibold text-xl mb-4">Lista de Cursos - Vista del Admin y profesor</div>
+    <p-table
+        #dt
+        [value]="courses"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        [showGridlines]="true"
+        [paginator]="true"
+        [globalFilterFields]="['title', 'createdBy', 'code']"
+        responsiveLayout="scroll"
+    >
+        <ng-template #caption>
+            <div class="flex justify-between items-center flex-column sm:flex-row">
+                <p-button 
+                        label="Nuevo Curso" 
+                        icon="pi pi-plus" 
+                        class="p-button-rounded mr-2"
+                        (click)="showCreateDialog()"></p-button>
+                <p-iconField iconPosition="left" class="ml-auto">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar curso" />
+                </p-iconField>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Título</th>
+                <th>Creado por</th>
+                <th>Código</th>
+                <th>Capítulos</th>
+                <th>Estado</th>
+                <th>Fecha Creación</th>
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-course>
+            <tr>
+                <td>{{course.title}}</td>
+                <td>{{course.createdBy}}</td>
+                <td>{{course.code}}</td>
+                <td>{{course.chapters}}</td>
+                <td>
+                    <p-tag [value]="course.isPublic ? 'Público' : 'Privado'" 
+                           [severity]="course.isPublic ? 'success' : 'warning'"></p-tag>
+                </td>
+                <td>{{course.createAt}}</td>
+                <td class="flex gap-2">
+                    <p-button pButton 
+                            icon="pi pi-pencil" 
+                            class="p-button-rounded p-button-text"
+                            (click)="showEditDialog(course)"></p-button>
+                    <p-button 
+                        icon="pi pi-trash" 
+                        severity="danger"
+                        class=""
+                        (onClick)="confirmDelete(course)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [header]="currentCourseId ? 'Editar Curso' : 'Nuevo Curso'" 
+         [visible]="displayCreateDialog || displayEditDialog" 
+         (onHide)="currentCourseId ? displayEditDialog = false : displayCreateDialog = false"
+         [style]="{width: '50vw'}" 
+         [modal]="true"
+         class="rounded-lg shadow-xl">
+    <form [formGroup]="courseForm" 
+          (ngSubmit)="currentCourseId ? updateCourse() : createCourse()" 
+          class="p-fluid space-y-4">
+        <div class="field space-y-2">
+            <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
+            <input id="title" pInputText formControlName="title" required 
+                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        
+        <div class="field space-y-2">
+            <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
+            <textarea id="description" pInputTextarea formControlName="description" rows="3"
+                      class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+        
+        <div class="field space-y-2">
+            <label for="urlLogo" class="block text-sm font-medium text-gray-700">URL del Logo</label>
+            <input id="urlLogo" pInputText formControlName="urlLogo" 
+                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        
+        <div class="field-checkbox flex items-center space-x-2">
+            <p-checkbox id="isPublic" formControlName="isPublic" [binary]="true" 
+                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"></p-checkbox>
+            <label for="isPublic" class="text-sm font-medium text-gray-700">Curso público</label>
+        </div>
+        
+        <div class="flex justify-end gap-3 mt-6">
+            <p-button type="button" label="Cancelar" 
+                    class=""
+                    (onClick)="currentCourseId ? displayEditDialog = false : displayCreateDialog = false"></p-button>
+            <p-button type="submit" 
+                    [label]="currentCourseId ? 'Actualizar' : 'Crear'" 
+                    [disabled]="courseForm.invalid"
+                    class=""></p-button>
+        </div>
+    </form>
+</p-dialog>
+
+
+<p-confirmdialog [style]="{ width: '450px' }" />

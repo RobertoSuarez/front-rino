@@ -12,9 +12,11 @@
                     </div>
                 </div>
                 @if (!editMode && profileData) {
-                <div>
+                <div class="flex gap-2">
                     <button pButton label="Editar Perfil" icon="pi pi-user-edit"
                         class="p-button-outlined p-button-rounded" (click)="toggleEditMode()"></button>
+                    <button pButton label="Cambiar Contraseña" icon="pi pi-lock"
+                        class="p-button-outlined p-button-rounded p-button-secondary" routerLink="/profile/change-password"></button>
                 </div>
                 }
             </div>

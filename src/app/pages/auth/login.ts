@@ -30,7 +30,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                     <i class="pi pi-shield text-white text-4xl"></i>
                                 </div>
                             </div>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-2">¡Bienvenido a Chasquis!</div>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-2">¡Bienvenido a CyberImperium!</div>
                             <div class="text-surface-600 dark:text-surface-300 text-lg mb-4">Plataforma de formación en ciberseguridad</div>
                             <p-divider>
                                 <span class="px-2 text-sm text-surface-500">Inicia sesión para continuar</span>
@@ -61,7 +61,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                     <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox>
                                     <label for="rememberme1" class="text-sm">Recordar sesión</label>
                                 </div>
-                                <a class="font-medium no-underline text-sm cursor-pointer text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+                                <a routerLink="/auth/forgot-password" class="font-medium no-underline text-sm cursor-pointer text-primary hover:underline">¿Olvidaste tu contraseña?</a>
                             </div>
                             
                             <button pButton pRipple label="Iniciar sesión" icon="pi pi-lock-open" class="w-full p-3 text-lg bg-gradient-to-r from-blue-600 to-purple-700 border-none" [loading]="loading" (click)="onSubmit()"></button>

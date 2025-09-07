@@ -31,7 +31,7 @@ import { ApiService } from '../../core/services/api.service';
                                     <i class="pi pi-shield text-white text-3xl"></i>
                                 </div>
                             </div>
-                            <div class="text-surface-900 dark:text-surface-0 text-2xl font-medium mb-2">Únete a Chasquis Ciberseguridad</div>
+                            <div class="text-surface-900 dark:text-surface-0 text-2xl font-medium mb-2">Únete a CyberImperium</div>
                             <div class="text-surface-600 dark:text-surface-300 text-base mb-4">Crea tu cuenta para acceder a todos los recursos</div>
                             <p-divider>
                                 <span class="px-2 text-sm text-surface-500">Completa tus datos</span>

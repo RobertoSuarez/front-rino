@@ -1,0 +1,152 @@
+<p-toast></p-toast>
+<div class="card">
+    <div class="font-semibold text-xl mb-4">Gestión de Capítulos</div>
+
+    <div class="mb-4">
+        <select class="p-2 border border-gray-300 rounded-md w-64" 
+                (change)="onCourseChange($event)"
+                [value]="selectedCourseId">
+            <option value="" disabled>Selecciona un curso</option>
+            <option *ngFor="let course of courses" [value]="course.value" [selected]="course.value === selectedCourseId">{{course.label}}</option>
+        </select>
+    </div>
+
+    <p-table
+        #dt
+        [value]="chapters"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        [showGridlines]="true"
+        [paginator]="true"
+        [globalFilterFields]="['title', 'shortDescription', 'difficulty']"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center flex-column sm:flex-row">
+                <p-button 
+                        label="Nuevo Capítulo" 
+                        icon="pi pi-plus" 
+                        class="p-button-rounded mr-2"
+                        [disabled]="!selectedCourseId"
+                        (click)="showCreateDialog()"></p-button>
+                <p-iconField iconPosition="left" class="ml-auto">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar capítulo" />
+                </p-iconField>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Dificultad</th>
+                <th>Fecha Creación</th>
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-chapter>
+            <tr>
+                <td>{{chapter.title}}</td>
+                <td>{{chapter.shortDescription}}</td>
+                <td>
+                    <p-tag [value]="chapter.difficulty" 
+                           [severity]="chapter.difficulty === 'Fácil' ? 'success' : (chapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
+                </td>
+                <td>{{chapter.createAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="flex gap-2">
+                    <p-button pButton 
+                            icon="pi pi-pencil" 
+                            class="p-button-rounded p-button-text"
+                            (click)="showEditDialog(chapter)"></p-button>
+                    <p-button 
+                        icon="pi pi-trash" 
+                        severity="danger"
+                        class="p-button-rounded p-button-text"
+                        (click)="confirmDelete(chapter)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="5" class="text-center p-4">
+                    <div *ngIf="selectedCourseId; else selectCourse">
+                        No se encontraron capítulos para este curso.
+                    </div>
+                    <ng-template #selectCourse>
+                        Selecciona un curso para ver sus capítulos.
+                    </ng-template>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [header]="currentChapterId ? 'Editar Capítulo' : 'Nuevo Capítulo'" 
+         [visible]="displayCreateDialog || displayEditDialog" 
+         (onHide)="hideDialog()"
+         [style]="{width: '50vw'}" 
+         [modal]="true"
+         [closable]="true"
+         class="rounded-lg shadow-xl">
+    <form [formGroup]="chapterForm" 
+          (ngSubmit)="currentChapterId ? updateChapter() : createChapter()" 
+          class="p-fluid space-y-4">
+        
+        <div class="field space-y-2">
+            <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
+            <input id="title" pInputText formControlName="title" required 
+                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+            <small *ngIf="chapterForm.get('title')?.invalid && chapterForm.get('title')?.touched" class="text-red-500">
+                El título es requerido
+            </small>
+        </div>
+        
+        <div class="field space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="shortDescription" class="block text-sm font-medium text-gray-700">Descripción Corta</label>
+                <p-button type="button" 
+                         label="Generar con IA" 
+                         icon="pi pi-bolt" 
+                         styleClass="p-button-sm p-button-text p-button-info"
+                         [loading]="loading"
+                         (onClick)="generateDescriptionWithAI()"></p-button>
+            </div>
+            <textarea id="shortDescription" formControlName="shortDescription" rows="3"
+                      class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <small *ngIf="chapterForm.get('shortDescription')?.invalid && chapterForm.get('shortDescription')?.touched" class="text-red-500">
+                La descripción es requerida
+            </small>
+        </div>
+        
+        <div class="field space-y-2">
+            <label for="difficulty" class="block text-sm font-medium text-gray-700">Dificultad</label>
+            <select id="difficulty" 
+                   formControlName="difficulty"
+                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option *ngFor="let option of difficultyOptions" [value]="option.value">{{option.label}}</option>
+            </select>
+            <small *ngIf="chapterForm.get('difficulty')?.invalid && chapterForm.get('difficulty')?.touched" class="text-red-500">
+                La dificultad es requerida
+            </small>
+        </div>
+        
+        <div class="flex justify-end gap-3 mt-6">
+            <p-button type="button" label="Cancelar" 
+                    class=""
+                    (onClick)="hideDialog()"></p-button>
+            <p-button type="submit" 
+                    [label]="currentChapterId ? 'Actualizar' : 'Crear'" 
+                    [disabled]="chapterForm.invalid"
+                    class=""></p-button>
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }" />

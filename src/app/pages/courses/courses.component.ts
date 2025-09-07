@@ -21,6 +21,7 @@ import { Button } from "primeng/button";
 import { environment } from 'src/environments/environment';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { AiService } from '../../core/services/ai.service';
 
 @Component({
   selector: 'app-courses',
@@ -64,7 +65,8 @@ export class CoursesComponent implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private aiService: AiService
   ) {
     this.courseForm = this.fb.group({
       title: ['', Validators.required],
@@ -202,5 +204,66 @@ export class CoursesComponent implements OnInit {
         },
         complete: () => this.loading = false
       });
+  }
+
+  /**
+   * Maneja el cierre del diálogo, tanto para creación como para edición
+   */
+  hideDialog() {
+    if (this.currentCourseId) {
+      this.displayEditDialog = false;
+    } else {
+      this.displayCreateDialog = false;
+    }
+    this.currentCourseId = null;
+    this.courseForm.reset();
+  }
+
+  /**
+   * Genera una descripción para el curso utilizando IA
+   */
+  generateDescriptionWithAI() {
+    console.log('Generating description with AI', this.courseForm.value);
+    const title = this.courseForm.get('title')?.value;
+    
+    if (!title) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor, ingresa un título para el curso primero'
+      });
+      return;
+    }
+
+    this.loading = true;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Generando',
+      detail: 'Generando descripción con IA...'
+    });
+
+    this.aiService.generateCourseDescription(title).subscribe({
+      next: (response) => {
+        if (response && response.data.description) {
+          this.courseForm.patchValue({
+            description: response.data.description
+          });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Descripción generada correctamente'
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al generar descripción', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al generar descripción con IA'
+        });
+      },
+      complete: () => this.loading = false
+    });
   }
 }

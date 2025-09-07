@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -40,7 +41,8 @@ interface ProfileData {
     ReactiveFormsModule,
     InputTextModule,
     InputMaskModule,
-    ToastModule
+    ToastModule,
+    RouterModule
   ],
   providers: [MessageService],
   templateUrl: './profile.component.html',

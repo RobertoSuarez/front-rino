@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { MenuService } from '../../core/services/menu.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-menu',
@@ -15,10 +17,20 @@ import { AppMenuitem } from './app.menuitem';
         </ng-container>
     </ul> `
 })
-export class AppMenu {
+export class AppMenu implements OnInit, OnDestroy {
     model: MenuItem[] = [];
+    private menuSubscription!: Subscription;
+
+    constructor(private menuService: MenuService) {}
 
     ngOnInit() {
+        // Suscribirse a los cambios del menú según el tipo de usuario
+        this.menuSubscription = this.menuService.menuItems$.subscribe(menuItems => {
+            this.model = menuItems;
+        });
+        
+        // Menú de ejemplo para desarrollo (comentado)
+        /*
         this.model = [
             {
                 label: 'Home',
@@ -156,5 +168,12 @@ export class AppMenu {
                 ]
             }
         ];
+        */
+    }
+
+    ngOnDestroy() {
+        if (this.menuSubscription) {
+            this.menuSubscription.unsubscribe();
+        }
     }
 }

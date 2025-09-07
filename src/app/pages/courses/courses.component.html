@@ -70,9 +70,9 @@
 
 <p-dialog [header]="currentCourseId ? 'Editar Curso' : 'Nuevo Curso'" 
          [visible]="displayCreateDialog || displayEditDialog" 
-         (onHide)="currentCourseId ? displayEditDialog = false : displayCreateDialog = false"
          [style]="{width: '50vw'}" 
          [modal]="true"
+         [closable]="true"
          class="rounded-lg shadow-xl">
     <form [formGroup]="courseForm" 
           (ngSubmit)="currentCourseId ? updateCourse() : createCourse()" 
@@ -84,8 +84,16 @@
         </div>
         
         <div class="field space-y-2">
-            <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
-            <textarea id="description" pInputTextarea formControlName="description" rows="3"
+            <div class="flex justify-between items-center">
+                <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
+                <p-button type="button" 
+                         label="Generar con IA" 
+                         icon="pi pi-bolt" 
+                         styleClass="p-button-sm p-button-text p-button-info"
+                         [loading]="loading"
+                         (onClick)="generateDescriptionWithAI()"></p-button>
+            </div>
+            <textarea id="description" formControlName="description" rows="3"
                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
         </div>
         
@@ -104,7 +112,7 @@
         <div class="flex justify-end gap-3 mt-6">
             <p-button type="button" label="Cancelar" 
                     class=""
-                    (onClick)="currentCourseId ? displayEditDialog = false : displayCreateDialog = false"></p-button>
+                    (onClick)="hideDialog()"></p-button>
             <p-button type="submit" 
                     [label]="currentCourseId ? 'Actualizar' : 'Crear'" 
                     [disabled]="courseForm.invalid"

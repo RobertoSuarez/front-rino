@@ -3,6 +3,20 @@ import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { ApiService } from './api.service';
 import { ApiResponse, AuthData, LoginRequest, User } from '../models';
 
+export interface RecoverPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -122,5 +136,37 @@ export class AuthService {
     localStorage.setItem(this.userKey, JSON.stringify(user));
     this.currentUserSubject.next(user);
     console.log('Datos del usuario actualizados en localStorage');
+  }
+
+  /**
+   * Solicita la recuperación de contraseña enviando un correo al usuario
+   * @param email Email del usuario que olvidó su contraseña
+   * @returns Observable con la respuesta del servidor
+   */
+  recoverPassword(email: string): Observable<ApiResponse<any>> {
+    const data: RecoverPasswordRequest = { email };
+    return this.apiService.post<ApiResponse<any>>('auth/recover-password', data);
+  }
+
+  /**
+   * Restablece la contraseña usando el token enviado por correo
+   * @param token Token de recuperación de contraseña
+   * @param password Nueva contraseña
+   * @returns Observable con la respuesta del servidor
+   */
+  resetPassword(token: string, password: string): Observable<ApiResponse<any>> {
+    const data: ResetPasswordRequest = { token, newPassword: password };
+    return this.apiService.post<ApiResponse<any>>('auth/set-password', data);
+  }
+
+  /**
+   * Cambia la contraseña del usuario autenticado
+   * @param currentPassword Contraseña actual
+   * @param newPassword Nueva contraseña
+   * @returns Observable con la respuesta del servidor
+   */
+  changePassword(currentPassword: string, newPassword: string): Observable<ApiResponse<any>> {
+    const data: ChangePasswordRequest = { currentPassword, newPassword };
+    return this.apiService.post<ApiResponse<any>>('auth/change-password-from-inside', data);
   }
 }

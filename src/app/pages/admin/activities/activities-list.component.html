@@ -1,0 +1,159 @@
+<p-toast></p-toast>
+<div class="card">
+    <div class="font-semibold text-xl mb-4">Gestión de Actividades</div>
+
+    <div class="mb-4 flex flex-col md:flex-row gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Curso</label>
+            <select class="p-2 border border-gray-300 rounded-md w-64" 
+                    (change)="onCourseChange($event)"
+                    [value]="selectedCourseId">
+                <option value="" disabled>Selecciona un curso</option>
+                <option *ngFor="let course of courses" [value]="course.value" [selected]="course.value === selectedCourseId">{{course.label}}</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Capítulo</label>
+            <select class="p-2 border border-gray-300 rounded-md w-64" 
+                    (change)="onChapterChange($event)"
+                    [value]="selectedChapterId"
+                    [disabled]="!selectedCourseId || chapters.length === 0">
+                <option value="" disabled>Selecciona un capítulo</option>
+                <option *ngFor="let chapter of chapters" [value]="chapter.value" [selected]="chapter.value === selectedChapterId">{{chapter.label}}</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tema</label>
+            <select class="p-2 border border-gray-300 rounded-md w-64" 
+                    (change)="onTemaChange($event)"
+                    [value]="selectedTemaId"
+                    [disabled]="!selectedChapterId || temas.length === 0">
+                <option value="" disabled>Selecciona un tema</option>
+                <option *ngFor="let tema of temas" [value]="tema.value" [selected]="tema.value === selectedTemaId">{{tema.label}}</option>
+            </select>
+        </div>
+    </div>
+
+    <p-table
+        #dt
+        [value]="activities"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        [showGridlines]="true"
+        [paginator]="true"
+        [globalFilterFields]="['id', 'title']"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center flex-column sm:flex-row">
+                <p-button 
+                        label="Nueva Actividad" 
+                        icon="pi pi-plus" 
+                        class="p-button-rounded mr-2"
+                        [disabled]="!selectedTemaId"
+                        (click)="showCreateDialog()"></p-button>
+                <p-iconField iconPosition="left" class="ml-auto">
+                    <p-inputIcon>
+                        <i class="pi pi-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar actividad" />
+                </p-iconField>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Fecha Creación</th>
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-activity>
+            <tr>
+                <td>{{activity.id}}</td>
+                <td>{{activity.title}}</td>
+                <td>{{activity.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="flex gap-2">
+                    <p-button pButton 
+                            icon="pi pi-pencil" 
+                            class="p-button-rounded p-button-text"
+                            (click)="showEditDialog(activity)"></p-button>
+                    <p-button 
+                        icon="pi pi-trash" 
+                        severity="danger"
+                        class="p-button-rounded p-button-text"
+                        (click)="confirmDelete(activity)"></p-button>
+                    <p-button 
+                        icon="pi pi-list" 
+                        severity="info"
+                        class="p-button-rounded p-button-text"
+                        pTooltip="Ver ejercicios"
+                        (click)="navigateToExercises(activity.id)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="4" class="text-center p-4">
+                    <div *ngIf="selectedTemaId; else selectTema">
+                        No se encontraron actividades para este tema.
+                    </div>
+                    <ng-template #selectTema>
+                        <div *ngIf="selectedChapterId; else selectChapter">
+                            Selecciona un tema para ver sus actividades.
+                        </div>
+                        <ng-template #selectChapter>
+                            <div *ngIf="selectedCourseId; else selectCourse">
+                                Selecciona un capítulo para ver sus temas.
+                            </div>
+                            <ng-template #selectCourse>
+                                Selecciona un curso, capítulo y tema para ver sus actividades.
+                            </ng-template>
+                        </ng-template>
+                    </ng-template>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [header]="currentActivityId ? 'Editar Actividad' : 'Nueva Actividad'" 
+         [visible]="displayCreateDialog || displayEditDialog" 
+         (onHide)="hideDialog()"
+         [style]="{width: '40vw'}" 
+         [modal]="true"
+         [closable]="true"
+         class="rounded-lg shadow-xl">
+    <form [formGroup]="activityForm" 
+          (ngSubmit)="currentActivityId ? updateActivity() : createActivity()" 
+          class="p-fluid space-y-4">
+        
+        <div class="field space-y-2">
+            <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
+            <input id="title" pInputText formControlName="title" required 
+                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+            <small *ngIf="activityForm.get('title')?.invalid && activityForm.get('title')?.touched" class="text-red-500">
+                El título es requerido
+            </small>
+        </div>
+        
+        <div class="flex justify-end gap-3 mt-6">
+            <p-button type="button" label="Cancelar" 
+                    class=""
+                    (onClick)="hideDialog()"></p-button>
+            <p-button type="submit" 
+                    [label]="currentActivityId ? 'Actualizar' : 'Crear'" 
+                    [disabled]="activityForm.invalid"
+                    class=""></p-button>
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '450px' }" />

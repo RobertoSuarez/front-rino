@@ -10,6 +10,6 @@ export interface User {
   whatsApp: string;
   urlAvatar: string | null;
   status: 'active' | 'inactive';
-  typeUser: 'student' | 'admin' | 'teacher';
+  typeUser: 'student' | 'admin' | 'teacher' | 'parent';
   requiredUpdate: boolean;
 }

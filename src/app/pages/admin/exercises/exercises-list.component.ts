@@ -18,8 +18,14 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from "primeng/button";
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { SelectionSingleComponent } from './components/selection-single.component';
+import { SelectionMultipleComponent } from './components/selection-multiple.component';
+import { OrderFragmentCodeComponent } from './components/order-fragment-code.component';
+import { OrderLineCodeComponent } from './components/order-line-code.component';
+import { WriteCodeComponent } from './components/write-code.component';
+import { FindErrorCodeComponent } from './components/find-error-code.component';
 
 @Component({
   selector: 'app-exercises-list',
@@ -37,7 +43,13 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     CheckboxModule,
     ReactiveFormsModule,
     ButtonModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    SelectionSingleComponent,
+    SelectionMultipleComponent,
+    OrderFragmentCodeComponent,
+    OrderLineCodeComponent,
+    WriteCodeComponent,
+    FindErrorCodeComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './exercises-list.component.html',
@@ -53,6 +65,12 @@ export class ExercisesListComponent implements OnInit {
   exerciseForm: FormGroup;
   activityId: number | null = null;
   activityTitle: string = '';
+  exerciseTypeData: any = {};
+  
+  // Parámetros para volver a la página de actividades
+  returnCourseId: number | null = null;
+  returnChapterId: number | null = null;
+  returnTemaId: number | null = null;
   
   exerciseTypes = [
     { label: 'Selección Simple', value: 'selection_single' },
@@ -77,7 +95,8 @@ export class ExercisesListComponent implements OnInit {
     private fb: FormBuilder,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.exerciseForm = this.createForm();
   }
@@ -88,6 +107,21 @@ export class ExercisesListComponent implements OnInit {
         this.activityId = +params['activityId'];
         this.loadActivityDetails();
         this.loadExercises();
+      }
+    });
+    
+    // Obtener los parámetros de retorno de la URL si existen
+    this.route.queryParams.subscribe(params => {
+      if (params['returnCourseId']) {
+        this.returnCourseId = +params['returnCourseId'];
+      }
+      
+      if (params['returnChapterId']) {
+        this.returnChapterId = +params['returnChapterId'];
+      }
+      
+      if (params['returnTemaId']) {
+        this.returnTemaId = +params['returnTemaId'];
       }
     });
   }
@@ -137,9 +171,9 @@ export class ExercisesListComponent implements OnInit {
     if (!this.activityId) return;
 
     this.loading = true;
-    // Asumimos que el servicio de ejercicios puede obtener ejercicios por activityId
-    // Si no existe esta funcionalidad, habría que implementarla
-    this.exerciseService.getExercisesByTemaId(0, `actividad${this.activityId}`).subscribe({
+    // Pasamos 0 como temaId para no filtrar por tema y solo por actividad
+    // El formato 'actividadX' ahora es interpretado correctamente por el backend
+    this.exerciseService.getExercisesByTemaId(this.activityId).subscribe({
       next: (response) => {
         this.exercises = response;
         this.loading = false;
@@ -201,6 +235,10 @@ export class ExercisesListComponent implements OnInit {
           answerOrderLineCode: response.answerOrderLineCode,
           answerFindError: response.answerFindError
         });
+        
+        // Cargar datos para el componente específico
+        this.exerciseTypeData = response;
+        
         this.displayEditDialog = true;
         this.loading = false;
       },
@@ -221,6 +259,9 @@ export class ExercisesListComponent implements OnInit {
   }
 
   onExerciseTypeChange() {
+    // Limpiar datos del tipo anterior
+    this.exerciseTypeData = {};
+    
     // Limpiar campos específicos según el tipo de ejercicio seleccionado
     const typeExercise = this.exerciseForm.get('typeExercise')?.value;
     
@@ -275,6 +316,22 @@ export class ExercisesListComponent implements OnInit {
         });
         break;
     }
+  }
+
+  onExerciseDataChange(data: any) {
+    // Actualizar el formulario con los datos del componente específico
+    this.exerciseForm.patchValue({
+      optionSelectOptions: data.optionSelectOptions || [],
+      optionOrderFragmentCode: data.optionOrderFragmentCode || [],
+      optionOrderLineCode: data.optionOrderLineCode || [],
+      optionsFindErrorCode: data.optionsFindErrorCode || [],
+      answerSelectCorrect: data.answerSelectCorrect || '',
+      answerSelectsCorrect: data.answerSelectsCorrect || [],
+      answerOrderFragmentCode: data.answerOrderFragmentCode || [],
+      answerOrderLineCode: data.answerOrderLineCode || [],
+      answerFindError: data.answerFindError || '',
+      code: data.code || this.exerciseForm.get('code')?.value || ''
+    });
   }
 
   createExercise() {
@@ -376,5 +433,28 @@ export class ExercisesListComponent implements OnInit {
     }
     this.currentExerciseId = null;
     this.exerciseForm.reset();
+  }
+  
+  /**
+   * Navega de vuelta a la página de actividades preservando el estado
+   */
+  navigateBackToActivities() {
+    const queryParams: any = {};
+    
+    if (this.returnCourseId) {
+      queryParams.courseId = this.returnCourseId;
+    }
+    
+    if (this.returnChapterId) {
+      queryParams.chapterId = this.returnChapterId;
+    }
+    
+    if (this.returnTemaId) {
+      queryParams.temaId = this.returnTemaId;
+    }
+    
+    this.router.navigate(['/admin/activities'], {
+      queryParams
+    });
   }
 }

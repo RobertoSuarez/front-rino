@@ -1,6 +1,13 @@
 <p-toast></p-toast>
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Ejercicios de la Actividad: {{activityTitle}}</div>
+    <div class="flex justify-between items-center mb-4">
+        <div class="font-semibold text-xl">Ejercicios de la Actividad: {{activityTitle}}</div>
+        <p-button 
+            icon="pi pi-arrow-left" 
+            label="Volver a Actividades" 
+            class="p-button-outlined"
+            (click)="navigateBackToActivities()"></p-button>
+    </div>
 
     <p-table
         #dt
@@ -142,74 +149,45 @@
             </small>
         </div>
 
-        <!-- Campos específicos según el tipo de ejercicio -->
-        <div *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_single' || exerciseForm.get('typeExercise')?.value === 'selection_multiple'">
-            <div class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Opciones de Selección (separadas por coma)</label>
-                <textarea formControlName="optionSelectOptions" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Opción 1, Opción 2, Opción 3"></textarea>
-            </div>
+        <!-- Componentes dinámicos según el tipo de ejercicio -->
+        <div class="field space-y-2">
+            <label class="block text-sm font-medium text-gray-700 mb-3">Configuración del Ejercicio</label>
+            
+            <app-selection-single 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_single'"
+                [initialData]="exerciseTypeData"
+                (dataChange)="onExerciseDataChange($event)">
+            </app-selection-single>
 
-            <div *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_single'" class="field space-y-2">
-                <label for="answerSelectCorrect" class="block text-sm font-medium text-gray-700">Respuesta Correcta</label>
-                <input id="answerSelectCorrect" formControlName="answerSelectCorrect"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
-            </div>
+            <app-selection-multiple 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_multiple'"
+                [initialData]="exerciseTypeData"
+                (dataChange)="onExerciseDataChange($event)">
+            </app-selection-multiple>
 
-            <div *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_multiple'" class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Respuestas Correctas (separadas por coma)</label>
-                <textarea formControlName="answerSelectsCorrect" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Respuesta 1, Respuesta 2"></textarea>
-            </div>
-        </div>
+            <app-order-fragment-code 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'order_fragment_code'"
+                [initialData]="exerciseTypeData"
+                (dataChange)="onExerciseDataChange($event)">
+            </app-order-fragment-code>
 
-        <div *ngIf="exerciseForm.get('typeExercise')?.value === 'order_fragment_code'">
-            <div class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Fragmentos de Código para Ordenar (separados por coma)</label>
-                <textarea formControlName="optionOrderFragmentCode" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Fragmento 1, Fragmento 2, Fragmento 3"></textarea>
-            </div>
+            <app-order-line-code 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'order_line_code'"
+                [initialData]="exerciseTypeData"
+                (dataChange)="onExerciseDataChange($event)">
+            </app-order-line-code>
 
-            <div class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Orden Correcto de Fragmentos (separados por coma)</label>
-                <textarea formControlName="answerOrderFragmentCode" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Fragmento 1, Fragmento 2, Fragmento 3"></textarea>
-            </div>
-        </div>
+            <app-write-code 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'write_code'"
+                [initialData]="exerciseTypeData"
+                (dataChange)="onExerciseDataChange($event)">
+            </app-write-code>
 
-        <div *ngIf="exerciseForm.get('typeExercise')?.value === 'order_line_code'">
-            <div class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Líneas de Código para Ordenar (separadas por coma)</label>
-                <textarea formControlName="optionOrderLineCode" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Línea 1, Línea 2, Línea 3"></textarea>
-            </div>
-
-            <div class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Orden Correcto de Líneas (separadas por coma)</label>
-                <textarea formControlName="answerOrderLineCode" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Línea 1, Línea 2, Línea 3"></textarea>
-            </div>
-        </div>
-
-        <div *ngIf="exerciseForm.get('typeExercise')?.value === 'find_error_code'">
-            <div class="field space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Opciones de Errores (separadas por coma)</label>
-                <textarea formControlName="optionsFindErrorCode" rows="3"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Error 1, Error 2, Error 3"></textarea>
-            </div>
-
-            <div class="field space-y-2">
-                <label for="answerFindError" class="block text-sm font-medium text-gray-700">Error Correcto</label>
-                <input id="answerFindError" formControlName="answerFindError"
-                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
-            </div>
+            <app-find-error-code 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'find_error_code'"
+                [initialData]="exerciseTypeData"
+                (dataChange)="onExerciseDataChange($event)">
+            </app-find-error-code>
         </div>
         
         <div class="flex justify-end gap-3 mt-6">

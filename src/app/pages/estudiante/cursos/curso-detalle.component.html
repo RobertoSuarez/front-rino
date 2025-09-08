@@ -1,0 +1,230 @@
+<p-toast></p-toast>
+
+<div class="curso-detalle-container" *ngIf="!loading && curso">
+  <!-- Cabecera del curso -->
+  <div class="curso-header">
+    <div class="container mx-auto p-4">
+      <div class="flex flex-column md:flex-row justify-content-between align-items-start mb-4">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">{{ curso.title }}</h1>
+          <p class="text-gray-600 mb-3">{{ curso.description }}</p>
+          <div class="flex align-items-center gap-3">
+            <span class="flex align-items-center">
+              <i class="pi pi-user mr-2"></i>
+              {{ curso.instructor }}
+            </span>
+            <span class="flex align-items-center">
+              <i class="pi pi-clock mr-2"></i>
+              {{ curso.duracion }}
+            </span>
+            <span class="flex align-items-center">
+              <i class="pi pi-book mr-2"></i>
+              {{ curso.capitulos?.length || 0 }} capítulos
+            </span>
+          </div>
+        </div>
+        <div class="mt-3 md:mt-0 text-right">
+          <div class="flex flex-column align-items-end">
+            <span class="text-lg font-bold mb-1">Progreso total</span>
+            <div class="flex align-items-center gap-2 mb-2">
+              <p-progressBar [value]="curso.progreso" styleClass="w-10rem"></p-progressBar>
+              <span class="font-bold">{{ curso.progreso }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal - Interfaz de tres paneles -->
+  <div class="curso-content-container">
+    <div class="container mx-auto">
+      <div class="grid">
+        <!-- Panel izquierdo - Estructura del curso -->
+        <div class="col-12 md:col-3 lg:col-2 panel-izquierdo">
+          <p-card styleClass="h-full shadow-1">
+            <ng-template pTemplate="header">
+              <div class="bg-primary p-3">
+                <h3 class="text-white font-medium m-0">Contenido del curso</h3>
+              </div>
+            </ng-template>
+            <div class="p-0">
+              <p-tree [value]="estructuraCurso" selectionMode="single" 
+                     styleClass="curso-estructura-tree"
+                     (onNodeSelect)="seleccionarNodo($event.node)">
+                <ng-template pTemplate="default" let-node>
+                  <div class="flex align-items-center gap-2 w-full py-1">
+                    <span [class]="node.icon"></span>
+                    <span class="flex-grow-1">{{ node.label }}</span>
+                    <span *ngIf="node.data.progreso > 0 && node.data.progreso < 100" 
+                          class="progress-indicator warning">{{ node.data.progreso }}%</span>
+                    <span *ngIf="node.data.progreso === 100" 
+                          class="progress-indicator success">
+                      <i class="pi pi-check"></i>
+                    </span>
+                  </div>
+                </ng-template>
+              </p-tree>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Panel central - Contenido del tema/actividad -->
+        <div class="col-12 md:col-6 lg:col-7 panel-central">
+          <p-card styleClass="h-full shadow-1">
+            <ng-template pTemplate="header">
+              <div class="bg-blue-50 p-3">
+                <h3 class="text-blue-800 font-medium m-0" *ngIf="contenidoActual">
+                  {{ contenidoActual.title }}
+                </h3>
+                <p-skeleton *ngIf="!contenidoActual" width="60%" height="24px"></p-skeleton>
+              </div>
+            </ng-template>
+
+            <!-- Spinner de carga -->
+            <div *ngIf="loadingContenido" class="flex justify-content-center align-items-center py-5">
+              <div class="spinner-container">
+  <div class="spinner"></div>
+</div>
+            </div>
+
+            <!-- Contenido del tema -->
+            <div *ngIf="!loadingContenido && tipoContenido === 'tema' && contenidoActual" class="p-4 contenido-tema">
+              <div [innerHTML]="contenidoActual.theory" class="teoria-contenido"></div>
+              
+              <div class="flex justify-content-between mt-5">
+                <button pButton label="Anterior" icon="pi pi-arrow-left" 
+                        class="p-button-outlined" (click)="navegarAnterior()"></button>
+                <button pButton label="Marcar como completado" icon="pi pi-check" 
+                        class="p-button-success" (click)="marcarComoCompletado()"
+                        [disabled]="contenidoActual.completado"></button>
+                <button pButton label="Siguiente" icon="pi pi-arrow-right" iconPos="right" 
+                        class="p-button-primary" (click)="navegarSiguiente()"></button>
+              </div>
+            </div>
+
+            <!-- Contenido de la actividad -->
+            <div *ngIf="!loadingContenido && tipoContenido === 'actividad' && contenidoActual" class="p-4 contenido-actividad">
+              <div class="mb-4">
+                <h4 class="text-xl font-medium mb-3">Instrucciones</h4>
+                <div [innerHTML]="contenidoActual.instructions" class="instrucciones-contenido"></div>
+              </div>
+
+              <p-divider></p-divider>
+
+              <!-- Ejercicios de la actividad -->
+              <div *ngIf="contenidoActual.exercises && contenidoActual.exercises.length > 0" class="mt-4">
+                <div class="ejercicios-accordion">
+                  <div *ngFor="let ejercicio of contenidoActual.exercises; let i = index" class="ejercicio-item">
+                    <div class="ejercicio-header" (click)="toggleEjercicio(i)">
+                      <h4>Ejercicio {{ i + 1 }}</h4>
+                      <i class="pi" [ngClass]="{'pi-chevron-down': !isEjercicioOpen(i), 'pi-chevron-up': isEjercicioOpen(i)}"></i>
+                    </div>
+                    <div class="ejercicio-content" [ngClass]="{'ejercicio-open': isEjercicioOpen(i)}">
+                    <div [innerHTML]="ejercicio.question" class="mb-3"></div>
+                    
+                    <!-- Aquí iría el componente para responder según el tipo de ejercicio -->
+                    <div class="mt-3 ejercicio-respuesta">
+                      <!-- Placeholder para el componente de respuesta -->
+                      <div class="p-3 border-round bg-gray-100 text-center">
+                        Componente de respuesta para el ejercicio
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex justify-content-between mt-5">
+                  <button pButton label="Anterior" icon="pi pi-arrow-left" 
+                          class="p-button-outlined" (click)="navegarAnterior()"></button>
+                  <button pButton label="Enviar respuestas" icon="pi pi-send" 
+                          class="p-button-success" (click)="enviarRespuestasActividad({})"></button>
+                  <button pButton label="Siguiente" icon="pi pi-arrow-right" iconPos="right" 
+                          class="p-button-primary" (click)="navegarSiguiente()"></button>
+                </div>
+              </div>
+
+              <!-- Resultado de la actividad si ya fue completada -->
+              <div *ngIf="contenidoActual.completado" class="mt-4 p-4 border-round bg-green-50">
+                <h4 class="text-xl font-medium mb-2 text-green-800">Actividad completada</h4>
+                <div class="flex align-items-center gap-3">
+                  <span class="text-lg">Puntuación:</span>
+                  <span class="text-2xl font-bold">{{ contenidoActual.score }}/100</span>
+                </div>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Panel derecho - Progreso y recursos -->
+        <div class="col-12 md:col-3 lg:col-3 panel-derecho">
+          <p-card styleClass="h-full shadow-1">
+            <ng-template pTemplate="header">
+              <div class="bg-primary p-3">
+                <h3 class="text-white font-medium m-0">Tu progreso</h3>
+              </div>
+            </ng-template>
+
+            <!-- Progreso del curso -->
+            <div class="p-3">
+              <h4 class="text-lg font-medium mb-2">Progreso del curso</h4>
+              <div class="flex flex-column gap-2 mb-4">
+                <div class="flex justify-content-between align-items-center">
+                  <span>Total completado</span>
+                  <span class="font-bold">{{ curso.progreso }}%</span>
+                </div>
+                <p-progressBar [value]="curso.progreso" styleClass="h-1rem"></p-progressBar>
+              </div>
+
+              <!-- Estadísticas -->
+              <div class="mt-4">
+                <h4 class="text-lg font-medium mb-2">Estadísticas</h4>
+                <ul class="list-none p-0 m-0">
+                  <li class="flex justify-content-between align-items-center py-2 border-bottom-1 border-gray-200">
+                    <span>Capítulos completados</span>
+                    <span class="font-bold">{{ curso.capitulosCompletados || 0 }}/{{ curso.capitulos?.length || 0 }}</span>
+                  </li>
+                  <li class="flex justify-content-between align-items-center py-2 border-bottom-1 border-gray-200">
+                    <span>Temas completados</span>
+                    <span class="font-bold">{{ curso.temasCompletados || 0 }}/{{ curso.totalTemas || 0 }}</span>
+                  </li>
+                  <li class="flex justify-content-between align-items-center py-2 border-bottom-1 border-gray-200">
+                    <span>Actividades completadas</span>
+                    <span class="font-bold">{{ curso.actividadesCompletadas || 0 }}/{{ curso.totalActividades || 0 }}</span>
+                  </li>
+                  <li class="flex justify-content-between align-items-center py-2">
+                    <span>Puntuación promedio</span>
+                    <span class="font-bold">{{ curso.puntuacionPromedio || 0 }}/100</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Recursos adicionales -->
+              <div class="mt-4">
+                <h4 class="text-lg font-medium mb-2">Recursos adicionales</h4>
+                <ul class="list-none p-0 m-0">
+                  <li *ngFor="let recurso of curso.recursos" class="mb-2">
+                    <a [href]="recurso.url" target="_blank" class="flex align-items-center no-underline">
+                      <i class="pi pi-external-link mr-2 text-primary"></i>
+                      <span>{{ recurso.title }}</span>
+                    </a>
+                  </li>
+                  <li *ngIf="!curso.recursos || curso.recursos.length === 0" class="text-gray-500">
+                    No hay recursos adicionales disponibles
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Spinner de carga inicial -->
+<div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 80vh;">
+  <div class="spinner-container">
+  <div class="spinner"></div>
+</div>
+</div>

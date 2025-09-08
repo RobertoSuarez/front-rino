@@ -330,7 +330,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     const subscription = this.userService.getUserById(this.userId).subscribe({
       next: (response) => {
         if (response.statusCode === 200 && response.data) {
-          this.populateForm(response.data);
+          this.populateForm(response.data.data);
         }
         this.loading = false;
       },

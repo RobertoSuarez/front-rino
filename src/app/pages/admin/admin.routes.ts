@@ -45,5 +45,10 @@ export const adminRoutes: Routes = [
     path: 'exercises/:activityId',
     loadComponent: () => import('./exercises/exercises-list.component').then(m => m.ExercisesListComponent),
     title: 'Gestión de Ejercicios'
+  },
+  {
+    path: 'statistics',
+    loadComponent: () => import('./statistics/statistics-dashboard.component').then(m => m.StatisticsDashboardComponent),
+    title: 'Estadísticas de la Plataforma'
   }
 ];

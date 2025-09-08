@@ -1,0 +1,39 @@
+:host ::ng-deep {
+  .p-card {
+    height: 100%;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    border-radius: 4px;
+    
+    .p-card-header {
+      padding-bottom: 0;
+    }
+    
+    .p-card-body {
+      padding-top: 1rem;
+    }
+  }
+  
+  .p-tabview-panels {
+    padding: 1.5rem 0;
+  }
+  
+  .p-progressbar {
+    height: 0.5rem;
+  }
+  
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+    }
+  }
+  
+  .bg-primary {
+    background-color: #3B82F6;
+  }
+  
+  .text-primary {
+    color: #3B82F6;
+  }
+}

@@ -26,11 +26,8 @@ export class ExerciseService {
    * @param activity Filtro opcional por actividad
    * @returns Observable con los datos de los ejercicios
    */
-  getExercisesByTemaId(temaId: number, activity?: string): Observable<ExerciseListItem[]> {
-    let url = `${this.apiUrl}?temaId=${temaId}`;
-    if (activity) {
-      url += `&activity=${activity}`;
-    }
+  getExercisesByTemaId(activityId: number): Observable<ExerciseListItem[]> {
+    let url = `${this.apiUrl}?activityId=${activityId}`;
     return this.http.get<{data: ExerciseListItem[]}>(url)
       .pipe(
         map(response => response.data || [])

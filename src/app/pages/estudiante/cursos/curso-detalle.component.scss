@@ -1,0 +1,219 @@
+.curso-detalle-container {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 64px); /* Ajustar según la altura del header */
+}
+
+.curso-header {
+  background-color: var(--surface-0);
+  border-bottom: 1px solid var(--surface-200);
+  padding: 1rem 0;
+}
+
+.curso-content-container {
+  flex: 1;
+  padding: 1.5rem 0;
+  background-color: var(--surface-50);
+}
+
+/* Estilos para el spinner personalizado */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-left-color: var(--primary-color, #3B82F6);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para el acordeón personalizado */
+.ejercicios-accordion {
+  border: 1px solid var(--surface-200);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ejercicio-item {
+  margin-bottom: 1px;
+}
+
+.ejercicio-header {
+  background-color: var(--surface-100);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ejercicio-header:hover {
+  background-color: var(--surface-200);
+}
+
+.ejercicio-content {
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.ejercicio-content.ejercicio-open {
+  padding: 1rem;
+  max-height: 1000px; /* Valor alto para permitir cualquier contenido */
+}
+
+/* Estilos para los paneles */
+.panel-izquierdo, .panel-central, .panel-derecho {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Estilos para el árbol de estructura del curso */
+:host ::ng-deep {
+  .curso-estructura-tree {
+    border: none;
+    padding: 0;
+    
+    .p-treenode {
+      padding: 0.25rem 0;
+    }
+    
+    .p-treenode-content {
+      border: none;
+      padding: 0.5rem;
+      border-radius: 4px;
+      
+      &:hover {
+        background-color: var(--surface-100);
+      }
+      
+      &.p-highlight {
+        background-color: var(--primary-100);
+        color: var(--primary-700);
+        font-weight: 600;
+      }
+    }
+  }
+  
+  .p-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    .p-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    
+    .p-card-content {
+      flex: 1;
+      padding: 0;
+      overflow-y: auto;
+    }
+  }
+  
+  .p-progressbar {
+    height: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .p-accordion {
+    .p-accordion-header-link {
+      padding: 1rem;
+    }
+    
+    .p-accordion-content {
+      padding: 1.25rem;
+    }
+  }
+}
+
+/* Indicadores de progreso en el árbol */
+.progress-indicator {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  
+  &.warning {
+    background-color: var(--yellow-100);
+    color: var(--yellow-700);
+  }
+  
+  &.success {
+    background-color: var(--green-100);
+    color: var(--green-700);
+  }
+}
+
+/* Estilos para el contenido de teoría */
+.teoria-contenido {
+  line-height: 1.6;
+  
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin-bottom: 1rem;
+  }
+  
+  ul, ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  pre {
+    background-color: var(--surface-100);
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  
+  code {
+    background-color: var(--surface-100);
+    padding: 0.125rem 0.25rem;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+  
+  img {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+  }
+  
+  blockquote {
+    border-left: 4px solid var(--primary-300);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--text-color-secondary);
+  }
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+  .panel-izquierdo, .panel-central, .panel-derecho {
+    height: auto;
+    max-height: none;
+    margin-bottom: 1rem;
+  }
+}

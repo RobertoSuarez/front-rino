@@ -1,0 +1,128 @@
+<p-toast></p-toast>
+
+<div class="container mx-auto p-4">
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+    <div class="mb-4 md:mb-0">
+      <h1 class="text-3xl font-bold text-primary">Mis Cursos</h1>
+      <p class="text-gray-600 mt-1">Gestiona tu aprendizaje y progreso</p>
+    </div>
+    <div class="flex items-center bg-white shadow-sm rounded-lg p-2 border border-gray-200">
+      <i class="pi pi-filter text-gray-500 mr-2"></i>
+      <select [(ngModel)]="filtroSeleccionado" (change)="filtrarCursos({value: filtroSeleccionado})" 
+              class="border-none focus:outline-none bg-transparent text-gray-700 pr-8 w-64">
+        <option *ngFor="let option of filtroOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- Navegación entre vistas -->
+  <div class="bg-gray-50 rounded-lg p-3 mb-6 border border-gray-200">
+    <div class="flex flex-wrap gap-3">
+      <button pButton label="Mis Cursos" icon="pi pi-book" 
+              class="p-button-primary p-button-raised" 
+              [routerLink]="['/estudiante/cursos']"></button>
+      <button pButton label="Explorar Cursos" icon="pi pi-search" 
+              class="p-button-outlined p-button-secondary" 
+              [routerLink]="['/estudiante/cursos-disponibles']"></button>
+      <div class="ml-auto hidden md:flex items-center text-gray-500">
+        <i class="pi pi-info-circle mr-2"></i>
+        <span>Tienes {{ cursos.length }} cursos en tu lista</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+    <div class="spinner-container bg-white p-6 rounded-full shadow-md">
+      <div class="spinner"></div>
+    </div>
+    <p class="mt-4 text-gray-600 font-medium">Cargando tus cursos...</p>
+  </div>
+
+  <!-- Lista de cursos -->
+  <div *ngIf="!loading" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Mensaje si no hay cursos -->
+    <div *ngIf="cursos.length === 0" class="col-span-1 md:col-span-2 lg:col-span-3 text-center">
+      <div class="p-8 rounded-xl bg-gray-50 border border-gray-200 shadow-sm">
+        <div class="flex flex-col items-center">
+          <div class="bg-primary-100 p-4 rounded-full mb-4">
+            <i class="pi pi-book text-5xl text-primary"></i>
+          </div>
+          <h2 class="text-2xl font-medium mb-3">No tienes cursos disponibles</h2>
+          <p class="text-gray-600 mb-6 max-w-md">Explora nuestro catálogo y suscríbete a nuevos cursos para comenzar tu aprendizaje.</p>
+          <button pButton label="Explorar cursos" icon="pi pi-search" 
+                  class="p-button-primary p-button-raised" 
+                  [routerLink]="['/estudiante/cursos-disponibles']"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjetas de cursos -->
+    <div *ngFor="let curso of cursos" class="col-span-1">
+      <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
+        <!-- Imagen del curso -->
+        <div class="relative">
+          <img [src]="curso.urlLogo || 'assets/images/curso-default.jpg'" alt="Imagen del curso" 
+               class="w-full h-48 object-cover">
+          <div class="absolute top-0 right-0 m-3">
+            <p-tag [value]="getEstadoCurso(curso.progreso)" 
+                  [severity]="getColorEstado(curso.progreso)" 
+                  [rounded]="true"></p-tag>
+          </div>
+        </div>
+
+        <!-- Contenido del curso -->
+        <div class="p-5 flex-grow flex flex-col justify-between">
+          <!-- Título del curso -->
+          <h3 class="text-xl font-bold text-gray-800 mb-4 line-clamp-2">{{ curso.title }}</h3>
+          <!-- Barra de progreso -->
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Tu progreso</span>
+              <span class="text-sm font-bold bg-primary-100 text-primary px-2 py-1 rounded-full">{{ curso.progreso }}%</span>
+            </div>
+            <p-progressBar [value]="curso.progreso" [showValue]="false" 
+                          styleClass="h-2 rounded-full" 
+                          [style]="{'background': 'var(--surface-200)'}"></p-progressBar>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="flex justify-between items-center text-sm text-gray-500 mb-4 border-t border-gray-100 pt-4">
+            <div class="flex items-center">
+              <i class="pi pi-book mr-2 text-primary"></i>
+              <span>{{ curso.chapters || 0 }} capítulos</span>
+            </div>
+            <div class="flex items-center">
+              <i class="pi pi-clock mr-2 text-primary"></i>
+              <span>{{ curso.duracion || 'N/A' }}</span>
+            </div>
+          </div>
+          
+          <!-- Botón de acción -->
+          <button pButton label="Continuar aprendiendo" icon="pi pi-arrow-right" 
+                  class="p-button-primary p-button-raised w-full" 
+                  (click)="verDetalleCurso(curso.id)"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton para carga -->
+  <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    <div *ngFor="let i of [1,2,3]" class="col-span-1">
+      <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+        <p-skeleton height="12rem" styleClass="w-full"></p-skeleton>
+        <div class="p-4">
+          <p-skeleton height="2rem" styleClass="w-3/4 mb-4"></p-skeleton>
+          <p-skeleton height="0.75rem" styleClass="w-full mb-2"></p-skeleton>
+          <p-skeleton height="0.5rem" styleClass="w-full mb-4"></p-skeleton>
+          <div class="flex justify-between mb-4">
+            <p-skeleton height="1rem" width="30%"></p-skeleton>
+            <p-skeleton height="1rem" width="30%"></p-skeleton>
+          </div>
+          <p-skeleton height="2.5rem" styleClass="w-full"></p-skeleton>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

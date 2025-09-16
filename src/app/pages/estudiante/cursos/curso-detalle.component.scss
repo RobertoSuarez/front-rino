@@ -1,19 +1,38 @@
 .curso-detalle-container {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 64px); /* Ajustar según la altura del header */
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: calc(100vh - 64px);
 }
 
 .curso-header {
-  background-color: var(--surface-0);
-  border-bottom: 1px solid var(--surface-200);
-  padding: 1rem 0;
+  margin-bottom: 2rem;
+  
+  .course-header-content {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+  
+  .course-logo {
+    border: 4px solid white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .course-actions button {
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 }
 
-.curso-content-container {
-  flex: 1;
-  padding: 1.5rem 0;
-  background-color: var(--surface-50);
+.chapters-timeline {
+  .p-card {
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+  }
 }
 
 /* Estilos para el spinner personalizado */
@@ -209,11 +228,318 @@
   }
 }
 
-/* Estilos para dispositivos móviles */
+/* Estilos complementarios para TailwindCSS */
+
+/* Estilos para el spinner personalizado */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-left-color: #3B82F6;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos específicos para PrimeNG Timeline */
+:host ::ng-deep {
+  .customized-timeline {
+    .p-timeline-event-marker {
+      border: none !important;
+      border-radius: 50% !important;
+      width: 3rem !important;
+      height: 3rem !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .p-timeline-event-content {
+      padding: 0 !important;
+      margin: 1.5rem 0 !important;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* Responsive para timeline */
+    @media (max-width: 768px) {
+      .p-timeline-event:nth-child(even) .p-timeline-event-content,
+      .p-timeline-event:nth-child(odd) .p-timeline-event-content {
+        text-align: left !important;
+      }
+
+      .p-timeline-event-content {
+        max-width: 100% !important;
+        margin: 1rem 1rem !important;
+      }
+    }
+  }
+
+  /* Estilos para el knob */
+  .p-knob {
+    .p-knob-text {
+      font-weight: 600 !important;
+      font-size: 14px !important;
+    }
+  }
+
+  /* Estilos para tags */
+  .p-tag {
+    border-radius: 50px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+}
+
+/* Animación de entrada para las cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timeline-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Estilos responsive mejorados */
 @media (max-width: 768px) {
-  .panel-izquierdo, .panel-central, .panel-derecho {
-    height: auto;
-    max-height: none;
-    margin-bottom: 1rem;
+  .curso-detalle-container {
+    padding: 1rem;
+  }
+
+  .curso-header {
+    .course-header-content {
+      .flex {
+        flex-direction: column;
+        text-align: center;
+
+        .course-image-container {
+          align-self: center;
+          margin-bottom: 1rem;
+        }
+
+        .course-actions {
+          align-self: center;
+          margin-top: 1rem;
+        }
+      }
+    }
+  }
+
+  :host ::ng-deep {
+    .modern-timeline {
+      .p-timeline-event:nth-child(even) .p-timeline-event-content,
+      .p-timeline-event:nth-child(odd) .p-timeline-event-content {
+        text-align: left !important;
+      }
+    }
+
+    .timeline-content-wrapper {
+      max-width: 100% !important;
+      margin: 0 1rem !important;
+    }
+
+    .modern-card {
+      max-width: 100% !important;
+      margin: 0 !important;
+
+      &.timeline-card-left,
+      &.timeline-card-right {
+        margin: 0 !important;
+      }
+
+      // Header responsive
+      .card-header-modern {
+        padding: 1rem;
+
+        .card-title-section {
+          flex-direction: column;
+          text-align: center;
+          gap: 0.75rem;
+
+          .chapter-number {
+            align-self: center;
+            }
+          }
+        }
+
+        // Header responsive
+        .card-header-modern {
+          padding: 1rem;
+        .card-status-section {
+          align-self: center;
+          margin-top: 0.5rem;
+        }
+      }
+
+      // Contenido responsive
+      .card-content-modern {
+        padding: 1rem;
+
+        // Progreso responsive
+        .progress-section {
+          .progress-bar-container {
+            .progress-bar-background {
+              height: 6px;
+            }
+          }
+        }
+
+        // Knob responsive
+        .knob-section {
+          .knob-wrapper {
+            .modern-knob {
+              // Reducir el tamaño del knob en móvil
+              transform: scale(0.8);
+            }
+          }
+        }
+
+        // Botones responsive
+        .actions-section {
+          .action-buttons-grid {
+            flex-direction: column;
+            gap: 0.75rem;
+
+            button {
+              width: 100%;
+              justify-content: center;
+              padding: 0.875rem 1.25rem !important;
+
+              &:hover {
+                transform: none !important; // Desactivar hover en móvil
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Marker responsive
+    .timeline-marker-wrapper {
+      .custom-marker {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+
+        .marker-icon {
+          font-size: 1rem;
+        }
+
+        &:hover {
+          transform: none; // Desactivar hover en móvil
+        }
+      }
+
+      .marker-glow {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .curso-header {
+    h1 {
+      font-size: 2rem !important;
+    }
+
+    .flex.flex-wrap {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 0.5rem !important;
+    }
+  }
+
+  :host ::ng-deep {
+    .modern-card {
+      .card-header-modern {
+        .card-title-section {
+          .chapter-title {
+            font-size: 1rem;
+          }
+        }
+
+        .card-status-section {
+          .status-tag {
+            font-size: 0.7rem !important;
+            padding: 0.4rem 0.8rem !important;
+          }
+        }
+      }
+
+      .card-content-modern {
+        .actions-section {
+          .action-buttons-grid {
+            button {
+              font-size: 0.9rem;
+              padding: 0.75rem 1rem !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Estilos para tablets */
+@media (max-width: 1024px) and (min-width: 769px) {
+  :host ::ng-deep {
+    .timeline-content-wrapper {
+      max-width: 450px;
+    }
+
+    .modern-card {
+      &.timeline-card-left {
+        margin-right: 2rem;
+      }
+
+      &.timeline-card-right {
+        margin-left: 2rem;
+      }
+    }
+  }
+}
+
+/* Estilos de impresión */
+@media print {
+  :host ::ng-deep {
+    .modern-timeline {
+      .p-timeline-event-connector {
+        background: #000 !important;
+      }
+    }
+
+    .modern-card {
+      box-shadow: none !important;
+      border: 1px solid #ccc !important;
+
+      &:hover {
+        transform: none !important;
+      }
+    }
   }
 }

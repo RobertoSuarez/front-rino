@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -6,11 +6,14 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService, UserIndicators } from '../../core/services/user.service';
+import { Subject, takeUntil, interval } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TooltipModule],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -39,6 +42,8 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
 
         <div class="layout-topbar-actions">
+            
+
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
@@ -59,20 +64,28 @@ import { AuthService } from '../../core/services/auth.service';
                 </div>
             </div>
 
+            <!-- Indicadores de usuario -->
+            <div class="user-indicators flex items-center gap-3 mr-4" *ngIf="userIndicators">
+                <div class="indicator-item flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 rounded-lg" pTooltip="Puntos de experiencia acumulados" tooltipPosition="bottom">
+                    <i class="pi pi-star text-blue-600"></i>
+                    <span class="text-sm font-medium text-blue-800 dark:text-blue-200">{{userIndicators.yachay}} Yachay</span>
+                </div>
+                <div class="indicator-item flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900 rounded-lg" pTooltip="Vidas disponibles" tooltipPosition="bottom">
+                    <i class="pi pi-heart text-red-600"></i>
+                    <span class="text-sm font-medium text-red-800 dark:text-red-200">{{userIndicators.tumis}} Tumis</span>
+                </div>
+                <div class="indicator-item flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900 rounded-lg" pTooltip="Moneda virtual disponible" tooltipPosition="bottom">
+                    <i class="pi pi-dollar text-yellow-600"></i>
+                    <span class="text-sm font-medium text-yellow-800 dark:text-yellow-200">{{userIndicators.mullu}} Mullu</span>
+                </div>
+            </div>
+
             <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
                 <i class="pi pi-ellipsis-v"></i>
             </button>
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
                     <div class="relative">
                         <button 
                             type="button" 
@@ -103,14 +116,45 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
     </div>`
 })
-export class AppTopbar {
+export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
+    userIndicators: UserIndicators | null = null;
+    private destroy$ = new Subject<void>();
 
     constructor(
         public layoutService: LayoutService,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private userService: UserService
     ) {}
+
+    ngOnInit() {
+        this.loadUserIndicators();
+        // Actualizar indicadores cada 30 segundos
+        interval(30000)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => this.loadUserIndicators());
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    loadUserIndicators() {
+        if (this.authService.isAuthenticated()) {
+            this.userService.getUserIndicators()
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: (response) => {
+                        this.userIndicators = response.data;
+                    },
+                    error: (error) => {
+                        console.error('Error loading user indicators:', error);
+                    }
+                });
+        }
+    }
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));

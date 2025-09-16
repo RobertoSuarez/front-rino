@@ -153,7 +153,7 @@ export class MenuService {
         label: 'Aprendizaje',
         items: [
           { label: 'Mis Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/estudiante/cursos'] },
-          { label: 'Explorar Cursos', icon: 'pi pi-fw pi-search', routerLink: ['/estudiante/cursos-disponibles'] },
+          { label: 'Explorar Cursos', icon: 'pi pi-fw pi-search', routerLink: ['/estudiante/explorar-cursos'] },
           { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/student/classes'] },
           { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/student/assessments'] }
         ]

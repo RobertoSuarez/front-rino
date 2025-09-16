@@ -13,6 +13,18 @@ export interface Chapter {
   updateAt?: string;
 }
 
+export interface ChapterWithProgress {
+
+  id: number;
+  title: string;
+  shortDescription: string;
+  progress: number;
+  started: boolean;
+  nextToStart: boolean;
+  index: number;
+}
+  
+
 /**
  * Interfaz para la respuesta de la API al obtener capítulos
  */

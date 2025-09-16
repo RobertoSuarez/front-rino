@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { ApiResponse } from '../models';
+import { Chapter, ChapterWithProgress } from '../models/chapter.interface';
+import { Course, CourseDetail, CourseSubscription } from '../models/course.model';
 
 export interface Curso {
   id: number;
@@ -33,39 +36,32 @@ export class CursosService {
   /**
    * Obtiene todos los cursos disponibles para inscripción
    */
-  getAllCursos(): Observable<Curso[]> {
-    return this.http.get<any>(`${this.apiUrl}/courses`).pipe(
-      map(response => {
-        // Procesar la respuesta con formato { statusCode, message, data }
-        if (response && response.data && Array.isArray(response.data)) {
-          return response.data;
-        } else if (Array.isArray(response)) {
-          return response;
-        } else if (response && typeof response === 'object') {
-          // Si es un objeto con una propiedad que contiene el array
-          const possibleArrayProps = Object.values(response).find(val => Array.isArray(val));
-          if (possibleArrayProps) {
-            return possibleArrayProps as Curso[];
-          }
-        }
-        console.warn('La respuesta de getAllCursos no es un array:', response);
-        return [];
-      }),
-      catchError(error => {
-        console.error('Error al obtener todos los cursos', error);
-        return of([]);
-      })
-    );
+  getAllCursos(): Observable<ApiResponse<Course[]>> {
+    return this.http.get<ApiResponse<Course[]>>(`${this.apiUrl}/courses`);
   }
 
   /**
    * Inscribe al usuario en un curso específico
    */
   inscribirseEnCurso(cursoId: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/courses/${cursoId}/subscribe`, {}).pipe(
+    return this.http.post<any>(`${this.apiUrl}/subscriptions`, {}, {
+      params: { courseId: cursoId.toString() }
+    }).pipe(
+      map(response => {
+        if (response && response.data) {
+          return { success: true, message: response.data };
+        }
+        return { success: true, message: 'Suscripción exitosa' };
+      }),
       catchError(error => {
         console.error(`Error al inscribirse en el curso ${cursoId}`, error);
-        return of(null);
+        
+        // Verificar si el error es porque ya está suscrito
+        if (error.error && error.error.message === 'Ya estás suscrito a este curso.') {
+          return of({ success: false, message: 'Ya estás suscrito a este curso.', alreadySubscribed: true });
+        }
+        
+        return of({ success: false, message: 'Error al inscribirse en el curso' });
       })
     );
   }
@@ -73,27 +69,8 @@ export class CursosService {
   /**
    * Obtiene todos los cursos suscritos por el estudiante con su progreso
    */
-  getMisCursos(): Observable<any[]> {
-    return this.http.get<any>(`${this.apiUrl}/courses/subscriptions`).pipe(
-      map(response => {
-        // Asegurar que la respuesta sea un array
-        if (Array.isArray(response)) {
-          return response;
-        } else if (response && typeof response === 'object') {
-          // Si es un objeto con una propiedad que contiene el array
-          const possibleArrayProps = Object.values(response).find(val => Array.isArray(val));
-          if (possibleArrayProps) {
-            return possibleArrayProps as any[];
-          }
-        }
-        console.warn('La respuesta de getMisCursos no es un array:', response);
-        return [];
-      }),
-      catchError(error => {
-        console.error('Error al obtener cursos', error);
-        return of([]);
-      })
-    );
+  getCourseSubscription(): Observable<ApiResponse<CourseSubscription[]>> {
+    return this.http.get<ApiResponse<CourseSubscription[]>>(`${this.apiUrl}/courses/subscriptions`);
   }
 
   /**
@@ -148,12 +125,54 @@ export class CursosService {
     );
   }
 
+  getCourseById(cursoId: number): Observable<ApiResponse<CourseDetail>> {
+    return this.http.get<ApiResponse<CourseDetail>>(`${this.apiUrl}/courses/${cursoId}`)
+  }
+
+  getChapters(cursoId: number): Observable<Chapter[]> {
+    return this.http.get<ApiResponse<Chapter[]>>(`${this.apiUrl}/chapters?courseId=${cursoId}`).pipe(
+      map(response => {
+        const chapters = response.data || [];
+        return chapters;
+      }),
+      catchError(error => {
+        console.error(`Error al obtener capítulos del curso ${cursoId}`, error);
+        return of([]);
+      })
+    );
+  }
+
+  getChaptersWithProgress(cursoId: number): Observable<ChapterWithProgress[]> {
+    return this.http.get<ApiResponse<ChapterWithProgress[]>>(`${this.apiUrl}/courses/${cursoId}/chapters/progress`).pipe(
+      map(response => {
+        const chapters = response.data || [];
+        return chapters;
+      }),
+      catchError(error => {
+        console.error(`Error al obtener capítulos del curso ${cursoId}`, error);
+        return of([]);
+      })
+    );
+  }
+
+  inicializarCapitulo(chapterId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/chapters/${chapterId}/init`, {}).pipe(
+      catchError(error => {
+        console.error(`Error al inicializar capítulo ${chapterId}`, error);
+        throw error;
+      })
+    );
+  }
+
   /**
    * Obtiene el detalle de un curso con sus capítulos y progreso
    */
   getDetalleCurso(cursoId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/courses/${cursoId}/chapters/progress`).pipe(
       map(response => {
+        // Extraer los capítulos de la respuesta
+        const capitulos = response.data || [];
+        
         // Procesar la respuesta para agregar información adicional
         const curso = {
           id: cursoId,
@@ -161,15 +180,17 @@ export class CursosService {
           description: response.description || 'Sin descripción',
           instructor: response.instructor || 'Instructor no especificado',
           imageUrl: response.imageUrl || '',
-          progreso: this.calcularProgresoTotal(response.chapters || []),
-          capitulos: response.chapters || [],
-          capitulosCompletados: this.contarCapitulosCompletados(response.chapters || []),
-          temasCompletados: this.contarTemasCompletados(response.chapters || []),
-          totalTemas: this.contarTotalTemas(response.chapters || []),
-          actividadesCompletadas: this.contarActividadesCompletadas(response.chapters || []),
-          totalActividades: this.contarTotalActividades(response.chapters || []),
-          puntuacionPromedio: this.calcularPuntuacionPromedio(response.chapters || []),
-          recursos: response.resources || []
+          progreso: this.calcularProgresoTotal(capitulos),
+          capitulos: capitulos,
+          capitulosCompletados: this.contarCapitulosCompletados(capitulos),
+          temasCompletados: this.contarTemasCompletados(capitulos),
+          totalTemas: this.contarTotalTemas(capitulos),
+          actividadesCompletadas: this.contarActividadesCompletadas(capitulos),
+          totalActividades: this.contarTotalActividades(capitulos),
+          puntuacionPromedio: this.calcularPuntuacionPromedio(capitulos),
+          recursos: response.resources || [],
+          // Añadir información sobre el siguiente capítulo a iniciar
+          siguienteCapitulo: capitulos.find((cap: any) => cap.nextToStart === true) || null
         };
         return curso;
       }),
@@ -247,16 +268,31 @@ export class CursosService {
   }
 
   /**
+   * Inicia un capítulo para el usuario actual
+   * @param chapterId ID del capítulo a iniciar
+   * @returns Observable con la respuesta del servidor
+   */
+  iniciarCapitulo(chapterId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/chapters/${chapterId}/init`, {}).pipe(
+      map(response => {
+        return { success: true };
+      }),
+      catchError(error => {
+        console.error(`Error al iniciar el capítulo ${chapterId}`, error);
+        return of({ success: false, error });
+      })
+    );
+  }
+
+  /**
    * Calcula el progreso total de un curso basado en sus capítulos
    */
   private calcularProgresoTotal(capitulos: any[]): number {
     if (!capitulos || capitulos.length === 0) return 0;
     
-    const totalElementos = this.contarTotalTemas(capitulos) + this.contarTotalActividades(capitulos);
-    if (totalElementos === 0) return 0;
-    
-    const elementosCompletados = this.contarTemasCompletados(capitulos) + this.contarActividadesCompletadas(capitulos);
-    return Math.round((elementosCompletados / totalElementos) * 100);
+    // Si los capítulos ya tienen un valor de progreso, calculamos el promedio
+    const totalProgreso = capitulos.reduce((sum, cap) => sum + (cap.progress || 0), 0);
+    return Math.round(totalProgreso / capitulos.length);
   }
 
   /**
@@ -264,78 +300,79 @@ export class CursosService {
    */
   private contarCapitulosCompletados(capitulos: any[]): number {
     if (!capitulos) return 0;
-    return capitulos.filter(cap => cap.completed).length;
+    return capitulos.filter(cap => cap.progress === 100).length;
   }
 
   /**
    * Cuenta el total de temas en todos los capítulos
+   * Nota: Con la nueva estructura de datos, este método podría necesitar ajustes
+   * cuando tengamos acceso a los temas dentro de los capítulos
    */
   private contarTotalTemas(capitulos: any[]): number {
+    // Con la nueva estructura, podríamos no tener acceso directo a los temas
+    // Por ahora, estimamos 3 temas por capítulo como valor predeterminado
     if (!capitulos) return 0;
-    return capitulos.reduce((total, cap) => total + (cap.temas?.length || 0), 0);
+    return capitulos.length * 3; // Estimación temporal
   }
 
   /**
-   * Cuenta los temas completados en todos los capítulos
+   * Cuenta los temas completados
+   * Nota: Con la nueva estructura de datos, este método podría necesitar ajustes
    */
   private contarTemasCompletados(capitulos: any[]): number {
+    // Estimamos basado en el progreso de los capítulos
     if (!capitulos) return 0;
-    return capitulos.reduce((total, cap) => {
-      if (!cap.temas) return total;
-      return total + cap.temas.filter((tema: any) => tema.completed).length;
-    }, 0);
+    let temasCompletados = 0;
+    capitulos.forEach(cap => {
+      // Si el capítulo tiene progreso, estimamos temas completados proporcionalmente
+      if (cap.progress) {
+        temasCompletados += Math.round((cap.progress / 100) * 3); // Asumiendo 3 temas por capítulo
+      }
+    });
+    return temasCompletados;
   }
 
   /**
    * Cuenta el total de actividades en todos los capítulos
+   * Nota: Con la nueva estructura de datos, este método podría necesitar ajustes
    */
   private contarTotalActividades(capitulos: any[]): number {
+    // Estimamos 2 actividades por capítulo como valor predeterminado
     if (!capitulos) return 0;
-    return capitulos.reduce((total, cap) => {
-      if (!cap.temas) return total;
-      return total + cap.temas.reduce((subTotal: number, tema: any) => {
-        return subTotal + (tema.actividades?.length || 0);
-      }, 0);
-    }, 0);
+    return capitulos.length * 2; // Estimación temporal
   }
 
   /**
-   * Cuenta las actividades completadas en todos los capítulos
+   * Cuenta las actividades completadas
+   * Nota: Con la nueva estructura de datos, este método podría necesitar ajustes
    */
   private contarActividadesCompletadas(capitulos: any[]): number {
+    // Estimamos basado en el progreso de los capítulos
     if (!capitulos) return 0;
-    return capitulos.reduce((total, cap) => {
-      if (!cap.temas) return total;
-      return total + cap.temas.reduce((subTotal: number, tema: any) => {
-        if (!tema.actividades) return subTotal;
-        return subTotal + tema.actividades.filter((act: any) => act.completed).length;
-      }, 0);
-    }, 0);
+    let actividadesCompletadas = 0;
+    capitulos.forEach(cap => {
+      // Si el capítulo tiene progreso, estimamos actividades completadas proporcionalmente
+      if (cap.progress) {
+        actividadesCompletadas += Math.round((cap.progress / 100) * 2); // Asumiendo 2 actividades por capítulo
+      }
+    });
+    return actividadesCompletadas;
   }
 
   /**
    * Calcula la puntuación promedio de todas las actividades completadas
+   * Nota: Con la nueva estructura de datos, este método podría necesitar ajustes
    */
   private calcularPuntuacionPromedio(capitulos: any[]): number {
-    if (!capitulos) return 0;
+    // Con la nueva estructura, estimamos una puntuación basada en el progreso
+    if (!capitulos || capitulos.length === 0) return 0;
     
-    let totalPuntuacion = 0;
-    let actividadesConPuntuacion = 0;
+    // Calculamos un promedio basado en el progreso de los capítulos
+    // Asumimos que un capítulo con 100% de progreso tiene una puntuación de 100
+    const capitulosConProgreso = capitulos.filter(cap => cap.progress > 0);
+    if (capitulosConProgreso.length === 0) return 0;
     
-    capitulos.forEach(cap => {
-      if (!cap.temas) return;
-      cap.temas.forEach((tema: any) => {
-        if (!tema.actividades) return;
-        tema.actividades.forEach((act: any) => {
-          if (act.completed && act.score !== undefined) {
-            totalPuntuacion += act.score;
-            actividadesConPuntuacion++;
-          }
-        });
-      });
-    });
-    
-    if (actividadesConPuntuacion === 0) return 0;
-    return Math.round(totalPuntuacion / actividadesConPuntuacion);
+    const totalPuntuacion = capitulosConProgreso.reduce((sum, cap) => sum + cap.progress, 0);
+    return Math.round(totalPuntuacion / capitulosConProgreso.length);
   }
 }

@@ -31,6 +31,12 @@ export interface UsersListResponse {
   limit: number;
 }
 
+export interface UserIndicators {
+  yachay: number;
+  tumis: number;
+  mullu: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -65,6 +71,14 @@ export class UserService {
       currentPassword,
       newPassword
     });
+  }
+
+  /**
+   * Obtiene los indicadores del usuario (yachay, tumis, mullu)
+   * @returns Observable con los indicadores del usuario
+   */
+  getUserIndicators(): Observable<ApiResponse<UserIndicators>> {
+    return this.apiService.get<ApiResponse<UserIndicators>>('users/indicators');
   }
 
   // ========== GESTIÓN DE USUARIOS (ADMIN) ==========

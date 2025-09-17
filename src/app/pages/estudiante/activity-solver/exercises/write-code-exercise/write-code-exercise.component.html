@@ -1,0 +1,25 @@
+<div class="exercise-container">
+  <div class="instructions mb-4">
+    <p class="text-slate-600">Escribe el código para resolver el ejercicio.</p>
+  </div>
+  
+  <div class="code-editor-container">
+    <textarea 
+      class="code-editor"
+      [ngModel]="codeValue"
+      (ngModelChange)="onCodeChange($event)"
+      [disabled]="disabled"
+      rows="15"
+      placeholder="Escribe tu código aquí...">
+    </textarea>
+  </div>
+  
+  <div class="mt-4 flex justify-end">
+    <p-button 
+      label="Verificar respuesta" 
+      icon="pi pi-check" 
+      [disabled]="!codeValue.trim() || disabled"
+      (onClick)="onSubmit()">
+    </p-button>
+  </div>
+</div>

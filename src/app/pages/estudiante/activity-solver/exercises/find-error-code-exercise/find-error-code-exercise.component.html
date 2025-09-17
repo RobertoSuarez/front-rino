@@ -1,0 +1,31 @@
+<div class="exercise-container">
+  <div class="instructions mb-4">
+    <p class="text-slate-600">Selecciona la línea que contiene el error en el código.</p>
+  </div>
+  
+  <div class="options-container">
+    <div *ngFor="let option of options; let i = index" class="option-item">
+      <div class="p-field-radiobutton">
+        <p-radioButton 
+          [inputId]="'error_option_' + i"
+          [value]="option"
+          [(ngModel)]="selectedValue"
+          [disabled]="disabled"
+          (onClick)="onSelectionChange(option)">
+        </p-radioButton>
+        <label [for]="'error_option_' + i" class="option-label">
+          <code class="error-code">{{ option }}</code>
+        </label>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mt-4 flex justify-end">
+    <p-button 
+      label="Verificar respuesta" 
+      icon="pi pi-check" 
+      [disabled]="!selectedValue || disabled"
+      (onClick)="onSubmit()">
+    </p-button>
+  </div>
+</div>

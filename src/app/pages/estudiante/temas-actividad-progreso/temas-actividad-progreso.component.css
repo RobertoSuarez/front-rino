@@ -1,0 +1,115 @@
+:host {
+  display: block;
+}
+
+/* Spinner de carga */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para las cards de temas */
+.tema-card {
+  position: relative;
+}
+
+.tema-card::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tema-card:hover::before {
+  opacity: 1;
+}
+
+/* Mejoras para responsive */
+@media (max-width: 768px) {
+  .tema-card .flex-col {
+    align-items: stretch;
+  }
+  
+  .tema-card .flex-col .flex {
+    justify-content: center;
+  }
+}
+
+/* Animaciones suaves */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos para las actividades */
+.actividad-card {
+  transition: all 0.2s ease;
+}
+
+.actividad-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejoras para los botones */
+button[pButton] {
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+button[pButton]:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilos para los tags */
+.p-tag {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* Mejoras para el layout */
+.course-actions {
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .course-actions {
+    width: 100%;
+  }
+  
+  .course-actions button {
+    width: 100%;
+  }
+}
+
+/* Mejoras para la accesibilidad */
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.p-tag:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

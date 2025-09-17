@@ -182,6 +182,41 @@ export class TemasListComponent implements OnInit {
     });
   }
 
+  /**
+   * Convierte una fecha en formato string 'dd/MM/yyyy HH:mm:ss' a un objeto Date
+   * @param dateString Fecha en formato string
+   * @returns Fecha convertida a ISO string o la fecha original si no se pudo convertir
+   */
+  private convertStringToDate(dateString: string): string {
+    if (!dateString || typeof dateString !== 'string') {
+      return dateString;
+    }
+    
+    const parts = dateString.split(' ');
+    if (parts.length === 2) {
+      const dateParts = parts[0].split('/');
+      const timeParts = parts[1].split(':');
+      
+      if (dateParts.length === 3 && timeParts.length >= 2) {
+        try {
+          const day = parseInt(dateParts[0], 10);
+          const month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript van de 0 a 11
+          const year = parseInt(dateParts[2], 10);
+          const hour = parseInt(timeParts[0], 10);
+          const minute = parseInt(timeParts[1], 10);
+          const second = timeParts.length > 2 ? parseInt(timeParts[2], 10) : 0;
+          
+          return new Date(year, month, day, hour, minute, second).toISOString();
+        } catch (error) {
+          console.error('Error al convertir fecha:', error);
+          return dateString;
+        }
+      }
+    }
+    
+    return dateString;
+  }
+
   loadTemas() {
     if (!this.selectedChapterId) {
       this.temas = [];
@@ -191,7 +226,13 @@ export class TemasListComponent implements OnInit {
     this.loading = true;
     this.temaService.getTemasByChapterId(this.selectedChapterId).subscribe({
       next: (response) => {
-        this.temas = response.data;
+        // Convertir las fechas string a objetos Date
+        this.temas = response.data.map(tema => {
+          if (tema.createdAt) {
+            tema.createdAt = this.convertStringToDate(tema.createdAt);
+          }
+          return tema;
+        });
         this.loading = false;
       },
       error: (err) => {
@@ -226,6 +267,11 @@ export class TemasListComponent implements OnInit {
     this.temaService.getTemaById(tema.id).subscribe({
       next: (response) => {
         if (response && response.data) {
+          // Convertir fechas si es necesario
+          if (response.data.createdAt) {
+            response.data.createdAt = this.convertStringToDate(response.data.createdAt);
+          }
+          
           this.temaForm.patchValue({
             chapterId: response.data.chapterId || this.selectedChapterId,
             title: response.data.title,

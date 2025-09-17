@@ -148,7 +148,9 @@
                             class="bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 border-2 border-green-600 text-green-100 font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
                             pTooltip="Revisar contenido completado" tooltipPosition="top"></button>
 
-                          <button *ngIf="event.started && !event.completed" pButton type="button" label="Continuar"
+                          <button 
+                            *ngIf="event.started && !event.completed" pButton type="button" label="Continuar"
+                            (click)="irATemas(event.chapterId)"
                             icon="pi pi-play"
                             class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1"
                             pTooltip="Continuar desde donde lo dejaste" tooltipPosition="top"></button>

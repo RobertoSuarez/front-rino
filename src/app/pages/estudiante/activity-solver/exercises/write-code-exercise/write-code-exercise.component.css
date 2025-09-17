@@ -1,0 +1,44 @@
+.exercise-container {
+  margin-bottom: 1.5rem;
+}
+
+.code-editor-container {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.code-editor {
+  width: 100%;
+  padding: 1rem;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #334155;
+  background-color: #1e293b;
+  color: #f8fafc;
+  border: none;
+  border-radius: 0.5rem;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.code-editor:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.code-editor::placeholder {
+  color: #94a3b8;
+}
+
+/* Estilos para el botón */
+:host ::ng-deep .p-button {
+  transition: all 0.3s ease;
+}
+
+:host ::ng-deep .p-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

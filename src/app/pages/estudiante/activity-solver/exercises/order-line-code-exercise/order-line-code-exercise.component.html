@@ -1,0 +1,37 @@
+<div class="exercise-container">
+  <div class="instructions mb-4">
+    <p class="text-slate-600">Arrastra las líneas de código para ordenarlas correctamente.</p>
+  </div>
+  
+  <div class="lines-container" cdkDropList (cdkDropListDropped)="onDrop($event)">
+    <div *ngFor="let line of linesToOrder; let i = index" 
+         class="line-item" 
+         cdkDrag
+         [cdkDragDisabled]="disabled">
+      <div class="line-content">
+        <div class="line-number">{{ i + 1 }}</div>
+        <code class="line-code">{{ line }}</code>
+      </div>
+      <div class="line-handle" cdkDragHandle>
+        <i class="pi pi-bars"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mt-4 flex justify-between">
+    <p-button 
+      label="Reiniciar orden" 
+      icon="pi pi-refresh" 
+      styleClass="p-button-secondary p-button-outlined"
+      [disabled]="disabled"
+      (onClick)="resetOrder()">
+    </p-button>
+    
+    <p-button 
+      label="Verificar respuesta" 
+      icon="pi pi-check" 
+      [disabled]="!linesToOrder.length || disabled"
+      (onClick)="onSubmit()">
+    </p-button>
+  </div>
+</div>

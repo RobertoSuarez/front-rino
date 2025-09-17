@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiTemaResponse, CreateTemaRequest, GetTemaByIdResponse, UpdateTemaRequest } from '../models/tema.interface';
+import { ApiTemaResponse, CreateTemaRequest, GetTemaByIdResponse, TemaConProgreso, UpdateTemaRequest } from '../models/tema.interface';
+import { ApiResponse } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -75,5 +76,10 @@ export class TemaService {
    */
   deleteTema(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+
+  getTemaConProgreso(chapterId: string): Observable<ApiResponse<TemaConProgreso[]>> {
+    return this.http.get<ApiResponse<TemaConProgreso[]>>(`${environment.apiUrl}/chapters/${chapterId}/temas/progress`);
   }
 }

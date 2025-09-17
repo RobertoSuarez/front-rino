@@ -1,0 +1,225 @@
+
+<p-toast></p-toast>
+
+<!-- Spinner de carga inicial -->
+<div *ngIf="loading()" class="flex justify-content-center align-items-center" style="height: 80vh;">
+  <div class="spinner-container">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- Contenido principal -->
+<div *ngIf="!loading()" class="p-6 min-h-[calc(100vh-64px)]">
+  
+  <!-- Cabecera del capítulo -->
+  <div class="mb-8">
+    <p-card class="shadow-3 bg-white rounded-xl">
+      <ng-template #header>
+        <div class="p-6">
+          <div class="flex flex-col md:flex-row items-start gap-6">
+            
+            <!-- Información del capítulo -->
+            <div class="flex-1">
+              
+
+              <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-3 leading-tight">
+                {{ capituloTitulo() }}
+              </h1>
+
+              <p class="text-lg md:text-xl text-slate-600 mb-4 leading-relaxed">
+                Fortaleciendo la Ciudadela
+              </p>
+
+              <div class="flex flex-wrap items-center gap-4 text-base">
+                <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg shadow-sm">
+                  <i class="pi pi-book text-blue-600"></i>
+                  <span class="font-semibold">Curso:</span>
+                  <span class="text-slate-600">{{ cursoTitulo() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón de acción -->
+            <div class="course-actions">
+              <button pButton type="button" label="Volver atrás" icon="pi pi-arrow-left"
+                class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                pTooltip="Volver a la página anterior" tooltipPosition="bottom" 
+                (click)="volverAtras()"></button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- Lista de temas -->
+  <div class="temas-container">
+    <p-card class="shadow-2 rounded-xl border-0 overflow-hidden">
+      <div class="p-6">
+        
+        <!-- Mensaje cuando no hay temas -->
+        <div *ngIf="temas().length === 0" class="text-center py-12">
+          <i class="pi pi-book text-6xl text-slate-300 mb-4"></i>
+          <h3 class="text-2xl font-bold text-slate-600 mb-2">No hay temas disponibles</h3>
+          <p class="text-slate-500">Este capítulo aún no tiene temas configurados.</p>
+        </div>
+
+        <!-- Lista de temas -->
+        <div *ngIf="temas().length > 0" class="space-y-6">
+          
+          <!-- Tema individual -->
+          <div *ngFor="let tema of temas(); let i = index" class="tema-card">
+            <p-card class="shadow-4 rounded-2xl border-0 overflow-hidden transition-all duration-300 hover:shadow-5xl hover:-translate-y-1">
+              
+              <!-- Header del tema -->
+              <ng-template #header>
+                <div class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 p-6">
+                  <div class="flex flex-col md:flex-row items-start justify-between gap-4">
+                    
+                    <!-- Información del tema -->
+                    <div class="flex items-center gap-4 flex-1">
+                      <!-- Círculo de progreso -->
+                      <div class="relative">
+                        <p-knob 
+                          [ngModel]="calcularProgreso(tema)" 
+                          [readonly]="true" 
+                          [size]="80" 
+                          [strokeWidth]="8"
+                          [valueColor]="obtenerEstadoTema(tema) === 'completed' ? '#10b981' : obtenerEstadoTema(tema) === 'in-progress' ? '#3b82f6' : obtenerEstadoTema(tema) === 'ready-to-start' ? '#f59e0b' : '#6b7280'"
+                          valueTemplate="{value}%"
+                          class="drop-shadow-lg">
+                        </p-knob>
+                        
+                        <!-- Ícono de estado en el centro -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <i *ngIf="obtenerEstadoTema(tema) === 'completed'" 
+                             class="pi pi-check text-green-600 text-2xl font-bold"></i>
+                          <i *ngIf="obtenerEstadoTema(tema) === 'locked'" 
+                             class="pi pi-lock text-slate-400 text-xl"></i>
+                        </div>
+                      </div>
+                      
+                      <!-- Información del tema -->
+                      <div class="flex-1">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">{{ tema.title }}</h3>
+                        <p class="text-slate-600 text-base mb-3 line-clamp-2">{{ tema.shortDescription }}</p>
+                        
+                        <!-- Estadísticas de actividades -->
+                        <div class="flex items-center gap-4 text-sm text-slate-500">
+                          <div class="flex items-center gap-1">
+                            <i class="pi pi-list"></i>
+                            <span>Actividad {{ tema.completedActivities }} de {{ tema.activitiesToComplete }}</span>
+                          </div>
+                          <div class="flex items-center gap-1">
+                            <i class="pi pi-chart-line"></i>
+                            <span>{{ calcularProgreso(tema) }}% completado</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Estado y acciones -->
+                    <div class="flex flex-col items-end gap-3">
+                      <!-- Tag de estado -->
+                      <p-tag 
+                        [value]="obtenerTextoEstado(obtenerEstadoTema(tema))"
+                        [severity]="obtenerSeveridadEstado(obtenerEstadoTema(tema))"
+                        class="status-tag rounded-full px-4 py-2 font-bold text-xs uppercase tracking-wider shadow-lg"
+                        styleClass="p-tag-rounded">
+                      </p-tag>
+                      
+                      <!-- Botón de acción -->
+                      <div class="flex gap-2">
+                        <!-- Botón Empezar -->
+                        <button *ngIf="obtenerEstadoTema(tema) === 'ready-to-start'" 
+                                pButton type="button" 
+                                label="EMPEZAR +50 YACHAY" 
+                                icon="pi pi-play"
+                                class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
+                                pTooltip="Iniciar este tema" tooltipPosition="top"
+                                (click)="iniciarTema(tema)">
+                        </button>
+                        
+                        <!-- Botón Continuar -->
+                        <button *ngIf="obtenerEstadoTema(tema) === 'in-progress'" 
+                                pButton type="button" 
+                                label="Continuar" 
+                                icon="pi pi-play"
+                                class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1"
+                                pTooltip="Continuar desde donde lo dejaste" tooltipPosition="top"
+                                (click)="continuarTema(tema)">
+                        </button>
+                        
+                        <!-- Botón Completado -->
+                        <button *ngIf="obtenerEstadoTema(tema) === 'completed'" 
+                                pButton type="button" 
+                                label="Revisar" 
+                                icon="pi pi-eye"
+                                class="bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
+                                pTooltip="Revisar contenido completado" tooltipPosition="top">
+                        </button>
+                        
+                        <!-- Botón Bloqueado -->
+                        <button *ngIf="obtenerEstadoTema(tema) === 'locked'" 
+                                pButton type="button" 
+                                label="Bloqueado" 
+                                icon="pi pi-lock"
+                                class="bg-slate-100 border-2 border-slate-300 text-slate-500 font-bold rounded-xl px-6 py-3 cursor-not-allowed"
+                                [disabled]="true" 
+                                pTooltip="Complete los temas anteriores para desbloquear" 
+                                tooltipPosition="top">
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+              
+              <!-- Contenido del tema (actividades) -->
+              <div class="p-6" *ngIf="tema.activities && tema.activities.length > 0">
+                <h4 class="text-lg font-semibold text-slate-800 mb-4">Actividades del tema</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div *ngFor="let actividad of tema.activities" 
+                       class="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all cursor-pointer"
+                       (click)="iniciarActividad(actividad)">
+                    
+                    <div class="flex items-center justify-between mb-2">
+                      <h5 class="font-semibold text-slate-800 truncate">{{ actividad.title }}</h5>
+                      <div class="flex items-center gap-1">
+                        <i *ngIf="actividad.completed" class="pi pi-check-circle text-green-500"></i>
+                        <i *ngIf="actividad.started && !actividad.completed" class="pi pi-play-circle text-blue-500"></i>
+                        <i *ngIf="!actividad.started" class="pi pi-circle text-slate-400"></i>
+                      </div>
+                    </div>
+                    
+                    <!-- Barra de progreso de la actividad -->
+                    <p-progressBar 
+                      [value]="actividad.progress" 
+                      [style]="{'height': '6px'}"
+                      [styleClass]="'rounded-full'">
+                    </p-progressBar>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                      <div class="text-xs text-slate-500">
+                        {{ actividad.progress }}% completado
+                      </div>
+                      <button pButton type="button" 
+                              icon="pi pi-play" 
+                              class="p-button-rounded p-button-sm p-button-text"
+                              pTooltip="Iniciar actividad" 
+                              tooltipPosition="top"
+                              (click)="$event.stopPropagation(); iniciarActividad(actividad)">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+            </p-card>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>

@@ -56,3 +56,24 @@ export interface UpdateTemaRequest {
   urlBackground?: string;
   difficulty?: string;
 }
+
+
+export interface ActividadConProgreso {
+  id: number;
+  title: string;
+  started: boolean;
+  progress: number;
+  completed: boolean;
+}
+
+export interface TemaConProgreso {
+  id: number;
+  title: string;
+  shortDescription: string;
+  urlBackground: string;
+  index: number;
+  completedActivities: number;
+  activitiesToComplete: number;
+  nextToStart: boolean,
+  activities: ActividadConProgreso[];
+}

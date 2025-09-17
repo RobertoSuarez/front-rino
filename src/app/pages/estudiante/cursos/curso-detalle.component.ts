@@ -2,7 +2,7 @@ import { Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } f
 import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
@@ -64,8 +64,8 @@ interface TimelineEvent {
     TimelineModule,
     KnobModule,
     TagModule,
-    TooltipModule
-  ],
+    TooltipModule,
+],
   providers: [MessageService],
   templateUrl: './curso-detalle.component.html',
   styleUrls: ['./curso-detalle.component.scss'],
@@ -83,6 +83,7 @@ export class CursoDetalleComponent implements OnInit {
   private cursosService = inject(CursosService);
   private messageService = inject(MessageService);
   private location = inject(Location);
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -228,5 +229,9 @@ export class CursoDetalleComponent implements OnInit {
         });
       }
     });
+  }
+
+  irATemas(chapterId: string) {
+    this.router.navigate(['/estudiante/cursos', this.cursoId, 'chapters', chapterId, 'temas']);
   }
 }

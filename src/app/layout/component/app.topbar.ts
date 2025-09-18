@@ -20,7 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
                 <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/">
-                <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         fill-rule="evenodd"
                         clip-rule="evenodd"
@@ -36,6 +36,18 @@ import { TooltipModule } from 'primeng/tooltip';
                             fill="var(--primary-color)"
                         />
                     </g>
+                </svg> -->
+                <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="45" width="60" height="45" rx="10" fill="var(--primary-color)" />
+
+                    <path d="M 30 40 A 15 15 0 0 1 70 45 L 70 40 A 20 20 0 0 0 30 45 Z" fill="#4d4c5d" />
+
+                    <rect x="20" y="45" width="60" height="45" rx="10" stroke="#4d4c5d" stroke-width="5" fill="none" />
+
+                    <path d="M 30 40 A 15 15 0 0 1 70 45 L 70 40 A 20 20 0 0 0 30 45 Z" stroke="#4d4c5d" stroke-width="5" fill="none" />
+                    
+                    <circle cx="50" cy="65" r="8" fill="#4d4c5d" />
+                    <rect x="47" y="70" width="6" height="12" fill="#4d4c5d" />
                 </svg>
                 <span>CYBERIMPERIUM</span>
             </a>
@@ -126,7 +138,7 @@ export class AppTopbar implements OnInit, OnDestroy {
         private authService: AuthService,
         private router: Router,
         private userService: UserService
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.loadUserIndicators();

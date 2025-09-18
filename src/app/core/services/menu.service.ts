@@ -177,6 +177,12 @@ export class MenuService {
           { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] },
           { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/profile/change-password'] }
         ]
+      },
+      {
+        label: 'Configuración',
+        items: [
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/'] }
+        ]
       }
     ];
   }
@@ -219,6 +225,12 @@ export class MenuService {
         items: [
           { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] },
           { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/profile/change-password'] }
+        ]
+      },
+      {
+        label: 'Configuración',
+        items: [
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/'] }
         ]
       }
     ];

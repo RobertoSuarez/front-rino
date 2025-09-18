@@ -223,7 +223,6 @@ export class CoursesComponent implements OnInit {
    * Genera una descripción para el curso utilizando IA
    */
   generateDescriptionWithAI() {
-    console.log('Generating description with AI', this.courseForm.value);
     const title = this.courseForm.get('title')?.value;
     
     if (!title) {

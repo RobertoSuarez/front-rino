@@ -167,7 +167,6 @@ export class TemasActividadProgresoComponent implements OnInit {
   }
   
   iniciarActividad(actividad: ActividadConProgreso): void {
-    console.log('Iniciar actividad:', actividad);
     // Navegar al componente ActivitySolver con el ID de la actividad
     this.router.navigate(['/estudiante/activity', actividad.id], {
       queryParams: {

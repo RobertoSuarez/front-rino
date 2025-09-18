@@ -390,23 +390,19 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (!this.userId) return;
 
     this.loading = true;
-    console.log('Cargando usuario con ID:', this.userId);
     
     // Primero, aseguramos que el formulario esté inicializado correctamente
     this.userForm = this.createForm();
     
     const subscription = this.userService.getUserById(this.userId).subscribe({
       next: (response) => {
-        console.log('Respuesta del servidor:', response);
         if (response && response.data) {
-          console.log('Datos del usuario recibidos:', response.data);
           
           // Forzar un pequeño retraso para asegurar que el formulario esté listo
           setTimeout(() => {
             this.populateForm(response.data.data);
             
             // Verificar que los datos se hayan establecido correctamente
-            console.log('Valores del formulario después de populateForm:', this.userForm.value);
             
             this.messageService.add({
               severity: 'success',
@@ -441,7 +437,6 @@ export class UserFormComponent implements OnInit, OnDestroy {
   }
 
   populateForm(user: User) {
-    console.log('Poblando formulario con datos:', user);
     
     // Remover validadores de contraseña en modo edición
     this.userForm.get('password')?.clearValidators();
@@ -474,7 +469,6 @@ export class UserFormComponent implements OnInit, OnDestroy {
         // Verificar si la fecha es válida
         if (!isNaN(date.getTime())) {
           formattedBirthday = date.toISOString().split('T')[0];
-          console.log('Fecha formateada correctamente:', formattedBirthday);
         } else {
           console.error('Fecha inválida:', user.birthday);
         }
@@ -494,13 +488,11 @@ export class UserFormComponent implements OnInit, OnDestroy {
       status: user.status || 'active'
     };
     
-    console.log('Valores a cargar en el formulario:', formValues);
     
     // Actualizar el formulario
     this.userForm.patchValue(formValues);
     
     // Verificar que los valores se hayan cargado correctamente
-    console.log('Valores actuales del formulario:', this.userForm.value);
   }
 
   onSubmit() {
@@ -576,7 +568,6 @@ export class UserFormComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.userForm.value;
-    console.log('Valores del formulario para actualizar:', formValue);
     
     // Formatear la fecha de nacimiento para el backend
     let formattedBirthday = '';
@@ -585,7 +576,6 @@ export class UserFormComponent implements OnInit, OnDestroy {
         const date = new Date(formValue.birthday);
         if (!isNaN(date.getTime())) {
           formattedBirthday = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-          console.log('Fecha formateada para enviar al backend:', formattedBirthday);
         } else {
           console.warn('Fecha inválida, no se enviará al backend');
         }
@@ -605,12 +595,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
       status: formValue.status
     };
     
-    console.log('Datos a enviar al backend:', userData);
-    console.log('ID del usuario a actualizar:', this.userId);
 
     const subscription = this.userService.updateUser(this.userId, userData).subscribe({
       next: (response) => {
-        console.log('Respuesta del servidor:', response);
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',

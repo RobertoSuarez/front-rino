@@ -42,7 +42,6 @@ export class AuthService {
       try {
         const user = JSON.parse(userData);
         this.currentUserSubject.next(user);
-        console.log('Usuario cargado desde localStorage:', user);
       } catch (error) {
         console.error('Error al parsear datos del usuario:', error);
         localStorage.removeItem(this.userKey);
@@ -66,7 +65,6 @@ export class AuthService {
       next: (response: any) => {
         if (response && response.data) {
           this.currentUserSubject.next(response.data);
-          console.log('Usuario cargado:', response.data);
         }
       },
       error: (error) => {
@@ -97,7 +95,6 @@ export class AuthService {
           localStorage.setItem(this.userKey, JSON.stringify(response.data.user));
           // Actualizar el usuario actual
           this.currentUserSubject.next(response.data.user);
-          console.log('Usuario y token guardados en localStorage');
         }
       })
     );
@@ -135,7 +132,6 @@ export class AuthService {
   updateUser(user: User): void {
     localStorage.setItem(this.userKey, JSON.stringify(user));
     this.currentUserSubject.next(user);
-    console.log('Datos del usuario actualizados en localStorage');
   }
 
   /**

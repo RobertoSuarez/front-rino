@@ -21,7 +21,8 @@ export const appRoutes: Routes = [
             { path: 'profile', component: ProfileComponent },
             { path: 'courses', loadComponent: () => import('./app/pages/courses/courses.component').then(m => m.CoursesComponent) },
             { path: 'admin', loadChildren: () => import('./app/pages/admin/admin.routes').then(m => m.adminRoutes) },
-            { path: 'estudiante', loadChildren: () => import('./app/pages/estudiante/estudiante.routes') }
+            { path: 'estudiante', loadChildren: () => import('./app/pages/estudiante/estudiante.routes') },
+            { path: 'student-chat', loadChildren: () => import('./app/pages/student-chat/student-chat.module').then(m => m.StudentChatModule) }
         ]
     },
     { path: 'landing', component: Landing },

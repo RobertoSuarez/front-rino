@@ -30,7 +30,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                     <i class="pi pi-shield text-white text-4xl"></i>
                                 </div>
                             </div>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-2">¡Bienvenido a CyberImperium!</div>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-2">¡Bienvenido a Cyber Imperium!</div>
                             <div class="text-surface-600 dark:text-surface-300 text-lg mb-4">Plataforma de formación en ciberseguridad</div>
                             <p-divider>
                                 <span class="px-2 text-sm text-surface-500">Inicia sesión para continuar</span>

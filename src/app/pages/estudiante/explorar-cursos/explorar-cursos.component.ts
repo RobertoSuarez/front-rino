@@ -66,7 +66,6 @@ export class ExplorarCursosComponent implements OnInit {
         this.cursos = Array.isArray(data) ? data : [];
         this.cursosFiltrados = [...this.cursos];
         this.aplicarOrden();
-        console.log('Todos los cursos cargados:', this.cursos);
         this.loading = false;
       },
       error: (error) => {

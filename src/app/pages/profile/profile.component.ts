@@ -144,13 +144,10 @@ export class ProfileComponent implements OnInit {
   }
   
   fetchProfileData(userId: number): void {
-    console.log('Fetching profile data for user ID:', userId);
     this.apiService.get(`users/${userId}/profile`).subscribe({
       next: (response: any) => {
-        console.log('Profile API response:', response);
         if (response && response.data) {
           this.profileData = response.data;
-          console.log('Profile data loaded:', this.profileData);
           this.initForm();
         } else {
           this.error = (response && response.message) ? response.message : 'Error al cargar el perfil';

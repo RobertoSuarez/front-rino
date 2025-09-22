@@ -160,14 +160,14 @@ export class MenuService {
       {
         label: 'Progreso',
         items: [
-          { label: 'Estadísticas', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/student/statistics'] },
+          { label: 'Leaderboard', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/estudiante/leaderboard'] },
           { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/student/achievements'] }
         ]
       },
       {
         label: 'Herramientas',
         items: [
-          { label: 'Chat IA', icon: 'pi pi-fw pi-comments', routerLink: ['/chatgpt'] },
+          { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] },
           { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/community'] }
         ]
       },

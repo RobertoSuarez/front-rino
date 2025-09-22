@@ -181,7 +181,8 @@ export class MenuService {
       {
         label: 'Configuración',
         items: [
-          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/'] }
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/settings'] },
+          { label: 'Test Settings', icon: 'pi pi-fw pi-wrench', routerLink: ['/test-settings'] }
         ]
       }
     ];
@@ -230,7 +231,7 @@ export class MenuService {
       {
         label: 'Configuración',
         items: [
-          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/'] }
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/settings'] }
         ]
       }
     ];

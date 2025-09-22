@@ -1,0 +1,82 @@
+<p-toast></p-toast>
+<div class="grid grid-cols-12 gap-8">
+    <div class="col-span-12">
+        <!-- Header -->
+        <div class="card mb-0 overflow-hidden">
+            <div class="flex align-items-center justify-between p-4">
+                <div class="flex align-items-center gap-4">
+                    <i class="pi pi-cog text-900 !text-3xl mr-3"></i>
+                    <div>
+                        <div class="text-900 m-0 font-bold">Configuración del Entorno</div>
+                        <div class="text-600 m-0">Personaliza la apariencia de la interfaz</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme Settings -->
+        <div class="card mt-4">
+            <div class="p-4">
+                <h4 class="text-900 mb-4 flex align-items-center gap-2">
+                    <i class="pi pi-palette"></i>
+                    Tema de Color
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @for (theme of themeOptions; track theme.value) {
+                    <div class="flex align-items-center gap-3 p-3 border-1 border-round cursor-pointer transition-all transition-duration-200"
+                         [class.bg-primary-50]="settingsForm.value.theme === theme.value"
+                         [class.border-primary]="settingsForm.value.theme === theme.value"
+                         (click)="onThemeChange(theme.value)">
+                        <p-radioButton [inputId]="theme.value" [value]="theme.value"
+                                     formControlName="theme"></p-radioButton>
+                        <i [class]="theme.icon + ' text-xl'"></i>
+                        <label [for]="theme.value" class="cursor-pointer font-medium">{{ theme.label }}</label>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Font Settings -->
+        <div class="card mt-4">
+            <div class="p-4">
+                <h4 class="text-900 mb-4 flex align-items-center gap-2">
+                    <i class="pi pi-font"></i>
+                    Configuración de Fuente
+                </h4>
+
+                <!-- Font Family -->
+                <div class="mb-4">
+                    <label class="block text-900 font-medium mb-2">Tipo de Fuente</label>
+                    <p-select [options]="fontOptions" optionLabel="label" optionValue="value"
+                             formControlName="fontFamily"
+                             (onChange)="onFontFamilyChange($event.value)"
+                             placeholder="Seleccionar fuente" class="w-full"></p-select>
+                </div>
+
+                <!-- Font Size -->
+                <div>
+                    <label class="block text-900 font-medium mb-2">Tamaño de Fuente</label>
+                    <div class="flex align-items-center gap-3">
+                        <p-button icon="pi pi-minus" severity="secondary" rounded
+                                 (click)="decreaseFontSize()"
+                                 [disabled]="currentFontSize <= 12"></p-button>
+                        <span class="text-lg font-mono px-3">{{ currentFontSize }}px</span>
+                        <p-button icon="pi pi-plus" severity="secondary" rounded
+                                 (click)="increaseFontSize()"
+                                 [disabled]="currentFontSize >= 24"></p-button>
+                    </div>
+                    <small class="text-600 mt-1 block">Rango: 12px - 24px</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card mt-4">
+            <div class="p-4 flex justify-content-end gap-3">
+                <p-button label="Restablecer Valores" icon="pi pi-refresh" severity="secondary"
+                         (click)="resetToDefaults()"></p-button>
+            </div>
+        </div>
+    </div>
+</div>

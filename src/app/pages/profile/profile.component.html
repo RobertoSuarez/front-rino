@@ -1,22 +1,22 @@
 <p-toast></p-toast>
-<div class="grid grid-cols-12 gap-8">
+<div class="grid grid-cols-12 gap-4 md:gap-8">
     <div class="col-span-12">
         <!-- Header con gradiente -->
         <div class="card mb-0 overflow-hidden">
-            <div class="flex align-items-center justify-between p-4">
-                <div class="flex align-items-center gap-4">
-                    <i class="pi pi-user text-900 !text-3xl mr-3"></i>
+            <div class="flex flex-col md:flex-row md:align-items-center md:justify-between p-3 md:p-4">
+                <div class="flex align-items-center gap-3 md:gap-4 mb-3 md:mb-0">
+                    <i class="pi pi-user text-900 !text-2xl md:!text-3xl mr-2 md:mr-3"></i>
                     <div>
-                        <div class="text-900 m-0 font-bold">Mi Perfil</div>
-                        <div class="text-600 m-0">Gestiona tu información personal</div  >
+                        <div class="text-900 m-0 font-bold text-lg md:text-xl">Mi Perfil</div>
+                        <div class="text-600 m-0 text-sm md:text-base">Gestiona tu información personal</div  >
                     </div>
                 </div>
                 @if (!editMode && profileData) {
-                <div class="flex gap-2">
+                <div class="flex flex-col sm:flex-row gap-2">
                     <button pButton label="Editar Perfil" icon="pi pi-user-edit"
-                        class="p-button-outlined p-button-rounded" (click)="toggleEditMode()"></button>
+                        class="p-button-outlined p-button-rounded w-full sm:w-auto" (click)="toggleEditMode()"></button>
                     <button pButton label="Cambiar Contraseña" icon="pi pi-lock"
-                        class="p-button-outlined p-button-rounded p-button-secondary" routerLink="/profile/change-password"></button>
+                        class="p-button-outlined p-button-rounded p-button-secondary w-full sm:w-auto" routerLink="/profile/change-password"></button>
                 </div>
                 }
             </div>
@@ -24,10 +24,10 @@
 
         <!-- Loading State -->
         <div *ngIf="loading" class="card">
-            <div class="flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="flex justify-content-center align-items-center min-h-[300px] md:min-h-[400px]">
                 <div class="text-center">
                     <p-progressSpinner strokeWidth="3" animationDuration="1s"></p-progressSpinner>
-                    <p class="text-600 mt-3">Cargando información del perfil...</p>
+                    <p class="text-600 mt-3 text-sm md:text-base">Cargando información del perfil...</p>
                 </div>
             </div>
         </div>
@@ -35,12 +35,12 @@
         <!-- Error State -->
         @if(error && !loading) {
         <div class="card">
-            <div class="flex align-items-center justify-content-center p-6 border-round-lg"
+            <div class="flex align-items-center justify-content-center p-4 md:p-6 border-round-lg"
                 style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 1px solid #f87171;">
                 <div class="text-center">
-                    <i class="pi pi-exclamation-triangle text-red-500 text-4xl mb-3"></i>
-                    <h4 class="text-red-800 m-0 mb-2">Error al cargar el perfil</h4>
-                    <p class="text-red-600 m-0">{{ error }}</p>
+                    <i class="pi pi-exclamation-triangle text-red-500 text-3xl md:text-4xl mb-3"></i>
+                    <h4 class="text-red-800 m-0 mb-2 text-lg md:text-xl">Error al cargar el perfil</h4>
+                    <p class="text-red-600 m-0 text-sm md:text-base">{{ error }}</p>
                 </div>
             </div>
         </div>
@@ -48,99 +48,108 @@
 
         <!-- Modo visualización -->
         @if (profileData && !loading && !editMode) {
-        <div class="grid grid-cols-12 col-span-12 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
             <!-- Tarjeta de perfil principal -->
-            <div class="col-span-6">
+            <div class="col-span-1 md:col-span-6">
                 <div class="card text-center h-full">
                     <div class="relative inline-block mb-4">
-                        <img [src]="profileData.urlAvatar" class="border-circle shadow-4"
-                            style="width: 180px; height: 180px; object-fit: cover; border: 4px solid var(--surface-border);"
+                        <img [src]="profileData.urlAvatar" class="border-circle shadow-4 w-[150px] h-[150px] md:w-[180px] md:h-[180px]"
+                            style="object-fit: cover; border: 4px solid var(--surface-border);"
                             alt="Avatar de usuario">
-                        <div class="absolute bg-green-500 border-circle shadow-2"
-                            style="width: 24px; height: 24px; bottom: 10px; right: 10px; border: 3px solid white;">
+                        <div class="absolute bg-green-500 border-circle shadow-2 w-5 h-5 md:w-6 md:h-6"
+                            style="bottom: 8px; right: 8px; md:bottom: 10px; md:right: 10px; border: 3px solid white;">
                         </div>
                     </div>
 
-                    <h2 class="text-900 font-bold text-2xl m-0 mb-2">{{ profileData.firstName }} {{ profileData.lastName
+                    <h2 class="text-900 font-bold text-xl md:text-2xl m-0 mb-2">{{ profileData.firstName }} {{ profileData.lastName
                         }}</h2>
-                    <p class="text-600 text-lg mb-4">{{ profileData.email }}</p>
+                    <p class="text-600 text-base md:text-lg mb-4">{{ profileData.email }}</p>
 
                     <div class="surface-100 border-round-lg p-3 mb-4">
                         <div class="flex align-items-center justify-content-center mb-2">
                             <i class="pi pi-calendar text-primary mr-2"></i>
-                            <span class="text-700 font-medium">Miembro desde</span>
+                            <span class="text-700 font-medium text-sm md:text-base">Miembro desde</span>
                         </div>
-                        <span class="text-900 font-bold">{{ formatDate(profileData.createdAt) }}</span>
+                        <span class="text-900 font-bold text-sm md:text-base">{{ formatDate(profileData.createdAt) }}</span>
                     </div>
 
                     <div *ngIf="profileData.birthday" class="surface-100 border-round-lg p-3 mb-4">
                         <div class="flex align-items-center justify-content-center mb-2">
                             <i class="pi pi-gift text-pink-500 mr-2"></i>
-                            <span class="text-700 font-medium">Cumpleaños</span>
+                            <span class="text-700 font-medium text-sm md:text-base">Cumpleaños</span>
                         </div>
-                        <span class="text-900 font-bold">{{ formatDate(profileData.birthday) }}</span>
+                        <span class="text-900 font-bold text-sm md:text-base">{{ formatDate(profileData.birthday) }}</span>
                     </div>
 
                     <div *ngIf="profileData.whatsApp" class="surface-100 border-round-lg p-3">
                         <div class="flex align-items-center justify-content-center mb-2">
                             <i class="pi pi-whatsapp text-green-500 mr-2"></i>
-                            <span class="text-700 font-medium">WhatsApp</span>
+                            <span class="text-700 font-medium text-sm md:text-base">WhatsApp</span>
                         </div>
-                        <span class="text-900 font-bold">{{ profileData.whatsApp }}</span>
+                        <span class="text-900 font-bold text-sm md:text-base">{{ profileData.whatsApp }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Estadísticas del Usuario -->
-            <div class="col-span-6">
+            <div class="col-span-1 md:col-span-6">
                 <div class="card h-full">
                     <div class="flex mb-4 gap-4 items-center w-full">
-                        <i class="pi pi-chart-bar text-primary text-2xl"></i>
-                        <h3 class="text-900 font-bold text-xl m-0">Estadísticas del Usuario</h3>
+                        <i class="pi pi-chart-bar text-primary text-xl md:text-2xl"></i>
+                        <h3 class="text-900 font-bold text-lg md:text-xl m-0">Indicadores del Usuario</h3>
                     </div>
 
-                    <div class="grid grid-cols-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 xl:gap-8" *ngIf="userIndicators">
+                        <!-- Yachay Card -->
                         <div class="col-span-1">
                             <div
-                                class="surface-card border-round-lg p-4 text-center shadow-1 hover:shadow-3 transition-all transition-duration-300">
-                                <div class="bg-blue-100 border-circle inline-flex items-center justify-center mb-3"
-                                    style="width: 50px; height: 50px;">
-                                    <i class="pi pi-users text-blue-600 text-xl"></i>
+                                class="surface-card min-h-[180px] md:min-h-[220px] p-3 md:p-5 text-center shadow-2 hover:shadow-4 transition-all transition-duration-300 cursor-pointer transform hover:scale-102 border-1 border-blue-200"
+                                style="border-radius: 25px;"
+                                pTooltip="Puntos de experiencia acumulados" tooltipPosition="bottom">
+                                <div class="bg-blue-100 border-circle inline-flex items-center justify-center mb-4 shadow-1"
+                                    style="width: 70px; height: 70px;">
+                                    <i class="pi pi-star text-blue-600 text-2xl md:text-3xl"></i>
                                 </div>
-                                <div class="text-900 font-bold text-2xl mb-1">{{ profileData.followers }}</div>
-                                <div class="text-600 font-medium text-sm mb-2">Seguidores</div>
-                                <div class="text-green-500 font-bold text-xs">
-                                    <i class="pi pi-arrow-up mr-1"></i>+12% este mes
+                                <div class="text-900 font-bold text-3xl md:text-4xl mb-2">{{ userIndicators.yachay }}</div>
+                                <div class="text-600 font-semibold text-lg md:text-xl mb-3">Yachay</div>
+                                <div class="bg-blue-50 border-round-lg py-1 px-2 md:py-2 md:px-3 inline-block">
+                                    <span class="text-blue-700 text-sm font-medium">+15% esta semana</span>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Tumis Card -->
                         <div class="col-span-1">
                             <div
-                                class="surface-card border-round-lg p-4 text-center shadow-1 hover:shadow-3 transition-all transition-duration-300">
-                                <div class="bg-orange-100 border-circle inline-flex items-center justify-center mb-3"
-                                    style="width: 50px; height: 50px;">
-                                    <i class="pi pi-star text-orange-600 text-xl"></i>
+                                class="surface-card min-h-[180px] md:min-h-[220px] p-3 md:p-5 text-center shadow-2 hover:shadow-4 transition-all transition-duration-300 cursor-pointer transform hover:scale-102 border-1 border-red-200"
+                                style="border-radius: 25px;"
+                                pTooltip="Vidas disponibles" tooltipPosition="bottom">
+                                <div class="bg-red-100 border-circle inline-flex items-center justify-center mb-4 shadow-1"
+                                    style="width: 70px; height: 70px;">
+                                    <i class="pi pi-heart text-red-600 text-2xl md:text-3xl"></i>
                                 </div>
-                                <div class="text-900 font-bold text-2xl mb-1">{{ profileData.score }}</div>
-                                <div class="text-600 font-medium text-sm mb-2">Puntuación</div>
-                                <div class="text-green-500 font-bold text-xs">
-                                    <i class="pi pi-arrow-up mr-1"></i>+5% esta semana
+                                <div class="text-900 font-bold text-3xl md:text-4xl mb-2">{{ userIndicators.tumis }}</div>
+                                <div class="text-600 font-semibold text-lg md:text-xl mb-3">Tumis</div>
+                                <div class="bg-red-50 border-round-lg py-1 px-2 md:py-2 md:px-3 inline-block">
+                                    <span class="text-red-700 text-sm font-medium">+8% esta semana</span>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Mullu Card -->
                         <div class="col-span-1">
                             <div
-                                class="surface-card border-round-lg p-4 text-center shadow-1 hover:shadow-3 transition-all transition-duration-300">
-                                <div class="bg-purple-100 border-circle inline-flex items-center justify-center mb-3"
-                                    style="width: 50px; height: 50px;">
-                                    <i class="pi pi-bitcoin text-purple-600 text-xl"></i>
+                                class="surface-card min-h-[180px] md:min-h-[220px] p-3 md:p-5 text-center shadow-2 hover:shadow-4 transition-all transition-duration-300 cursor-pointer transform hover:scale-102 border-1 border-yellow-200"
+                                style="border-radius: 25px;"
+                                pTooltip="Moneda virtual disponible" tooltipPosition="bottom">
+                                <div class="bg-yellow-100 border-circle inline-flex items-center justify-center mb-4 shadow-1"
+                                    style="width: 70px; height: 70px;">
+                                    <i class="pi pi-dollar text-yellow-600 text-2xl md:text-3xl"></i>
                                 </div>
-                                <div class="text-900 font-bold text-2xl mb-1">{{ profileData.gem }}</div>
-                                <div class="text-600 font-medium text-sm mb-2">Gemas</div>
-                                <div class="text-blue-500 font-bold text-xs">
-                                    <i class="pi pi-minus mr-1"></i>Sin cambios
+                                <div class="text-900 font-bold text-3xl md:text-4xl mb-2">{{ userIndicators.mullu }}</div>
+                                <div class="text-600 font-semibold text-lg md:text-xl mb-3">Mullu</div>
+                                <div class="bg-yellow-50 border-round-lg py-1 px-2 md:py-2 md:px-3 inline-block">
+                                    <span class="text-yellow-700 text-sm font-medium">Sin cambios</span>
                                 </div>
                             </div>
                         </div>
@@ -166,41 +175,41 @@
 
         <!-- Modo edición mejorado -->
         @if (profileData && !loading && editMode) {
-        <div class="grid grid-cols-12 col-span-12">
-            <div class="col-span-12">
-                <div class="w-full p-8 rounded-lg bg-white">
-                    <div class="flex w-full justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="pi pi-user-edit text-primary !text-2xl mr-3"></i>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+            <div class="col-span-1 md:col-span-12">
+                <div class="w-full p-4 md:p-8 rounded-lg bg-white">
+                    <div class="flex flex-col md:flex-row w-full md:justify-between mb-4 md:mb-0">
+                        <div class="flex items-center gap-2 mb-3 md:mb-0">
+                            <i class="pi pi-user-edit text-primary !text-xl md:!text-2xl mr-2 md:mr-3"></i>
                             <div class="flex flex-col">
-                                <div class="text-900 font-bold m-0">Editar Perfil</div>
-                                <p class="text-600 m-0">Actualiza tu información personal</p>
+                                <div class="text-900 font-bold text-lg md:text-xl m-0">Editar Perfil</div>
+                                <p class="text-600 m-0 text-sm md:text-base">Actualiza tu información personal</p>
                             </div>
                         </div>
-                        <button pButton type="button" icon="pi pi-times !text-2xl"
-                            class="p-button-rounded p-button-text p-button-plain" (click)="cancelEdit()"></button>
+                        <button pButton type="button" icon="pi pi-times !text-xl md:!text-2xl"
+                            class="p-button-rounded p-button-text p-button-plain self-end md:self-auto" (click)="cancelEdit()"></button>
                     </div>
 
                     <form [formGroup]="profileForm" (ngSubmit)="saveProfile($event)" class="p-fluid">
-                        <div class="grid grid-cols-12">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
                             <!-- Sección de Avatar -->
-                            <div class="col-span-12 md:col-span-6">
-                                <div class="surface-50 border-round-lg p-4 text-center h-full">
-                                    <h4 class="text-900 font-bold mb-4">Foto de Perfil</h4>
+                            <div class="col-span-1 md:col-span-6">
+                                <div class="surface-50 border-round-lg p-3 md:p-4 text-center h-full">
+                                    <h4 class="text-900 font-bold mb-4 text-lg md:text-xl">Foto de Perfil</h4>
 
                                     <div class="relative inline-block mb-4">
                                         <img [src]="profileForm.get('urlAvatar')?.value || 'https://via.placeholder.com/180x180/e2e8f0/64748b?text=Avatar'"
-                                            class="border-circle shadow-3"
-                                            style="width: 180px; height: 180px; object-fit: cover; border: 4px solid white;"
+                                            class="border-circle shadow-3 w-[150px] h-[150px] md:w-[180px] md:h-[180px]"
+                                            style="object-fit: cover; border: 4px solid white;"
                                             alt="Avatar de usuario">
-                                        <div class="absolute bg-primary border-circle shadow-2 flex align-items-center justify-content-center cursor-pointer hover:bg-primary-reverse transition-colors transition-duration-200"
-                                            style="width: 40px; height: 40px; bottom: 10px; right: 10px; border: 3px solid white;">
-                                            <i class="pi pi-camera text-white"></i>
+                                        <div class="absolute bg-primary border-circle shadow-2 flex align-items-center justify-content-center cursor-pointer hover:bg-primary-reverse transition-colors transition-duration-200 w-10 h-10 md:w-10 md:h-10"
+                                            style="bottom: 10px; right: 10px; border: 3px solid white;">
+                                            <i class="pi pi-camera text-white text-lg"></i>
                                         </div>
                                     </div>
 
                                     <div class="field">
-                                        <label for="urlAvatar" class="font-medium text-900">URL de Avatar</label>
+                                        <label for="urlAvatar" class="font-medium text-900 text-sm md:text-base">URL de Avatar</label>
                                         <input id="urlAvatar" type="text" pInputText formControlName="urlAvatar"
                                             class="mt-2 w-full" placeholder="https://ejemplo.com/mi-avatar.jpg">
                                         <small
@@ -213,31 +222,34 @@
                             </div>
 
                             <!-- Formulario de datos personales -->
-                            <div class="col-span-12 md:col-span-6">
-                                <div class="surface-50 border-round-lg p-4 h-full">
-                                    <h4 class="text-900 font-bold mb-4">Información Personal</h4>
+                            <div class="col-span-1 md:col-span-6">
+                                <div class="surface-50 border-round-lg p-3 md:p-4 h-full">
+                                    <h4 class="text-900 font-bold mb-4 text-lg md:text-xl">Información Personal</h4>
 
-                                    <div class="flex flex-col w-full">
+                                    <div class="flex flex-col w-full gap-3 md:gap-4">
                                         
-                                        <div class="w-full p-2 flex gap-4 items-center">
-                                            <label for="firstName" class="font-medium text-900">
+                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
+                                            <label for="firstName" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
                                                 <i class="pi pi-user mr-2 text-primary"></i>Nombre
                                             </label>
-                                            <input id="firstName" type="text" pInputText formControlName="firstName"
-                                                class="mt-2 flex-1" placeholder="Ingresa tu nombre">
-                                            <small
-                                                *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
-                                                class="p-error block mt-1">
-                                                <i class="pi pi-exclamation-circle mr-1"></i>Nombre es requerido
-                                            </small>
+                                            <div class="flex-1">
+                                                <input id="firstName" type="text" pInputText formControlName="firstName"
+                                                    class="w-full" placeholder="Ingresa tu nombre">
+                                                <small
+                                                    *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
+                                                    class="p-error block mt-1">
+                                                    <i class="pi pi-exclamation-circle mr-1"></i>Nombre es requerido
+                                                </small>
+                                            </div>
                                         </div>
-                                        <div class="w-full p-2 flex gap-4 items-center">
-                                            <label for="lastName" class="font-medium text-900">
+
+                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
+                                            <label for="lastName" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
                                                 <i class="pi pi-user mr-2 text-primary"></i>Apellido
                                             </label>
-                                            <div class="flex-1 flex flex-column">
+                                            <div class="flex-1">
                                                 <input id="lastName" type="text" pInputText formControlName="lastName"
-                                                    class="mt-2 w-full" placeholder="Ingresa tu apellido">
+                                                    class="w-full" placeholder="Ingresa tu apellido">
                                                 <small
                                                     *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
                                                     class="p-error block mt-1">
@@ -246,27 +258,27 @@
                                             </div>
                                         </div>
 
-                                        <div class="w-full p-2 flex gap-4 items-center">
-                                            <label for="birthday" class="font-medium text-900">
+                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
+                                            <label for="birthday" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
                                                 <i class="pi pi-calendar mr-2 text-pink-500"></i>Fecha de Nacimiento
                                             </label>
-                                            <div class="flex-1 flex flex-col">
+                                            <div class="flex-1">
                                                 <input id="birthday" type="text" pInputText formControlName="birthday"
-                                                    class="mt-2 w-full" placeholder="DD/MM/YYYY">
-                                                <small class="text-600 block mt-1">Formato: DD/MM/YYYY</small>
+                                                    class="w-full" placeholder="DD/MM/YYYY">
+                                                <small class="text-600 block mt-1 text-xs md:text-sm">Formato: DD/MM/YYYY</small>
                                             </div>
                                         </div>
-                                        <div class="w-full p-2 flex gap-4 items-center">
-                                            <label for="whatsApp" class="font-medium text-900">
+
+                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
+                                            <label for="whatsApp" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
                                                 <i class="pi pi-whatsapp mr-2 text-green-500"></i>WhatsApp
                                             </label>
-                                            <div class="flex-1 flex flex-col">
+                                            <div class="flex-1">
                                                 <p-inputMask id="whatsApp" mask="(999) 999-9999"
-                                                    formControlName="whatsApp" class="mt-2"
+                                                    formControlName="whatsApp"
                                                     placeholder="(123) 456-7890">
                                                 </p-inputMask>
-                                                <small class="text-600 block mt-1">Opcional - Para contacto
-                                                    directo</small>
+                                                <small class="text-600 block mt-1 text-xs md:text-sm">Opcional - Para contacto directo</small>
                                                 <small
                                                     *ngIf="profileForm.get('whatsApp')?.invalid && profileForm.get('whatsApp')?.touched"
                                                     class="p-error block mt-1">
@@ -275,16 +287,15 @@
                                             </div>
                                         </div>
 
-                                        <div class="w-full p-2 flex gap-4 items-center">
-                                            <label class="font-medium text-900">
+                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
+                                            <label class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
                                                 <i class="pi pi-envelope mr-2 text-blue-500"></i>Email
                                             </label>
-                                            <div class="flex-1 flex flex-col">
+                                            <div class="flex-1">
                                                 <input type="text" pInputText [value]="profileData.email" disabled
-                                                    class="mt-2">
-                                                <small class="text-600 block mt-1">
-                                                    <i class="pi pi-lock mr-1"></i>El email no se puede modificar por
-                                                    seguridad
+                                                    class="w-full">
+                                                <small class="text-600 block mt-1 text-xs md:text-sm">
+                                                    <i class="pi pi-lock mr-1"></i>El email no se puede modificar por seguridad
                                                 </small>
                                             </div>
                                         </div>
@@ -294,13 +305,13 @@
                         </div>
 
                         <!-- Botones de acción -->
-                        <div class="flex gap-3 mt-4 py-4 border-top-1 surface-border ml-auto justify-end">
+                        <div class="flex flex-col sm:flex-row gap-3 mt-4 py-4 border-top-1 surface-border justify-end">
                             <button pButton type="button" label="Cancelar" icon="pi pi-times"
-                                class="p-button-outlined p-button-secondary" (click)="cancelEdit()"></button>
+                                class="p-button-outlined p-button-secondary w-full sm:w-auto order-2 sm:order-1" (click)="cancelEdit()"></button>
 
                             <button pButton type="submit" label="Guardar Cambios" icon="pi pi-check"
                                 [disabled]="profileForm.invalid || savingChanges" [loading]="savingChanges"
-                                class="px-4"></button>
+                                class="w-full sm:w-auto px-4 order-1 sm:order-2"></button>
                         </div>
                     </form>
                 </div>

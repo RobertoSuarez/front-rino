@@ -6,6 +6,8 @@ import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { authGuard } from './app/core/guards';
 import { ProfileComponent } from './app/pages/profile/profile.component';
+import { SettingsComponent } from './app/pages/settings/settings.component';
+import { TestSettingsComponent } from './app/pages/settings/test-settings.component';
 
 export const appRoutes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -19,6 +21,8 @@ export const appRoutes: Routes = [
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
             { path: 'profile', component: ProfileComponent },
+            { path: 'settings', component: SettingsComponent },
+            { path: 'test-settings', component: TestSettingsComponent },
             { path: 'courses', loadComponent: () => import('./app/pages/courses/courses.component').then(m => m.CoursesComponent) },
             { path: 'admin', loadChildren: () => import('./app/pages/admin/admin.routes').then(m => m.adminRoutes) },
             { path: 'estudiante', loadChildren: () => import('./app/pages/estudiante/estudiante.routes') }

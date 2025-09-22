@@ -17,4 +17,30 @@
     --focus-ring-color: var(--p-focus-ring-color);
     --focus-ring-offset: var(--p-focus-ring-offset);
     --focus-ring-shadow: var(--p-focus-ring-shadow);
+
+    /* Custom font variables */
+    --app-font-family: var(--p-font-family);
+    --app-font-size: 16px;
+}
+
+/* Sepia theme */
+:root[class*='app-sepia'] {
+    --text-color: #5c4b37;
+    --text-color-secondary: #8b7355;
+    --surface-card: #f5f2e8;
+    --surface-ground: #e8dcc0;
+    --surface-hover: #f0ead8;
+    --surface-border: #d4c5a9;
+    filter: sepia(20%) contrast(110%) brightness(105%);
+}
+
+/* Inverted colors theme */
+:root[class*='app-inverted'] {
+    --text-color: #ffffff;
+    --text-color-secondary: #cccccc;
+    --surface-card: #1a1a1a;
+    --surface-ground: #2a2a2a;
+    --surface-hover: #333333;
+    --surface-border: #555555;
+    filter: invert(100%);
 }

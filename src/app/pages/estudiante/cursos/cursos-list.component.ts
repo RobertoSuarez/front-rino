@@ -66,7 +66,6 @@ export class CursosListComponent implements OnInit {
   ngOnInit(): void {
     this.cargarCursos();
     this.cursosService.getAllCursos().subscribe(response => {
-      console.log("todos los cursos: ", response.data);
       this.todosLosCursos = response.data;
     })
   }
@@ -76,7 +75,6 @@ export class CursosListComponent implements OnInit {
     this.cursosService.getCourseSubscription().subscribe({
       next: (response) => {
         
-        console.log("data: ", response.data);
         this.cursos = response.data;
         this.loading = false;
       },

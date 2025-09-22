@@ -59,7 +59,6 @@ export class CursosDisponiblesComponent implements OnInit {
       next: (data) => {
         // Asegurar que data sea un array
         this.cursos = Array.isArray(data) ? data : [];
-        console.log('Cursos disponibles cargados:', this.cursos);
         this.loading = false;
       },
       error: (error) => {

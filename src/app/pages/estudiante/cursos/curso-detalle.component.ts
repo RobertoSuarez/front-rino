@@ -198,7 +198,6 @@ export class CursoDetalleComponent implements OnInit {
   }
 
   inicializarCapitulo(chapterId: any) {
-    console.log('Inicializando capítulo:', chapterId);
     
     this.messageService.add({
       severity: 'info',
@@ -208,7 +207,6 @@ export class CursoDetalleComponent implements OnInit {
 
     this.cursosService.inicializarCapitulo(chapterId).subscribe({
       next: (response) => {
-        console.log('Capítulo inicializado exitosamente:', response);
         
         this.messageService.add({
           severity: 'success',

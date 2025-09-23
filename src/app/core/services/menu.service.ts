@@ -168,7 +168,7 @@ export class MenuService {
         label: 'Herramientas',
         items: [
           { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] },
-          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/community'] }
+          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/estudiante/community'] }
         ]
       },
       {

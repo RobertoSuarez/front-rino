@@ -6,11 +6,13 @@ import { TemasActividadProgresoComponent } from './temas-actividad-progreso/tema
 import { ActivitySolverComponent } from './activity-solver/activity-solver.component';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { ClassesComponent } from './classes/classes.component';
+import { EvaluationsComponent } from './evaluations/evaluations.component';
 
 export default [
     { path: 'explorar-cursos', component: ExplorarCursosComponent },
     { path: 'cursos', component: CursosListComponent },
     { path: 'classes', component: ClassesComponent },
+    { path: 'evaluations', component: EvaluationsComponent },
     { path: 'cursos/:id/capitulos', component: CursoDetalleComponent },
     { path: 'cursos/:cursoId/chapters/:capituloId/temas', component: TemasActividadProgresoComponent },
     { path: 'activity/:activityId', component: ActivitySolverComponent },

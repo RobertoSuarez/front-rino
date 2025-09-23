@@ -8,6 +8,7 @@ import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { ClassesComponent } from './classes/classes.component';
 import { EvaluationsComponent } from './evaluations/evaluations.component';
 import { AchievementsComponent } from './achievements/achievements.component';
+import { CommunityComponent } from './community/community.component';
 
 export default [
     { path: 'explorar-cursos', component: ExplorarCursosComponent },
@@ -15,6 +16,7 @@ export default [
     { path: 'classes', component: ClassesComponent },
     { path: 'evaluations', component: EvaluationsComponent },
     { path: 'achievements', component: AchievementsComponent },
+    { path: 'community', component: CommunityComponent },
     { path: 'cursos/:id/capitulos', component: CursoDetalleComponent },
     { path: 'cursos/:cursoId/chapters/:capituloId/temas', component: TemasActividadProgresoComponent },
     { path: 'activity/:activityId', component: ActivitySolverComponent },

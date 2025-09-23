@@ -7,12 +7,14 @@ import { ActivitySolverComponent } from './activity-solver/activity-solver.compo
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { ClassesComponent } from './classes/classes.component';
 import { EvaluationsComponent } from './evaluations/evaluations.component';
+import { AchievementsComponent } from './achievements/achievements.component';
 
 export default [
     { path: 'explorar-cursos', component: ExplorarCursosComponent },
     { path: 'cursos', component: CursosListComponent },
     { path: 'classes', component: ClassesComponent },
     { path: 'evaluations', component: EvaluationsComponent },
+    { path: 'achievements', component: AchievementsComponent },
     { path: 'cursos/:id/capitulos', component: CursoDetalleComponent },
     { path: 'cursos/:cursoId/chapters/:capituloId/temas', component: TemasActividadProgresoComponent },
     { path: 'activity/:activityId', component: ActivitySolverComponent },

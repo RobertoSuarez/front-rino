@@ -1,0 +1,277 @@
+<div class="classes-container">
+  <!-- Header Section -->
+  <div class="classes-header">
+    <div class="header-content">
+      <h1 class="page-title">Mis Clases de Ciberseguridad</h1>
+      <p class="page-subtitle">Gestiona tus clases de seguridad digital y aprende a protegerte en internet</p>
+    </div>
+    <button
+      pButton
+      type="button"
+      label="Unirse a Clase"
+      icon="pi pi-plus"
+      class="join-button p-button-primary p-button-rounded"
+      (click)="openJoinDialog()">
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+      <p>Cargando clases...</p>
+    </div>
+  </div>
+
+  <!-- Classes Grid -->
+  <div *ngIf="!isLoading" class="classes-grid">
+    <div *ngIf="classes.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="pi pi-book"></i>
+      </div>
+      <h3>No tienes clases de ciberseguridad</h3>
+      <p>Únete a tu primera clase de seguridad digital usando el botón de arriba</p>
+      <button
+        pButton
+        type="button"
+        label="Unirse a Clase"
+        icon="pi pi-plus"
+        class="p-button-outlined p-button-primary"
+        (click)="openJoinDialog()">
+      </button>
+    </div>
+
+    <div *ngFor="let class of classes" class="class-card-wrapper">
+      <p-card class="class-card" [style.border-left-color]="class.color">
+        <ng-template pTemplate="header">
+          <div class="class-header">
+            <div class="class-icon" [style.background-color]="class.color">
+              <i [class]="getClassIcon(class.subject)"></i>
+            </div>
+            <div class="class-actions">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-ellipsis-v"
+                class="p-button-text p-button-rounded p-button-plain"
+                (click)="showOptionsMenu($event, class)">
+              </button>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+          <div class="class-content">
+            <h3 class="class-name">{{ class.name }}</h3>
+            <p class="class-description">{{ class.description }}</p>
+
+            <div class="class-details">
+              <div class="detail-item">
+                <i class="pi pi-user"></i>
+                <span>{{ class.teacher }}</span>
+              </div>
+              <div class="detail-item">
+                <i class="pi pi-users"></i>
+                <span>{{ class.studentsCount }} estudiantes</span>
+              </div>
+              <div *ngIf="class.schedule" class="detail-item">
+                <i class="pi pi-clock"></i>
+                <span>{{ class.schedule }}</span>
+              </div>
+            </div>
+
+            <div class="class-code">
+              <small>Código: {{ class.code }}</small>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <div class="class-footer">
+            <button
+              pButton
+              type="button"
+              label="Ver Detalles"
+              icon="pi pi-eye"
+              class="p-button-text p-button-sm"
+              (click)="viewClassDetails(class)">
+            </button>
+            <button
+              pButton
+              type="button"
+              label="Salir"
+              icon="pi pi-sign-out"
+              class="p-button-text p-button-danger p-button-sm"
+              (click)="leaveClass(class.id)">
+            </button>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Join Class Dialog -->
+  <p-dialog
+    [(visible)]="showJoinDialog"
+    modal="true"
+    header="Unirse a una Clase de Ciberseguridad"
+    [style]="{ width: '90vw', 'max-width': '400px' }"
+    [closable]="true"
+    (onHide)="closeJoinDialog()">
+
+    <div class="join-dialog-content">
+      <div class="dialog-icon">
+        <i class="pi pi-plus-circle"></i>
+      </div>
+
+      <p class="dialog-description">
+        Ingresa el código de la clase de ciberseguridad proporcionado por tu profesor para unirte.
+      </p>
+
+      <div class="code-input-container">
+        <label for="classCode">Código de la Clase</label>
+        <p-inputGroup>
+          <p-inputGroupAddon>
+            <i class="pi pi-key"></i>
+          </p-inputGroupAddon>
+          <input
+            id="classCode"
+            pInputText
+            [(ngModel)]="classCode"
+            placeholder="Ej: CYBER101"
+            (keyup.enter)="joinClass()"
+            style="text-transform: uppercase;"
+            maxlength="20">
+        </p-inputGroup>
+      </div>
+
+      <div class="dialog-actions">
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          class="p-button-text p-button-secondary"
+          (click)="closeJoinDialog()">
+        </button>
+        <button
+          pButton
+          type="button"
+          label="Unirse"
+          icon="pi pi-plus"
+          class="p-button-primary"
+          [loading]="isJoining"
+          [disabled]="!classCode.trim()"
+          (click)="joinClass()">
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Class Details Dialog -->
+  <p-dialog
+    [(visible)]="showDetailsDialog"
+    modal="true"
+    [header]="selectedClass?.name || 'Detalles de la Clase'"
+    [style]="{ width: '90vw', 'max-width': '600px' }"
+    [closable]="true"
+    (onHide)="closeDetailsDialog()">
+
+    <div class="class-details-content" *ngIf="selectedClass">
+      <!-- Class Header Info -->
+      <div class="details-header">
+        <div class="class-icon-large" [style.background-color]="selectedClass.color">
+          <i [class]="getClassIcon(selectedClass.subject)"></i>
+        </div>
+        <div class="class-basic-info">
+          <h3>{{ selectedClass.name }}</h3>
+          <p class="teacher-info">
+            <i class="pi pi-user"></i>
+            {{ selectedClass.teacher }}
+          </p>
+          <div class="class-meta">
+            <span class="badge difficulty" [class]="'difficulty-' + selectedClass.difficulty?.toLowerCase()">
+              {{ selectedClass.difficulty }}
+            </span>
+            <span class="badge duration">
+              <i class="pi pi-clock"></i>
+              {{ selectedClass.duration }}
+            </span>
+            <span class="badge students">
+              <i class="pi pi-users"></i>
+              {{ selectedClass.studentsCount }} estudiantes
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Class Description -->
+      <div class="details-section">
+        <h4><i class="pi pi-info-circle"></i> Descripción</h4>
+        <p>{{ selectedClass.description }}</p>
+      </div>
+
+      <!-- Objectives -->
+      <div class="details-section" *ngIf="selectedClass.objectives && selectedClass.objectives.length > 0">
+        <h4><i class="pi pi-target"></i> Objetivos de Aprendizaje</h4>
+        <ul class="objectives-list">
+          <li *ngFor="let objective of selectedClass.objectives">
+            <i class="pi pi-check"></i>
+            {{ objective }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Topics -->
+      <div class="details-section" *ngIf="selectedClass.topics && selectedClass.topics.length > 0">
+        <h4><i class="pi pi-list"></i> Temas a Cubrir</h4>
+        <div class="topics-grid">
+          <span class="topic-tag" *ngFor="let topic of selectedClass.topics">
+            {{ topic }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Requirements -->
+      <div class="details-section" *ngIf="selectedClass.requirements && selectedClass.requirements.length > 0">
+        <h4><i class="pi pi-exclamation-triangle"></i> Requisitos</h4>
+        <ul class="requirements-list">
+          <li *ngFor="let requirement of selectedClass.requirements">
+            <i class="pi pi-circle-fill"></i>
+            {{ requirement }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div class="details-section" *ngIf="selectedClass.resources && selectedClass.resources.length > 0">
+        <h4><i class="pi pi-book"></i> Recursos Disponibles</h4>
+        <ul class="resources-list">
+          <li *ngFor="let resource of selectedClass.resources">
+            <i class="pi pi-file"></i>
+            {{ resource }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Schedule and Code -->
+      <div class="details-section schedule-section">
+        <div class="schedule-info">
+          <h4><i class="pi pi-calendar"></i> Horario</h4>
+          <p>{{ selectedClass.schedule }}</p>
+        </div>
+        <div class="code-info">
+          <h4><i class="pi pi-key"></i> Código de la Clase</h4>
+          <div class="code-display">
+            <code>{{ selectedClass.code }}</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+</div>
+
+<p-toast></p-toast>

@@ -7,6 +7,7 @@ export interface layoutConfig {
     surface?: string | undefined | null;
     darkTheme?: boolean;
     menuMode?: string;
+    themeMode?: 'light' | 'dark' | 'sepia' | 'inverted';
 }
 
 interface LayoutState {
@@ -31,7 +32,8 @@ export class LayoutService {
         primary: 'emerald',
         surface: null,
         darkTheme: false,
-        menuMode: 'static'
+        menuMode: 'static',
+        themeMode: 'light'
     };
 
     _state: LayoutState = {
@@ -63,6 +65,8 @@ export class LayoutService {
     overlayOpen$ = this.overlayOpen.asObservable();
 
     theme = computed(() => (this.layoutConfig()?.darkTheme ? 'light' : 'dark'));
+
+    getThemeMode = computed(() => this.layoutConfig()?.themeMode || 'light');
 
     isSidebarActive = computed(() => this.layoutState().overlayMenuActive || this.layoutState().staticMenuMobileActive);
 
@@ -125,6 +129,34 @@ export class LayoutService {
             document.documentElement.classList.add('app-dark');
         } else {
             document.documentElement.classList.remove('app-dark');
+        }
+    }
+
+    setThemeMode(themeMode: 'light' | 'dark' | 'sepia' | 'inverted'): void {
+        // Update config
+        this.layoutConfig.update(cfg => ({ ...cfg, themeMode }));
+
+        // Remove all theme classes first
+        document.documentElement.classList.remove('app-dark', 'app-sepia', 'app-inverted');
+
+        // Apply the appropriate theme
+        switch (themeMode) {
+            case 'dark':
+                this.layoutConfig.update(cfg => ({ ...cfg, darkTheme: true }));
+                document.documentElement.classList.add('app-dark');
+                break;
+            case 'sepia':
+                this.layoutConfig.update(cfg => ({ ...cfg, darkTheme: false }));
+                document.documentElement.classList.add('app-sepia');
+                break;
+            case 'inverted':
+                this.layoutConfig.update(cfg => ({ ...cfg, darkTheme: false }));
+                document.documentElement.classList.add('app-inverted');
+                break;
+            case 'light':
+            default:
+                this.layoutConfig.update(cfg => ({ ...cfg, darkTheme: false }));
+                break;
         }
     }
 

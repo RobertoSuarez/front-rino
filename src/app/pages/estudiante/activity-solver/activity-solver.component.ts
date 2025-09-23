@@ -228,7 +228,7 @@ export class ActivitySolverComponent implements OnInit {
       return 0;
     }
     
-    return (this.currentExerciseIndex() / this.safeActivity.exercises.length) * 100;
+    return (Math.round((this.currentExerciseIndex() / this.safeActivity.exercises.length) * 100));
   }
 
   get isFirstExercise(): boolean {
@@ -315,7 +315,7 @@ export class ActivitySolverComponent implements OnInit {
     
     // Preparar las respuestas para enviar al backend
     const feedbackResponses = this.answers().map(answer => ({
-      qualification: answer.qualification || 0,
+      qualification: Math.round(answer.qualification || 0),
       feedback: answer.feedback || ''
     }));
     

@@ -36,30 +36,40 @@
 /* Inverted colors theme */
 :root[class*='app-inverted'] {
     /* Define specific colors for inverted theme - WHITE background with DARK text */
-    --text-color: #1a1a1a;           /* Dark text instead of white */
-    --text-color-secondary: #4a4a4a; /* Dark secondary text */
-    --surface-card: #ffffff;         /* White card backgrounds */
-    --surface-ground: #f8f9fa;       /* Light gray for main content */
-    --surface-hover: #e9ecef;        /* Lighter hover state */
-    --surface-border: #dee2e6;       /* Light borders */
-    --surface-overlay: #ffffff;      /* White overlays */
-    --primary-color: #3b82f6;        /* Keep primary color visible */
-    --primary-contrast-color: #ffffff;
+    --text-color: #1a1a1a !important;           /* Dark text instead of white */
+    --text-color-secondary: #4a4a4a !important; /* Dark secondary text */
+    --surface-card: #ffffff !important;         /* White card backgrounds */
+    --surface-ground: #f8f9fa !important;       /* Light gray for main content */
+    --surface-hover: #e9ecef !important;        /* Lighter hover state */
+    --surface-border: #dee2e6 !important;       /* Light borders */
+    --surface-overlay: #ffffff !important;      /* White overlays */
+    --primary-color: #3b82f6 !important;        /* Keep primary color visible */
+    --primary-contrast-color: #ffffff !important;
 
     /* Menu colors for inverted theme - WHITE background with DARK text */
-    --menu-background: #ffffff;      /* White menu background */
-    --menu-text: #1a1a1a;           /* Dark menu text */
-    --menu-hover: #1a1a1a;          /* Dark hover background */
-    --menu-hover-text: #ffffff;     /* White text on dark hover */
-    --menu-active: #3b82f6;         /* Blue for active items */
+    --menu-background: #ffffff !important;      /* White menu background */
+    --menu-text: #1a1a1a !important;           /* Dark menu text */
+    --menu-hover: #1a1a1a !important;          /* Dark hover background */
+    --menu-hover-text: #ffffff !important;     /* White text on dark hover */
+    --menu-active: #3b82f6 !important;         /* Blue for active items */
 
     /* Main content colors - WHITE background with DARK text */
-    --content-background: #ffffff;   /* White content background */
-    --content-text: #1a1a1a;        /* Dark content text */
-    --content-secondary: #4a4a4a;   /* Dark secondary text */
+    --content-background: #ffffff !important;   /* White content background */
+    --content-text: #1a1a1a !important;        /* Dark content text */
+    --content-secondary: #4a4a4a !important;   /* Dark secondary text */
 
     /* Card backgrounds - WHITE */
-    --card-background: #ffffff;     /* White cards */
-    --card-border: #dee2e6;         /* Light borders */
-    --card-hover: #f8f9fa;          /* Light hover */
+    --card-background: #ffffff !important;     /* White cards */
+    --card-border: #dee2e6 !important;         /* Light borders */
+    --card-hover: #f8f9fa !important;          /* Light hover */
+
+    /* Text colors for titles and content */
+    --p-text-color: #1a1a1a !important;
+    --p-text-muted-color: #4a4a4a !important;
+    
+    /* Override PrimeNG variables */
+    --p-content-background: #ffffff !important;
+    --p-content-border-color: #dee2e6 !important;
+    --p-content-hover-background: #f8f9fa !important;
+    --p-overlay-popover-background: #ffffff !important;
 }

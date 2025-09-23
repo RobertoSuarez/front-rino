@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LeaderboardService, LeaderboardUser } from '../../../core/services/leaderboard.service';
 import { finalize } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    TooltipModule
   ],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss']

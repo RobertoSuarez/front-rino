@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService, UserIndicators } from '../../core/services/user.service';
 import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +14,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface ProfileData {
   id: number;
@@ -26,6 +28,8 @@ interface ProfileData {
   followers: number;
   score: number;
   gem: number;
+  yachay: number;
+  tumis: number;
 }
 
 @Component({
@@ -42,6 +46,7 @@ interface ProfileData {
     InputTextModule,
     InputMaskModule,
     ToastModule,
+    TooltipModule,
     RouterModule
   ],
   providers: [MessageService],
@@ -56,10 +61,12 @@ export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
   savingChanges: boolean = false;
   userId: number | null = null;
+  userIndicators: UserIndicators | null = null;
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
+    private userService: UserService,
     private messageService: MessageService,
     private fb: FormBuilder
   ) {
@@ -74,6 +81,22 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfileData();
+    this.loadUserIndicators();
+  }
+
+  loadUserIndicators(): void {
+    if (this.authService.isAuthenticated()) {
+      this.userService.getUserIndicators().subscribe({
+        next: (response) => {
+          if (response && response.data) {
+            this.userIndicators = response.data;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading user indicators:', error);
+        }
+      });
+    }
   }
 
   loadProfileData(): void {
@@ -263,7 +286,7 @@ export class ProfileComponent implements OnInit {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
-        timeZone: 'America/Mexico_City'
+        timeZone: 'America/Guayaquil'
       };
       
       return new Intl.DateTimeFormat('es-ES', options).format(date);

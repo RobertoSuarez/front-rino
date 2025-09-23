@@ -103,10 +103,7 @@
             position: absolute;
             background-color: var(--surface-overlay);
             transform-origin: top;
-            box-shadow:
-                0px 3px 5px rgba(0, 0, 0, 0.02),
-                0px 0px 2px rgba(0, 0, 0, 0.05),
-                0px 1px 4px rgba(0, 0, 0, 0.08);
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
             border-radius: var(--content-border-radius);
             padding: 1rem;
             right: 1rem;
@@ -164,67 +161,88 @@
         }
     }
 
-    @media (max-width: 640px) {
-        .layout-topbar {
-            padding: 0 2rem;
+@media (max-width: 991px) {
+    .layout-topbar {
+        padding: 0 2rem;
 
-            .layout-topbar-logo-container {
-                width: auto;
+        .layout-topbar-logo-container {
+            width: auto;
+        }
+
+        .layout-topbar-logo {
+            .logo-text {
+                display: none;
             }
+        }
 
-            .layout-menu-button {
-                margin-left: 0;
-                margin-right: 0.5rem;
-            }
+        .layout-menu-button {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
 
-            .layout-topbar-menu-button {
-                display: inline-flex;
-            }
+        .layout-topbar-menu-button {
+            display: inline-flex;
+        }
 
-            .layout-topbar-menu {
-                position: absolute;
-                background-color: var(--surface-overlay);
-                transform-origin: top;
-                box-shadow:
-                    0px 3px 5px rgba(0, 0, 0, 0.02),
-                    0px 0px 2px rgba(0, 0, 0, 0.05),
-                    0px 1px 4px rgba(0, 0, 0, 0.08);
+        .layout-topbar-menu {
+            position: absolute;
+            background-color: var(--surface-overlay);
+            transform-origin: top;
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
+            border-radius: var(--content-border-radius);
+            padding: 1rem;
+            right: 2rem;
+            top: 4rem;
+            min-width: 15rem;
+            border: 1px solid var(--surface-border);
+
+            .layout-topbar-action {
+                display: flex;
+                width: 100%;
+                height: auto;
+                justify-content: flex-start;
                 border-radius: var(--content-border-radius);
-                padding: 1rem;
-                right: 2rem;
-                top: 4rem;
-                min-width: 15rem;
-                border: 1px solid var(--surface-border);
+                padding: 0.5rem 1rem;
 
-                .layout-topbar-menu-content {
-                    gap: 0.5rem;
+                i {
+                    font-size: 1rem;
+                    margin-right: 0.5rem;
                 }
 
-                .layout-topbar-action {
-                    display: flex;
-                    width: 100%;
-                    height: auto;
-                    justify-content: flex-start;
-                    border-radius: var(--content-border-radius);
-                    padding: 0.5rem 1rem;
-
-                    i {
-                        font-size: 1rem;
-                        margin-right: 0.5rem;
-                    }
-
-                    span {
-                        font-weight: medium;
-                        display: block;
-                    }
+                span {
+                    font-weight: medium;
+                    display: block;
                 }
             }
+        }
 
-            .layout-topbar-logo {
-                .logo-text {
-                    display: none !important;
-                }
-            }
+        .layout-topbar-menu-content {
+            flex-direction: column;
+        }
+    }
+}
+
+// Estilos para indicadores compactos
+.user-indicators-compact {
+    .indicator-compact-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: var(--surface-card);
+        border: 1px solid var(--surface-border);
+        transition: all 0.2s ease;
+        cursor: help;
+
+        &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        i {
+            font-size: 1rem;
         }
     }
 }

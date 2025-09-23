@@ -153,22 +153,22 @@ export class MenuService {
         label: 'Aprendizaje',
         items: [
           { label: 'Mis Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/estudiante/cursos'] },
-          { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/student/classes'] },
-          { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/student/assessments'] }
+          { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/estudiante/classes'] },
+          { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/estudiante/evaluations'] }
         ]
       },
       {
         label: 'Progreso',
         items: [
           { label: 'Leaderboard', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/estudiante/leaderboard'] },
-          { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/student/achievements'] }
+          { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/estudiante/achievements'] }
         ]
       },
       {
         label: 'Herramientas',
         items: [
           { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] },
-          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/community'] }
+          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/estudiante/community'] }
         ]
       },
       {
@@ -181,7 +181,7 @@ export class MenuService {
       {
         label: 'Configuración',
         items: [
-          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/'] }
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/settings'] }
         ]
       }
     ];
@@ -230,7 +230,7 @@ export class MenuService {
       {
         label: 'Configuración',
         items: [
-          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/'] }
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/settings'] }
         ]
       }
     ];

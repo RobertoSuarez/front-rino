@@ -1,0 +1,293 @@
+<div class="achievements-container">
+  <!-- Header Section -->
+  <div class="achievements-header">
+    <div class="header-content">
+      <h1 class="page-title">Mis Logros</h1>
+      <p class="page-subtitle">Insignias y badges ganados por completar cursos de ciberseguridad</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-number">{{ getCompletionPercentage() }}%</div>
+        <div class="stat-label">Completado</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ getUnlockedAchievements() }}</div>
+        <div class="stat-label">Desbloqueados</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ getInProgressAchievements() }}</div>
+        <div class="stat-label">En Progreso</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Overview -->
+  <div class="progress-overview">
+    <div class="progress-card">
+      <h3>Progreso General</h3>
+      <p>Has completado {{ getCompletionPercentage() }}% de todos los logros disponibles</p>
+      <p-progressBar
+        [value]="getCompletionPercentage()"
+        [showValue]="false"
+        styleClass="achievement-progress">
+      </p-progressBar>
+      <div class="progress-stats">
+        <span class="stat">{{ getUnlockedAchievements() }}/{{ getTotalAchievements() }} logros</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+      <p>Cargando logros...</p>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div *ngIf="!isLoading" class="filter-tabs">
+    <button
+      pButton
+      type="button"
+      [label]="'Todos (' + getTotalAchievements() + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'all'"
+      (click)="setActiveFilter('all')">
+    </button>
+    <button
+      pButton
+      type="button"
+      [label]="'Desbloqueados (' + getUnlockedAchievements() + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'unlocked'"
+      (click)="setActiveFilter('unlocked')">
+    </button>
+    <button
+      pButton
+      type="button"
+      [label]="'En Progreso (' + getInProgressAchievements() + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'in_progress'"
+      (click)="setActiveFilter('in_progress')">
+    </button>
+    <button
+      pButton
+      type="button"
+      [label]="'Bloqueados (' + getLockedAchievements() + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'locked'"
+      (click)="setActiveFilter('locked')">
+    </button>
+  </div>
+
+  <!-- Achievements Grid -->
+  <div *ngIf="!isLoading" class="achievements-grid">
+    <div *ngIf="getFilteredAchievements().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="pi pi-trophy"></i>
+      </div>
+      <h3>{{ getEmptyStateTitle() }}</h3>
+      <p>{{ getEmptyStateMessage() }}</p>
+    </div>
+
+    <div *ngFor="let achievement of getFilteredAchievements()" class="achievement-card-wrapper">
+      <div class="achievement-card" [class]="getAchievementCardClass(achievement)">
+        <!-- Achievement Badge -->
+        <div class="achievement-badge" [style.background-color]="achievement.color">
+          <div class="badge-icon" [class]="achievement.status === 'locked' ? 'locked' : ''">
+            <i [class]="achievement.icon"></i>
+            <div *ngIf="achievement.status === 'locked'" class="lock-overlay">
+              <i class="pi pi-lock"></i>
+            </div>
+          </div>
+
+          <!-- Rarity Indicator -->
+          <div class="rarity-indicator" [style.background-color]="getRarityColor(achievement.rarity || 'common')">
+            <span class="rarity-label">{{ getRarityLabel(achievement.rarity || 'common') }}</span>
+          </div>
+        </div>
+
+        <!-- Achievement Info -->
+        <div class="achievement-info">
+          <div class="achievement-header">
+            <h3 class="achievement-title">{{ achievement.title }}</h3>
+            <div class="status-badge">
+              <p-badge
+                [value]="getStatusLabel(achievement.status)"
+                [styleClass]="getStatusBadgeClass(achievement.status)">
+              </p-badge>
+            </div>
+          </div>
+
+          <p class="achievement-description">{{ achievement.description }}</p>
+
+          <div class="achievement-category">
+            <i class="pi pi-tag"></i>
+            <span>{{ achievement.category }}</span>
+          </div>
+
+          <!-- Progress Bar for In Progress -->
+          <div *ngIf="achievement.status === 'in_progress' && achievement.progress && achievement.maxProgress"
+               class="progress-section">
+            <div class="progress-label">
+              <span>Progreso: {{ achievement.progress }}/{{ achievement.maxProgress }}</span>
+            </div>
+            <p-progressBar
+              [value]="getProgressPercentage(achievement)"
+              [showValue]="false">
+            </p-progressBar>
+          </div>
+
+          <!-- Unlocked Date -->
+          <div *ngIf="achievement.status === 'unlocked' && achievement.unlockedDate"
+               class="unlocked-date">
+            <i class="pi pi-calendar"></i>
+            <span>Desbloqueado: {{ achievement.unlockedDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <!-- Rewards -->
+          <div *ngIf="achievement.rewards && achievement.rewards.length > 0" class="rewards-section">
+            <div class="reward-item" *ngFor="let reward of achievement.rewards">
+              <i class="pi pi-gift"></i>
+              <span>{{ reward }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="achievement-actions">
+          <button
+            pButton
+            type="button"
+            label="Ver Detalles"
+            icon="pi pi-eye"
+            class="p-button-text p-button-sm"
+            (click)="viewAchievementDetails(achievement)">
+          </button>
+
+          <button
+            *ngIf="achievement.status === 'unlocked'"
+            pButton
+            type="button"
+            label="Compartir"
+            icon="pi pi-share-alt"
+            class="p-button-outlined p-button-sm"
+            (click)="shareAchievement(achievement)">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievement Details Dialog -->
+  <p-dialog
+    [(visible)]="showDetailsDialog"
+    modal="true"
+    [header]="selectedAchievement?.title || 'Detalles del Logro'"
+    [style]="{ width: '90vw', 'max-width': '600px' }"
+    [closable]="true"
+    (onHide)="closeDetailsDialog()">
+
+    <div class="achievement-details-content" *ngIf="selectedAchievement">
+      <!-- Achievement Header -->
+      <div class="details-header">
+        <div class="achievement-badge-large" [style.background-color]="selectedAchievement.color">
+          <i [class]="selectedAchievement.icon"></i>
+          <div *ngIf="selectedAchievement.status === 'locked'" class="lock-overlay">
+            <i class="pi pi-lock"></i>
+          </div>
+        </div>
+        <div class="achievement-basic-info">
+          <div class="status-and-rarity">
+            <p-badge
+              [value]="getStatusLabel(selectedAchievement.status)"
+              [styleClass]="getStatusBadgeClass(selectedAchievement.status)">
+            </p-badge>
+            <span class="rarity-tag" [style.color]="getRarityColor(selectedAchievement.rarity || 'common')">
+              {{ getRarityLabel(selectedAchievement.rarity || 'common') }}
+            </span>
+          </div>
+          <p class="achievement-category-large">{{ selectedAchievement.category }}</p>
+        </div>
+      </div>
+
+      <!-- Achievement Description -->
+      <div class="details-section">
+        <h4><i class="pi pi-info-circle"></i> Descripción</h4>
+        <p>{{ selectedAchievement.description }}</p>
+      </div>
+
+      <!-- Progress (if in progress) -->
+      <div class="details-section" *ngIf="selectedAchievement.status === 'in_progress' && selectedAchievement.progress && selectedAchievement.maxProgress">
+        <h4><i class="pi pi-chart-line"></i> Progreso</h4>
+        <div class="progress-display">
+          <div class="progress-numbers">
+            {{ selectedAchievement.progress }} / {{ selectedAchievement.maxProgress }}
+          </div>
+          <p-progressBar
+            [value]="getProgressPercentage(selectedAchievement)"
+            [showValue]="false">
+          </p-progressBar>
+          <div class="progress-percentage">
+            {{ getProgressPercentage(selectedAchievement) | number:'1.0-0' }}% completado
+          </div>
+        </div>
+      </div>
+
+      <!-- Requirements -->
+      <div class="details-section" *ngIf="selectedAchievement.requirements && selectedAchievement.requirements.length > 0">
+        <h4><i class="pi pi-list-check"></i> Requisitos</h4>
+        <ul class="requirements-list">
+          <li *ngFor="let requirement of selectedAchievement.requirements">
+            <i class="pi pi-check-circle"></i>
+            {{ requirement }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Rewards -->
+      <div class="details-section" *ngIf="selectedAchievement.rewards && selectedAchievement.rewards.length > 0">
+        <h4><i class="pi pi-gift"></i> Recompensas</h4>
+        <ul class="rewards-list">
+          <li *ngFor="let reward of selectedAchievement.rewards">
+            <i class="pi pi-star"></i>
+            {{ reward }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Unlocked Date -->
+      <div class="details-section" *ngIf="selectedAchievement.status === 'unlocked' && selectedAchievement.unlockedDate">
+        <h4><i class="pi pi-calendar"></i> Fecha de Desbloqueo</h4>
+        <p>{{ selectedAchievement.unlockedDate | date:'EEEE, dd \'de\' MMMM \'de\' yyyy' }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="details-actions">
+        <button
+          *ngIf="selectedAchievement.status === 'unlocked'"
+          pButton
+          type="button"
+          label="Compartir Logro"
+          icon="pi pi-share-alt"
+          class="p-button-outlined"
+          (click)="shareAchievement(selectedAchievement)">
+        </button>
+        <button
+          pButton
+          type="button"
+          label="Cerrar"
+          icon="pi pi-times"
+          class="p-button-secondary"
+          (click)="closeDetailsDialog()">
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+</div>
+
+<p-toast></p-toast>

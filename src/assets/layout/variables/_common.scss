@@ -31,16 +31,35 @@
     --surface-ground: #e8dcc0;
     --surface-hover: #f0ead8;
     --surface-border: #d4c5a9;
-    filter: sepia(20%) contrast(110%) brightness(105%);
 }
 
 /* Inverted colors theme */
 :root[class*='app-inverted'] {
-    --text-color: #ffffff;
-    --text-color-secondary: #cccccc;
-    --surface-card: #1a1a1a;
-    --surface-ground: #2a2a2a;
-    --surface-hover: #333333;
-    --surface-border: #555555;
-    filter: invert(100%);
+    /* Define specific colors for inverted theme - WHITE background with DARK text */
+    --text-color: #1a1a1a;           /* Dark text instead of white */
+    --text-color-secondary: #4a4a4a; /* Dark secondary text */
+    --surface-card: #ffffff;         /* White card backgrounds */
+    --surface-ground: #f8f9fa;       /* Light gray for main content */
+    --surface-hover: #e9ecef;        /* Lighter hover state */
+    --surface-border: #dee2e6;       /* Light borders */
+    --surface-overlay: #ffffff;      /* White overlays */
+    --primary-color: #3b82f6;        /* Keep primary color visible */
+    --primary-contrast-color: #ffffff;
+
+    /* Menu colors for inverted theme - WHITE background with DARK text */
+    --menu-background: #ffffff;      /* White menu background */
+    --menu-text: #1a1a1a;           /* Dark menu text */
+    --menu-hover: #1a1a1a;          /* Dark hover background */
+    --menu-hover-text: #ffffff;     /* White text on dark hover */
+    --menu-active: #3b82f6;         /* Blue for active items */
+
+    /* Main content colors - WHITE background with DARK text */
+    --content-background: #ffffff;   /* White content background */
+    --content-text: #1a1a1a;        /* Dark content text */
+    --content-secondary: #4a4a4a;   /* Dark secondary text */
+
+    /* Card backgrounds - WHITE */
+    --card-background: #ffffff;     /* White cards */
+    --card-border: #dee2e6;         /* Light borders */
+    --card-hover: #f8f9fa;          /* Light hover */
 }

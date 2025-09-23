@@ -1,36 +1,69 @@
 <p-toast></p-toast>
-<div class="grid grid-cols-12 gap-8">
+<div class="grid grid-cols-12 gap-4 md:gap-8">
     <div class="col-span-12">
         <!-- Header -->
         <div class="card mb-0 overflow-hidden">
-            <div class="flex align-items-center justify-between p-4">
-                <div class="flex align-items-center gap-4">
-                    <i class="pi pi-cog text-900 !text-3xl mr-3"></i>
+            <div class="flex flex-col md:flex-row md:align-items-center md:justify-between p-3 md:p-4">
+                <div class="flex align-items-center gap-3 md:gap-4 mb-3 md:mb-0">
+                    <i class="pi pi-cog text-900 !text-2xl md:!text-3xl mr-2 md:mr-3"></i>
                     <div>
-                        <div class="text-900 m-0 font-bold">Configuración del Entorno</div>
-                        <div class="text-600 m-0">Personaliza la apariencia de la interfaz</div>
+                        <div class="text-900 m-0 font-bold text-lg md:text-xl">Configuración del Entorno</div>
+                        <div class="text-600 m-0 text-sm md:text-base">Personaliza la apariencia de la interfaz</div>
                     </div>
                 </div>
+                @if (hasUnsavedChanges) {
+                <div class="flex align-items-center gap-2 px-3 py-1 border-round unsaved-changes-indicator">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>Cambios pendientes</span>
+                </div>
+                }
             </div>
         </div>
 
         <!-- Theme Settings -->
         <div class="card mt-4">
-            <div class="p-4">
-                <h4 class="text-900 mb-4 flex align-items-center gap-2">
-                    <i class="pi pi-palette"></i>
+            <div class="p-3 md:p-4">
+                <h4 class="text-900 mb-4 flex align-items-center gap-2 text-base md:text-lg">
+                    <i class="pi pi-palette text-primary"></i>
                     Tema de Color
                 </h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 theme-selection">
                     @for (theme of themeOptions; track theme.value) {
-                    <div class="flex align-items-center gap-3 p-3 border-1 border-round cursor-pointer transition-all transition-duration-200"
+                    <div class="theme-card p-4 md:p-5 border-2 border-round-lg cursor-pointer transition-all transition-duration-300 hover:shadow-lg hover:scale-105"
+                         [class.selected]="settingsForm.value.theme === theme.value"
+                         [class.border-primary-400]="settingsForm.value.theme === theme.value"
                          [class.bg-primary-50]="settingsForm.value.theme === theme.value"
-                         [class.border-primary]="settingsForm.value.theme === theme.value"
+                         [class.border-surface-200]="settingsForm.value.theme !== theme.value"
                          (click)="onThemeChange(theme.value)">
-                        <p-radioButton [inputId]="theme.value" [value]="theme.value"
-                                     formControlName="theme"></p-radioButton>
-                        <i [class]="theme.icon + ' text-xl'"></i>
-                        <label [for]="theme.value" class="cursor-pointer font-medium">{{ theme.label }}</label>
+                        
+                        <div class="flex align-items-center justify-content-between mb-3">
+                            <div class="flex align-items-center gap-3">
+                                <div class="theme-icon-wrapper p-2 border-round-md bg-primary-100 text-primary-600">
+                                    <i [class]="theme.icon + ' text-lg'"></i>
+                                </div>
+                                <div>
+                                    <h5 class="m-0 font-semibold text-900 text-sm md:text-base">{{ theme.label }}</h5>
+                                    <p class="m-0 text-xs text-600">{{ getThemeDescription(theme.value) }}</p>
+                                </div>
+                            </div>
+                            
+                            @if (settingsForm.value.theme === theme.value) {
+                            <div class="selected-indicator">
+                                <i class="pi pi-check-circle text-primary-500 text-xl"></i>
+                            </div>
+                            }
+                        </div>
+                        
+                        <!-- Theme Preview -->
+                        <div class="theme-preview border-1 border-round p-2 bg-surface-50" 
+                             [class]="getThemePreviewClass(theme.value)">
+                            <div class="flex gap-1 mb-2">
+                                <div class="w-2 h-2 border-round bg-red-400"></div>
+                                <div class="w-2 h-2 border-round bg-yellow-400"></div>
+                                <div class="w-2 h-2 border-round bg-green-400"></div>
+                            </div>
+                            <div class="text-xs">Vista previa</div>
+                        </div>
                     </div>
                     }
                 </div>
@@ -39,43 +72,126 @@
 
         <!-- Font Settings -->
         <div class="card mt-4">
-            <div class="p-4">
-                <h4 class="text-900 mb-4 flex align-items-center gap-2">
-                    <i class="pi pi-font"></i>
+            <div class="p-3 md:p-4">
+                <h4 class="text-900 mb-4 flex align-items-center gap-2 text-base md:text-lg">
+                    <i class="pi pi-font text-primary"></i>
                     Configuración de Fuente
                 </h4>
 
                 <!-- Font Family -->
-                <div class="mb-4">
-                    <label class="block text-900 font-medium mb-2">Tipo de Fuente</label>
-                    <p-select [options]="fontOptions" optionLabel="label" optionValue="value"
-                             formControlName="fontFamily"
-                             (onChange)="onFontFamilyChange($event.value)"
-                             placeholder="Seleccionar fuente" class="w-full"></p-select>
+                <div class="mb-6">
+                    <label class="block text-900 font-semibold mb-4 text-sm md:text-base">Tipo de Fuente</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-selection">
+                        @for (font of fontOptions; track font.value) {
+                        <div class="font-card border-2 border-round-lg p-4 text-center cursor-pointer transition-all transition-duration-300 hover:shadow-lg hover:scale-105"
+                             [class.selected]="settingsForm.value.fontFamily === font.value"
+                             [class.border-primary-400]="settingsForm.value.fontFamily === font.value"
+                             [class.bg-primary-50]="settingsForm.value.fontFamily === font.value"
+                             [class.border-surface-200]="settingsForm.value.fontFamily !== font.value"
+                             (click)="onFontFamilyChange(font.value)">
+                            
+                            <!-- Font Preview with actual font name -->
+                            <div class="font-preview-large mb-3 p-3 bg-surface-100 border-round"
+                                 [style.font-family]="getFontFamily(font.value)"
+                                 [style.font-size]="'1.5rem'"
+                                 [style.font-weight]="'500'">
+                                {{ font.label }}
+                            </div>
+                            
+                            <!-- Font Info -->
+                            <div class="font-info">
+                                <h6 class="m-0 font-semibold text-900 text-sm">{{ font.label }}</h6>
+                                <p class="m-0 text-xs text-600 mt-1">{{ getFontDescription(font.value) }}</p>
+                            </div>
+                            
+                            <!-- Selection Indicator -->
+                            @if (settingsForm.value.fontFamily === font.value) {
+                            <div class="selected-indicator mt-3">
+                                <i class="pi pi-check-circle text-primary-500 text-lg"></i>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
                 </div>
 
                 <!-- Font Size -->
-                <div>
-                    <label class="block text-900 font-medium mb-2">Tamaño de Fuente</label>
-                    <div class="flex align-items-center gap-3">
-                        <p-button icon="pi pi-minus" severity="secondary" rounded
-                                 (click)="decreaseFontSize()"
-                                 [disabled]="currentFontSize <= 12"></p-button>
-                        <span class="text-lg font-mono px-3">{{ currentFontSize }}px</span>
-                        <p-button icon="pi pi-plus" severity="secondary" rounded
-                                 (click)="increaseFontSize()"
-                                 [disabled]="currentFontSize >= 24"></p-button>
+                <div class="mb-6">
+                    <label class="block text-900 font-semibold mb-4 text-sm md:text-base">Tamaño de Fuente</label>
+                    <div class="font-size-container bg-surface-50 border-2 border-surface-200 border-round-lg p-4">
+                        <div class="flex align-items-center justify-content-center gap-4 mb-4">
+                            <p-button 
+                                icon="pi pi-minus" 
+                                severity="secondary" 
+                                rounded
+                                size="large"
+                                (click)="decreaseFontSize()"
+                                [disabled]="currentFontSize <= 12"
+                                class="font-size-btn">
+                            </p-button>
+                            
+                            <div class="font-size-display text-center">
+                                <div class="font-size-value text-2xl font-bold text-primary-600 mb-1">{{ currentFontSize }}px</div>
+                                <div class="font-size-label text-xs text-600 font-medium">Tamaño actual</div>
+                            </div>
+                            
+                            <p-button 
+                                icon="pi pi-plus" 
+                                severity="secondary" 
+                                rounded
+                                size="large"
+                                (click)="increaseFontSize()"
+                                [disabled]="currentFontSize >= 24"
+                                class="font-size-btn">
+                            </p-button>
+                        </div>
+                        
+                        <!-- Font Size Range -->
+                        <div class="font-size-range mb-3">
+                            <div class="flex justify-content-between text-xs text-600 mb-2">
+                                <span>12px</span>
+                                <span>Rango permitido</span>
+                                <span>24px</span>
+                            </div>
+                            <div class="progress-bar bg-surface-200 border-round h-1 relative">
+                                <div class="progress-fill bg-primary-400 border-round h-full transition-all transition-duration-300"
+                                     [style.width]="((currentFontSize - 12) / (24 - 12) * 100) + '%'"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Live Preview -->
+                        <div class="font-size-preview text-center p-3 bg-white border-1 border-round">
+                            <div class="preview-text" 
+                                 [style.font-size]="currentFontSize + 'px'"
+                                 [style.font-family]="getCurrentFontFamily()">
+                                Texto de ejemplo con tamaño {{ currentFontSize }}px
+                            </div>
+                        </div>
                     </div>
-                    <small class="text-600 mt-1 block">Rango: 12px - 24px</small>
+                </div>
+
+                <!-- Font Preview -->
+                <div class="bg-white dark:bg-gray-900 border-1 border-round p-3 md:p-4 font-preview-section">
+                    <label class="block text-900 font-medium mb-3 text-sm md:text-base preview-label">Vista Previa</label>
+                    <div class="font-preview text-sm md:text-base leading-relaxed">
+                        <p class="mb-2">Esta es una muestra del texto con la fuente y tamaño seleccionados.</p>
+                        <p class="mb-2"><strong>Fuente actual:</strong> {{ currentFontLabel }}</p>
+                        <p class="text-xs text-600">Los cambios se aplican automáticamente a toda la aplicación.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Actions -->
         <div class="card mt-4">
-            <div class="p-4 flex justify-content-end gap-3">
+            <div class="p-3 md:p-4 flex flex-col sm:flex-row justify-content-end gap-3">
                 <p-button label="Restablecer Valores" icon="pi pi-refresh" severity="secondary"
-                         (click)="resetToDefaults()"></p-button>
+                         (click)="resetToDefaults()" class="w-full sm:w-auto"></p-button>
+                <p-button label="Guardar Configuración" icon="pi pi-check" severity="success"
+                         (click)="saveSettings()"
+                         [badge]="hasUnsavedChanges ? '!' : ''"
+                         badgeSeverity="warn"
+                         class="w-full sm:w-auto"></p-button>
             </div>
         </div>
     </div>

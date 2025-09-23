@@ -161,7 +161,7 @@ export class MenuService {
         label: 'Progreso',
         items: [
           { label: 'Leaderboard', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/estudiante/leaderboard'] },
-          { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/student/achievements'] }
+          { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/estudiante/achievements'] }
         ]
       },
       {

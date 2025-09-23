@@ -5,10 +5,12 @@ import { ExplorarCursosComponent } from './explorar-cursos/explorar-cursos.compo
 import { TemasActividadProgresoComponent } from './temas-actividad-progreso/temas-actividad-progreso.component';
 import { ActivitySolverComponent } from './activity-solver/activity-solver.component';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
+import { ClassesComponent } from './classes/classes.component';
 
 export default [
     { path: 'explorar-cursos', component: ExplorarCursosComponent },
     { path: 'cursos', component: CursosListComponent },
+    { path: 'classes', component: ClassesComponent },
     { path: 'cursos/:id/capitulos', component: CursoDetalleComponent },
     { path: 'cursos/:cursoId/chapters/:capituloId/temas', component: TemasActividadProgresoComponent },
     { path: 'activity/:activityId', component: ActivitySolverComponent },

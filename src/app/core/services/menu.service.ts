@@ -153,7 +153,7 @@ export class MenuService {
         label: 'Aprendizaje',
         items: [
           { label: 'Mis Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/estudiante/cursos'] },
-          { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/student/classes'] },
+          { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/estudiante/classes'] },
           { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/student/assessments'] }
         ]
       },
@@ -181,8 +181,7 @@ export class MenuService {
       {
         label: 'Configuración',
         items: [
-          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/settings'] },
-          { label: 'Test Settings', icon: 'pi pi-fw pi-wrench', routerLink: ['/test-settings'] }
+          { label: 'Configurar entorno', icon: 'pi pi-fw pi-cog', routerLink: ['/settings'] }
         ]
       }
     ];

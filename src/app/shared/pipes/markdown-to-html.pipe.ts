@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-// @ts-ignore
 import { marked } from 'marked';
 
 @Pipe({
@@ -12,17 +11,15 @@ export class MarkdownToHtmlPipe implements PipeTransform {
 
   transform(value: string): SafeHtml {
     if (!value) return '';
-    
-    // Configurar marked para manejar código y otros elementos
-    const options = {
+
+    // Configurar las opciones de marked
+    marked.setOptions({
       gfm: true,
-      breaks: true,
-      smartLists: true,
-      smartypants: true,
-      xhtml: true
-    };
-    
-    const html = marked(value, options);
-    return this.sanitizer.bypassSecurityTrustHtml(html as string);
+      breaks: true
+    });
+
+    // Usar la API correcta de marked v16
+    const html = marked.parse(value) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }

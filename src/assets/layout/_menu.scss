@@ -17,6 +17,50 @@
     padding: 0.5rem 1.5rem;
 }
 
+/* High contrast specific styles for menu */
+:root[class*='app-inverted'] .layout-sidebar {
+    background-color: #ffffff !important;
+    border: 2px solid #dee2e6 !important;
+}
+
+:root[class*='app-inverted'] .layout-menu {
+    background-color: #ffffff !important;
+}
+
+:root[class*='app-inverted'] .layout-menu .layout-menuitem-root-text {
+    color: #1a1a1a !important;
+}
+
+:root[class*='app-inverted'] .layout-menu a {
+    color: #1a1a1a !important;
+    background-color: transparent !important;
+}
+
+:root[class*='app-inverted'] .layout-menu a:hover {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+:root[class*='app-inverted'] .layout-menu a:hover .layout-menuitem-icon,
+:root[class*='app-inverted'] .layout-menu a:hover .layout-submenu-toggler {
+    color: #ffffff !important;
+}
+
+:root[class*='app-inverted'] .layout-menu a.active-route {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+:root[class*='app-inverted'] .layout-menu a.active-route .layout-menuitem-icon,
+:root[class*='app-inverted'] .layout-menu a.active-route .layout-submenu-toggler {
+    color: #ffffff !important;
+}
+
+:root[class*='app-inverted'] .layout-menu .layout-menuitem-icon,
+:root[class*='app-inverted'] .layout-menu .layout-submenu-toggler {
+    color: #1a1a1a !important;
+}
+
 .layout-menu {
     margin: 0;
     padding: 0;

@@ -1,0 +1,287 @@
+/* High Contrast Theme - Comprehensive Styles */
+
+/* Apply high contrast to all text elements */
+:root[class*='app-inverted'] {
+    /* CRITICAL: Fix sidebar menu first - Dark sidebar with white text */
+    .layout-sidebar {
+        background-color: #1a1a1a !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 0 4px 8px rgba(255,255,255,0.3) !important;
+    }
+
+    .layout-menu {
+        background-color: #1a1a1a !important;
+    }
+
+    .layout-menu .layout-menuitem-root-text {
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+
+    .layout-menu a {
+        color: #ffffff !important;
+        background-color: transparent !important;
+        border-radius: 8px !important;
+        margin: 2px 0 !important;
+    }
+
+    .layout-menu a:hover {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    .layout-menu a:hover .layout-menuitem-icon,
+    .layout-menu a:hover .layout-submenu-toggler {
+        color: #1a1a1a !important;
+    }
+
+    .layout-menu a.active-route {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+
+    .layout-menu a.active-route .layout-menuitem-icon,
+    .layout-menu a.active-route .layout-submenu-toggler {
+        color: #ffffff !important;
+    }
+
+    .layout-menu .layout-menuitem-icon,
+    .layout-menu .layout-submenu-toggler {
+        color: #ffffff !important;
+    }
+
+    .layout-menu .layout-menuitem-text {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+
+    .layout-menu a:hover .layout-menuitem-text {
+        color: #1a1a1a !important;
+    }
+
+    .layout-menu a.active-route .layout-menuitem-text {
+        color: #ffffff !important;
+    }
+
+    /* Force all main content text to be dark on white background */
+    .layout-main *, 
+    .layout-content *,
+    .card *,
+    .p-card *,
+    .p-card-body *,
+    .p-card-content * {
+        color: #1a1a1a !important;
+    }
+
+    /* Main content area */
+    .layout-main, .layout-content {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Specific overrides for common text elements */
+    h1, h2, h3, h4, h5, h6,
+    .text-900, .text-800, .text-700, .text-600, .text-500,
+    .font-bold, .font-semibold, .font-medium,
+    p, span, div, label, small {
+        color: #1a1a1a !important;
+    }
+
+    /* Card and container backgrounds */
+    .card, .p-card, .p-card-body, .p-card-content {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    /* Button text colors */
+    .p-button, button {
+        color: #1a1a1a !important;
+        background-color: #ffffff !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    .p-button:hover, button:hover {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+    }
+
+    .p-button-outlined {
+        border-color: #1a1a1a !important;
+        color: #1a1a1a !important;
+        background-color: #ffffff !important;
+    }
+
+    .p-button-outlined:hover {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+    }
+
+    /* Input field text */
+    .p-inputtext, input, textarea, select {
+        color: #1a1a1a !important;
+        background-color: #ffffff !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    /* Toast messages */
+    .p-toast .p-toast-message {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    /* Dropdown and select elements */
+    .p-dropdown, .p-select {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    /* Table elements */
+    .p-datatable, .p-datatable-table {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    .p-datatable-thead > tr > th {
+        background-color: #f8f9fa !important;
+        color: #1a1a1a !important;
+        border-color: #1a1a1a !important;
+    }
+
+    .p-datatable-tbody > tr > td {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border-color: #1a1a1a !important;
+    }
+
+    /* Override any remaining dark text */
+    .text-primary {
+        color: #3b82f6 !important;
+    }
+
+    .text-secondary {
+        color: #4a4a4a !important;
+    }
+
+    /* Ensure main content icons are visible */
+    .layout-main .pi, 
+    .layout-content .pi,
+    .card .pi,
+    .layout-main i[class*="pi-"],
+    .layout-content i[class*="pi-"],
+    .card i[class*="pi-"] {
+        color: #1a1a1a !important;
+    }
+
+    /* Primary color icons should stay blue */
+    .text-primary .pi,
+    .text-primary i[class*="pi-"] {
+        color: #3b82f6 !important;
+    }
+
+    /* Main layout background */
+    body, .layout-main, .layout-content {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Sidebar and topbar */
+    .layout-topbar {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border-bottom: 2px solid #1a1a1a !important;
+    }
+
+    /* Profile component specific */
+    .profile-header, .profile-content {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Settings component specific */
+    .theme-card, .font-card {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border-color: #1a1a1a !important;
+    }
+
+    .theme-card.selected, .font-card.selected {
+        border-color: #3b82f6 !important;
+        background-color: #f0f8ff !important;
+    }
+
+    /* Form labels and descriptions */
+    .font-info h6, .font-info p,
+    .theme-preview, .font-preview {
+        color: #1a1a1a !important;
+    }
+
+    /* Ensure all PrimeNG components have proper contrast */
+    .p-component {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Override any CSS custom properties that might interfere */
+    --p-text-color: #1a1a1a !important;
+    --p-text-muted-color: #4a4a4a !important;
+    --p-surface-0: #ffffff !important;
+    --p-surface-50: #f8f9fa !important;
+    --p-surface-100: #f1f3f4 !important;
+    --p-surface-200: #e9ecef !important;
+    --p-content-background: #ffffff !important;
+    --p-content-border-color: #1a1a1a !important;
+
+    /* Chat and course specific elements */
+    .chat-container, .course-container, .chapter-container {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    .chat-message, .course-card, .chapter-card {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    /* Exercise and activity containers */
+    .exercise-container, .activity-container {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Progress bars and indicators */
+    .progress-bar, .progress-indicator {
+        background-color: #f8f9fa !important;
+        color: #1a1a1a !important;
+        border: 1px solid #1a1a1a !important;
+    }
+
+    /* Course specific elements from images */
+    .course-title, .chapter-title, .exercise-title {
+        color: #1a1a1a !important;
+        background-color: #ffffff !important;
+    }
+
+    /* Search bars and filters */
+    .search-input, .filter-dropdown {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+    }
+
+    /* Progress indicators and completion status */
+    .progress-text, .completion-status {
+        color: #1a1a1a !important;
+    }
+
+    /* Chat specific elements */
+    .chat-input, .chat-message-text {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 2px solid #1a1a1a !important;
+    }
+}

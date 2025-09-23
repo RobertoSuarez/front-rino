@@ -1,0 +1,332 @@
+<div class="evaluations-container">
+  <!-- Header Section -->
+  <div class="evaluations-header">
+    <div class="header-content">
+      <h1 class="page-title">Mis Evaluaciones</h1>
+      <p class="page-subtitle">Gestiona tus evaluaciones y realiza un seguimiento de tu progreso académico</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-number">{{ getPendingCount() }}</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ getCompletedCount() }}</div>
+        <div class="stat-label">Completadas</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ getAverageScore() }}</div>
+        <div class="stat-label">Promedio</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+      <p>Cargando evaluaciones...</p>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div *ngIf="!isLoading" class="filter-tabs">
+    <button
+      pButton
+      type="button"
+      [label]="'Todas (' + evaluations.length + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'all'"
+      (click)="setActiveFilter('all')">
+    </button>
+    <button
+      pButton
+      type="button"
+      [label]="'Pendientes (' + getPendingCount() + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'pending'"
+      (click)="setActiveFilter('pending')">
+    </button>
+    <button
+      pButton
+      type="button"
+      [label]="'Completadas (' + getCompletedCount() + ')'"
+      class="p-button-text filter-tab"
+      [class.active]="activeFilter === 'completed'"
+      (click)="setActiveFilter('completed')">
+    </button>
+  </div>
+
+  <!-- Evaluations Grid -->
+  <div *ngIf="!isLoading" class="evaluations-grid">
+    <div *ngIf="getFilteredEvaluations().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="pi pi-check-square"></i>
+      </div>
+      <h3>{{ getEmptyStateTitle() }}</h3>
+      <p>{{ getEmptyStateMessage() }}</p>
+    </div>
+
+    <div *ngFor="let evaluation of getFilteredEvaluations()" class="evaluation-card-wrapper">
+      <p-card class="evaluation-card" [style.border-left-color]="evaluation.color">
+        <ng-template pTemplate="header">
+          <div class="evaluation-header">
+            <div class="evaluation-icon" [style.background-color]="evaluation.color">
+              <i [class]="getStatusIcon(evaluation.status)"></i>
+            </div>
+            <div class="evaluation-actions">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-ellipsis-v"
+                class="p-button-text p-button-rounded p-button-plain"
+                (click)="showOptionsMenu($event, evaluation)">
+              </button>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+          <div class="evaluation-content">
+            <div class="evaluation-main">
+              <h3 class="evaluation-title">{{ evaluation.title }}</h3>
+              <p class="evaluation-description">{{ evaluation.description }}</p>
+
+              <div class="evaluation-meta">
+                <div class="meta-item">
+                  <i class="pi pi-book"></i>
+                  <span>{{ evaluation.className }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="pi pi-user"></i>
+                  <span>{{ evaluation.teacher }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="pi pi-calendar"></i>
+                  <span>{{ evaluation.dueDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="pi pi-clock"></i>
+                  <span>{{ evaluation.timeLimit }} min</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="evaluation-status">
+              <div class="status-info">
+                <p-badge
+                  [value]="getStatusLabel(evaluation.status)"
+                  [styleClass]="getStatusBadgeClass(evaluation.status)">
+                </p-badge>
+
+                <div class="due-info" *ngIf="evaluation.status !== 'completed'">
+                  <span class="due-label">Entrega:</span>
+                  <span
+                    class="due-date"
+                    [class.overdue]="isOverdue(evaluation.dueDate)"
+                    [class.due-soon]="getDaysUntilDue(evaluation.dueDate) <= 3 && getDaysUntilDue(evaluation.dueDate) > 0">
+                    {{ getDaysUntilDue(evaluation.dueDate) === 0 ? 'Hoy' :
+                       getDaysUntilDue(evaluation.dueDate) === 1 ? 'Mañana' :
+                       getDaysUntilDue(evaluation.dueDate) < 0 ? 'Vencida' :
+                       getDaysUntilDue(evaluation.dueDate) + ' días' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="score-info" *ngIf="evaluation.status === 'completed' && evaluation.score !== undefined">
+                <div class="score-display">
+                  <span class="score-value">{{ evaluation.score }}/{{ evaluation.maxScore }}</span>
+                  <span class="score-percentage">{{ getProgressPercentage(evaluation) | number:'1.0-0' }}%</span>
+                </div>
+                <p-progressBar
+                  [value]="getProgressPercentage(evaluation)"
+                  [styleClass]="getProgressBarClass(evaluation.score!, evaluation.maxScore)">
+                </p-progressBar>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <div class="evaluation-footer">
+            <div class="evaluation-details">
+              <span class="questions-count">
+                <i class="pi pi-question-circle"></i>
+                {{ evaluation.questionsCount }} preguntas
+              </span>
+              <span class="difficulty" [class]="'difficulty-' + evaluation.difficulty?.toLowerCase()">
+                {{ evaluation.difficulty }}
+              </span>
+            </div>
+
+            <div class="evaluation-actions">
+              <button
+                *ngIf="evaluation.status === 'pending' || evaluation.status === 'overdue'"
+                pButton
+                type="button"
+                label="Comenzar"
+                icon="pi pi-play"
+                class="p-button-primary p-button-sm"
+                (click)="startEvaluation(evaluation)">
+              </button>
+              <button
+                *ngIf="evaluation.status === 'in_progress'"
+                pButton
+                type="button"
+                label="Continuar"
+                icon="pi pi-arrow-right"
+                class="p-button-warning p-button-sm">
+              </button>
+              <button
+                *ngIf="evaluation.status === 'completed'"
+                pButton
+                type="button"
+                label="Ver Resultados"
+                icon="pi pi-chart-bar"
+                class="p-button-success p-button-sm"
+                (click)="viewResults(evaluation)">
+              </button>
+              <button
+                pButton
+                type="button"
+                label="Detalles"
+                icon="pi pi-eye"
+                class="p-button-text p-button-sm"
+                (click)="viewEvaluationDetails(evaluation)">
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Evaluation Details Dialog -->
+  <p-dialog
+    [(visible)]="showDetailsDialog"
+    modal="true"
+    [header]="selectedEvaluation?.title || 'Detalles de la Evaluación'"
+    [style]="{ width: '90vw', 'max-width': '700px' }"
+    [closable]="true"
+    (onHide)="closeDetailsDialog()">
+
+    <div class="evaluation-details-content" *ngIf="selectedEvaluation">
+      <!-- Header Info -->
+      <div class="details-header">
+        <div class="evaluation-icon-large" [style.background-color]="selectedEvaluation.color">
+          <i [class]="getStatusIcon(selectedEvaluation.status)"></i>
+        </div>
+        <div class="evaluation-basic-info">
+          <div class="status-and-score">
+            <p-badge
+              [value]="getStatusLabel(selectedEvaluation.status)"
+              [styleClass]="getStatusBadgeClass(selectedEvaluation.status)">
+            </p-badge>
+            <div class="score-display" *ngIf="selectedEvaluation.status === 'completed' && selectedEvaluation.score !== undefined">
+              <span class="score">{{ selectedEvaluation.score }}/{{ selectedEvaluation.maxScore }}</span>
+              <span class="percentage">({{ getProgressPercentage(selectedEvaluation) | number:'1.0-0' }}%)</span>
+            </div>
+          </div>
+          <div class="evaluation-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Clase:</span>
+              <span class="meta-value">{{ selectedEvaluation.className }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Profesor:</span>
+              <span class="meta-value">{{ selectedEvaluation.teacher }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Fecha límite:</span>
+              <span class="meta-value">{{ selectedEvaluation.dueDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Tiempo límite:</span>
+              <span class="meta-value">{{ selectedEvaluation.timeLimit }} minutos</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Preguntas:</span>
+              <span class="meta-value">{{ selectedEvaluation.questionsCount }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Dificultad:</span>
+              <span class="meta-value difficulty" [class]="'difficulty-' + selectedEvaluation.difficulty?.toLowerCase()">
+                {{ selectedEvaluation.difficulty }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="details-section" *ngIf="selectedEvaluation.instructions">
+        <h4><i class="pi pi-info-circle"></i> Instrucciones</h4>
+        <p>{{ selectedEvaluation.instructions }}</p>
+      </div>
+
+      <!-- Topics -->
+      <div class="details-section" *ngIf="selectedEvaluation.topics && selectedEvaluation.topics.length > 0">
+        <h4><i class="pi pi-list"></i> Temas a Evaluar</h4>
+        <div class="topics-grid">
+          <span class="topic-tag" *ngFor="let topic of selectedEvaluation.topics">
+            {{ topic }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Attempts Info -->
+      <div class="details-section">
+        <h4><i class="pi pi-refresh"></i> Intentos</h4>
+        <div class="attempts-info">
+          <div class="attempt-item">
+            <span class="attempt-label">Permitidos:</span>
+            <span class="attempt-value">{{ selectedEvaluation.attemptsAllowed }}</span>
+          </div>
+          <div class="attempt-item">
+            <span class="attempt-label">Utilizados:</span>
+            <span class="attempt-value">{{ selectedEvaluation.attemptsUsed }}</span>
+          </div>
+          <div class="attempt-item">
+            <span class="attempt-label">Disponibles:</span>
+            <span class="attempt-value">{{ selectedEvaluation.attemptsAllowed! - selectedEvaluation.attemptsUsed! }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="details-actions">
+        <button
+          *ngIf="selectedEvaluation.status === 'pending' || selectedEvaluation.status === 'overdue'"
+          pButton
+          type="button"
+          label="Comenzar Evaluación"
+          icon="pi pi-play"
+          class="p-button-primary"
+          (click)="startEvaluation(selectedEvaluation)">
+        </button>
+        <button
+          *ngIf="selectedEvaluation.status === 'in_progress'"
+          pButton
+          type="button"
+          label="Continuar Evaluación"
+          icon="pi pi-arrow-right"
+          class="p-button-warning">
+        </button>
+        <button
+          *ngIf="selectedEvaluation.status === 'completed'"
+          pButton
+          type="button"
+          label="Ver Resultados Detallados"
+          icon="pi pi-chart-bar"
+          class="p-button-success"
+          (click)="viewResults(selectedEvaluation)">
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+</div>
+
+<p-toast></p-toast>

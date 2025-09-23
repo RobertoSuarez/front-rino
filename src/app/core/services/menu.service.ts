@@ -154,7 +154,7 @@ export class MenuService {
         items: [
           { label: 'Mis Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/estudiante/cursos'] },
           { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/estudiante/classes'] },
-          { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/student/assessments'] }
+          { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/estudiante/evaluations'] }
         ]
       },
       {

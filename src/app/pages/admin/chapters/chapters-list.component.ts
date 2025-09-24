@@ -21,6 +21,10 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AiService } from '../../../core/services/ai.service';
 import { CourseService } from '../../../core/services/course.service';
+import { ActivatedRoute } from '@angular/router';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { TooltipModule } from 'primeng/tooltip';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chapters-list',
@@ -38,7 +42,9 @@ import { CourseService } from '../../../core/services/course.service';
     CheckboxModule,
     ReactiveFormsModule,
     ButtonModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    BreadcrumbModule,
+    TooltipModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './chapters-list.component.html'
@@ -48,7 +54,9 @@ export class ChaptersListComponent implements OnInit {
   loading: boolean = true;
   displayCreateDialog: boolean = false;
   displayEditDialog: boolean = false;
+  displayDetailsDialog: boolean = false;
   currentChapterId: number | null = null;
+  selectedChapter: Chapter | null = null;
   chapterForm: FormGroup;
   courses: any[] = [];
   selectedCourseId: number | null = null;
@@ -57,6 +65,13 @@ export class ChaptersListComponent implements OnInit {
     { label: 'Medio', value: 'Medio' },
     { label: 'Difícil', value: 'Difícil' }
   ];
+
+  breadcrumbItems = [
+    { label: 'Cursos', routerLink: '/courses' },
+    { label: 'Capítulos', routerLink: '/admin/chapters' }
+  ];
+
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
 
   @ViewChild('dt') dt!: Table;
 
@@ -67,12 +82,18 @@ export class ChaptersListComponent implements OnInit {
     private http: HttpClient,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private aiService: AiService
+    private aiService: AiService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.chapterForm = this.createForm();
   }
 
   ngOnInit() {
+    // Leer el query parameter courseId si viene desde el modal de cursos
+    const courseIdParam = this.route.snapshot.queryParams['courseId'];
+    const courseIdFromUrl = courseIdParam ? parseInt(courseIdParam, 10) : null;
+
     // Cargar la lista de cursos para el filtro
     this.http.get<any>(`${environment.apiUrl}/courses`).subscribe({
       next: (response) => {
@@ -81,14 +102,20 @@ export class ChaptersListComponent implements OnInit {
             label: course.title,
             value: course.id
           }));
-          
-          // Seleccionar automáticamente el primer curso
-          const firstCourse = response.data[0];
-          if (firstCourse && firstCourse.id) {
-            this.selectedCourseId = firstCourse.id;
-            // Cargar los capítulos del curso seleccionado
-            this.loadChapters();
+
+          // Si viene courseId desde URL, seleccionar ese curso
+          if (courseIdFromUrl) {
+            this.selectedCourseId = courseIdFromUrl;
+          } else {
+            // Seleccionar automáticamente el primer curso
+            const firstCourse = response.data[0];
+            if (firstCourse && firstCourse.id) {
+              this.selectedCourseId = firstCourse.id;
+            }
           }
+
+          // Cargar los capítulos del curso seleccionado
+          this.loadChapters();
         }
       },
       error: (err) => {
@@ -283,8 +310,27 @@ export class ChaptersListComponent implements OnInit {
     } else {
       this.displayCreateDialog = false;
     }
+    this.displayDetailsDialog = false;
     this.currentChapterId = null;
+    this.selectedChapter = null;
     this.chapterForm.reset();
+  }
+
+  viewChapterDetails(chapter: Chapter) {
+    this.selectedChapter = chapter;
+    this.displayDetailsDialog = true;
+  }
+
+  onDetailsDialogHide() {
+    this.displayDetailsDialog = false;
+    this.selectedChapter = null;
+  }
+
+  navigateToThemes(chapter: Chapter) {
+    // Navegar a la pantalla de temas/contenido del capítulo
+    this.router.navigate(['/admin/themes'], {
+      queryParams: { chapterId: chapter.id }
+    });
   }
 
   /**

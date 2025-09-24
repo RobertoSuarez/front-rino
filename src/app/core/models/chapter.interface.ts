@@ -9,8 +9,8 @@ export interface Chapter {
   difficulty: string;
   courseId?: number;
   course?: any;
-  createAt?: string;
-  updateAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ChapterWithProgress {

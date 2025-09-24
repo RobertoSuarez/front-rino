@@ -12,15 +12,17 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Button } from "primeng/button";
-import { environment } from 'src/environments/environment';
-import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../../environments/environment';
 import { AiService } from '../../core/services/ai.service';
 
 @Component({
@@ -35,11 +37,13 @@ import { AiService } from '../../core/services/ai.service';
     IconFieldModule,
     InputIconModule,
     InputTextModule,
+    ButtonModule,
     DialogModule,
     CheckboxModule,
     ReactiveFormsModule,
-    Button,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    BreadcrumbModule,
+    RouterModule
 ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './courses.component.html'
@@ -47,8 +51,10 @@ import { AiService } from '../../core/services/ai.service';
 export class CoursesComponent implements OnInit {
   courses: Course[] = [];
   loading: boolean = true;
+  displayDetailsDialog: boolean = false;
   displayCreateDialog: boolean = false;
   displayEditDialog: boolean = false;
+  selectedCourse: any = null;
   newCourse: any = {
     title: '',
     description: '',
@@ -58,6 +64,22 @@ export class CoursesComponent implements OnInit {
   currentCourseId: string | null = null;
   courseForm: FormGroup;
 
+  defaultImages: string[] = [
+    'https://i.ibb.co/chdPzT1f/Quiero-un-logo-para-mi-aplicaci-n-web-gamificada-para-ense-ar-cyberseguridad.jpg',
+    'https://i.ibb.co/YBRnQLst/quiero-que-me-ayudes-creando-una-imagen-que-pueda-usar-de-portada-para-un-curso-de-varios-que-tengo.jpg',
+    'https://i.ibb.co/hPLvgjc/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/mdBjLyJ/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/77tzGmy/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/932zmNVD/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/gZLQn5Jg/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg'
+  ];
+
+  breadcrumbItems = [
+    { label: 'Cursos', routerLink: '/courses' }
+  ];
+
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
+
   @ViewChild('dt') dt!: Table;
 
   constructor(
@@ -66,6 +88,7 @@ export class CoursesComponent implements OnInit {
     private http: HttpClient,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
+    private router: Router,
     private aiService: AiService
   ) {
     this.courseForm = this.fb.group({
@@ -74,6 +97,10 @@ export class CoursesComponent implements OnInit {
       urlLogo: ['', Validators.required],
       isPublic: [false]
     });
+  }
+
+  get dialogVisible(): boolean {
+    return this.displayCreateDialog || this.displayEditDialog;
   }
 
   ngOnInit() {
@@ -93,7 +120,7 @@ export class CoursesComponent implements OnInit {
     this.courseForm.setValue({
       title: '',
       description: '',
-      urlLogo: '',
+      urlLogo: this.defaultImages[0], // Set default image
       isPublic: false
     });
     this.currentCourseId = null;
@@ -206,6 +233,19 @@ export class CoursesComponent implements OnInit {
       });
   }
 
+  selectImage(imageUrl: string) {
+    this.courseForm.patchValue({
+      urlLogo: imageUrl
+    });
+  }
+
+  onFileSelected(event: any) {
+    // Mock upload - in real implementation, upload to server
+    this.courseForm.patchValue({
+      urlLogo: 'https://i.ibb.co/chdPzT1f/uploaded-image-mock.jpg' // Mock URL for uploaded image
+    });
+  }
+
   /**
    * Maneja el cierre del diálogo, tanto para creación como para edición
    */
@@ -217,6 +257,42 @@ export class CoursesComponent implements OnInit {
     }
     this.currentCourseId = null;
     this.courseForm.reset();
+  }
+
+  onDialogHide(visible: boolean) {
+    if (!visible) {
+      this.hideDialog();
+    }
+  }
+
+  onDetailsDialogHide(event?: any) {
+    this.displayDetailsDialog = false;
+    this.selectedCourse = null;
+  }
+
+  viewCourseDetails(course: any) {
+    this.selectedCourse = course;
+    this.displayDetailsDialog = true; // Mostrar modal inmediatamente
+    this.loading = true;
+
+    this.http.get<GetCourseByIdResponse>(`${environment.apiUrl}/courses/${course.id}`)
+      .subscribe({
+        next: (response) => {
+          // Combinar datos existentes con datos adicionales
+          this.selectedCourse = { ...this.selectedCourse, ...response.data };
+        },
+        error: (err) => {
+          this.messageService.add({severity:'error', summary:'Error', detail:'Error al cargar detalles del curso'});
+        },
+        complete: () => this.loading = false
+      });
+  }
+
+  navigateToChapters(course: any) {
+    // Navegar a la pantalla de capítulos del admin con el courseId como query parameter
+    this.router.navigate(['/admin/chapters'], {
+      queryParams: { courseId: course.id }
+    });
   }
 
   /**

@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4"></p-breadcrumb>
 <div class="card">
     <div class="font-semibold text-xl mb-4">Gestión de Capítulos</div>
 
@@ -20,17 +21,21 @@
         [rowHover]="true"
         [showGridlines]="true"
         [paginator]="true"
-        [globalFilterFields]="['title', 'shortDescription', 'difficulty']"
+        [globalFilterFields]="['title', 'shortDescription', 'difficulty', 'createAt', 'updatedAt']"
         responsiveLayout="scroll"
     >
         <ng-template pTemplate="caption">
             <div class="flex justify-between items-center flex-column sm:flex-row">
-                <p-button 
-                        label="Nuevo Capítulo" 
-                        icon="pi pi-plus" 
-                        class="p-button-rounded mr-2"
+                <p-button
+                        label="Nuevo Capítulo"
+                        icon="pi pi-plus"
+                        severity="success"
+                        [raised]="true"
                         [disabled]="!selectedCourseId"
-                        (click)="showCreateDialog()"></p-button>
+                        (click)="showCreateDialog()"
+                        class="shadow-lg hover:shadow-xl transition-all duration-200"
+                        pTooltip="Crear un nuevo capítulo"
+                        tooltipPosition="bottom"></p-button>
                 <p-iconField iconPosition="left" class="ml-auto">
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
@@ -43,9 +48,9 @@
         <ng-template pTemplate="header">
             <tr>
                 <th>Título</th>
-                <th>Descripción</th>
                 <th>Dificultad</th>
                 <th>Fecha Creación</th>
+                <th>Fecha Actualización</th>
                 <th>Acciones</th>
             </tr>
         </ng-template>
@@ -53,29 +58,48 @@
         <ng-template pTemplate="body" let-chapter>
             <tr>
                 <td>{{chapter.title}}</td>
-                <td>{{chapter.shortDescription}}</td>
                 <td>
                     <p-tag [value]="chapter.difficulty" 
                            [severity]="chapter.difficulty === 'Fácil' ? 'success' : (chapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
                 </td>
-                <td>{{chapter.createAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td>{{chapter.createdAt}}</td>
+                <td>{{chapter.updatedAt}}</td>
                 <td class="flex gap-2">
-                    <p-button pButton 
-                            icon="pi pi-pencil" 
-                            class="p-button-rounded p-button-text"
-                            (click)="showEditDialog(chapter)"></p-button>
-                    <p-button 
-                        icon="pi pi-trash" 
+                    <p-button
+                            icon="pi pi-eye"
+                            [raised]="true"
+                            severity="warn"
+                            (click)="viewChapterDetails(chapter)"
+                            pTooltip="Ver detalles"
+                            tooltipPosition="top"></p-button>
+                    <p-button
+                            icon="pi pi-pencil"
+                            [raised]="true"
+                            severity="info"
+                            (click)="showEditDialog(chapter)"
+                            pTooltip="Editar capítulo"
+                            tooltipPosition="top"></p-button>
+                    <p-button
+                        icon="pi pi-trash"
+                        [raised]="true"
                         severity="danger"
-                        class="p-button-rounded p-button-text"
-                        (click)="confirmDelete(chapter)"></p-button>
+                        (onClick)="confirmDelete(chapter)"
+                        pTooltip="Eliminar capítulo"
+                        tooltipPosition="top"></p-button>
+                    <p-button
+                        icon="pi pi-list"
+                        [raised]="true"
+                        severity="success"
+                        (click)="navigateToThemes(chapter)"
+                        pTooltip="Ver temas"
+                        tooltipPosition="top"></p-button>
                 </td>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="5" class="text-center p-4">
+                <td colspan="6" class="text-center p-4">
                     <div *ngIf="selectedCourseId; else selectCourse">
                         No se encontraron capítulos para este curso.
                     </div>
@@ -88,13 +112,31 @@
     </p-table>
 </div>
 
-<p-dialog [header]="currentChapterId ? 'Editar Capítulo' : 'Nuevo Capítulo'" 
-         [visible]="displayCreateDialog || displayEditDialog" 
+<p-dialog [header]="currentChapterId ? 'Editar Capítulo' : 'Nuevo Capítulo'"
+         [visible]="displayCreateDialog || displayEditDialog"
          (onHide)="hideDialog()"
-         [style]="{width: '50vw'}" 
+         [style]="{width: '50vw'}"
          [modal]="true"
-         [closable]="true"
+         [closable]="false"
          class="rounded-lg shadow-xl">
+    <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+            <h3 class="text-lg font-semibold text-gray-800 m-0">
+                {{ currentChapterId ? 'Editar Capítulo' : 'Nuevo Capítulo' }}
+            </h3>
+            <p-button
+                icon="pi pi-times"
+                [rounded]="true"
+                severity="secondary"
+                size="small"
+                [text]="true"
+                (onClick)="hideDialog()"
+                class="hover:bg-gray-100 transition-colors duration-200"
+                pTooltip="Cerrar"
+                tooltipPosition="bottom">
+            </p-button>
+        </div>
+    </ng-template>
     <form [formGroup]="chapterForm" 
           (ngSubmit)="currentChapterId ? updateChapter() : createChapter()" 
           class="p-fluid space-y-4">
@@ -111,12 +153,17 @@
         <div class="field space-y-2">
             <div class="flex justify-between items-center">
                 <label for="shortDescription" class="block text-sm font-medium text-gray-700">Descripción Corta</label>
-                <p-button type="button" 
-                         label="Generar con IA" 
-                         icon="pi pi-bolt" 
-                         styleClass="p-button-sm p-button-text p-button-info"
+                <p-button type="button"
+                         label="Generar con IA"
+                         icon="pi pi-bolt"
+                         severity="info"
+                         size="small"
+                         [outlined]="true"
                          [loading]="loading"
-                         (onClick)="generateDescriptionWithAI()"></p-button>
+                         (onClick)="generateDescriptionWithAI()"
+                         class="transition-all duration-200 hover:shadow-md"
+                         pTooltip="Generar descripción automáticamente"
+                         tooltipPosition="top"></p-button>
             </div>
             <textarea id="shortDescription" formControlName="shortDescription" rows="3"
                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
@@ -137,16 +184,102 @@
             </small>
         </div>
         
-        <div class="flex justify-end gap-3 mt-6">
-            <p-button type="button" label="Cancelar" 
-                    class=""
-                    (onClick)="hideDialog()"></p-button>
-            <p-button type="submit" 
-                    [label]="currentChapterId ? 'Actualizar' : 'Crear'" 
-                    [disabled]="chapterForm.invalid"
-                    class=""></p-button>
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+            <p-button type="button"
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="hideDialog()"
+                    class="transition-all duration-200 hover:shadow-md"></p-button>
+            <p-button type="submit"
+                    [label]="currentChapterId ? 'Actualizar Capítulo' : 'Crear Capítulo'"
+                    icon="pi pi-check"
+                    severity="success"
+                    [raised]="true"
+                    [disabled]="chapterForm.invalid || loading"
+                    [loading]="loading"
+                    class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
         </div>
     </form>
+</p-dialog>
+
+<p-dialog [header]="selectedChapter ? 'Detalles del Capítulo' : 'Capítulo'"
+         [(visible)]="displayDetailsDialog"
+         [style]="{width: '60vw'}"
+         [modal]="true"
+         [closable]="false"
+         (visibleChange)="onDetailsDialogHide()"
+         class="rounded-lg shadow-xl">
+    <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+            <h3 class="text-lg font-semibold text-gray-800 m-0">
+                {{ selectedChapter ? 'Detalles del Capítulo' : 'Capítulo' }}
+            </h3>
+            <p-button
+                icon="pi pi-times"
+                [rounded]="true"
+                severity="secondary"
+                size="small"
+                [text]="true"
+                (onClick)="onDetailsDialogHide()"
+                class="hover:bg-gray-100 transition-colors duration-200"
+                pTooltip="Cerrar"
+                tooltipPosition="bottom">
+            </p-button>
+        </div>
+    </ng-template>
+    <div *ngIf="selectedChapter" class="space-y-6">
+        <!-- Hero Section -->
+        <div class="flex items-center space-x-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+            <div class="flex-1">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selectedChapter.title }}</h2>
+                <p class="text-gray-600 mb-4">{{ selectedChapter.shortDescription }}</p>
+                <div class="flex items-center gap-4">
+                    <p-tag [value]="selectedChapter.difficulty" 
+                           [severity]="selectedChapter.difficulty === 'Fácil' ? 'success' : (selectedChapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Dificultad</div>
+                <div class="font-semibold">{{ selectedChapter.difficulty }}</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Creado</div>
+                <div class="font-semibold text-sm">{{ selectedChapter.createdAt }}</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Actualizado</div>
+                <div class="font-semibold text-sm">{{ selectedChapter.updatedAt }}</div>
+            </div>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <p-button
+                label="Cerrar"
+                icon="pi pi-times"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="onDetailsDialogHide()"
+                class="transition-all duration-200 hover:shadow-md"></p-button>
+            <p-button
+                label="Editar Capítulo"
+                icon="pi pi-pencil"
+                severity="info"
+                [raised]="true"
+                (onClick)="selectedChapter && showEditDialog(selectedChapter); onDetailsDialogHide()"
+                class="shadow-lg hover:shadow-xl transition-all duration-200"
+                pTooltip="Modificar la información del capítulo"
+                tooltipPosition="top"></p-button>
+        </div>
+    </ng-template>
 </p-dialog>
 
 <p-confirmDialog [style]="{ width: '450px' }" />

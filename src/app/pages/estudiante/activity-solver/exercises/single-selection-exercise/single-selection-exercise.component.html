@@ -1,25 +1,11 @@
 <div class="exercise-container">
   <div class="options-container">
-    <div *ngFor="let option of options; let i = index" class="option-item">
-      <div class="p-field-radiobutton">
-        <p-radioButton 
-          [inputId]="'option_' + i"
-          [value]="option"
-          [(ngModel)]="selectedValue"
-          [disabled]="disabled"
-          (onClick)="onSelectionChange(option)">
-        </p-radioButton>
-        <label [for]="'option_' + i" class="option-label">{{ option }}</label>
-      </div>
+    <div *ngFor="let option of options; let i = index"
+         class="option-item"
+         [class.selected]="selectedValue === option"
+         (click)="onSelectionChange(option)">
+      <div class="custom-radio" [class.selected]="selectedValue === option"></div>
+      <span class="option-label">{{ option }}</span>
     </div>
-  </div>
-  
-  <div class="mt-4 flex justify-end">
-    <p-button 
-      label="Verificar respuesta" 
-      icon="pi pi-check" 
-      [disabled]="!selectedValue || disabled"
-      (onClick)="onSubmit()">
-    </p-button>
   </div>
 </div>

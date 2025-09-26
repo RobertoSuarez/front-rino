@@ -30,7 +30,6 @@ export class OrderFragmentCodeExerciseComponent {
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
   fragmentsToOrder: string[] = [];
-  disabled = false;
 
   ngOnChanges() {
     if (this.orderedFragments && this.orderedFragments.length > 0) {
@@ -43,18 +42,18 @@ export class OrderFragmentCodeExerciseComponent {
   onDrop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.fragmentsToOrder, event.previousIndex, event.currentIndex);
     this.onChange(this.fragmentsToOrder);
-  }
-
-  onSubmit() {
-    if (this.fragmentsToOrder && this.fragmentsToOrder.length > 0) {
-      this.answerSubmitted.emit(this.fragmentsToOrder);
-    }
+    this.onTouch();
+    // Emitir automáticamente la respuesta cuando cambie el orden
+    this.answerSubmitted.emit(this.fragmentsToOrder);
   }
 
   resetOrder() {
     if (this.fragments && this.fragments.length > 0) {
       this.fragmentsToOrder = [...this.fragments];
       this.onChange(this.fragmentsToOrder);
+      this.onTouch();
+      // Emitir la respuesta después de resetear
+      this.answerSubmitted.emit(this.fragmentsToOrder);
     }
   }
 
@@ -75,6 +74,6 @@ export class OrderFragmentCodeExerciseComponent {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // No necesitamos disabled state ya que la verificación se maneja desde el padre
   }
 }

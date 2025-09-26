@@ -26,16 +26,9 @@ export class WriteCodeExerciseComponent {
   @Output() answerSubmitted = new EventEmitter<string>();
 
   codeValue: string = '';
-  disabled = false;
 
   ngOnChanges() {
     this.codeValue = this.code || '';
-  }
-
-  onSubmit() {
-    if (this.codeValue && this.codeValue.trim()) {
-      this.answerSubmitted.emit(this.codeValue);
-    }
   }
 
   // Implementación de ControlValueAccessor
@@ -55,12 +48,14 @@ export class WriteCodeExerciseComponent {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // No necesitamos disabled state ya que la verificación se maneja desde el padre
   }
 
-  onCodeChange(event: any) {
-    this.codeValue = event.target.value;
+  onCodeChange(value: string) {
+    this.codeValue = value;
     this.onChange(this.codeValue);
     this.onTouch();
+    // Emitir automáticamente la respuesta cuando cambie el código
+    this.answerSubmitted.emit(this.codeValue);
   }
 }

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AppLayout } from './app/layout/component/app.layout';
+import { ActivityLayoutComponent } from './app/layout/component/activity-layout.component';
 import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
@@ -10,6 +11,20 @@ import { SettingsComponent } from './app/pages/settings/settings.component';
 
 export const appRoutes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+
+    // Ruta específica para activity-solver con layout dedicado
+    {
+        path: 'estudiante/activity/:activityId',
+        component: ActivityLayoutComponent,
+        canActivate: [() => authGuard()],
+        children: [
+            {
+                path: '',
+                loadComponent: () => import('./app/pages/estudiante/activity-solver/activity-solver.component').then(m => m.ActivitySolverComponent)
+            }
+        ]
+    },
+
     {
         path: '',
         component: AppLayout,
@@ -23,7 +38,10 @@ export const appRoutes: Routes = [
             { path: 'settings', component: SettingsComponent },
             { path: 'courses', loadComponent: () => import('./app/pages/courses/courses.component').then(m => m.CoursesComponent) },
             { path: 'admin', loadChildren: () => import('./app/pages/admin/admin.routes').then(m => m.adminRoutes) },
-            { path: 'estudiante', loadChildren: () => import('./app/pages/estudiante/estudiante.routes') },
+            {
+                path: 'estudiante',
+                loadChildren: () => import('./app/pages/estudiante/estudiante.routes')
+            },
             { path: 'student-chat', loadChildren: () => import('./app/pages/student-chat/student-chat.module').then(m => m.StudentChatModule) }
         ]
     },

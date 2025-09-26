@@ -8,44 +8,34 @@
   </div>
 </div>
 
-<!-- Contenido principal -->
-<div *ngIf="!loading() && !activityCompleted()" class="p-6 min-h-[calc(100vh-64px)]">
-  
-  <!-- Cabecera de la actividad -->
-  <div class="mb-8">
-    <p-card class="shadow-3 bg-white rounded-xl">
-      <div class="p-6">
-        <div class="flex flex-col md:flex-row items-start justify-between gap-6">
-          
-          <!-- Información de la actividad -->
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-4">
-              <p-button icon="pi pi-arrow-left" 
-                       styleClass="p-button-rounded p-button-text p-button-secondary"
-                       (click)="navigateBack()"
-                       pTooltip="Volver atrás" tooltipPosition="bottom"></p-button>
-              <h1 class="text-3xl font-bold text-slate-900">{{ safeActivity.title }}</h1>
-            </div>
-            
-            <!-- Barra de progreso -->
-            <div class="mt-4">
-              <p-progressBar [value]="progress" [showValue]="true" styleClass="h-2"></p-progressBar>
-              <div class="flex justify-between mt-2 text-sm text-slate-600">
-                <span>Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}</span>
-                <span>{{ progress.toFixed(0) }}% completado</span>
-              </div>
-            </div>
-          </div>
-        </div>
+<!-- Contenido principal - Diseño Duolingo -->
+<div class="h-full bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+
+  <!-- Barra de progreso superior -->
+  <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-3">
+        <p-button icon="pi pi-arrow-left"
+                 styleClass="p-button-rounded p-button-text p-button-secondary"
+                 (click)="navigateBack()"
+                 pTooltip="Volver atrás" tooltipPosition="bottom"></p-button>
+        <span class="text-sm font-medium text-gray-600">
+          Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
+        </span>
       </div>
-    </p-card>
+      <p-progressBar [value]="progress" [showValue]="false" styleClass="h-2 bg-gray-200"></p-progressBar>
+      <div class="text-center mt-2">
+        <span class="text-xs text-gray-500">{{ progress.toFixed(0) }}% completado</span>
+      </div>
+    </div>
   </div>
-  
-  <!-- Contenido del ejercicio actual -->
-  <div *ngIf="currentExercise" class="mb-8">
-    <p-card class="shadow-2 rounded-xl border-0 overflow-hidden">
-      <div class="p-6">
-        <!-- Enunciado del ejercicio -->
+
+  <!-- Contenido del ejercicio con scroll automático -->
+  <div class="flex-1 px-6 py-8 overflow-y-auto">
+    <div class="flex justify-center">
+      <div class="w-[90%] max-w-none py-8">
+      <div *ngIf="currentExercise" class="bg-white rounded-2xl shadow-xl">
+        <div class="p-8">
         <div class="mb-6">
           <h2 class="text-2xl font-bold text-slate-800 mb-4">{{ currentExercise.statement }}</h2>
           
@@ -110,99 +100,173 @@
           </app-find-error-code-exercise>
         </div>
         
-        <!-- Feedback del ejercicio -->
-        <div *ngIf="showFeedback() && currentFeedback()" class="mt-6">
-          <div [ngClass]="{'bg-green-50 border-green-500': safeFeedback.qualification >= 7, 'bg-amber-50 border-amber-500': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'bg-red-50 border-red-500': safeFeedback.qualification < 5}" 
-               class="p-4 rounded-lg border-l-4">
-            <div class="flex items-start gap-3">
-              <i [ngClass]="{'pi-check-circle text-green-500': safeFeedback.qualification >= 7, 'pi-exclamation-circle text-amber-500': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'pi-times-circle text-red-500': safeFeedback.qualification < 5}" 
-                 class="pi text-xl mt-1"></i>
-              <div>
-                <h3 [ngClass]="{'text-green-700': safeFeedback.qualification >= 7, 'text-amber-700': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'text-red-700': safeFeedback.qualification < 5}" 
-                    class="text-lg font-semibold mb-1">
-                  {{ safeFeedback.qualification >= 7 ? '¡Correcto!' : safeFeedback.qualification >= 5 ? 'Parcialmente correcto' : 'Incorrecto' }}
-                </h3>
-                <p [ngClass]="{'text-green-800': safeFeedback.qualification >= 7, 'text-amber-800': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'text-red-800': safeFeedback.qualification < 5}">
-                  {{ safeFeedback.feedback }}
-                </p>
-                <div class="mt-2">
-                  <span class="font-semibold">Puntuación: </span>
-                  <span>{{ safeFeedback.qualification }}/10</span>
-                </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex justify-center mt-8 mb-8">
+          <!-- Botón Verificar Respuesta (antes de verificar) -->
+          <div *ngIf="!answerVerified()" class="flex gap-4 mb-8">
+            <p-button
+              label="Verificar Respuesta"
+              icon="pi pi-check"
+              styleClass="p-button-primary px-8 py-3 text-lg"
+              (onClick)="verifyAnswer()"
+              [loading]="submitting()"
+              [disabled]="!hasAnswer()">
+            </p-button>
+          </div>
+
+          <!-- Botones Siguiente/Anterior (después de verificar) -->
+          <div *ngIf="answerVerified()" class="flex gap-4 mb-8">
+            <p-button
+              *ngIf="!isFirstExercise"
+              label="Anterior"
+              icon="pi pi-arrow-left"
+              styleClass="p-button-secondary"
+              (onClick)="previousExercise()">
+            </p-button>
+
+            <p-button
+              [label]="isLastExercise ? 'Finalizar Actividad' : 'Siguiente'"
+              [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
+              [styleClass]="isLastExercise ? 'p-button-success' : 'p-button-primary'"
+              (onClick)="nextExercise()"
+              [loading]="submitting()">
+            </p-button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Drawer de Feedback desde abajo -->
+<p-drawer
+  [(visible)]="showFeedbackDrawer"
+  [modal]="true"
+  position="bottom"
+  [style]="{'height': 'auto'}"
+  [contentStyle]="{'padding': '0'}"
+  header="Resultado de tu respuesta"
+  [showCloseIcon]="true"
+  (onHide)="closeFeedbackDrawer()">
+
+  <!-- Contenido del drawer de feedback -->
+  <div class="feedback-drawer-content" *ngIf="showFeedback() && currentFeedback()">
+    <div class="p-6">
+      <div [ngClass]="{'bg-green-50 border-green-500': safeFeedback.qualification >= 7, 'bg-amber-50 border-amber-500': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'bg-red-50 border-red-500': safeFeedback.qualification < 5}"
+           class="rounded-xl border-l-4 p-6 shadow-lg">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <div [ngClass]="{'bg-green-100': safeFeedback.qualification >= 7, 'bg-amber-100': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'bg-red-100': safeFeedback.qualification < 5}"
+                 class="w-16 h-16 rounded-full flex items-center justify-center">
+              <i [ngClass]="{'pi-check-circle text-green-600 text-3xl': safeFeedback.qualification >= 7, 'pi-exclamation-circle text-amber-600 text-3xl': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'pi-times-circle text-red-600 text-3xl': safeFeedback.qualification < 5}"
+                 class="pi"></i>
+            </div>
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <h3 [ngClass]="{'text-green-800': safeFeedback.qualification >= 7, 'text-amber-800': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'text-red-800': safeFeedback.qualification < 5}"
+                class="text-2xl font-bold mb-3">
+              {{ safeFeedback.qualification >= 7 ? '¡Excelente trabajo!' : safeFeedback.qualification >= 5 ? 'Buen intento, sigue practicando' : 'Necesitas revisar el concepto' }}
+            </h3>
+
+            <p [ngClass]="{'text-green-700': safeFeedback.qualification >= 7, 'text-amber-700': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'text-red-700': safeFeedback.qualification < 5}"
+               class="text-lg leading-relaxed mb-4">
+              {{ safeFeedback.feedback }}
+            </p>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-600">Puntuación obtenida:</span>
+                <span [ngClass]="{'text-green-600': safeFeedback.qualification >= 7, 'text-amber-600': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 'text-red-600': safeFeedback.qualification < 5}"
+                      class="text-xl font-bold">
+                  {{ safeFeedback.qualification }}/10
+                </span>
+              </div>
+
+              <div class="flex gap-2">
+                <p-button
+                  label="Revisar respuesta"
+                  icon="pi pi-eye"
+                  styleClass="p-button-secondary p-button-sm"
+                  (onClick)="closeFeedbackDrawer()">
+                </p-button>
+                <p-button
+                  [label]="isLastExercise ? 'Finalizar' : 'Continuar'"
+                  [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
+                  [styleClass]="isLastExercise ? 'p-button-success p-button-sm' : 'p-button-primary p-button-sm'"
+                  (onClick)="isLastExercise ? nextExercise() : continueFromFeedback()">
+                </p-button>
               </div>
             </div>
           </div>
         </div>
-        
-        <!-- Botones de navegación -->
-        <div class="flex justify-between mt-8">
-          <p-button 
-            [disabled]="isFirstExercise" 
-            icon="pi pi-arrow-left" 
-            label="Anterior" 
-            styleClass="p-button-secondary" 
-            (onClick)="previousExercise()">
-          </p-button>
-          
-          <p-button 
-            [label]="isLastExercise ? 'Finalizar' : 'Siguiente'" 
-            [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'" 
-            [styleClass]="isLastExercise ? 'p-button-success' : 'p-button-primary'" 
-            (onClick)="nextExercise()"
-            [loading]="submitting()">
-          </p-button>
-        </div>
       </div>
-    </p-card>
+    </div>
   </div>
-</div>
+</p-drawer>
 
-<!-- Pantalla de actividad completada -->
-<div *ngIf="!loading() && activityCompleted() && activityResult()" class="p-6 min-h-[calc(100vh-64px)]">
-  <p-card class="shadow-3 bg-white rounded-xl">
-    <div class="p-6 text-center">
-      <div class="mb-8">
-        <div class="flex justify-center mb-4">
-          <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center">
-            <i class="pi pi-check-circle text-green-500 text-5xl"></i>
+<!-- Modal de resultados de actividad completada -->
+<p-dialog
+  [(visible)]="showResultsModal"
+  [modal]="true"
+  [closeOnEscape]="false"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{width: '100vw', height: '100vh', 'max-width': '100vw', 'max-height': '100vh'}"
+  [contentStyle]="{'height': '100%', 'padding': '0'}"
+  [maskStyle]="{'background-color': 'rgba(0, 0, 0, 0.8)'}"
+  styleClass="fullscreen-results-modal">
+
+  <!-- Contenido del modal -->
+  <div class="results-modal-content">
+    <div class="text-center py-12 px-6">
+      <div class="mb-12">
+        <div class="flex justify-center mb-6">
+          <div class="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-2xl">
+            <i class="pi pi-check-circle text-white text-6xl"></i>
           </div>
         </div>
-        
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">¡Actividad completada!</h1>
-        <p class="text-xl text-slate-600">Has completado la actividad "{{ safeActivityResult.activity }}"</p>
+
+        <h1 class="text-5xl font-bold text-slate-900 mb-4">¡Actividad completada!</h1>
+        <p class="text-2xl text-slate-600">Has completado la actividad "{{ safeActivityResult.activity }}"</p>
       </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-blue-50 p-6 rounded-xl shadow-sm">
-          <div class="text-blue-500 text-4xl font-bold mb-2">{{ safeActivityResult.score }}</div>
-          <div class="text-blue-700 font-semibold">Puntuación total</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl shadow-xl border border-blue-200">
+          <div class="text-blue-600 text-5xl font-bold mb-3">{{ safeActivityResult.score }}</div>
+          <div class="text-blue-700 font-semibold text-lg">Puntuación total</div>
         </div>
-        
-        <div class="bg-green-50 p-6 rounded-xl shadow-sm">
-          <div class="text-green-500 text-4xl font-bold mb-2">{{ safeActivityResult.accuracy }}%</div>
-          <div class="text-green-700 font-semibold">Precisión</div>
+
+        <div class="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-2xl shadow-xl border border-green-200">
+          <div class="text-green-600 text-5xl font-bold mb-3">{{ safeActivityResult.accuracy }}%</div>
+          <div class="text-green-700 font-semibold text-lg">Precisión</div>
         </div>
-        
-        <div class="bg-amber-50 p-6 rounded-xl shadow-sm">
-          <div class="text-amber-500 text-4xl font-bold mb-2">+{{ safeActivityResult.gems }}</div>
-          <div class="text-amber-700 font-semibold">Yachay ganados</div>
+
+        <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-8 rounded-2xl shadow-xl border border-amber-200">
+          <div class="text-amber-600 text-5xl font-bold mb-3">+{{ safeActivityResult.gems }}</div>
+          <div class="text-amber-700 font-semibold text-lg">Yachay ganados</div>
         </div>
       </div>
-      
-      <div class="flex flex-col md:flex-row justify-center gap-4">
-        <p-button 
-          label="Volver a los temas" 
-          icon="pi pi-arrow-left" 
-          styleClass="p-button-secondary" 
+
+      <div class="flex flex-col md:flex-row justify-center gap-6">
+        <p-button
+          label="Volver a los temas"
+          icon="pi pi-arrow-left"
+          styleClass="p-button-secondary p-button-lg px-8 py-4 text-lg"
           (onClick)="navigateBack()">
         </p-button>
-        
-        <p-button 
-          label="Reintentar actividad" 
-          icon="pi pi-refresh" 
+
+        <p-button
+          label="Reintentar actividad"
+          icon="pi pi-refresh"
+          styleClass="p-button-primary p-button-lg px-8 py-4 text-lg"
           (onClick)="restartActivity()">
         </p-button>
       </div>
     </div>
-  </p-card>
-</div>
+  </div>
+</p-dialog>

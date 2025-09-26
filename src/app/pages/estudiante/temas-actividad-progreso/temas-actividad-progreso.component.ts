@@ -179,7 +179,8 @@ export class TemasActividadProgresoComponent implements OnInit {
   // Métodos auxiliares
   calcularProgreso(tema: TemaConProgreso): number {
     if (tema.activitiesToComplete === 0) return 0;
-    return Math.round((tema.completedActivities / tema.activitiesToComplete) * 100);
+    const progreso = (tema.completedActivities / tema.activitiesToComplete) * 100;
+    return Math.min(100, Math.max(0, Math.round(progreso)));
   }
 
   obtenerEstadoTema(tema: TemaConProgreso): 'completed' | 'in-progress' | 'ready-to-start' | 'locked' {

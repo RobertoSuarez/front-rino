@@ -9,6 +9,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ActivityService } from '@/core/services/activity.service';
@@ -74,6 +75,7 @@ interface ActivityResult {
     ProgressBarModule,
     ToastModule,
     DialogModule,
+    DrawerModule,
     ConfirmDialogModule,
     SingleSelectionExerciseComponent,
     MultipleSelectionExerciseComponent,
@@ -107,6 +109,9 @@ export class ActivitySolverComponent implements OnInit {
   currentFeedback = signal<{ qualification: number, feedback: string } | null>(null);
   activityCompleted = signal(false);
   activityResult = signal<ActivityResult | null>(null);
+  answerVerified = signal(false);
+  showResultsModal = signal(false); // Modal de resultados
+  showFeedbackDrawer = signal(false); // Drawer de feedback
   
   // Getters seguros para evitar errores de nulos
   get safeActivity(): ActivityWithExercises {
@@ -243,6 +248,112 @@ export class ActivitySolverComponent implements OnInit {
     return this.currentExerciseIndex() === this.safeActivity.exercises.length - 1;
   }
 
+  getCurrentAnswer(): any {
+    const currentAnswer = this.answers()[this.currentExerciseIndex()];
+    if (!currentAnswer) return null;
+
+    switch (currentAnswer.type) {
+      case 'selection_single':
+        return currentAnswer.answerSelect;
+      case 'selection_multiple':
+        return currentAnswer.answerSelects;
+      case 'order_fragment_code':
+        return currentAnswer.answerOrderFragmentCode;
+      case 'order_line_code':
+        return currentAnswer.answerOrderLineCode;
+      case 'write_code':
+        return currentAnswer.answerWriteCode;
+      case 'find_error_code':
+        return currentAnswer.answerFindError;
+      default:
+        return null;
+    }
+  }
+
+  hasAnswer(): boolean {
+    const currentAnswer = this.answers()[this.currentExerciseIndex()];
+    if (!currentAnswer) return false;
+
+    switch (currentAnswer.type) {
+      case 'selection_single':
+        return !!(currentAnswer.answerSelect && currentAnswer.answerSelect.trim());
+      case 'selection_multiple':
+        return !!(currentAnswer.answerSelects && currentAnswer.answerSelects.length > 0);
+      case 'order_fragment_code':
+        return !!(currentAnswer.answerOrderFragmentCode && currentAnswer.answerOrderFragmentCode.length > 0);
+      case 'order_line_code':
+        return !!(currentAnswer.answerOrderLineCode && currentAnswer.answerOrderLineCode.length > 0);
+      case 'write_code':
+        return !!(currentAnswer.answerWriteCode && currentAnswer.answerWriteCode.trim());
+      case 'find_error_code':
+        return !!(currentAnswer.answerFindError && currentAnswer.answerFindError.trim());
+      default:
+        return false;
+    }
+  }
+
+  verifyAnswer(): void {
+    if (!this.currentExercise) {
+      return;
+    }
+
+    const exerciseId = this.currentExercise.id;
+    const exerciseType = this.currentExercise.typeExercise;
+
+    // Obtener la respuesta almacenada del ejercicio actual
+    const currentAnswer = this.answers()[this.currentExerciseIndex()];
+    if (!currentAnswer) {
+      return;
+    }
+
+    // Construir el objeto de respuesta con todos los campos requeridos
+    const checkExerciseDto: any = {
+      // Inicializar todos los campos con valores por defecto
+      answerSelect: '',
+      answerSelects: [],
+      answerOrderFragmentCode: [],
+      answerOrderLineCode: [],
+      answerWriteCode: '',
+      answerFindError: ''
+    };
+
+    // Llenar con la respuesta almacenada
+    checkExerciseDto.answerSelect = currentAnswer.answerSelect || '';
+    checkExerciseDto.answerSelects = currentAnswer.answerSelects || [];
+    checkExerciseDto.answerOrderFragmentCode = currentAnswer.answerOrderFragmentCode || [];
+    checkExerciseDto.answerOrderLineCode = currentAnswer.answerOrderLineCode || [];
+    checkExerciseDto.answerWriteCode = currentAnswer.answerWriteCode || '';
+    checkExerciseDto.answerFindError = currentAnswer.answerFindError || '';
+
+    // Enviar la respuesta al backend para validación
+    this.submitting.set(true);
+
+    this.exerciseService.checkAnswer(exerciseId, checkExerciseDto).subscribe({
+      next: (feedback) => {
+        // Actualizar la retroalimentación en el estado local
+        this.updateFeedback(exerciseId, feedback);
+
+        // Mostrar la retroalimentación en el drawer
+        this.currentFeedback.set(feedback);
+        this.showFeedback.set(true);
+        this.showFeedbackDrawer.set(true); // Abrir drawer
+        this.answerVerified.set(true); // Marcar respuesta como verificada
+        this.submitting.set(false);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al validar la respuesta:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al validar la respuesta'
+        });
+        this.submitting.set(false);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   nextExercise(): void {
     if (this.isLastExercise) {
       this.confirmFinishActivity();
@@ -252,6 +363,8 @@ export class ActivitySolverComponent implements OnInit {
     this.currentExerciseIndex.update(index => index + 1);
     this.showFeedback.set(false);
     this.currentFeedback.set(null);
+    this.answerVerified.set(false); // Resetear estado de verificación
+    this.showFeedbackDrawer.set(false); // Cerrar drawer
   }
 
   previousExercise(): void {
@@ -262,6 +375,8 @@ export class ActivitySolverComponent implements OnInit {
     this.currentExerciseIndex.update(index => index - 1);
     this.showFeedback.set(false);
     this.currentFeedback.set(null);
+    this.answerVerified.set(false); // Resetear estado de verificación
+    this.showFeedbackDrawer.set(false); // Cerrar drawer
   }
 
   confirmFinishActivity(): void {
@@ -323,6 +438,7 @@ export class ActivitySolverComponent implements OnInit {
       next: (result) => {
         this.activityResult.set(result);
         this.activityCompleted.set(true);
+        this.showResultsModal.set(true); // Abrir modal automáticamente
         this.submitting.set(false);
         this.cdr.detectChanges();
       },
@@ -343,71 +459,14 @@ export class ActivitySolverComponent implements OnInit {
     if (!this.currentExercise) {
       return;
     }
-    
+
     const exerciseId = this.currentExercise.id;
     const exerciseType = this.currentExercise.typeExercise;
-    
-    // Construir el objeto de respuesta con todos los campos requeridos
-    const checkExerciseDto: any = {
-      // Inicializar todos los campos con valores por defecto
-      answerSelect: '',
-      answerSelects: [],
-      answerOrderFragmentCode: [],
-      answerOrderLineCode: [],
-      answerWriteCode: '',
-      answerFindError: ''
-    };
-    
-    // Actualizar el campo específico según el tipo de ejercicio
-    switch (exerciseType) {
-      case 'selection_single':
-        checkExerciseDto.answerSelect = answer;
-        break;
-      case 'selection_multiple':
-        checkExerciseDto.answerSelects = answer;
-        break;
-      case 'order_fragment_code':
-        checkExerciseDto.answerOrderFragmentCode = answer;
-        break;
-      case 'order_line_code':
-        checkExerciseDto.answerOrderLineCode = answer;
-        break;
-      case 'write_code':
-        checkExerciseDto.answerWriteCode = answer;
-        break;
-      case 'find_error_code':
-        checkExerciseDto.answerFindError = answer;
-        break;
-    }
-    
-    // Actualizar la respuesta en el estado local
+
+    // Solo actualizar la respuesta en el estado local, sin enviar al backend
     this.updateAnswer(exerciseId, exerciseType, answer);
-    
-    // Enviar la respuesta al backend para validación
-    this.submitting.set(true);
-    
-    this.exerciseService.checkAnswer(exerciseId, checkExerciseDto).subscribe({
-      next: (feedback) => {
-        // Actualizar la retroalimentación en el estado local
-        this.updateFeedback(exerciseId, feedback);
-        
-        // Mostrar la retroalimentación
-        this.currentFeedback.set(feedback);
-        this.showFeedback.set(true);
-        this.submitting.set(false);
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error al validar la respuesta:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al validar la respuesta'
-        });
-        this.submitting.set(false);
-        this.cdr.detectChanges();
-      }
-    });
+
+    // No enviar automáticamente al backend - esperar al clic en "Verificar Respuesta"
   }
 
   updateAnswer(exerciseId: number, type: string, value: any): void {
@@ -509,5 +568,17 @@ export class ActivitySolverComponent implements OnInit {
     this.currentExerciseIndex.set(0);
     this.activityCompleted.set(false);
     this.activityResult.set(null);
+    this.answerVerified.set(false); // Resetear estado de verificación
+    this.showResultsModal.set(false); // Cerrar modal
+    this.showFeedbackDrawer.set(false); // Cerrar drawer
+  }
+
+  closeFeedbackDrawer(): void {
+    this.showFeedbackDrawer.set(false);
+  }
+
+  continueFromFeedback(): void {
+    this.closeFeedbackDrawer();
+    this.nextExercise();
   }
 }

@@ -74,6 +74,8 @@ export class CoursesComponent implements OnInit {
     'https://i.ibb.co/gZLQn5Jg/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg'
   ];
 
+  uploadedImages: string[] = []; // Array para imágenes subidas dinámicamente
+
   breadcrumbItems = [
     { label: 'Cursos', routerLink: '/courses' }
   ];
@@ -104,7 +106,7 @@ export class CoursesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.courseService.getCourses().subscribe({
+    this.courseService.getCoursesForAdmin().subscribe({
       next: (response) => {
         this.courses = response.data;
         this.loading = false;
@@ -140,6 +142,13 @@ export class CoursesComponent implements OnInit {
             urlLogo: response.data.urlLogo,
             isPublic: response.data.isPublic
           });
+          
+          // Si la imagen actual no está en las imágenes prediseñadas, agregarla como subida
+          const currentImageUrl = response.data.urlLogo;
+          if (currentImageUrl && !this.defaultImages.includes(currentImageUrl) && !this.uploadedImages.includes(currentImageUrl)) {
+            this.uploadedImages.push(currentImageUrl);
+          }
+          
           this.displayEditDialog = true;
         },
         error: (err) => {
@@ -173,9 +182,9 @@ export class CoursesComponent implements OnInit {
         });
     }
   }
-
+  
   loadCourses() {
-    this.courseService.getCourses().subscribe({
+    this.courseService.getCoursesForAdmin().subscribe({
       next: (response) => {
         this.courses = response.data;
       },
@@ -240,10 +249,44 @@ export class CoursesComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
-    // Mock upload - in real implementation, upload to server
-    this.courseForm.patchValue({
-      urlLogo: 'https://i.ibb.co/chdPzT1f/uploaded-image-mock.jpg' // Mock URL for uploaded image
-    });
+    const file = event.target.files[0];
+    if (file) {
+      this.loading = true;
+      
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.http.post(`${environment.apiUrl}/courses/upload-image`, formData)
+        .subscribe({
+          next: (response: any) => {
+            if (response && response.data.url) {
+              // Agregar la imagen subida al array de imágenes disponibles
+              this.uploadedImages.push(response.data.url);
+              this.defaultImages = [...this.defaultImages, response.data.url];
+              
+              // Seleccionar automáticamente la imagen subida
+              this.courseForm.patchValue({
+                urlLogo: response.data.url
+              });
+              
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: 'Imagen subida correctamente'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Error al subir imagen', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error al subir la imagen'
+            });
+          },
+          complete: () => this.loading = false
+        });
+    }
   }
 
   /**
@@ -257,6 +300,8 @@ export class CoursesComponent implements OnInit {
     }
     this.currentCourseId = null;
     this.courseForm.reset();
+    // Limpiar las imágenes subidas cuando se cierra el diálogo
+    this.uploadedImages = [];
   }
 
   onDialogHide(visible: boolean) {

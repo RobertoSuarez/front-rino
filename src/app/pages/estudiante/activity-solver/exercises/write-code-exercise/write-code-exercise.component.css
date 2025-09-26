@@ -1,44 +1,176 @@
 .exercise-container {
-  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
+/* Instrucciones mejoradas */
+.instructions {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #0ea5e9;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+}
+
+.instructions p {
+  margin: 0;
+  color: #0c4a6e;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Contenedor del editor de código */
 .code-editor-container {
   position: relative;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.code-editor-container:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Barra superior del editor (simulando IDE) */
+.code-editor-header {
+  background: #1e293b;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #334155;
+}
+
+.code-editor-title {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+.code-editor-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.code-editor-dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+}
+
+.code-editor-dots .dot-red { background: #ef4444; }
+.code-editor-dots .dot-yellow { background: #f59e0b; }
+.code-editor-dots .dot-green { background: #10b981; }
+
+/* Área del editor */
+.code-editor-wrapper {
+  position: relative;
+  background: #0f172a;
 }
 
 .code-editor {
   width: 100%;
-  padding: 1rem;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: #334155;
-  background-color: #1e293b;
+  min-height: 300px;
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: #f8fafc;
+  background: transparent;
   border: none;
-  border-radius: 0.5rem;
-  resize: vertical;
   outline: none;
-  transition: all 0.2s ease;
+  resize: vertical;
+  tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
 }
 
-.code-editor:focus {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-}
-
+/* Placeholder mejorado */
 .code-editor::placeholder {
-  color: #94a3b8;
+  color: #64748b;
+  font-style: italic;
+  opacity: 0.8;
 }
 
-/* Estilos para el botón */
-:host ::ng-deep .p-button {
-  transition: all 0.3s ease;
+/* Estilos de foco */
+.code-editor:focus {
+  box-shadow: none;
 }
 
-:host ::ng-deep .p-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Números de línea simulados */
+.code-editor::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 1.5rem;
+  bottom: 1.5rem;
+  width: 2px;
+  background: #334155;
+  border-radius: 1px;
+}
+
+/* Scrollbar personalizado */
+.code-editor::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.code-editor::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.code-editor::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.code-editor::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Animación de entrada */
+.exercise-container {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .code-editor {
+    font-size: 0.9rem;
+    padding: 1rem;
+    min-height: 250px;
+  }
+
+  .code-editor-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .instructions {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .code-editor {
+    font-size: 0.85rem;
+    min-height: 200px;
+  }
 }

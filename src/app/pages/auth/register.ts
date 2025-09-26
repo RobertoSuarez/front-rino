@@ -10,6 +10,7 @@ import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
+import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { ApiService } from '../../core/services/api.service';
@@ -17,7 +18,7 @@ import { ApiService } from '../../core/services/api.service';
 @Component({
     selector: 'app-register',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, DividerModule, TooltipModule, ToastModule, AppFloatingConfigurator, CommonModule],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, MessageModule, FormsModule, RouterModule, RippleModule, DividerModule, TooltipModule, ToastModule, AppFloatingConfigurator, CommonModule],
     providers: [MessageService],
     template: `
         <app-floating-configurator />
@@ -41,16 +42,14 @@ import { ApiService } from '../../core/services/api.service';
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="name" class="block text-surface-900 dark:text-surface-0 text-base font-medium mb-2">Nombre</label>
-                                <div class="p-input-icon-left w-full mb-4">
-                                    <i class="pi pi-user"></i>
+                                <div class="w-full mb-4">
                                     <input pInputText id="name" type="text" placeholder="Tu nombre" class="w-full" [(ngModel)]="name" />
                                 </div>
                             </div>
                             
                             <div>
                                 <label for="lastname" class="block text-surface-900 dark:text-surface-0 text-base font-medium mb-2">Apellido</label>
-                                <div class="p-input-icon-left w-full mb-4">
-                                    <i class="pi pi-user"></i>
+                                <div class="w-full mb-4">
                                     <input pInputText id="lastname" type="text" placeholder="Tu apellido" class="w-full" [(ngModel)]="lastname" />
                                 </div>
                             </div>
@@ -58,8 +57,7 @@ import { ApiService } from '../../core/services/api.service';
 
                         <div>
                             <label for="email" class="block text-surface-900 dark:text-surface-0 text-base font-medium mb-2">Correo electrónico</label>
-                            <div class="p-input-icon-left w-full mb-4">
-                                <i class="pi pi-envelope"></i>
+                            <div class="w-full mb-4">
                                 <input pInputText id="email" type="email" placeholder="tu@email.com" class="w-full" [(ngModel)]="email" />
                             </div>
                         </div>
@@ -84,9 +82,9 @@ import { ApiService } from '../../core/services/api.service';
                         </div>
 
                         <div>
-                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-base mb-2">Contraseña</label>
-                            <div class="mb-4">
-                                <p-password id="password" [(ngModel)]="password" placeholder="Contraseña" [toggleMask]="true" styleClass="w-full" [feedback]="true">
+                            <label for="password" class="w-full block text-surface-900 dark:text-surface-0 text-base font-medium mb-2">Contraseña</label>
+                            <div class="w-full mb-4">
+                                <p-password fluid id="password"  [(ngModel)]="password" [toggleMask]="true" placeholder="Contraseña" promptLabel="Elige una contraseña" weakLabel="Contraseña débil" mediumLabel="Contraseña media" strongLabel="Contraseña fuerte">
                                     <ng-template pTemplate="header">
                                         <div class="p-3 text-center bg-surface-0 dark:bg-surface-900">
                                             <i class="pi pi-shield text-3xl text-primary mb-2"></i>
@@ -110,9 +108,12 @@ import { ApiService } from '../../core/services/api.service';
 
                         <div>
                             <label for="confirmPassword" class="block text-surface-900 dark:text-surface-0 font-medium text-base mb-2">Confirmar contraseña</label>
-                            <div class="mb-4">
-                                <p-password id="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Confirmar contraseña" [toggleMask]="true" styleClass="w-full" [feedback]="false"></p-password>
+                            <div class="w-full mb-4">
+                                <p-password fluid id="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Confirmar contraseña" [toggleMask]="true" [invalid]="!passwordsMatch && confirmPassword" styleClass="w-full" [feedback]="false"></p-password>
                             </div>
+                            @if (!passwordsMatch && confirmPassword) {
+                                <p-message severity="error" size="small" variant="simple">Las contraseñas no coinciden.</p-message>
+                            }
                         </div>
 
                         <div class="flex items-center mb-4">
@@ -145,6 +146,10 @@ export class Register {
     userType: string = '';
     acceptTerms: boolean = false;
     isLoading: boolean = false;
+    
+    get passwordsMatch(): boolean {
+        return this.password === this.confirmPassword && this.confirmPassword !== '';
+    }
     
     userTypes = [
         { name: 'Administrador', value: 'admin' },

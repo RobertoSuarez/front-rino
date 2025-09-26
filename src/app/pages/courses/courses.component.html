@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4"></p-breadcrumb>
 <div class="card">
     <div class="font-semibold text-xl mb-4">Lista de Cursos - Vista del Admin y profesor</div>
     <p-table
@@ -18,7 +19,9 @@
                 <p-button 
                         label="Nuevo Curso" 
                         icon="pi pi-plus" 
-                        class="p-button-rounded mr-2"
+                        [raised]="true" 
+                        severity="info"
+                        class="mr-2"
                         (click)="showCreateDialog()"></p-button>
                 <p-iconField iconPosition="left" class="ml-auto">
                     <p-inputIcon>
@@ -53,15 +56,34 @@
                 </td>
                 <td>{{course.createAt}}</td>
                 <td class="flex gap-2">
-                    <p-button pButton 
+                    <p-button 
+                            icon="pi pi-eye" 
+                            [raised]="true" 
+                            severity="warn"
+                            (click)="viewCourseDetails(course)"
+                            pTooltip="Ver detalles"
+                            tooltipPosition="top"></p-button>
+                    <p-button 
                             icon="pi pi-pencil" 
-                            class="p-button-rounded p-button-text"
-                            (click)="showEditDialog(course)"></p-button>
+                            [raised]="true" 
+                            severity="info"
+                            (click)="showEditDialog(course)"
+                            pTooltip="Editar"
+                            tooltipPosition="top"></p-button>
                     <p-button 
                         icon="pi pi-trash" 
+                        [raised]="true" 
                         severity="danger"
-                        class=""
-                        (onClick)="confirmDelete(course)"></p-button>
+                        (onClick)="confirmDelete(course)"
+                        pTooltip="Eliminar"
+                        tooltipPosition="top"></p-button>
+                    <p-button 
+                        icon="pi pi-list" 
+                        [raised]="true" 
+                        severity="success"
+                        (click)="navigateToChapters(course)"
+                        pTooltip="Ver capítulos"
+                        tooltipPosition="top"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -69,10 +91,11 @@
 </div>
 
 <p-dialog [header]="currentCourseId ? 'Editar Curso' : 'Nuevo Curso'" 
-         [visible]="displayCreateDialog || displayEditDialog" 
+         [(visible)]="dialogVisible" 
          [style]="{width: '50vw'}" 
          [modal]="true"
          [closable]="true"
+         (visibleChange)="onDialogHide($event)"
          class="rounded-lg shadow-xl">
     <form [formGroup]="courseForm" 
           (ngSubmit)="currentCourseId ? updateCourse() : createCourse()" 
@@ -89,12 +112,37 @@
                 <p-button type="button" 
                          label="Generar con IA" 
                          icon="pi pi-bolt" 
-                         styleClass="p-button-sm p-button-text p-button-info"
+                         [raised]="true" 
+                         severity="info"
                          [loading]="loading"
                          (onClick)="generateDescriptionWithAI()"></p-button>
             </div>
             <textarea id="description" formControlName="description" rows="3"
                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+        
+        <div class="field space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Seleccionar Imagen de Portada</label>
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <img *ngFor="let image of defaultImages; let i = index" 
+                     [src]="image" 
+                     [alt]="'Imagen ' + (i + 1)" 
+                     class="w-full h-20 object-cover rounded-lg cursor-pointer border-2 hover:border-blue-500 transition-all"
+                     [class.border-blue-500]="courseForm.get('urlLogo')?.value === image"
+                     (click)="selectImage(image)">
+            </div>
+            <div class="flex items-center space-x-2">
+                <input type="file" 
+                       (change)="onFileSelected($event)" 
+                       class="hidden" 
+                       id="fileUpload">
+                <label for="fileUpload" 
+                       class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md cursor-pointer hover:bg-gray-200 transition-colors">
+                    <i class="pi pi-upload mr-2"></i>
+                    Subir Imagen (Mock)
+                </label>
+                <span class="text-xs text-gray-500">O selecciona una imagen de arriba</span>
+            </div>
         </div>
         
         <div class="field space-y-2">
@@ -110,15 +158,122 @@
         </div>
         
         <div class="flex justify-end gap-3 mt-6">
-            <p-button type="button" label="Cancelar" 
-                    class=""
-                    (onClick)="hideDialog()"></p-button>
+            <p-button type="button" 
+                      label="Cancelar" 
+                      [raised]="true" 
+                      severity="secondary"
+                      (onClick)="hideDialog()"></p-button>
             <p-button type="submit" 
-                    [label]="currentCourseId ? 'Actualizar' : 'Crear'" 
-                    [disabled]="courseForm.invalid"
-                    class=""></p-button>
+                      [label]="currentCourseId ? 'Actualizar' : 'Crear'" 
+                      [raised]="true" 
+                      severity="success"
+                      [disabled]="courseForm.invalid"></p-button>
         </div>
     </form>
+</p-dialog>
+
+<p-dialog header="Detalles del Curso" 
+         [(visible)]="displayDetailsDialog" 
+         [style]="{width: '60vw'}" 
+         [modal]="true"
+         [closable]="true"
+         (visibleChange)="onDetailsDialogHide($event)"
+         class="rounded-lg shadow-xl">
+    <div *ngIf="selectedCourse" class="space-y-6">
+        <!-- Hero Section -->
+        <div class="flex items-center space-x-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+            <img [src]="selectedCourse.urlLogo || 'https://via.placeholder.com/100'" 
+                 [alt]="selectedCourse.title" 
+                 class="w-24 h-24 rounded-xl shadow-lg object-cover">
+            <div class="flex-1">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selectedCourse.title }}</h2>
+                <p class="text-gray-600 mb-4">{{ selectedCourse.description || 'Sin descripción disponible' }}</p>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-user text-blue-600"></i>
+                        <span class="text-sm font-medium">{{ selectedCourse.createdBy || 'N/A' }}</span>
+                    </div>
+                    <p-tag [value]="selectedCourse.isPublic ? 'Público' : 'Privado'"
+                           [severity]="selectedCourse.isPublic ? 'success' : 'warning'"></p-tag>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Código</div>
+                <div class="font-semibold">{{ selectedCourse.code || 'N/A' }}</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Capítulos</div>
+                <div class="font-semibold">{{ selectedCourse.chapters || 0 }}</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Creado</div>
+                <div class="font-semibold text-sm">{{ selectedCourse.createAt || 'N/A' }}</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <div class="text-sm text-gray-500 mb-1">Actualizado</div>
+                <div class="font-semibold text-sm">{{ selectedCourse.updatedAt || 'N/A' }}</div>
+            </div>
+        </div>
+
+        <!-- Chapters Section -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="pi pi-list text-blue-600"></i>
+                Capítulos del Curso
+            </h3>
+            
+            <div *ngIf="selectedCourse.chapters && selectedCourse.chapters > 0" class="text-center py-8">
+                <p class="text-gray-600 mb-4">Este curso tiene {{ selectedCourse.chapters }} capítulo(s) disponibles.</p>
+                <p-button
+                    label="Gestionar Capítulos"
+                    icon="pi pi-arrow-right"
+                    [raised]="true"
+                    severity="info"
+                    (onClick)="navigateToChapters(selectedCourse)">
+                </p-button>
+            </div>
+
+            <div *ngIf="!selectedCourse.chapters || selectedCourse.chapters === 0" class="text-center py-8">
+                <i class="pi pi-inbox text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600 mb-4">Este curso aún no tiene capítulos creados.</p>
+                <p-button
+                    label="Crear Primer Capítulo"
+                    icon="pi pi-plus"
+                    [raised]="true"
+                    severity="success"
+                    (onClick)="navigateToChapters(selectedCourse)">
+                </p-button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center items-center py-8">
+        <i class="pi pi-spin pi-spinner text-2xl text-blue-500"></i>
+        <span class="ml-3">Cargando detalles...</span>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end gap-3">
+            <p-button
+                label="Cerrar"
+                icon="pi pi-times"
+                [raised]="true"
+                severity="secondary"
+                (onClick)="onDetailsDialogHide(false)">
+            </p-button>
+            <p-button
+                label="Editar Curso"
+                icon="pi pi-pencil"
+                [raised]="true"
+                severity="info"
+                (onClick)="showEditDialog(selectedCourse); onDetailsDialogHide(false)">
+            </p-button>
+        </div>
+    </ng-template>
 </p-dialog>
 
 

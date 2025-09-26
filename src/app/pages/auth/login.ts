@@ -37,16 +37,16 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                             </p-divider>
                         </div>
 
+                        <form (ngSubmit)="onSubmit()">
                         <div>
-                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-lg font-medium mb-2">Correo electrónico</label>
-                            <div class="p-input-icon-left w-full mb-6">
-                                <i class="pi pi-envelope"></i>
-                                <input pInputText id="email1" type="text" placeholder="tu@email.com" class="w-full md:w-120" [(ngModel)]="email" />
+                            <label for="email1" class="block text-surface-900 dark:text-surface-0 font-medium text-lg mb-2">Correo electrónico</label>
+                            <div class="mb-4">
+                                <input pInputText id="email1" name="email" type="text" placeholder="tu@email.com" class="w-full md:w-120" [(ngModel)]="email" />
                             </div>
 
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-lg mb-2">Contraseña</label>
                             <div class="mb-4">
-                                <p-password id="password1" [(ngModel)]="password" placeholder="Contraseña" [toggleMask]="true" styleClass="w-full" [fluid]="true" [feedback]="false">
+                                <p-password id="password1" name="password" [(ngModel)]="password" placeholder="Contraseña" [toggleMask]="true" styleClass="w-full" [fluid]="true" [feedback]="false">
                                     <ng-template pTemplate="header">
                                         <div class="p-3 text-center bg-surface-0 dark:bg-surface-900">
                                             <i class="pi pi-shield text-3xl text-primary mb-2"></i>
@@ -58,13 +58,13 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 
                             <div class="flex items-center justify-between mt-4 mb-6 gap-4 flex-wrap">
                                 <div class="flex items-center">
-                                    <p-checkbox [(ngModel)]="checked" id="rememberme1" binary class="mr-2"></p-checkbox>
+                                    <p-checkbox [(ngModel)]="checked" id="rememberme1" name="checked" binary class="mr-2"></p-checkbox>
                                     <label for="rememberme1" class="text-sm">Recordar sesión</label>
                                 </div>
                                 <a routerLink="/auth/forgot-password" class="font-medium no-underline text-sm cursor-pointer text-primary hover:underline">¿Olvidaste tu contraseña?</a>
                             </div>
                             
-                            <button pButton pRipple label="Iniciar sesión" icon="pi pi-lock-open" class="w-full p-3 text-lg bg-gradient-to-r from-blue-600 to-purple-700 border-none" [loading]="loading" (click)="onSubmit()"></button>
+                            <button pButton pRipple label="Iniciar sesión" icon="pi pi-lock-open" type="submit" class="w-full p-3 text-lg bg-gradient-to-r from-blue-600 to-purple-700 border-none" [loading]="loading"></button>
             <div *ngIf="errorMessage" class="mt-3 text-red-500 text-center">{{ errorMessage }}</div>
                             
                             <div class="mt-4 text-center">
@@ -72,6 +72,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 <a routerLink="/auth/register" class="font-medium text-primary text-sm hover:underline cursor-pointer">Regístrate ahora</a>
                             </div>
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>

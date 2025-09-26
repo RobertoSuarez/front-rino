@@ -39,12 +39,16 @@
     >
         <ng-template pTemplate="caption">
             <div class="flex justify-between items-center flex-column sm:flex-row">
-                <p-button 
-                        label="Nuevo Tema" 
-                        icon="pi pi-plus" 
-                        class="p-button-rounded mr-2"
+                <p-button
+                        label="Nuevo Tema"
+                        icon="pi pi-plus"
+                        severity="success"
+                        [raised]="true"
                         [disabled]="!selectedChapterId"
-                        (click)="showCreateDialog()"></p-button>
+                        (click)="showCreateDialog()"
+                        class="shadow-lg hover:shadow-xl transition-all duration-200"
+                        pTooltip="Crear un nuevo tema"
+                        tooltipPosition="bottom"></p-button>
                 <p-iconField iconPosition="left" class="ml-auto">
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
@@ -74,23 +78,27 @@
                 </td>
                 <td>{{tema.createdAt}}</td>
                 <td class="flex gap-2">
-                    <p-button pButton 
-                            icon="pi pi-pencil" 
-                            class="p-button-rounded p-button-text"
+                    <p-button
+                            icon="pi pi-pencil"
+                            [raised]="true"
+                            severity="info"
                             (click)="showEditDialog(tema)"
-                            pTooltip="Editar tema"></p-button>
-                    <p-button 
-                        icon="pi pi-trash" 
+                            pTooltip="Editar tema"
+                            tooltipPosition="top"></p-button>
+                    <p-button
+                        icon="pi pi-trash"
+                        [raised]="true"
                         severity="danger"
-                        class="p-button-rounded p-button-text"
                         (click)="confirmDelete(tema)"
-                        pTooltip="Eliminar tema"></p-button>
-                    <p-button 
-                        icon="pi pi-list" 
-                        severity="info"
-                        class="p-button-rounded p-button-text"
+                        pTooltip="Eliminar tema"
+                        tooltipPosition="top"></p-button>
+                    <p-button
+                        icon="pi pi-list"
+                        [raised]="true"
+                        severity="success"
                         (click)="navigateToActivities(tema.id)"
-                        pTooltip="Ver actividades"></p-button>
+                        pTooltip="Ver actividades"
+                        tooltipPosition="top"></p-button>
                 </td>
             </tr>
         </ng-template>
@@ -115,13 +123,31 @@
     </p-table>
 </div>
 
-<p-dialog [header]="currentTemaId ? 'Editar Tema' : 'Nuevo Tema'" 
-         [visible]="displayCreateDialog || displayEditDialog" 
+<p-dialog [header]="currentTemaId ? 'Editar Tema' : 'Nuevo Tema'"
+         [visible]="displayCreateDialog || displayEditDialog"
          (onHide)="hideDialog()"
-         [style]="{width: '60vw', height: '80vh'}" 
+         [style]="{width: '60vw', height: '80vh'}"
          [modal]="true"
-         [closable]="true"
+         [closable]="false"
          class="rounded-lg shadow-xl">
+    <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+            <h3 class="text-lg font-semibold text-gray-800 m-0">
+                {{ currentTemaId ? 'Editar Tema' : 'Nuevo Tema' }}
+            </h3>
+            <p-button
+                icon="pi pi-times"
+                [rounded]="true"
+                severity="secondary"
+                size="small"
+                [text]="true"
+                (onClick)="hideDialog()"
+                class="hover:bg-gray-100 transition-colors duration-200"
+                pTooltip="Cerrar"
+                tooltipPosition="bottom">
+            </p-button>
+        </div>
+    </ng-template>
     <form [formGroup]="temaForm" 
           (ngSubmit)="currentTemaId ? updateTema() : createTema()" 
           class="p-fluid space-y-4">
@@ -138,12 +164,17 @@
         <div class="field space-y-2">
             <div class="flex justify-between items-center">
                 <label for="shortDescription" class="block text-sm font-medium text-gray-700">Descripción Corta</label>
-                <p-button type="button" 
-                         label="Generar con IA" 
-                         icon="pi pi-bolt" 
-                         styleClass="p-button-sm p-button-text p-button-info"
+                <p-button type="button"
+                         label="Generar con IA"
+                         icon="pi pi-bolt"
+                         severity="info"
+                         size="small"
+                         [outlined]="true"
                          [loading]="loading"
-                         (onClick)="generateContentWithAI()"></p-button>
+                         (onClick)="generateContentWithAI()"
+                         class="transition-all duration-200 hover:shadow-md"
+                         pTooltip="Generar contenido automáticamente"
+                         tooltipPosition="top"></p-button>
             </div>
             <textarea id="shortDescription" formControlName="shortDescription" rows="2"
                       class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
@@ -179,14 +210,22 @@
             </small>
         </div>
         
-        <div class="flex justify-end gap-3 mt-6">
-            <p-button type="button" label="Cancelar" 
-                    class=""
-                    (onClick)="hideDialog()"></p-button>
-            <p-button type="submit" 
-                    [label]="currentTemaId ? 'Actualizar' : 'Crear'" 
-                    [disabled]="temaForm.invalid"
-                    class=""></p-button>
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+            <p-button type="button"
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="hideDialog()"
+                    class="transition-all duration-200 hover:shadow-md"></p-button>
+            <p-button type="submit"
+                    [label]="currentTemaId ? 'Actualizar Tema' : 'Crear Tema'"
+                    icon="pi pi-check"
+                    severity="success"
+                    [raised]="true"
+                    [disabled]="temaForm.invalid || loading"
+                    [loading]="loading"
+                    class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
         </div>
     </form>
 </p-dialog>

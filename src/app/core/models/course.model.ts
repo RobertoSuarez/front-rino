@@ -3,6 +3,7 @@ import { User } from "./user.interface";
 export interface Course {
   id: number;
   title: string;
+  description?: string; // Campo opcional
   createdBy: string;
   chapters: string;
   code: string;

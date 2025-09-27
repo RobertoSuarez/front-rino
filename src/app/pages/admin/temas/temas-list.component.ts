@@ -22,7 +22,7 @@ import { environment } from 'src/environments/environment';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AiService } from '../../../core/services/ai.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
@@ -67,6 +67,7 @@ export class TemasListComponent implements OnInit {
   chapters: any[] = [];
   selectedCourseId: number | null = null;
   selectedChapterId: number | null = null;
+  initialChapterId: number | null = null;
   difficultyOptions = [
     { label: 'Fácil', value: 'Fácil' },
     { label: 'Medio', value: 'Medio' },
@@ -84,12 +85,32 @@ export class TemasListComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private aiService: AiService,
+    private route: ActivatedRoute,
     private router: Router
   ) {
     this.temaForm = this.createForm();
   }
 
   ngOnInit() {
+    const queryParams = this.route.snapshot.queryParamMap;
+    const courseIdParam = queryParams.get('courseId');
+    const chapterIdParam = queryParams.get('chapterId');
+
+    if (courseIdParam) {
+      const parsedCourseId = parseInt(courseIdParam, 10);
+      if (!isNaN(parsedCourseId)) {
+        this.selectedCourseId = parsedCourseId;
+      }
+    }
+
+    if (chapterIdParam) {
+      const parsedChapterId = parseInt(chapterIdParam, 10);
+      if (!isNaN(parsedChapterId)) {
+        this.initialChapterId = parsedChapterId;
+        this.selectedChapterId = parsedChapterId;
+      }
+    }
+
     // Cargar la lista de cursos para el filtro
     this.http.get<any>(`${environment.apiUrl}/courses`).subscribe({
       next: (response) => {
@@ -98,14 +119,24 @@ export class TemasListComponent implements OnInit {
             label: course.title,
             value: course.id
           }));
-          
-          // Seleccionar automáticamente el primer curso
-          const firstCourse = response.data[0];
-          if (firstCourse && firstCourse.id) {
-            this.selectedCourseId = firstCourse.id;
-            // Cargar los capítulos del curso seleccionado
-            this.loadChapters();
+
+          const hasSelectedCourse = this.selectedCourseId !== null &&
+            this.courses.some((course) => course.value === this.selectedCourseId);
+
+          if (!hasSelectedCourse) {
+            this.selectedCourseId = this.courses[0]?.value ?? null;
           }
+
+          if (this.selectedCourseId !== null) {
+            this.loadChapters(this.initialChapterId);
+          } else {
+            this.loading = false;
+          }
+        } else {
+          this.courses = [];
+          this.chapters = [];
+          this.temas = [];
+          this.loading = false;
         }
       },
       error: (err) => {
@@ -115,6 +146,7 @@ export class TemasListComponent implements OnInit {
           summary: 'Error',
           detail: 'Error al cargar la lista de cursos'
         });
+        this.loading = false;
       }
     });
   }
@@ -131,44 +163,59 @@ export class TemasListComponent implements OnInit {
   }
 
   onCourseChange(event: any) {
-    this.selectedCourseId = parseInt(event.target.value, 10);
+    const value = parseInt(event.target.value, 10);
+    this.selectedCourseId = isNaN(value) ? null : value;
     this.selectedChapterId = null;
+    this.initialChapterId = null;
     this.temas = [];
     this.loadChapters();
   }
 
   onChapterChange(event: any) {
-    this.selectedChapterId = parseInt(event.target.value, 10);
+    const value = parseInt(event.target.value, 10);
+    this.selectedChapterId = isNaN(value) ? null : value;
     this.loadTemas();
   }
 
-  loadChapters() {
+  loadChapters(chapterIdToSelect?: number | null) {
     if (!this.selectedCourseId) {
       this.chapters = [];
+      this.temas = [];
+      this.loading = false;
       return;
     }
 
     this.loading = true;
     this.chapterService.getChaptersByCourseId(this.selectedCourseId).subscribe({
       next: (response) => {
-        if (response && response.data && response.data.length > 0) {
-          this.chapters = response.data.map((chapter: any) => ({
+        const chaptersData = response?.data ?? [];
+        if (chaptersData.length > 0) {
+          this.chapters = chaptersData.map((chapter: any) => ({
             label: chapter.title,
             value: chapter.id
           }));
-          
-          // Seleccionar automáticamente el primer capítulo
-          const firstChapter = response.data[0];
-          if (firstChapter && firstChapter.id) {
-            this.selectedChapterId = firstChapter.id;
-            // Cargar los temas del capítulo seleccionado
+
+          const desiredChapterId = chapterIdToSelect ?? this.initialChapterId ?? this.selectedChapterId;
+          const matchingChapter = desiredChapterId ? chaptersData.find((chapter: any) => chapter.id === desiredChapterId) : null;
+
+          if (matchingChapter) {
+            this.selectedChapterId = matchingChapter.id;
+          } else {
+            this.selectedChapterId = chaptersData[0]?.id ?? null;
+          }
+
+          this.initialChapterId = null;
+
+          if (this.selectedChapterId) {
             this.loadTemas();
+            return;
           }
         } else {
           this.chapters = [];
           this.temas = [];
-          this.loading = false;
         }
+
+        this.loading = false;
       },
       error: (err) => {
         console.error('Error al cargar capítulos', err);
@@ -220,6 +267,7 @@ export class TemasListComponent implements OnInit {
   loadTemas() {
     if (!this.selectedChapterId) {
       this.temas = [];
+      this.loading = false;
       return;
     }
 

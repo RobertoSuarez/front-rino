@@ -125,14 +125,14 @@
                       <!-- Botón de acción -->
                       <div class="flex gap-2">
                         <!-- Botón Empezar -->
-                        <button *ngIf="obtenerEstadoTema(tema) === 'ready-to-start'" 
+                        <!-- <button *ngIf="obtenerEstadoTema(tema) === 'ready-to-start'" 
                                 pButton type="button" 
                                 label="EMPEZAR +50 YACHAY" 
                                 icon="pi pi-play"
                                 class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
                                 pTooltip="Iniciar este tema" tooltipPosition="top"
                                 (click)="iniciarTema(tema)">
-                        </button>
+                        </button> -->
                         
                         <!-- Botón Continuar -->
                         <button *ngIf="obtenerEstadoTema(tema) === 'in-progress'" 
@@ -145,13 +145,13 @@
                         </button>
                         
                         <!-- Botón Completado -->
-                        <button *ngIf="obtenerEstadoTema(tema) === 'completed'" 
+                        <!-- <button *ngIf="obtenerEstadoTema(tema) === 'completed'" 
                                 pButton type="button" 
                                 label="Revisar" 
                                 icon="pi pi-eye"
                                 class="bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
                                 pTooltip="Revisar contenido completado" tooltipPosition="top">
-                        </button>
+                        </button> -->
                         
                         <!-- Botón Bloqueado -->
                         <button *ngIf="obtenerEstadoTema(tema) === 'locked'" 

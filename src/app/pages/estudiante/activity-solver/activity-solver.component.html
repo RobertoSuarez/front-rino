@@ -9,7 +9,7 @@
 </div>
 
 <!-- Contenido principal - Diseño Duolingo -->
-<div class="h-full bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+<div class="h-full inset-0 absolute bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
 
   <!-- Barra de progreso superior -->
   <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
@@ -19,6 +19,14 @@
                  styleClass="p-button-rounded p-button-text p-button-secondary"
                  (click)="navigateBack()"
                  pTooltip="Volver atrás" tooltipPosition="bottom"></p-button>
+        
+        <!-- Indicador de Tumis (vidas) en la parte superior derecha -->
+        <div class="flex items-center gap-2 bg-gradient-to-r from-red-50 to-pink-50 px-4 py-2 rounded-full border border-red-200 shadow-sm">
+          <i class="pi pi-heart-fill text-red-500 text-xl"></i>
+          <span class="text-red-700 font-semibold text-lg">{{ safeUserIndicators.tumis }}</span>
+          <span class="text-red-600 text-sm font-medium">vidas</span>
+        </div>
+        
         <span class="text-sm font-medium text-gray-600">
           Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
         </span>

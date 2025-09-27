@@ -95,7 +95,7 @@ export class ChaptersListComponent implements OnInit {
     const courseIdFromUrl = courseIdParam ? parseInt(courseIdParam, 10) : null;
 
     // Cargar la lista de cursos para el filtro
-    this.http.get<any>(`${environment.apiUrl}/courses`).subscribe({
+    this.http.get<any>(`${environment.apiUrl}/courses/admin`).subscribe({
       next: (response) => {
         if (response && response.data && response.data.length > 0) {
           this.courses = response.data.map((course: any) => ({
@@ -328,9 +328,14 @@ export class ChaptersListComponent implements OnInit {
 
   navigateToThemes(chapter: Chapter) {
     // Navegar a la pantalla de temas/contenido del capítulo
-    this.router.navigate(['/admin/themes'], {
-      queryParams: { chapterId: chapter.id }
-    });
+    const courseId = chapter.courseId ?? this.selectedCourseId;
+    const queryParams: any = { chapterId: chapter.id };
+
+    if (courseId) {
+      queryParams.courseId = courseId;
+    }
+
+    this.router.navigate(['/admin/temas'], { queryParams });
   }
 
   /**

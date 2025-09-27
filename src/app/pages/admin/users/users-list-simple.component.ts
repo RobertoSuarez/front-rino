@@ -199,194 +199,207 @@ import { User } from '../../../core/models';
           <p-dialog 
             [(visible)]="userDetailDialog" 
             [modal]="true" 
-            [style]="{ width: '800px', maxWidth: '95vw' }"
+            [style]="{ width: '900px' }"
             [draggable]="false" 
             [resizable]="false"
             styleClass="user-detail-dialog"
             [showHeader]="false"
             [dismissableMask]="true"
-            [closeOnEscape]="true">
+            [closeOnEscape]="true"
+            [contentStyle]="{ padding: '0' }">
             
-            <div *ngIf="selectedUser" class="p-0">
-              <!-- Encabezado con título y botón de cerrar -->
-              <div class="flex justify-between align-items-center p-4 border-bottom-1 surface-border">
-                <h2 class="text-2xl font-bold m-0">Detalles del Usuario</h2>
-                <button 
-                  pButton 
-                  pRipple 
-                  icon="pi pi-times" 
-                  class="p-button-rounded p-button-text p-button-plain"
-                  (click)="userDetailDialog = false">
-                </button>
-              </div>
-              
-              <!-- Perfil del usuario con avatar -->
-              <div class="p-4 bg-primary text-white">
-                <div class="flex flex-wrap align-items-center gap-4">
-                  <!-- Avatar -->
-                  <div class="flex align-items-center justify-content-center bg-white text-primary border-circle shadow-4 w-8rem h-8rem flex-shrink-0">
-                    <span class="text-5xl font-bold">{{ getInitials(selectedUser.firstName, selectedUser.lastName) }}</span>
-                  </div>
-                  
-                  <!-- Información principal -->
-                  <div class="flex flex-column flex-grow-1">
-                    <div class="flex flex-column sm:flex-row sm:align-items-center sm:justify-content-between">
-                      <h2 class="text-3xl font-bold m-0 mb-2 sm:mb-0">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</h2>
-                      
-                      <div class="flex gap-2">
-                        <span class="bg-white text-primary py-1 px-3 border-round font-medium flex align-items-center">
-                          <i class="pi {{ selectedUser.typeUser === 'admin' ? 'pi-shield' : selectedUser.typeUser === 'teacher' ? 'pi-book' : 'pi-user' }} mr-1"></i>
-                          {{ getUserTypeLabel(selectedUser.typeUser) }}
-                        </span>
-                        <span class="{{ selectedUser.status === 'active' ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900' }} py-1 px-3 border-round font-medium flex align-items-center">
-                          <i class="pi {{ selectedUser.status === 'active' ? 'pi-check-circle' : 'pi-times-circle' }} mr-1"></i>
-                          {{ selectedUser.status === 'active' ? 'Activo' : 'Inactivo' }}
-                        </span>
-                      </div>
+            <ng-container *ngIf="selectedUser as user">
+              <div class="relative border border-slate-200/70 bg-white text-slate-900 overflow-hidden shadow-2xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
+                <div class="relative bg-slate-900 px-6 py-8 text-white dark:bg-slate-950">
+                  <button 
+                    pButton 
+                    pRipple 
+                    type="button"
+                    icon="pi pi-times" 
+                    class="p-button-rounded"
+                    (click)="userDetailDialog = false">
+                  </button>
+
+                  <div class="flex flex-col gap-6 md:flex-row md:items-end">
+                    <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-[2rem] border border-white/30 bg-white/20 text-4xl font-semibold uppercase shadow-[0_12px_35px_rgba(15,23,42,0.28)] backdrop-blur-sm">
+                      {{ getInitials(user.firstName, user.lastName) }}
                     </div>
-                    
-                    <div class="flex align-items-center gap-2 mt-3">
-                      <i class="pi pi-envelope mr-1"></i>
-                      <span class="text-lg">{{ selectedUser.email }}</span>
-                    </div>
-                    
-                    <div class="flex align-items-center gap-2 mt-2" *ngIf="selectedUser.whatsApp">
-                      <i class="pi pi-phone mr-1"></i>
-                      <span class="text-lg">{{ selectedUser.whatsApp }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Información detallada -->
-              <div class="p-4">
-                <!-- Pestañas de información -->
-                <div class="surface-card p-0 shadow-2 border-round">
-                  <div class="flex justify-content-between align-items-center border-bottom-1 surface-border">
-                    <ul class="flex list-none p-0 m-0 overflow-x-auto">
-                      <li class="px-4 py-3 font-medium text-primary border-bottom-2 border-primary flex align-items-center">
-                        <i class="pi pi-user mr-2"></i>
-                        <span>Información Personal</span>
-                      </li>
-                    </ul>
-                    <div class="px-3">
-                      <span class="text-500 text-sm">ID: {{ selectedUser.id }}</span>
-                    </div>
-                  </div>
-                  
-                  <div class="p-4">
-                    <div class="flex flex-col gap-4">
-                      <!-- Columna 1: Información Básica -->
-                      <div class="flex-1">
-                        <div class="card border-1 surface-border p-0 h-full shadow-1">
-                          <div class="bg-primary p-3 flex align-items-center">
-                            <i class="pi pi-id-card text-white mr-2 text-xl"></i>
-                            <span class="font-medium text-lg text-white">Información Básica</span>
-                          </div>
-                          <div class="p-4">
-                            <div class="flex flex-column gap-4">
-                              <div class="flex flex-column">
-                                <div class="flex align-items-center mb-2">
-                                  <i class="pi pi-user text-primary mr-2"></i>
-                                  <span class="font-medium">Nombre Completo</span>
-                                </div>
-                                <div class="pl-4 text-900 font-medium">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</div>
-                              </div>
-                              
-                              <div class="flex flex-column">
-                                <div class="flex align-items-center mb-2">
-                                  <i class="pi pi-tag text-primary mr-2"></i>
-                                  <span class="font-medium">Tipo de Usuario</span>
-                                </div>
-                                <div class="pl-4">
-                                  <span class="inline-flex align-items-center bg-primary-100 text-primary-900 px-3 py-2 border-round">
-                                    <i class="pi {{ selectedUser.typeUser === 'admin' ? 'pi-shield' : selectedUser.typeUser === 'teacher' ? 'pi-book' : 'pi-user' }} mr-2"></i>
-                                    {{ getUserTypeLabel(selectedUser.typeUser) }}
-                                  </span>
-                                </div>
-                              </div>
-                              
-                              <div class="flex flex-column">
-                                <div class="flex align-items-center mb-2">
-                                  <i class="pi pi-calendar text-primary mr-2"></i>
-                                  <span class="font-medium">Fecha de Nacimiento</span>
-                                </div>
-                                <div class="pl-4 text-900">{{ (selectedUser.birthday | date:'dd/MM/yyyy') || 'No especificada' }}</div>
-                              </div>
+
+                    <div class="flex-1 space-y-6">
+                      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                          <p class="text-xs font-medium uppercase tracking-[0.35em] text-white/80">Perfil del usuario</p>
+                          <h2 class="text-3xl font-bold leading-tight">{{ user.firstName }} {{ user.lastName }}</h2>
+                          <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/80">
+                            <div class="inline-flex items-center gap-2">
+                              <i class="pi pi-envelope"></i>
+                              <span>{{ user.email }}</span>
                             </div>
+                            <div class="inline-flex items-center gap-2" *ngIf="user.whatsApp; else noWhatsApp">
+                              <i class="pi pi-whatsapp text-emerald-200"></i>
+                              <span>{{ user.whatsApp }}</span>
+                            </div>
+                            <ng-template #noWhatsApp>
+                              <div class="inline-flex items-center gap-2 opacity-70">
+                                <i class="pi pi-whatsapp"></i>
+                                <span>WhatsApp no registrado</span>
+                              </div>
+                            </ng-template>
                           </div>
                         </div>
+
+                        <div class="flex flex-wrap gap-3">
+                          <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium backdrop-blur">
+                            <i class="pi {{ user.typeUser === 'admin' ? 'pi-shield' : user.typeUser === 'teacher' ? 'pi-book' : user.typeUser === 'parent' ? 'pi-users' : 'pi-user' }}"></i>
+                            {{ getUserTypeLabel(user.typeUser) }}
+                          </span>
+                          <span 
+                            class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
+                            [ngClass]="user.status === 'active' ? 'bg-emerald-400/20 text-emerald-50 border border-emerald-200/60' : 'bg-rose-400/15 text-rose-50 border border-rose-200/60'">
+                            <i class="pi {{ user.status === 'active' ? 'pi-check-circle' : 'pi-times-circle' }}"></i>
+                            {{ user.status === 'active' ? 'Activo' : 'Inactivo' }}
+                          </span>
+                        </div>
                       </div>
-                      
-                      <!-- Columna 2: Información de Contacto -->
-                      <div class="flex-1">
-                        <div class="card border-1 surface-border p-0 h-full shadow-1">
-                          <div class="bg-primary p-3 flex align-items-center">
-                            <i class="pi pi-envelope text-white mr-2 text-xl"></i>
-                            <span class="font-medium text-lg text-white">Información de Contacto</span>
-                          </div>
-                          <div class="p-4">
-                            <div class="flex flex-column gap-4">
-                              <div class="flex flex-column">
-                                <div class="flex align-items-center mb-2">
-                                  <i class="pi pi-at text-primary mr-2"></i>
-                                  <span class="font-medium">Email</span>
-                                </div>
-                                <div class="pl-4">
-                                  <a href="mailto:{{ selectedUser.email }}" class="text-primary font-medium no-underline hover:underline flex align-items-center">
-                                    <i class="pi pi-envelope mr-2"></i>
-                                    <span>{{ selectedUser.email }}</span>
-                                  </a>
-                                </div>
-                              </div>
-                              
-                              <div class="flex flex-column">
-                                <div class="flex align-items-center mb-2">
-                                  <i class="pi pi-phone text-primary mr-2"></i>
-                                  <span class="font-medium">WhatsApp</span>
-                                </div>
-                                <div class="pl-4">
-                                  <span class="text-900 flex align-items-center">
-                                    <i class="pi pi-whatsapp mr-2 text-green-500"></i>
-                                    <span>{{ selectedUser.whatsApp || 'No especificado' }}</span>
-                                  </span>
-                                </div>
-                              </div>
-                              
-                              <div class="flex flex-column">
-                                <div class="flex align-items-center mb-2">
-                                  <i class="pi pi-check-circle text-primary mr-2"></i>
-                                  <span class="font-medium">Estado</span>
-                                </div>
-                                <div class="pl-4">
-                                  <span class="inline-flex align-items-center {{ selectedUser.status === 'active' ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900' }} px-3 py-2 border-round">
-                                    <i class="pi {{ selectedUser.status === 'active' ? 'pi-check-circle' : 'pi-times-circle' }} mr-2"></i>
-                                    {{ selectedUser.status === 'active' ? 'Activo' : 'Inactivo' }}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+
+                      <div class="flex flex-wrap items-center gap-4 text-sm text-white/85">
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5">
+                          <i class="pi pi-id-card"></i>
+                          <span>ID: {{ user.id }}</span>
+                        </div>
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5">
+                          <i class="pi pi-calendar"></i>
+                          <span>
+                            {{ user.birthday ? (user.birthday | date:'dd/MM/yyyy') : 'Fecha de nacimiento no registrada' }}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <div class="px-6 py-6 space-y-6">
+                  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <section class="rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/60">
+                      <h3 class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Información Personal</h3>
+                      <div class="mt-5 space-y-5">
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200">
+                            <i class="pi pi-user text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Nombre completo</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">{{ user.firstName }} {{ user.lastName }}</p>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200">
+                            <i class="pi pi-tag text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Tipo de usuario</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">{{ getUserTypeLabel(user.typeUser) }}</p>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200">
+                            <i class="pi pi-shield text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Estado</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">
+                              {{ user.status === 'active' ? 'Activo' : 'Inactivo' }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200">
+                            <i class="pi pi-calendar text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Fecha de nacimiento</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">
+                              {{ user.birthday ? (user.birthday | date:'dd/MM/yyyy') : 'No especificada' }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/60">
+                      <h3 class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Información de Contacto</h3>
+                      <div class="mt-5 space-y-5">
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-200">
+                            <i class="pi pi-envelope text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Email</p>
+                            <a 
+                              class="text-base font-medium text-slate-900 underline-offset-4 transition-colors hover:underline dark:text-slate-100"
+                              [href]="'mailto:' + user.email">
+                              {{ user.email }}
+                            </a>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-200">
+                            <i class="pi pi-whatsapp text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">WhatsApp</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">
+                              {{ user.whatsApp || 'No especificado' }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-200">
+                            <i class="pi pi-paperclip text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Otros detalles</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">
+                              Información adicional disponible en la edición del perfil.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="flex flex-col gap-3 border-t border-slate-200/80 pt-6 dark:border-slate-800">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      Puedes actualizar datos y añadir notas internas desde la vista de edición del usuario.
+                    </p>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                      <button 
+                        type="button"
+                        class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-600 transition-all hover:border-slate-400 hover:text-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
+                        (click)="userDetailDialog = false">
+                        <i class="pi pi-times"></i>
+                        <span>Cerrar</span>
+                      </button>
+                      <button
+                        pButton
+                        pRipple
+                        type="button"
+                        label="Editar Usuario"
+                        icon="pi pi-pencil"
+                        [routerLink]="['/admin/users/edit', user.id]"
+                        (click)="userDetailDialog = false"
+                        class="p-button-rounded p-button-primary px-5 py-2.5 shadow-lg shadow-indigo-500/30">
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <!-- Acciones en la parte inferior -->
-            <div class="p-4 border-top-1 surface-border flex justify-content-end gap-2">
-              <button 
-                pButton 
-                pRipple 
-                label="Editar Usuario" 
-                icon="pi pi-pencil" 
-                class="p-button-primary p-button-raised"
-                [routerLink]="['/admin/users/edit', selectedUser?.id]"
-                (click)="userDetailDialog = false">
-              </button>
-            </div>
+            </ng-container>
           </p-dialog>
         </div>
       </div>
@@ -400,7 +413,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
   searchTerm = '';
   userDetailDialog = false;
   selectedUser: User | null = null;
-  
+
   private searchTimeout: any;
   private subscriptions: Subscription[] = [];
 
@@ -408,7 +421,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadUsers();
@@ -423,10 +436,10 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
   loadUsers(event?: any) {
     this.loading = true;
-    
+
     const page = event ? (event.first / event.rows) + 1 : 1;
     const limit = event ? event.rows : 10;
-    
+
     const subscription = this.userService.getAllUsers(page, limit, this.searchTerm).subscribe({
       next: (response) => {
         if (response && response.data) {
@@ -449,7 +462,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
-    
+
     this.subscriptions.push(subscription);
   }
 
@@ -457,7 +470,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
-    
+
     this.searchTimeout = setTimeout(() => {
       this.loadUsers();
     }, 500);
@@ -471,7 +484,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
   toggleUserStatus(user: User) {
     const newStatus = user.status === 'active' ? 'inactive' : 'active';
     const action = newStatus === 'active' ? 'activar' : 'desactivar';
-    
+
     this.confirmationService.confirm({
       message: `¿Está seguro que desea ${action} al usuario ${user.firstName} ${user.lastName}?`,
       header: `${action.charAt(0).toUpperCase() + action.slice(1)} Usuario`,

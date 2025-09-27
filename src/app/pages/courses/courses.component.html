@@ -67,28 +67,28 @@
                             [raised]="true" 
                             severity="warn"
                             (click)="viewCourseDetails(course)"
-                            pTooltip="Ver detalles"
+                            pTooltip="Ver detalle del curso"
                             tooltipPosition="top"></p-button>
                     <p-button 
                             icon="pi pi-pencil" 
                             [raised]="true" 
                             severity="info"
                             (click)="showEditDialog(course)"
-                            pTooltip="Editar"
+                            pTooltip="Editar curso"
                             tooltipPosition="top"></p-button>
                     <p-button 
                         icon="pi pi-trash" 
                         [raised]="true" 
                         severity="danger"
-                        (onClick)="confirmDelete(course)"
-                        pTooltip="Eliminar"
+                        (click)="confirmDelete(course)"
+                        pTooltip="Eliminar curso"
                         tooltipPosition="top"></p-button>
                     <p-button 
                         icon="pi pi-list" 
                         [raised]="true" 
                         severity="success"
                         (click)="navigateToChapters(course)"
-                        pTooltip="Ver capítulos"
+                        pTooltip="Gestionar capítulos"
                         tooltipPosition="top"></p-button>
                 </td>
             </tr>

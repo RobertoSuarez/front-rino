@@ -29,16 +29,9 @@ export class SingleSelectionExerciseComponent {
   @Output() answerSubmitted = new EventEmitter<string>();
 
   selectedValue: string | undefined;
-  disabled = false;
 
   ngOnChanges() {
     this.selectedValue = this.selectedOption;
-  }
-
-  onSubmit() {
-    if (this.selectedValue) {
-      this.answerSubmitted.emit(this.selectedValue);
-    }
   }
 
   // Implementación de ControlValueAccessor
@@ -58,12 +51,14 @@ export class SingleSelectionExerciseComponent {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // No necesitamos disabled state ya que la verificación se maneja desde el padre
   }
 
   onSelectionChange(value: string) {
     this.selectedValue = value;
     this.onChange(value);
     this.onTouch();
+    // Emitir automáticamente la respuesta cuando cambie la selección
+    this.answerSubmitted.emit(value);
   }
 }

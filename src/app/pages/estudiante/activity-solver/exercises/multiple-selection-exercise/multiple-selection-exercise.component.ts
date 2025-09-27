@@ -29,16 +29,29 @@ export class MultipleSelectionExerciseComponent {
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
   selectedValues: string[] = [];
-  disabled = false;
 
   ngOnChanges() {
     this.selectedValues = this.selectedOptions || [];
   }
 
-  onSubmit() {
-    if (this.selectedValues && this.selectedValues.length > 0) {
-      this.answerSubmitted.emit(this.selectedValues);
+  isSelected(option: string): boolean {
+    return this.selectedValues.includes(option);
+  }
+
+  toggleSelection(option: string): void {
+    const index = this.selectedValues.indexOf(option);
+    if (index > -1) {
+      // Si ya está seleccionado, lo quitamos
+      this.selectedValues.splice(index, 1);
+    } else {
+      // Si no está seleccionado, lo agregamos
+      this.selectedValues.push(option);
     }
+
+    this.onChange(this.selectedValues);
+    this.onTouch();
+    // Emitir automáticamente la respuesta cuando cambie la selección
+    this.answerSubmitted.emit(this.selectedValues);
   }
 
   // Implementación de ControlValueAccessor
@@ -58,11 +71,6 @@ export class MultipleSelectionExerciseComponent {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-  }
-
-  onSelectionChange() {
-    this.onChange(this.selectedValues);
-    this.onTouch();
+    // No necesitamos disabled state ya que la verificación se maneja desde el padre
   }
 }

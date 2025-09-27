@@ -81,6 +81,15 @@ export class UserService {
     return this.apiService.get<ApiResponse<UserIndicators>>('users/indicators');
   }
 
+  /**
+   * Actualiza los indicadores del usuario (yachay, tumis, mullu)
+   * @param indicators Nuevos valores de los indicadores
+   * @returns Observable con los indicadores actualizados
+   */
+  updateUserIndicators(indicators: UserIndicators): Observable<ApiResponse<UserIndicators>> {
+    return this.apiService.patch<ApiResponse<UserIndicators>>('users/indicators', indicators);
+  }
+
   // ========== GESTIÓN DE USUARIOS (ADMIN) ==========
 
   /**

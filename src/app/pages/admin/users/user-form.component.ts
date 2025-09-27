@@ -68,11 +68,11 @@ import { User } from '../../../core/models';
               <h3 class="text-xl font-semibold text-900 mb-3">Información Personal</h3>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="firstName" class="block text-900 font-medium mb-2">
                 Nombre <span class="text-red-500">*</span>
               </label>
-              <span class="p-input-icon-left w-full">
+              <div class="w-full flex flex-row items-center gap-4">
                 <i class="pi pi-user"></i>
                 <input 
                   pInputText 
@@ -80,9 +80,11 @@ import { User } from '../../../core/models';
                   type="text" 
                   formControlName="firstName"
                   placeholder="Ingresa el nombre"
-                  class="w-full p-3"
+                  size="large"
+                  variant="outlined"
+                  class="w-full"
                   [class.ng-invalid]="isFieldInvalid('firstName')" />
-              </span>
+              </div>
               <small 
                 *ngIf="isFieldInvalid('firstName')" 
                 class="p-error block mt-1">
@@ -91,11 +93,11 @@ import { User } from '../../../core/models';
               </small>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="lastName" class="block text-900 font-medium mb-2">
                 Apellido <span class="text-red-500">*</span>
               </label>
-              <span class="p-input-icon-left w-full">
+              <div class="w-full flex flex-row items-center gap-4">
                 <i class="pi pi-user"></i>
                 <input 
                   pInputText 
@@ -103,9 +105,11 @@ import { User } from '../../../core/models';
                   type="text" 
                   formControlName="lastName"
                   placeholder="Ingresa el apellido"
-                  class="w-full p-3"
+                  size="large"
+                  variant="outlined"
+                  class="w-full"
                   [class.ng-invalid]="isFieldInvalid('lastName')" />
-              </span>
+              </div>
               <small 
                 *ngIf="isFieldInvalid('lastName')" 
                 class="p-error block mt-1">
@@ -114,11 +118,11 @@ import { User } from '../../../core/models';
               </small>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="email" class="block text-900 font-medium mb-2">
                 Correo Electrónico <span class="text-red-500">*</span>
               </label>
-              <span class="p-input-icon-left w-full">
+              <div class="w-full flex flex-row items-center gap-4">
                 <i class="pi pi-envelope"></i>
                 <input 
                   pInputText 
@@ -126,9 +130,11 @@ import { User } from '../../../core/models';
                   type="email" 
                   formControlName="email"
                   placeholder="usuario@ejemplo.com"
-                  class="w-full p-3"
+                  size="large"
+                  variant="outlined"
+                  class="w-full"
                   [class.ng-invalid]="isFieldInvalid('email')" />
-              </span>
+              </div>
               <small 
                 *ngIf="isFieldInvalid('email')" 
                 class="p-error block mt-1">
@@ -138,11 +144,11 @@ import { User } from '../../../core/models';
               </small>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="whatsApp" class="block text-900 font-medium mb-2">
                 WhatsApp
               </label>
-              <span class="p-input-icon-left w-full">
+              <div class="w-full flex flex-row items-center gap-4">
                 <i class="pi pi-phone"></i>
                 <input 
                   pInputText 
@@ -150,23 +156,27 @@ import { User } from '../../../core/models';
                   type="tel" 
                   formControlName="whatsApp"
                   placeholder="+57 300 123 4567"
-                  class="w-full p-3" />
-              </span>
+                  size="large"
+                  variant="outlined"
+                  class="w-full" />
+              </div>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="birthday" class="block text-900 font-medium mb-2">
                 Fecha de Nacimiento
               </label>
-              <span class="p-input-icon-left w-full">
+              <div class="w-full flex flex-row items-center gap-4">
                 <i class="pi pi-calendar"></i>
                 <input 
                   pInputText 
                   id="birthday" 
                   type="date" 
                   formControlName="birthday"
-                  class="w-full p-3" />
-              </span>
+                  size="large"
+                  variant="outlined"
+                  class="w-full" />
+              </div>
             </div>
 
             <!-- Información del Sistema -->
@@ -174,14 +184,12 @@ import { User } from '../../../core/models';
               <h3 class="text-xl font-semibold text-900 mb-3">Información del Sistema</h3>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="typeUser" class="block text-900 font-medium mb-2">
                 Tipo de Usuario <span class="text-red-500">*</span>
               </label>
-              <div class="p-inputgroup">
-                <span class="p-inputgroup-addon">
-                  <i class="pi pi-users"></i>
-                </span>
+              <div class="w-full flex flex-row items-center gap-4">
+                <i class="pi pi-users"></i>
                 <select 
                   formControlName="typeUser"
                   class="w-full p-inputtext p-3"
@@ -201,14 +209,12 @@ import { User } from '../../../core/models';
               </small>
             </div>
 
-            <div class="field col-12 md:col-6">
+            <div class="flex flex-col field col-12 md:col-6">
               <label for="status" class="block text-900 font-medium mb-2">
                 Estado
               </label>
-              <div class="p-inputgroup">
-                <span class="p-inputgroup-addon">
-                  <i class="pi pi-check-circle"></i>
-                </span>
+              <div class="w-full flex flex-row items-center gap-4">
+                <i class="pi pi-check-circle"></i>
                 <select 
                   formControlName="status"
                   class="w-full p-inputtext p-3">
@@ -223,19 +229,19 @@ import { User } from '../../../core/models';
               <h3 class="text-xl font-semibold text-900 mb-3">Seguridad</h3>
             </div>
 
-            <div *ngIf="!isEditMode" class="field flex-col col-12 md:col-6">
+            <div *ngIf="!isEditMode" class="flex flex-col field col-12 md:col-6">
               <label for="password" class="block text-900 font-medium mb-2">
                 Contraseña <span class="text-red-500">*</span>
               </label>
-              <div class="p-inputgroup">
-                <span class="p-inputgroup-addon">
-                  <i class="pi pi-lock"></i>
-                </span>
+              <div class="w-full flex flex-row items-center gap-4">
+                <i class="pi pi-lock"></i>
                 <p-password 
                   formControlName="password"
                   [toggleMask]="true"
+                  class="w-full"
                   placeholder="Ingresa la contraseña"
-                  inputStyleClass="p-3"
+                  [fluid]="true"
+                  inputStyleClass="pl-5"
                   [feedback]="true"
                   [class.ng-invalid]="isFieldInvalid('password')">
                   <ng-template pTemplate="header">
@@ -262,20 +268,19 @@ import { User } from '../../../core/models';
               </small>
             </div>
 
-            <div *ngIf="!isEditMode" class="field col-12 md:col-6">
+            <div *ngIf="!isEditMode" class="flex flex-col field col-12 md:col-6">
               <label for="confirmPassword" class="block text-900 font-medium mb-2">
                 Confirmar Contraseña <span class="text-red-500">*</span>
               </label>
-              <div class="p-inputgroup">
-                <span class="p-inputgroup-addon">
-                  <i class="pi pi-shield"></i>
-                </span>
+              <div class="w-full flex flex-row items-center gap-4">
+                <i class="pi pi-shield"></i>
                 <p-password 
                   formControlName="confirmPassword"
                   [toggleMask]="true"
+                  class="w-full"
                   placeholder="Confirma la contraseña"
-                  styleClass="w-full"
-                  inputStyleClass="p-3"
+                  fluid
+                  inputStyleClass="pl-5"
                   [feedback]="false"
                   [class.ng-invalid]="isFieldInvalid('confirmPassword')">
                 </p-password>

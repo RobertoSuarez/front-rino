@@ -43,6 +43,16 @@ export class ApiService {
   }
 
   /**
+   * Realiza una petición PATCH a la API
+   * @param endpoint Endpoint de la API
+   * @param body Cuerpo de la petición
+   * @returns Observable con la respuesta
+   */
+  patch<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.patch<T>(`${this.apiUrl}/${endpoint}`, body);
+  }
+
+  /**
    * Realiza una petición DELETE a la API
    * @param endpoint Endpoint de la API
    * @returns Observable con la respuesta

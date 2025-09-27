@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, forwardRef } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-order-fragment-code-exercise',
@@ -24,37 +24,44 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
     }
   ]
 })
-export class OrderFragmentCodeExerciseComponent {
+export class OrderFragmentCodeExerciseComponent implements OnChanges {
   @Input() fragments: string[] = [];
   @Input() orderedFragments: string[] | undefined = [];
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
-  fragmentsToOrder: string[] = [];
+  availableFragments: string[] = [];
+  orderedFragmentsList: string[] = [];
+  private initialFragments: string[] = [];
 
-  ngOnChanges() {
-    if (this.orderedFragments && this.orderedFragments.length > 0) {
-      this.fragmentsToOrder = [...this.orderedFragments];
-    } else if (this.fragments && this.fragments.length > 0) {
-      this.fragmentsToOrder = [...this.fragments];
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['fragments']) {
+      this.initialFragments = this.fragments ? [...this.fragments] : [];
+      if (!this.orderedFragments || this.orderedFragments.length === 0) {
+        this.orderedFragmentsList = [];
+      }
     }
+
+    if (changes['orderedFragments'] && this.orderedFragments) {
+      this.orderedFragmentsList = [...this.orderedFragments];
+    }
+
+    this.syncAvailableFromCurrent();
   }
 
-  onDrop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.fragmentsToOrder, event.previousIndex, event.currentIndex);
-    this.onChange(this.fragmentsToOrder);
-    this.onTouch();
-    // Emitir automáticamente la respuesta cuando cambie el orden
-    this.answerSubmitted.emit(this.fragmentsToOrder);
+  drop(event: CdkDragDrop<string[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+    }
+
+    this.propagateChanges();
   }
 
   resetOrder() {
-    if (this.fragments && this.fragments.length > 0) {
-      this.fragmentsToOrder = [...this.fragments];
-      this.onChange(this.fragmentsToOrder);
-      this.onTouch();
-      // Emitir la respuesta después de resetear
-      this.answerSubmitted.emit(this.fragmentsToOrder);
-    }
+    this.orderedFragmentsList = [];
+    this.syncAvailableFromCurrent();
+    this.propagateChanges();
   }
 
   // Implementación de ControlValueAccessor
@@ -62,7 +69,8 @@ export class OrderFragmentCodeExerciseComponent {
   onTouch: any = () => {};
 
   writeValue(value: string[]): void {
-    this.fragmentsToOrder = value || [];
+    this.orderedFragmentsList = value ? [...value] : [];
+    this.syncAvailableFromCurrent();
   }
 
   registerOnChange(fn: any): void {
@@ -75,5 +83,27 @@ export class OrderFragmentCodeExerciseComponent {
 
   setDisabledState(isDisabled: boolean): void {
     // No necesitamos disabled state ya que la verificación se maneja desde el padre
+  }
+
+  private propagateChanges(emit: boolean = true): void {
+    this.onChange(this.orderedFragmentsList);
+    this.onTouch();
+
+    if (emit) {
+      this.answerSubmitted.emit([...this.orderedFragmentsList]);
+    }
+  }
+
+  private syncAvailableFromCurrent(): void {
+    const remaining = this.initialFragments ? [...this.initialFragments] : [];
+
+    this.orderedFragmentsList.forEach(fragment => {
+      const index = remaining.indexOf(fragment);
+      if (index > -1) {
+        remaining.splice(index, 1);
+      }
+    });
+
+    this.availableFragments = remaining;
   }
 }

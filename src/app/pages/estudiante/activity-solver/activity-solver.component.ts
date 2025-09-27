@@ -14,6 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ActivityService } from '@/core/services/activity.service';
 import { ExerciseService } from '@/core/services/exercise.service';
+import { UserService, UserIndicators } from '@/core/services/user.service';
 import { ActivityWithExercises as ApiActivityWithExercises } from '@/core/models/activity.interface';
 import { SingleSelectionExerciseComponent } from './exercises/single-selection-exercise/single-selection-exercise.component';
 import { MultipleSelectionExerciseComponent } from './exercises/multiple-selection-exercise/multiple-selection-exercise.component';
@@ -95,6 +96,7 @@ export class ActivitySolverComponent implements OnInit {
   private router = inject(Router);
   private activityService = inject(ActivityService);
   private exerciseService = inject(ExerciseService);
+  private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -112,6 +114,7 @@ export class ActivitySolverComponent implements OnInit {
   answerVerified = signal(false);
   showResultsModal = signal(false); // Modal de resultados
   showFeedbackDrawer = signal(false); // Drawer de feedback
+  userIndicators = signal<UserIndicators | null>(null); // Indicadores del usuario
   
   // Getters seguros para evitar errores de nulos
   get safeActivity(): ActivityWithExercises {
@@ -126,11 +129,16 @@ export class ActivitySolverComponent implements OnInit {
     return this.activityResult() || { id: 0, progress: 0, score: 0, accuracy: 0, activity: '', gems: 0 };
   }
 
+  get safeUserIndicators(): UserIndicators {
+    return this.userIndicators() || { yachay: 0, tumis: 0, mullu: 0 };
+  }
+
   ngOnInit(): void {
     const activityId = this.route.snapshot.paramMap.get('activityId');
     
     if (activityId) {
       this.loadActivity(+activityId);
+      this.loadUserIndicators();
     } else {
       this.messageService.add({
         severity: 'error',
@@ -194,6 +202,44 @@ export class ActivitySolverComponent implements OnInit {
         });
         this.loading.set(false);
         this.navigateBack();
+      }
+    });
+  }
+
+  loadUserIndicators(): void {
+    this.userService.getUserIndicators().subscribe({
+      next: (response) => {
+        this.userIndicators.set(response.data);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al cargar los indicadores del usuario:', error);
+        // No mostrar mensaje de error al usuario, usar valores por defecto
+      }
+    });
+  }
+
+  decreaseTumis(): void {
+    const currentIndicators = this.safeUserIndicators;
+    const newTumis = Math.max(0, currentIndicators.tumis - 1); // No permitir valores negativos
+    debugger;
+    this.userService.updateUserIndicators({
+      yachay: currentIndicators.yachay,
+      tumis: newTumis,
+      mullu: currentIndicators.mullu
+    }).subscribe({
+      next: (response) => {
+        this.userIndicators.set(response.data);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al actualizar los indicadores del usuario:', error);
+        // Si hay error, actualizar localmente de todas formas para mantener consistencia en UI
+        this.userIndicators.set({
+          ...currentIndicators,
+          tumis: newTumis
+        });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -332,6 +378,11 @@ export class ActivitySolverComponent implements OnInit {
       next: (feedback) => {
         // Actualizar la retroalimentación en el estado local
         this.updateFeedback(exerciseId, feedback);
+
+        // Si la respuesta es incorrecta (calificación < 7), disminuir una vida (tumís)
+        if (feedback.qualification < 7) {
+          this.decreaseTumis();
+        }
 
         // Mostrar la retroalimentación en el drawer
         this.currentFeedback.set(feedback);

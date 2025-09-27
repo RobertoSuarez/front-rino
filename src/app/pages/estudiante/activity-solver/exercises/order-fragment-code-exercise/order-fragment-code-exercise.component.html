@@ -1,31 +1,83 @@
 <div class="exercise-container">
   <div class="instructions">
-    <p>Arrastra los fragmentos de código para ordenarlos correctamente.</p>
+    <p>Arrastra las piezas desde el área de elementos hacia el área de ordenamiento en el orden correcto.</p>
   </div>
 
-  <div class="fragments-container" cdkDropList (cdkDropListDropped)="onDrop($event)">
-    <div *ngFor="let fragment of fragmentsToOrder; let i = index"
-         class="fragment-item"
-         cdkDrag>
-      <div class="fragment-content">
-        <div class="fragment-number">{{ i + 1 }}</div>
-        <pre class="fragment-code"><code>{{ fragment }}</code></pre>
+  <div class="areas-container">
+    <div class="area-card">
+      <div class="area-header">
+        <h3>Área de elementos</h3>
+        <span class="subtitle">Fragmentos disponibles</span>
       </div>
-      <div class="fragment-handle" cdkDragHandle>
-        <i class="pi pi-bars"></i>
-      </div>
+      <div class="area-body"
+           cdkDropList
+           id="availableList"
+           [cdkDropListData]="availableFragments"
+           [cdkDropListConnectedTo]="['orderedList']"
+           (cdkDropListDropped)="drop($event)">
+        <div *ngIf="availableFragments.length === 0" class="empty-placeholder">
+          <i class="pi pi-inbox"></i>
+          <p>Todos los fragmentos están ordenados.</p>
+        </div>
 
-      <!-- Vista previa al arrastrar -->
-      <div *cdkDragPreview class="fragment-preview">
-        <pre class="fragment-code"><code>{{ fragment }}</code></pre>
-      </div>
+        <div *ngFor="let fragment of availableFragments; let idx = index"
+             class="fragment-item"
+             cdkDrag>
+          <div class="fragment-content">
+            <div class="fragment-number neutral">{{ idx + 1 }}</div>
+            <pre class="fragment-code"><code>{{ fragment }}</code></pre>
+          </div>
+          <div class="fragment-handle" cdkDragHandle>
+            <i class="pi pi-bars"></i>
+          </div>
 
-      <!-- Placeholder al arrastrar -->
-      <div *cdkDragPlaceholder class="fragment-placeholder"></div>
+          <div *cdkDragPreview class="fragment-preview">
+            <pre class="fragment-code"><code>{{ fragment }}</code></pre>
+          </div>
+
+          <div *cdkDragPlaceholder class="fragment-placeholder"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="area-card">
+      <div class="area-header">
+        <h3>Área de ordenamiento</h3>
+        <span class="subtitle">Construye la secuencia correcta</span>
+      </div>
+      <div class="area-body ordered"
+           cdkDropList
+           id="orderedList"
+           [cdkDropListData]="orderedFragmentsList"
+           [cdkDropListConnectedTo]="['availableList']"
+           (cdkDropListDropped)="drop($event)">
+        <div *ngIf="orderedFragmentsList.length === 0" class="empty-placeholder">
+          <i class="pi pi-arrow-right-arrow-left"></i>
+          <p>Arrastra aquí los fragmentos en el orden correcto.</p>
+        </div>
+
+        <div *ngFor="let fragment of orderedFragmentsList; let index = index"
+             class="fragment-item ordered"
+             cdkDrag>
+          <div class="fragment-content">
+            <div class="fragment-number">{{ index + 1 }}</div>
+            <pre class="fragment-code"><code>{{ fragment }}</code></pre>
+          </div>
+          <div class="fragment-handle" cdkDragHandle>
+            <i class="pi pi-bars"></i>
+          </div>
+
+          <div *cdkDragPreview class="fragment-preview">
+            <pre class="fragment-code"><code>{{ fragment }}</code></pre>
+          </div>
+
+          <div *cdkDragPlaceholder class="fragment-placeholder"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="mt-4 flex justify-start">
+  <div class="actions">
     <p-button
       label="Reiniciar orden"
       icon="pi pi-refresh"

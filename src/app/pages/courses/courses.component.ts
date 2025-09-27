@@ -24,6 +24,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { AiService } from '../../core/services/ai.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-courses',
@@ -43,7 +44,8 @@ import { AiService } from '../../core/services/ai.service';
     ReactiveFormsModule,
     ConfirmDialogModule,
     BreadcrumbModule,
-    RouterModule
+    RouterModule,
+    TooltipModule
 ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './courses.component.html'

@@ -1,7 +1,7 @@
 <p-toast></p-toast>
 <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4"></p-breadcrumb>
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Lista de Cursos - Vista del Admin y profesor</div>
+    <div class="font-semibold text-xl mb-4">Lista de Cursos</div>
     <p-table
         #dt
         [value]="courses"
@@ -51,8 +51,14 @@
                 <td>{{course.code}}</td>
                 <td>{{course.chapters}}</td>
                 <td>
-                    <p-tag [value]="course.isPublic ? 'Público' : 'Privado'" 
-                           [severity]="course.isPublic ? 'success' : 'warning'"></p-tag>
+                    @if (course.isPublic === true) {
+                        <p-tag [value]="'Público'" 
+                               [severity]="'success'"></p-tag>
+                    }
+                    @if (course.isPublic === false) {
+                        <p-tag [value]="'Privado'" 
+                               [severity]="'danger'"></p-tag>
+                    }
                 </td>
                 <td>{{course.createAt}}</td>
                 <td class="flex gap-2">
@@ -61,28 +67,28 @@
                             [raised]="true" 
                             severity="warn"
                             (click)="viewCourseDetails(course)"
-                            pTooltip="Ver detalles"
+                            pTooltip="Ver detalle del curso"
                             tooltipPosition="top"></p-button>
                     <p-button 
                             icon="pi pi-pencil" 
                             [raised]="true" 
                             severity="info"
                             (click)="showEditDialog(course)"
-                            pTooltip="Editar"
+                            pTooltip="Editar curso"
                             tooltipPosition="top"></p-button>
                     <p-button 
                         icon="pi pi-trash" 
                         [raised]="true" 
                         severity="danger"
-                        (onClick)="confirmDelete(course)"
-                        pTooltip="Eliminar"
+                        (click)="confirmDelete(course)"
+                        pTooltip="Eliminar curso"
                         tooltipPosition="top"></p-button>
                     <p-button 
                         icon="pi pi-list" 
                         [raised]="true" 
                         severity="success"
                         (click)="navigateToChapters(course)"
-                        pTooltip="Ver capítulos"
+                        pTooltip="Gestionar capítulos"
                         tooltipPosition="top"></p-button>
                 </td>
             </tr>
@@ -134,21 +140,16 @@
             <div class="flex items-center space-x-2">
                 <input type="file" 
                        (change)="onFileSelected($event)" 
+                       accept="image/*"
                        class="hidden" 
                        id="fileUpload">
                 <label for="fileUpload" 
                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md cursor-pointer hover:bg-gray-200 transition-colors">
                     <i class="pi pi-upload mr-2"></i>
-                    Subir Imagen (Mock)
+                    Subir Imagen
                 </label>
-                <span class="text-xs text-gray-500">O selecciona una imagen de arriba</span>
+                <span class="text-xs text-gray-500">Formatos: JPG, PNG, GIF, WebP</span>
             </div>
-        </div>
-        
-        <div class="field space-y-2">
-            <label for="urlLogo" class="block text-sm font-medium text-gray-700">URL del Logo</label>
-            <input id="urlLogo" pInputText formControlName="urlLogo" 
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
         </div>
         
         <div class="field-checkbox flex items-center space-x-2">
@@ -193,8 +194,8 @@
                         <i class="pi pi-user text-blue-600"></i>
                         <span class="text-sm font-medium">{{ selectedCourse.createdBy || 'N/A' }}</span>
                     </div>
-                    <p-tag [value]="selectedCourse.isPublic ? 'Público' : 'Privado'"
-                           [severity]="selectedCourse.isPublic ? 'success' : 'warning'"></p-tag>
+                    <p-tag [value]="selectedCourse.isPublic === true || selectedCourse.isPublic === 'true' ? 'Público' : 'Privado'"
+                           [severity]="selectedCourse.isPublic === true || selectedCourse.isPublic === 'true' ? 'success' : 'warning'"></p-tag>
                 </div>
             </div>
         </div>

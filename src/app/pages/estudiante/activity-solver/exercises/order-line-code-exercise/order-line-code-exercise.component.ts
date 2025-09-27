@@ -30,7 +30,6 @@ export class OrderLineCodeExerciseComponent {
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
   linesToOrder: string[] = [];
-  disabled = false;
 
   ngOnChanges() {
     if (this.orderedLines && this.orderedLines.length > 0) {
@@ -43,18 +42,18 @@ export class OrderLineCodeExerciseComponent {
   onDrop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.linesToOrder, event.previousIndex, event.currentIndex);
     this.onChange(this.linesToOrder);
-  }
-
-  onSubmit() {
-    if (this.linesToOrder && this.linesToOrder.length > 0) {
-      this.answerSubmitted.emit(this.linesToOrder);
-    }
+    this.onTouch();
+    // Emitir automáticamente la respuesta cuando cambie el orden
+    this.answerSubmitted.emit(this.linesToOrder);
   }
 
   resetOrder() {
     if (this.lines && this.lines.length > 0) {
       this.linesToOrder = [...this.lines];
       this.onChange(this.linesToOrder);
+      this.onTouch();
+      // Emitir la respuesta después de resetear
+      this.answerSubmitted.emit(this.linesToOrder);
     }
   }
 
@@ -75,6 +74,6 @@ export class OrderLineCodeExerciseComponent {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // No necesitamos disabled state ya que la verificación se maneja desde el padre
   }
 }

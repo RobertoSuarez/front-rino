@@ -1,50 +1,128 @@
 .exercise-container {
-  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
+/* Contenedor de opciones con mejor espaciado */
 .options-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 1rem;
 }
 
+/* Estilo mejorado para cada opción */
 .option-item {
-  padding: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
-  background-color: #f8fafc;
+  position: relative;
+  padding: 1.25rem 1.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .option-item:hover {
-  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.option-label {
-  margin-left: 0.75rem;
-  cursor: pointer;
-  font-size: 1rem;
-  color: #334155;
+/* Estilo para opción seleccionada */
+.option-item.selected {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
-:host ::ng-deep .p-checkbox .p-checkbox-box {
-  width: 22px;
-  height: 22px;
+/* Checkbox personalizado */
+.custom-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  transition: all 0.2s ease;
+  margin-right: 1rem;
+  flex-shrink: 0;
 }
 
-:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+.custom-checkbox.selected {
   border-color: #3b82f6;
   background: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
-:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight:hover {
-  border-color: #2563eb;
-  background: #2563eb;
-}
-
-:host ::ng-deep .p-checkbox .p-checkbox-box .p-checkbox-icon {
+.custom-checkbox::after {
+  content: '✓';
+  color: white;
   font-size: 14px;
-  color: #ffffff;
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s ease;
+}
+
+.custom-checkbox.selected::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Etiqueta de la opción */
+.option-label {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.5;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Animación de entrada */
+.option-item:nth-child(1) { animation-delay: 0.1s; }
+.option-item:nth-child(2) { animation-delay: 0.2s; }
+.option-item:nth-child(3) { animation-delay: 0.3s; }
+.option-item:nth-child(4) { animation-delay: 0.4s; }
+.option-item:nth-child(5) { animation-delay: 0.5s; }
+
+.option-item {
+  animation: slideInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para accesibilidad */
+.option-item:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .option-item {
+    padding: 1rem;
+  }
+
+  .option-label {
+    font-size: 0.95rem;
+  }
+
+  .custom-checkbox {
+    width: 22px;
+    height: 22px;
+    margin-right: 0.75rem;
+  }
 }

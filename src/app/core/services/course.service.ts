@@ -17,6 +17,10 @@ export class CourseService {
     return this.http.get<ApiCourseResponse>(this.apiUrl);
   }
 
+  getCoursesForAdmin(): Observable<ApiCourseResponse> {
+    return this.http.get<ApiCourseResponse>(`${this.apiUrl}/admin`);
+  }
+
   getCourseById(id: number | string): Observable<GetCourseByIdResponse> {
     return this.http.get<GetCourseByIdResponse>(`${this.apiUrl}/${id}`);
   }

@@ -11,12 +11,12 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'new',
-        loadComponent: () => import('./users/user-form-fixed.component').then(m => m.UserFormComponent),
+        loadComponent: () => import('./users/user-form.component').then(m => m.UserFormComponent),
         title: 'Crear Usuario'
       },
       {
         path: 'edit/:id',
-        loadComponent: () => import('./users/user-form-fixed.component').then(m => m.UserFormComponent),
+        loadComponent: () => import('./users/user-form.component').then(m => m.UserFormComponent),
         title: 'Editar Usuario'
       }
     ]

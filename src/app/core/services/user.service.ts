@@ -162,4 +162,13 @@ export class UserService {
   approveUser(id: number): Observable<ApiResponse<any>> {
     return this.apiService.patch<ApiResponse<any>>(`users/${id}/approve`, {});
   }
+
+  /**
+   * Verifica el email de un usuario usando un token
+   * @param token Token de verificación
+   * @returns Observable con la respuesta de la API
+   */
+  verifyEmail(token: string): Observable<ApiResponse<any>> {
+    return this.apiService.post<ApiResponse<any>>('users/verify-email', { token });
+  }
 }

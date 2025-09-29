@@ -155,7 +155,7 @@ import { User } from '../../../core/models';
                   id="whatsApp" 
                   type="tel" 
                   formControlName="whatsApp"
-                  placeholder="+57 300 123 4567"
+                  placeholder="+593 999 999 999"
                   size="large"
                   variant="outlined"
                   class="w-full" />

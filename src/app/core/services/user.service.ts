@@ -155,12 +155,11 @@ export class UserService {
   }
 
   /**
-   * Restablece la contraseña de un usuario
-   * @param id ID del usuario
-   * @param newPassword Nueva contraseña
+   * Aprueba un usuario
+   * @param id ID del usuario a aprobar
    * @returns Observable con la respuesta de la API
    */
-  resetUserPassword(id: number, newPassword: string): Observable<ApiResponse<any>> {
-    return this.apiService.put<ApiResponse<any>>(`users/${id}/reset-password`, { newPassword });
+  approveUser(id: number): Observable<ApiResponse<any>> {
+    return this.apiService.patch<ApiResponse<any>>(`users/${id}/approve`, {});
   }
 }

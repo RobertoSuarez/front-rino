@@ -12,4 +12,6 @@ export interface User {
   status: 'active' | 'inactive';
   typeUser: 'student' | 'admin' | 'teacher' | 'parent';
   requiredUpdate: boolean;
+  isVerified: boolean;
+  approved: boolean;
 }

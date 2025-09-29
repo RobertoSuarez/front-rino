@@ -108,6 +108,12 @@ import { User } from '../../../core/models';
                 <th pSortableColumn="status">
                   Estado <p-sortIcon field="status"></p-sortIcon>
                 </th>
+                <th pSortableColumn="isVerified">
+                  Verificado <p-sortIcon field="isVerified"></p-sortIcon>
+                </th>
+                <th pSortableColumn="approved">
+                  Aprobado <p-sortIcon field="approved"></p-sortIcon>
+                </th>
                 <th>Acciones</th>
               </tr>
             </ng-template>
@@ -134,6 +140,18 @@ import { User } from '../../../core/models';
                   <p-tag 
                     [value]="user.status === 'active' ? 'Activo' : 'Inactivo'" 
                     [severity]="user.status === 'active' ? 'success' : 'danger'">
+                  </p-tag>
+                </td>
+                <td>
+                  <p-tag 
+                    [value]="user.isVerified ? 'Sí' : 'No'" 
+                    [severity]="user.isVerified ? 'success' : 'warning'">
+                  </p-tag>
+                </td>
+                <td>
+                  <p-tag 
+                    [value]="user.approved ? 'Sí' : 'No'" 
+                    [severity]="user.approved ? 'success' : 'danger'">
                   </p-tag>
                 </td>
                 <td>
@@ -165,10 +183,11 @@ import { User } from '../../../core/models';
                     <button 
                       pButton 
                       pRipple 
-                      icon="pi pi-trash" 
-                      class="p-button-rounded p-button-danger p-button-text"
-                      pTooltip="Eliminar usuario"
-                      (click)="deleteUser(user)">
+                      [icon]="user.approved ? 'pi pi-check' : 'pi pi-thumbs-up'" 
+                      [class]="user.approved ? 'p-button-rounded p-button-success p-button-text' : 'p-button-rounded p-button-warning p-button-text'"
+                      [pTooltip]="user.approved ? 'Usuario ya aprobado' : 'Aprobar usuario'"
+                      [disabled]="user.approved"
+                      (click)="approveUser(user)">
                     </button>
                   </div>
                 </td>
@@ -177,7 +196,7 @@ import { User } from '../../../core/models';
             
             <ng-template pTemplate="emptymessage">
               <tr>
-                <td colspan="6" class="text-center py-4">
+                <td colspan="8" class="text-center py-4">
                   <div class="flex flex-column align-items-center gap-3">
                     <i class="pi pi-users text-4xl text-400"></i>
                     <span class="text-lg text-600">No se encontraron usuarios</span>
@@ -311,6 +330,30 @@ import { User } from '../../../core/models';
                             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Estado</p>
                             <p class="text-base font-medium text-slate-900 dark:text-slate-100">
                               {{ user.status === 'active' ? 'Activo' : 'Inactivo' }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200">
+                            <i class="pi pi-check-circle text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Verificado</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">
+                              {{ user.isVerified ? 'Sí' : 'No' }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200">
+                            <i class="pi pi-thumbs-up text-lg"></i>
+                          </div>
+                          <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Aprobado</p>
+                            <p class="text-base font-medium text-slate-900 dark:text-slate-100">
+                              {{ user.approved ? 'Sí' : 'No' }}
                             </p>
                           </div>
                         </div>
@@ -513,28 +556,28 @@ export class UsersListComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteUser(user: User) {
+  approveUser(user: User) {
     this.confirmationService.confirm({
-      message: `¿Está seguro que desea eliminar al usuario ${user.firstName} ${user.lastName}? Esta acción no se puede deshacer.`,
-      header: 'Confirmar Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
+      message: `¿Está seguro que desea aprobar al usuario ${user.firstName} ${user.lastName}?`,
+      header: 'Aprobar Usuario',
+      icon: 'pi pi-thumbs-up',
+      acceptButtonStyleClass: 'p-button-success',
       accept: () => {
-        const subscription = this.userService.deleteUser(user.id).subscribe({
+        const subscription = this.userService.approveUser(user.id).subscribe({
           next: (response) => {
             this.messageService.add({
               severity: 'success',
               summary: 'Éxito',
-              detail: 'Usuario eliminado correctamente'
+              detail: 'Usuario aprobado correctamente'
             });
             this.loadUsers();
           },
           error: (error) => {
-            console.error('Error deleting user:', error);
+            console.error('Error approving user:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Error al eliminar el usuario: ' + (error.error?.message || '')
+              detail: 'Error al aprobar el usuario: ' + (error.error?.message || '')
             });
           }
         });

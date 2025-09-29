@@ -143,10 +143,17 @@ import { User } from '../../../core/models';
                   </p-tag>
                 </td>
                 <td>
-                  <p-tag 
-                    [value]="user.isVerified ? 'Sí' : 'No'" 
-                    [severity]="user.isVerified ? 'success' : 'warning'">
-                  </p-tag>
+                  @if (user.isVerified) {
+                    <p-tag 
+                      [value]="'Sí'" 
+                      [severity]="'success'">
+                    </p-tag>
+                  } @else {
+                    <p-tag 
+                      [value]="'No'" 
+                      [severity]="'warn'">
+                    </p-tag>
+                  }
                 </td>
                 <td>
                   <p-tag 
@@ -188,6 +195,15 @@ import { User } from '../../../core/models';
                       [pTooltip]="user.approved ? 'Usuario ya aprobado' : 'Aprobar usuario'"
                       [disabled]="user.approved"
                       (click)="approveUser(user)">
+                    </button>
+                    <button 
+                      pButton 
+                      pRipple 
+                      [icon]="user.isVerified ? 'pi pi-check-circle' : 'pi pi-envelope'" 
+                      [class]="user.isVerified ? 'p-button-rounded p-button-success p-button-text' : 'p-button-rounded p-button-info p-button-text'"
+                      [pTooltip]="user.isVerified ? 'Usuario ya verificado' : 'Enviar verificación'"
+                      [disabled]="user.isVerified"
+                      (click)="sendVerificationEmail(user)">
                     </button>
                   </div>
                 </td>
@@ -582,6 +598,25 @@ export class UsersListComponent implements OnInit, OnDestroy {
           }
         });
         this.subscriptions.push(subscription);
+      }
+    });
+  }
+
+  sendVerificationEmail(user: User) {
+    this.confirmationService.confirm({
+      message: `¿Está seguro que desea enviar un email de verificación al usuario ${user.firstName} ${user.lastName}?`,
+      header: 'Enviar Verificación',
+      icon: 'pi pi-envelope',
+      acceptButtonStyleClass: 'p-button-info',
+      accept: () => {
+        // Para enviar verificación, necesitamos crear un nuevo token y enviar el email
+        // Por simplicidad, podríamos llamar al backend para reenviar la verificación
+        // o simplemente mostrar un mensaje indicando que se debería implementar
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Funcionalidad pendiente',
+          detail: 'La funcionalidad para reenviar emails de verificación está pendiente de implementación'
+        });
       }
     });
   }

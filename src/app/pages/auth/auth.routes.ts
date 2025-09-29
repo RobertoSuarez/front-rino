@@ -5,6 +5,7 @@ import { Error } from './error';
 import { Register } from './register';
 import { ForgotPassword } from './forgot-password';
 import { ResetPassword } from './reset-password';
+import { VerifyEmail } from './verify-email';
 import { guestGuard } from '../../core/guards';
 
 export default [
@@ -13,5 +14,6 @@ export default [
     { path: 'login', component: Login, canActivate: [() => guestGuard()] },
     { path: 'register', component: Register, canActivate: [() => guestGuard()] },
     { path: 'forgot-password', component: ForgotPassword, canActivate: [() => guestGuard()] },
-    { path: 'reset-password', component: ResetPassword, canActivate: [() => guestGuard()] }
+    { path: 'reset-password', component: ResetPassword, canActivate: [() => guestGuard()] },
+    { path: 'verify-email', component: VerifyEmail, canActivate: [() => guestGuard()] }
 ] as Routes;

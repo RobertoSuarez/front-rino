@@ -22,18 +22,29 @@ import { OrderFragmentCodeExerciseComponent } from './exercises/order-fragment-c
 import { OrderLineCodeExerciseComponent } from './exercises/order-line-code-exercise/order-line-code-exercise.component';
 import { WriteCodeExerciseComponent } from './exercises/write-code-exercise/write-code-exercise.component';
 import { FindErrorCodeExerciseComponent } from './exercises/find-error-code-exercise/find-error-code-exercise.component';
+import { VerticalOrderingExerciseComponent } from './exercises/vertical-ordering-exercise/vertical-ordering-exercise.component';
+import { HorizontalOrderingExerciseComponent } from './exercises/horizontal-ordering-exercise/horizontal-ordering-exercise.component';
+import { PhishingSelectionMultipleExerciseComponent } from './exercises/phishing-selection-multiple-exercise/phishing-selection-multiple-exercise.component';
+import { MatchPairsExerciseComponent } from './exercises/match-pairs-exercise/match-pairs-exercise.component';
 
 interface Exercise {
   id: number;
   statement: string;
   code: string;
-  typeExercise: 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code';
+  typeExercise: 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';
   approach: string;
   hind: string;
   optionSelectOptions: string[];
   optionOrderFragmentCode: string[];
   optionOrderLineCode: string[];
   optionFindErrorCode: string[];
+  optionsVerticalOrdering: string[];
+  optionsHorizontalOrdering: string[];
+  optionsPhishingSelection: string[];
+  phishingContext: string;
+  phishingImageUrl: string;
+  optionsMatchPairsLeft: string[];
+  optionsMatchPairsRight: string[];
 }
 
 interface ActivityWithExercises {
@@ -44,13 +55,17 @@ interface ActivityWithExercises {
 
 interface ExerciseAnswer {
   exerciseId: number;
-  type: 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code';
+  type: 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';
   answerSelect?: string;
   answerSelects?: string[];
   answerOrderFragmentCode?: string[];
   answerOrderLineCode?: string[];
   answerWriteCode?: string;
   answerFindError?: string;
+  answerVerticalOrdering?: string[];
+  answerHorizontalOrdering?: string[];
+  answerPhishingSelection?: string[];
+  answerMatchPairs?: { left: string; right: string }[];
   qualification?: number;
   feedback?: string;
 }
@@ -83,7 +98,11 @@ interface ActivityResult {
     OrderFragmentCodeExerciseComponent,
     OrderLineCodeExerciseComponent,
     WriteCodeExerciseComponent,
-    FindErrorCodeExerciseComponent
+    FindErrorCodeExerciseComponent,
+    VerticalOrderingExerciseComponent,
+    HorizontalOrderingExerciseComponent,
+    PhishingSelectionMultipleExerciseComponent,
+    MatchPairsExerciseComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './activity-solver.component.html',
@@ -154,6 +173,7 @@ export class ActivitySolverComponent implements OnInit {
     
     this.activityService.initActivity(activityId).subscribe({
       next: (data: ApiActivityWithExercises) => {
+        console.log('📚 Datos de actividad recibidos del backend:', data);
         // Convertir los datos de la API al formato interno
         const convertedData: ActivityWithExercises = {
           id: data.id,
@@ -162,16 +182,24 @@ export class ActivitySolverComponent implements OnInit {
             id: ex.id,
             statement: ex.statement,
             code: ex.code || '',
-            typeExercise: ex.typeExercise as 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code',
+            typeExercise: ex.typeExercise as any,
             approach: ex.approach || '',
             hind: ex.hind || '',
             optionSelectOptions: ex.optionSelectOptions || [],
             optionOrderFragmentCode: ex.optionOrderFragmentCode || [],
             optionOrderLineCode: ex.optionOrderLineCode || [],
-            optionFindErrorCode: ex.optionFindErrorCode || []
+            optionFindErrorCode: ex.optionFindErrorCode || [],
+            optionsVerticalOrdering: (ex as any).optionsVerticalOrdering || [],
+            optionsHorizontalOrdering: (ex as any).optionsHorizontalOrdering || [],
+            optionsPhishingSelection: (ex as any).optionsPhishingSelection || [],
+            phishingContext: (ex as any).phishingContext || '',
+            phishingImageUrl: (ex as any).phishingImageUrl || '',
+            optionsMatchPairsLeft: (ex as any).optionsMatchPairsLeft || [],
+            optionsMatchPairsRight: (ex as any).optionsMatchPairsRight || []
           }))
         };
         
+        console.log('✅ Datos convertidos para la aplicación:', convertedData);
         this.activity.set(convertedData);
         
         // Inicializar las respuestas vacías para cada ejercicio
@@ -186,7 +214,11 @@ export class ActivitySolverComponent implements OnInit {
           answerOrderFragmentCode: [],
           answerOrderLineCode: [],
           answerWriteCode: '',
-          answerFindError: ''
+          answerFindError: '',
+          answerVerticalOrdering: [],
+          answerHorizontalOrdering: [],
+          answerPhishingSelection: [],
+          answerMatchPairs: []
         }));
         
         this.answers.set(initialAnswers);
@@ -222,7 +254,7 @@ export class ActivitySolverComponent implements OnInit {
   decreaseTumis(): void {
     const currentIndicators = this.safeUserIndicators;
     const newTumis = Math.max(0, currentIndicators.tumis - 1); // No permitir valores negativos
-    debugger;
+
     this.userService.updateUserIndicators({
       yachay: currentIndicators.yachay,
       tumis: newTumis,
@@ -245,6 +277,12 @@ export class ActivitySolverComponent implements OnInit {
   }
 
   get currentExercise(): Exercise {
+    const exercise = this.getCurrentExerciseInternal();
+    console.log('🎯 Ejercicio actual (índice ' + this.currentExerciseIndex() + '):', exercise);
+    return exercise;
+  }
+
+  private getCurrentExerciseInternal(): Exercise {
     if (!this.activity() || !this.activity()?.exercises.length) {
       return {
         id: 0,
@@ -256,7 +294,14 @@ export class ActivitySolverComponent implements OnInit {
         optionSelectOptions: [],
         optionOrderFragmentCode: [],
         optionOrderLineCode: [],
-        optionFindErrorCode: []
+        optionFindErrorCode: [],
+        optionsVerticalOrdering: [],
+        optionsHorizontalOrdering: [],
+        optionsPhishingSelection: [],
+        phishingContext: '',
+        phishingImageUrl: '',
+        optionsMatchPairsLeft: [],
+        optionsMatchPairsRight: []
       };
     }
     
@@ -270,7 +315,14 @@ export class ActivitySolverComponent implements OnInit {
       optionSelectOptions: [],
       optionOrderFragmentCode: [],
       optionOrderLineCode: [],
-      optionFindErrorCode: []
+      optionFindErrorCode: [],
+      optionsVerticalOrdering: [],
+      optionsHorizontalOrdering: [],
+      optionsPhishingSelection: [],
+      phishingContext: '',
+      phishingImageUrl: '',
+      optionsMatchPairsLeft: [],
+      optionsMatchPairsRight: []
     };
   }
 
@@ -311,6 +363,14 @@ export class ActivitySolverComponent implements OnInit {
         return currentAnswer.answerWriteCode;
       case 'find_error_code':
         return currentAnswer.answerFindError;
+      case 'vertical_ordering':
+        return currentAnswer.answerVerticalOrdering;
+      case 'horizontal_ordering':
+        return currentAnswer.answerHorizontalOrdering;
+      case 'phishing_selection_multiple':
+        return currentAnswer.answerPhishingSelection;
+      case 'match_pairs':
+        return currentAnswer.answerMatchPairs;
       default:
         return null;
     }
@@ -333,6 +393,14 @@ export class ActivitySolverComponent implements OnInit {
         return !!(currentAnswer.answerWriteCode && currentAnswer.answerWriteCode.trim());
       case 'find_error_code':
         return !!(currentAnswer.answerFindError && currentAnswer.answerFindError.trim());
+      case 'vertical_ordering':
+        return !!(currentAnswer.answerVerticalOrdering && currentAnswer.answerVerticalOrdering.length > 0);
+      case 'horizontal_ordering':
+        return !!(currentAnswer.answerHorizontalOrdering && currentAnswer.answerHorizontalOrdering.length > 0);
+      case 'phishing_selection_multiple':
+        return !!(currentAnswer.answerPhishingSelection && currentAnswer.answerPhishingSelection.length > 0);
+      case 'match_pairs':
+        return !!(currentAnswer.answerMatchPairs && currentAnswer.answerMatchPairs.length > 0);
       default:
         return false;
     }
@@ -532,7 +600,11 @@ export class ActivitySolverComponent implements OnInit {
             answerOrderFragmentCode: answer.answerOrderFragmentCode || [],
             answerOrderLineCode: answer.answerOrderLineCode || [],
             answerWriteCode: answer.answerWriteCode || '',
-            answerFindError: answer.answerFindError || ''
+            answerFindError: answer.answerFindError || '',
+            answerVerticalOrdering: answer.answerVerticalOrdering || [],
+            answerHorizontalOrdering: answer.answerHorizontalOrdering || [],
+            answerPhishingSelection: answer.answerPhishingSelection || [],
+            answerMatchPairs: answer.answerMatchPairs || []
           };
           
           // Actualizar el campo específico según el tipo de ejercicio
@@ -554,6 +626,18 @@ export class ActivitySolverComponent implements OnInit {
               break;
             case 'find_error_code':
               updatedAnswer.answerFindError = value;
+              break;
+            case 'vertical_ordering':
+              updatedAnswer.answerVerticalOrdering = value;
+              break;
+            case 'horizontal_ordering':
+              updatedAnswer.answerHorizontalOrdering = value;
+              break;
+            case 'phishing_selection_multiple':
+              updatedAnswer.answerPhishingSelection = value;
+              break;
+            case 'match_pairs':
+              updatedAnswer.answerMatchPairs = value;
               break;
           }
           

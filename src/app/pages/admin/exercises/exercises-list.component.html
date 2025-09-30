@@ -56,10 +56,10 @@
                 <td>
                     <span *ngIf="exercise.typeExercise === 'selection_single'">Selección Simple</span>
                     <span *ngIf="exercise.typeExercise === 'selection_multiple'">Selección Múltiple</span>
-                    <span *ngIf="exercise.typeExercise === 'order_fragment_code'">Ordenar Fragmentos</span>
-                    <span *ngIf="exercise.typeExercise === 'order_line_code'">Ordenar Líneas</span>
-                    <span *ngIf="exercise.typeExercise === 'write_code'">Escribir Código</span>
-                    <span *ngIf="exercise.typeExercise === 'find_error_code'">Encontrar Error</span>
+                    <span *ngIf="exercise.typeExercise === 'vertical_ordering'">Ordenamiento Vertical</span>
+                    <span *ngIf="exercise.typeExercise === 'horizontal_ordering'">Ordenamiento Horizontal</span>
+                    <span *ngIf="exercise.typeExercise === 'phishing_selection_multiple'">Detección de Phishing</span>
+                    <span *ngIf="exercise.typeExercise === 'match_pairs'">Emparejar Conceptos</span>
                 </td>
                 <td>
                     <p-tag [value]="exercise.approach" 
@@ -165,29 +165,29 @@
                 (dataChange)="onExerciseDataChange($event)">
             </app-selection-multiple>
 
-            <app-order-fragment-code 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'order_fragment_code'"
+            <app-vertical-ordering 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'vertical_ordering'"
                 [initialData]="exerciseTypeData"
                 (dataChange)="onExerciseDataChange($event)">
-            </app-order-fragment-code>
+            </app-vertical-ordering>
 
-            <app-order-line-code 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'order_line_code'"
+            <app-horizontal-ordering 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'horizontal_ordering'"
                 [initialData]="exerciseTypeData"
                 (dataChange)="onExerciseDataChange($event)">
-            </app-order-line-code>
+            </app-horizontal-ordering>
 
-            <app-write-code 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'write_code'"
+            <app-phishing-selection-multiple 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'phishing_selection_multiple'"
                 [initialData]="exerciseTypeData"
                 (dataChange)="onExerciseDataChange($event)">
-            </app-write-code>
+            </app-phishing-selection-multiple>
 
-            <app-find-error-code 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'find_error_code'"
+            <app-match-pairs 
+                *ngIf="exerciseForm.get('typeExercise')?.value === 'match_pairs'"
                 [initialData]="exerciseTypeData"
                 (dataChange)="onExerciseDataChange($event)">
-            </app-find-error-code>
+            </app-match-pairs>
         </div>
         
         <div class="flex justify-end gap-3 mt-6">

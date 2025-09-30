@@ -106,6 +106,37 @@
             [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
             (answerSubmitted)="onAnswerSubmitted($event)">
           </app-find-error-code-exercise>
+
+          <app-vertical-ordering-exercise 
+            *ngSwitchCase="'vertical_ordering'"
+            [fragments]="currentExercise.optionsVerticalOrdering"
+            [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
+            (answerSubmitted)="onAnswerSubmitted($event)">
+          </app-vertical-ordering-exercise>
+
+          <app-horizontal-ordering-exercise 
+            *ngSwitchCase="'horizontal_ordering'"
+            [lines]="currentExercise.optionsHorizontalOrdering"
+            [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
+            (answerSubmitted)="onAnswerSubmitted($event)">
+          </app-horizontal-ordering-exercise>
+
+          <app-phishing-selection-multiple-exercise 
+            *ngSwitchCase="'phishing_selection_multiple'"
+            [options]="currentExercise.optionsPhishingSelection"
+            [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
+            [phishingContext]="currentExercise.phishingContext"
+            [phishingImageUrl]="currentExercise.phishingImageUrl"
+            (answerSubmitted)="onAnswerSubmitted($event)">
+          </app-phishing-selection-multiple-exercise>
+
+          <app-match-pairs-exercise 
+            *ngSwitchCase="'match_pairs'"
+            [leftOptions]="currentExercise.optionsMatchPairsLeft"
+            [rightOptions]="currentExercise.optionsMatchPairsRight"
+            [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
+            (answerSubmitted)="onAnswerSubmitted($event)">
+          </app-match-pairs-exercise>
         </div>
         
         </div>

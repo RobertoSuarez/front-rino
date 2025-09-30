@@ -1,0 +1,26 @@
+.pair-card {
+  border-color: #d1d5db;
+  background-color: white;
+}
+
+.left-card:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.right-card:hover {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}
+
+.pair-card.selected {
+  border-color: #8b5cf6;
+  background-color: #faf5ff;
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+}
+
+.pair-card.matched {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+  opacity: 0.8;
+}

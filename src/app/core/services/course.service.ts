@@ -24,4 +24,10 @@ export class CourseService {
   getCourseById(id: number | string): Observable<GetCourseByIdResponse> {
     return this.http.get<GetCourseByIdResponse>(`${this.apiUrl}/${id}`);
   }
+
+  uploadImage(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.apiUrl}/upload-image`, formData);
+  }
 }

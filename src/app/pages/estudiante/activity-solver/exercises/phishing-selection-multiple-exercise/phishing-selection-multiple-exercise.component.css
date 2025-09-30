@@ -1,0 +1,14 @@
+.option-card {
+  border-color: #d1d5db;
+  background-color: white;
+}
+
+.option-card:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.option-card.selected {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}

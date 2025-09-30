@@ -1,0 +1,71 @@
+<div class="space-y-6">
+  <p class="text-gray-600 mb-4 font-medium">Empareja los conceptos de la columna izquierda con sus definiciones en la columna derecha:</p>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Columna Izquierda -->
+    <div class="space-y-3">
+      <h3 class="text-lg font-semibold text-blue-700 mb-3">Conceptos</h3>
+      <div 
+        *ngFor="let item of leftOptions"
+        (click)="selectLeft(item)"
+        [class.selected]="selectedLeft === item"
+        [class.matched]="isLeftMatched(item)"
+        class="pair-card left-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-800 font-medium">{{item}}</span>
+          <i *ngIf="isLeftMatched(item)" class="pi pi-check-circle text-green-500 text-xl"></i>
+          <i *ngIf="selectedLeft === item && !isLeftMatched(item)" class="pi pi-circle text-blue-500 text-xl"></i>
+        </div>
+        <div *ngIf="isLeftMatched(item)" class="mt-2 text-sm text-green-600">
+          <i class="pi pi-arrow-right mr-1"></i>
+          Emparejado con: <strong>{{getRightMatch(item)}}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha -->
+    <div class="space-y-3">
+      <h3 class="text-lg font-semibold text-green-700 mb-3">Definiciones</h3>
+      <div 
+        *ngFor="let item of shuffledRightOptions"
+        (click)="selectRight(item)"
+        [class.selected]="selectedRight === item"
+        [class.matched]="isRightMatched(item)"
+        class="pair-card right-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-800 font-medium">{{item}}</span>
+          <i *ngIf="isRightMatched(item)" class="pi pi-check-circle text-green-500 text-xl"></i>
+          <i *ngIf="selectedRight === item && !isRightMatched(item)" class="pi pi-circle text-green-500 text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pares Emparejados -->
+  <div *ngIf="pairs.length > 0" class="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+    <h3 class="text-lg font-semibold text-purple-700 mb-3">Pares Emparejados ({{pairs.length}})</h3>
+    <div class="space-y-2">
+      <div *ngFor="let pair of pairs" class="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200">
+        <div class="flex items-center gap-3 flex-1">
+          <span class="text-blue-600 font-medium">{{pair.left}}</span>
+          <i class="pi pi-arrow-right text-purple-500"></i>
+          <span class="text-green-600 font-medium">{{pair.right}}</span>
+        </div>
+        <p-button 
+          icon="pi pi-times" 
+          severity="danger"
+          size="small"
+          class="p-button-rounded p-button-text"
+          (onClick)="removePair(pair)"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instrucciones -->
+  <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+    <p class="text-sm text-blue-700">
+      <i class="pi pi-info-circle mr-2"></i>
+      Selecciona un concepto de la izquierda y una definición de la derecha para emparejarlos
+    </p>
+  </div>
+</div>

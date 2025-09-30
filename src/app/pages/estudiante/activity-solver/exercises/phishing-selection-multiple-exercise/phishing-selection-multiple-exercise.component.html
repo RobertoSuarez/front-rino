@@ -1,0 +1,50 @@
+<div class="space-y-4">
+  <!-- Contexto del Phishing -->
+  <div *ngIf="phishingContext" class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg mb-4">
+    <div class="flex items-start gap-3">
+      <i class="pi pi-exclamation-triangle text-red-500 text-xl mt-1"></i>
+      <div>
+        <h3 class="text-lg font-semibold text-red-700 mb-2">Escenario de Phishing</h3>
+        <p class="text-red-800">{{phishingContext}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Imagen del Phishing (si existe) -->
+  <div *ngIf="phishingImageUrl" class="mb-4">
+    <img [src]="phishingImageUrl" alt="Ejemplo de phishing" class="w-full max-w-2xl mx-auto rounded-lg shadow-lg border-2 border-gray-200">
+  </div>
+
+  <!-- Instrucciones -->
+  <p class="text-gray-600 mb-4 font-medium">Selecciona todos los indicadores que son señales de phishing:</p>
+  
+  <!-- Opciones -->
+  <div class="space-y-3">
+    <div 
+      *ngFor="let option of options; let i = index"
+      (click)="toggleOption(option)"
+      [class.selected]="isSelected(option)"
+      class="option-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md">
+      <div class="flex items-center gap-3">
+        <p-checkbox 
+          [binary]="true"
+          [(ngModel)]="selectedValues"
+          [value]="option"
+          (onChange)="onSelectionChange()"
+          [inputId]="'option_' + i">
+        </p-checkbox>
+        <label [for]="'option_' + i" class="flex-1 cursor-pointer text-gray-800 font-medium">
+          {{option}}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contador de selecciones -->
+  <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+    <p class="text-sm text-blue-700">
+      <i class="pi pi-info-circle mr-2"></i>
+      Has seleccionado <strong>{{selectedValues.length}}</strong> indicador(es) de phishing
+    </p>
+  </div>
+</div>

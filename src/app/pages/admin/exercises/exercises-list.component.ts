@@ -22,10 +22,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SelectionSingleComponent } from './components/selection-single.component';
 import { SelectionMultipleComponent } from './components/selection-multiple.component';
-import { OrderFragmentCodeComponent } from './components/order-fragment-code.component';
-import { OrderLineCodeComponent } from './components/order-line-code.component';
-import { WriteCodeComponent } from './components/write-code.component';
-import { FindErrorCodeComponent } from './components/find-error-code.component';
+import { VerticalOrderingComponent } from './components/vertical-ordering.component';
+import { HorizontalOrderingComponent } from './components/horizontal-ordering.component';
+import { PhishingSelectionMultipleComponent } from './components/phishing-selection-multiple.component';
+import { MatchPairsComponent } from './components/match-pairs.component';
 
 @Component({
   selector: 'app-exercises-list',
@@ -46,10 +46,10 @@ import { FindErrorCodeComponent } from './components/find-error-code.component';
     ConfirmDialogModule,
     SelectionSingleComponent,
     SelectionMultipleComponent,
-    OrderFragmentCodeComponent,
-    OrderLineCodeComponent,
-    WriteCodeComponent,
-    FindErrorCodeComponent
+    VerticalOrderingComponent,
+    HorizontalOrderingComponent,
+    PhishingSelectionMultipleComponent,
+    MatchPairsComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './exercises-list.component.html',
@@ -75,10 +75,10 @@ export class ExercisesListComponent implements OnInit {
   exerciseTypes = [
     { label: 'Selección Simple', value: 'selection_single' },
     { label: 'Selección Múltiple', value: 'selection_multiple' },
-    { label: 'Ordenar Fragmentos de Código', value: 'order_fragment_code' },
-    { label: 'Ordenar Líneas de Código', value: 'order_line_code' },
-    { label: 'Escribir Código', value: 'write_code' },
-    { label: 'Encontrar Error en Código', value: 'find_error_code' }
+    { label: 'Ordenamiento Vertical', value: 'vertical_ordering' },
+    { label: 'Ordenamiento Horizontal', value: 'horizontal_ordering' },
+    { label: 'Detección de Phishing', value: 'phishing_selection_multiple' },
+    { label: 'Emparejar Conceptos', value: 'match_pairs' }
   ];
 
   difficultyOptions = [
@@ -142,7 +142,19 @@ export class ExercisesListComponent implements OnInit {
       answerSelectsCorrect: [[]],
       answerOrderFragmentCode: [[]],
       answerOrderLineCode: [[]],
-      answerFindError: ['']
+      answerFindError: [''],
+      answerWriteCode: [''],
+      optionsVerticalOrdering: [[]],
+      answerVerticalOrdering: [[]],
+      optionsHorizontalOrdering: [[]],
+      answerHorizontalOrdering: [[]],
+      optionsPhishingSelection: [[]],
+      answerPhishingSelection: [[]],
+      phishingContext: [''],
+      phishingImageUrl: [''],
+      optionsMatchPairsLeft: [[]],
+      optionsMatchPairsRight: [[]],
+      answerMatchPairs: [[]]
     });
   }
 
@@ -206,7 +218,19 @@ export class ExercisesListComponent implements OnInit {
       answerSelectsCorrect: [],
       answerOrderFragmentCode: [],
       answerOrderLineCode: [],
-      answerFindError: ''
+      answerFindError: '',
+      answerWriteCode: '',
+      optionsVerticalOrdering: [],
+      answerVerticalOrdering: [],
+      optionsHorizontalOrdering: [],
+      answerHorizontalOrdering: [],
+      optionsPhishingSelection: [],
+      answerPhishingSelection: [],
+      phishingContext: '',
+      phishingImageUrl: '',
+      optionsMatchPairsLeft: [],
+      optionsMatchPairsRight: [],
+      answerMatchPairs: []
     });
     this.currentExerciseId = null;
     this.displayCreateDialog = true;
@@ -233,7 +257,19 @@ export class ExercisesListComponent implements OnInit {
           answerSelectsCorrect: response.answerSelectsCorrect,
           answerOrderFragmentCode: response.answerOrderFragmentCode,
           answerOrderLineCode: response.answerOrderLineCode,
-          answerFindError: response.answerFindError
+          answerFindError: response.answerFindError,
+          answerWriteCode: response.answerWriteCode,
+          optionsVerticalOrdering: response.optionsVerticalOrdering,
+          answerVerticalOrdering: response.answerVerticalOrdering,
+          optionsHorizontalOrdering: response.optionsHorizontalOrdering,
+          answerHorizontalOrdering: response.answerHorizontalOrdering,
+          optionsPhishingSelection: response.optionsPhishingSelection,
+          answerPhishingSelection: response.answerPhishingSelection,
+          phishingContext: response.phishingContext,
+          phishingImageUrl: response.phishingImageUrl,
+          optionsMatchPairsLeft: response.optionsMatchPairsLeft,
+          optionsMatchPairsRight: response.optionsMatchPairsRight,
+          answerMatchPairs: response.answerMatchPairs
         });
         
         // Cargar datos para el componente específico
@@ -268,51 +304,64 @@ export class ExercisesListComponent implements OnInit {
     switch (typeExercise) {
       case 'selection_single':
         this.exerciseForm.patchValue({
-          answerSelectsCorrect: [],
-          answerOrderFragmentCode: [],
-          answerOrderLineCode: [],
-          answerFindError: ''
+          answerSelectsCorrect: []
         });
         break;
       case 'selection_multiple':
         this.exerciseForm.patchValue({
-          answerSelectCorrect: '',
-          answerOrderFragmentCode: [],
-          answerOrderLineCode: [],
-          answerFindError: ''
+          answerSelectCorrect: ''
         });
         break;
-      case 'order_fragment_code':
-        this.exerciseForm.patchValue({
-          answerSelectCorrect: '',
-          answerSelectsCorrect: [],
-          answerOrderLineCode: [],
-          answerFindError: ''
-        });
-        break;
-      case 'order_line_code':
-        this.exerciseForm.patchValue({
-          answerSelectCorrect: '',
-          answerSelectsCorrect: [],
-          answerOrderFragmentCode: [],
-          answerFindError: ''
-        });
-        break;
-      case 'write_code':
+      case 'vertical_ordering':
         this.exerciseForm.patchValue({
           answerSelectCorrect: '',
           answerSelectsCorrect: [],
           answerOrderFragmentCode: [],
           answerOrderLineCode: [],
-          answerFindError: ''
+          answerFindError: '',
+          answerWriteCode: '',
+          answerHorizontalOrdering: [],
+          answerPhishingSelection: [],
+          answerMatchPairs: []
         });
         break;
-      case 'find_error_code':
+      case 'horizontal_ordering':
         this.exerciseForm.patchValue({
           answerSelectCorrect: '',
           answerSelectsCorrect: [],
           answerOrderFragmentCode: [],
-          answerOrderLineCode: []
+          answerOrderLineCode: [],
+          answerFindError: '',
+          answerWriteCode: '',
+          answerVerticalOrdering: [],
+          answerPhishingSelection: [],
+          answerMatchPairs: []
+        });
+        break;
+      case 'phishing_selection_multiple':
+        this.exerciseForm.patchValue({
+          answerSelectCorrect: '',
+          answerSelectsCorrect: [],
+          answerOrderFragmentCode: [],
+          answerOrderLineCode: [],
+          answerFindError: '',
+          answerWriteCode: '',
+          answerVerticalOrdering: [],
+          answerHorizontalOrdering: [],
+          answerMatchPairs: []
+        });
+        break;
+      case 'match_pairs':
+        this.exerciseForm.patchValue({
+          answerSelectCorrect: '',
+          answerSelectsCorrect: [],
+          answerOrderFragmentCode: [],
+          answerOrderLineCode: [],
+          answerFindError: '',
+          answerWriteCode: '',
+          answerVerticalOrdering: [],
+          answerHorizontalOrdering: [],
+          answerPhishingSelection: []
         });
         break;
     }
@@ -330,7 +379,20 @@ export class ExercisesListComponent implements OnInit {
       answerOrderFragmentCode: data.answerOrderFragmentCode || [],
       answerOrderLineCode: data.answerOrderLineCode || [],
       answerFindError: data.answerFindError || '',
-      code: data.code || this.exerciseForm.get('code')?.value || ''
+      answerWriteCode: data.answerWriteCode || '',
+      code: data.code || this.exerciseForm.get('code')?.value || '',
+      // Nuevos campos para los 4 tipos adicionales
+      optionsVerticalOrdering: data.optionsVerticalOrdering || [],
+      answerVerticalOrdering: data.answerVerticalOrdering || [],
+      optionsHorizontalOrdering: data.optionsHorizontalOrdering || [],
+      answerHorizontalOrdering: data.answerHorizontalOrdering || [],
+      optionsPhishingSelection: data.optionsPhishingSelection || [],
+      answerPhishingSelection: data.answerPhishingSelection || [],
+      phishingContext: data.phishingContext || '',
+      phishingImageUrl: data.phishingImageUrl || '',
+      optionsMatchPairsLeft: data.optionsMatchPairsLeft || [],
+      optionsMatchPairsRight: data.optionsMatchPairsRight || [],
+      answerMatchPairs: data.answerMatchPairs || []
     });
   }
 

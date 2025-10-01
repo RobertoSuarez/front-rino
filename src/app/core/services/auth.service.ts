@@ -101,20 +101,89 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión del usuario
+   * Cierra la sesión del usuario y limpia todos los datos de autenticación
    */
   logout(): void {
+    // Eliminar token y datos del usuario
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    
+    // Limpiar cualquier otro dato relacionado con la sesión
+    // Mantener solo las preferencias de la app (tema, fuente, etc.)
+    const keysToPreserve = ['app-theme', 'app-font-family', 'app-font-size'];
+    const allKeys = Object.keys(localStorage);
+    
+    allKeys.forEach(key => {
+      // Si la clave no está en la lista de preservar, eliminarla
+      if (!keysToPreserve.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Actualizar el observable
     this.currentUserSubject.next(null);
   }
 
   /**
-   * Verifica si el usuario está autenticado
+   * Decodifica un token JWT sin verificar la firma
+   * @param token Token JWT a decodificar
+   * @returns Payload del token o null si es inválido
+   */
+  private decodeToken(token: string): any {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        return null;
+      }
+      const payload = parts[1];
+      const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(decoded);
+    } catch (error) {
+      console.error('Error al decodificar token:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Verifica si un token ha expirado
+   * @param token Token JWT a verificar
+   * @returns true si el token ha expirado, false en caso contrario
+   */
+  isTokenExpired(token: string | null): boolean {
+    if (!token) {
+      return true;
+    }
+
+    const decoded = this.decodeToken(token);
+    if (!decoded || !decoded.exp) {
+      return true;
+    }
+
+    // exp viene en segundos, Date.now() en milisegundos
+    const expirationDate = decoded.exp * 1000;
+    const now = Date.now();
+    
+    return expirationDate < now;
+  }
+
+  /**
+   * Verifica si el usuario está autenticado y el token no ha expirado
    * @returns true si el usuario está autenticado, false en caso contrario
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+    const token = localStorage.getItem(this.tokenKey);
+    if (!token) {
+      return false;
+    }
+
+    // Verificar si el token ha expirado
+    if (this.isTokenExpired(token)) {
+      // Limpiar datos si el token expiró
+      this.logout();
+      return false;
+    }
+
+    return true;
   }
 
   /**

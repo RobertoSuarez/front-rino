@@ -50,5 +50,25 @@ export const adminRoutes: Routes = [
     path: 'statistics',
     loadComponent: () => import('./statistics/statistics-dashboard.component').then(m => m.StatisticsDashboardComponent),
     title: 'Estadísticas de la Plataforma'
+  },
+  {
+    path: 'learning-paths',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./learning-paths/learning-paths-list.component').then(m => m.LearningPathsListComponent),
+        title: 'Gestión de Rutas de Aprendizaje'
+      },
+      {
+        path: 'new',
+        loadComponent: () => import('./learning-paths/learning-path-form.component').then(m => m.LearningPathFormComponent),
+        title: 'Crear Ruta de Aprendizaje'
+      },
+      {
+        path: 'edit/:id',
+        loadComponent: () => import('./learning-paths/learning-path-form.component').then(m => m.LearningPathFormComponent),
+        title: 'Editar Ruta de Aprendizaje'
+      }
+    ]
   }
 ];

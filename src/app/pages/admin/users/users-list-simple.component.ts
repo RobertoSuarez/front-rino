@@ -18,6 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { UserService, UsersListResponse } from '../../../core/services/user.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models';
 
 @Component({
@@ -49,8 +50,12 @@ import { User } from '../../../core/models';
           <p-toolbar styleClass="mb-4 gap-2">
             <ng-template pTemplate="left">
               <div class="my-2">
-                <h2 class="text-2xl font-bold text-900 mb-0">Gestión de Usuarios</h2>
-                <p class="text-600 mt-1">Administra todos los usuarios del sistema</p>
+                <h2 class="text-2xl font-bold text-900 mb-0">
+                  {{ currentUserType === 'teacher' ? 'Mis Estudiantes' : 'Gestión de Usuarios' }}
+                </h2>
+                <p class="text-600 mt-1">
+                  {{ currentUserType === 'teacher' ? 'Visualiza la información de tus estudiantes' : 'Administra todos los usuarios del sistema' }}
+                </p>
               </div>
             </ng-template>
             
@@ -67,6 +72,7 @@ import { User } from '../../../core/models';
                     class="w-full sm:w-auto" />
                 </span>
                 <button 
+                  *ngIf="currentUserType !== 'teacher'"
                   pButton 
                   pRipple 
                   label="Nuevo Usuario" 
@@ -172,6 +178,7 @@ import { User } from '../../../core/models';
                       (click)="viewUser(user)">
                     </button>
                     <button 
+                      *ngIf="currentUserType !== 'teacher'"
                       pButton 
                       pRipple 
                       icon="pi pi-pencil" 
@@ -180,6 +187,7 @@ import { User } from '../../../core/models';
                       [routerLink]="['/admin/users/edit', user.id]">
                     </button>
                     <button 
+                      *ngIf="currentUserType !== 'teacher'"
                       pButton 
                       pRipple 
                       [icon]="user.status === 'active' ? 'pi pi-ban' : 'pi pi-check'" 
@@ -188,6 +196,7 @@ import { User } from '../../../core/models';
                       (click)="toggleUserStatus(user)">
                     </button>
                     <button 
+                      *ngIf="currentUserType !== 'teacher'"
                       pButton 
                       pRipple 
                       [icon]="user.approved ? 'pi pi-check' : 'pi pi-thumbs-up'" 
@@ -197,6 +206,7 @@ import { User } from '../../../core/models';
                       (click)="approveUser(user)">
                     </button>
                     <button 
+                      *ngIf="currentUserType !== 'teacher'"
                       pButton 
                       pRipple 
                       [icon]="user.isVerified ? 'pi pi-check-circle' : 'pi pi-envelope'" 
@@ -445,6 +455,7 @@ import { User } from '../../../core/models';
                         <span>Cerrar</span>
                       </button>
                       <button
+                        *ngIf="currentUserType !== 'teacher'"
                         pButton
                         pRipple
                         type="button"
@@ -472,17 +483,26 @@ export class UsersListComponent implements OnInit, OnDestroy {
   searchTerm = '';
   userDetailDialog = false;
   selectedUser: User | null = null;
+  currentUserType: string = '';
 
   private searchTimeout: any;
   private subscriptions: Subscription[] = [];
 
   constructor(
     private userService: UserService,
+    private authService: AuthService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) { }
 
   ngOnInit() {
+    // Obtener el tipo de usuario actual
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.currentUserType = user.typeUser;
+      }
+    });
+    
     this.loadUsers();
   }
 
@@ -502,8 +522,17 @@ export class UsersListComponent implements OnInit, OnDestroy {
     const subscription = this.userService.getAllUsers(page, limit, this.searchTerm).subscribe({
       next: (response) => {
         if (response && response.data) {
-          this.users = response.data.users;
-          this.totalRecords = response.data.total;
+          let users = response.data.users;
+          
+          // Si el usuario actual es profesor, filtrar solo estudiantes
+          if (this.currentUserType === 'teacher') {
+            users = users.filter((user: User) => user.typeUser === 'student');
+            this.totalRecords = users.length;
+          } else {
+            this.totalRecords = response.data.total;
+          }
+          
+          this.users = users;
         } else {
           this.users = [];
           this.totalRecords = 0;

@@ -75,22 +75,19 @@ export class MenuService {
       {
         label: 'Configuración',
         items: [
-          { label: 'Parámetros', icon: 'pi pi-fw pi-cog', routerLink: ['/admin/parameters'] },
-          { label: 'Documentos', icon: 'pi pi-fw pi-file', routerLink: ['/admin/documents'] }
+          { label: 'Parámetros', icon: 'pi pi-fw pi-cog', routerLink: ['/admin/parameters'] }
         ]
       },
       {
         label: 'Herramientas',
         items: [
-          { label: 'Chat IA', icon: 'pi pi-fw pi-comments', routerLink: ['/chatgpt'] },
-          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/community'] }
+          { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] }
         ]
       },
       {
         label: 'Mi Cuenta',
         items: [
-          { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] },
-          { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/profile/change-password'] }
+          { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] }
         ]
       }
     ];
@@ -108,26 +105,22 @@ export class MenuService {
         ]
       },
       {
-        label: 'Docencia',
+        label: 'Gestión',
         items: [
-          { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/teacher/classes'] },
-          { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/teacher/assessments'] },
-          { label: 'Estudiantes', icon: 'pi pi-fw pi-users', routerLink: ['/teacher/students'] }
+          { label: 'Estudiantes', icon: 'pi pi-fw pi-users', routerLink: ['/admin/users'] }
         ]
       },
       {
         label: 'Contenido',
         items: [
           { label: 'Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/courses'] },
-          { label: 'Rutas de Aprendizaje', icon: 'pi pi-fw pi-sitemap', routerLink: ['/admin/learning-paths'] },
-          { label: 'Materiales', icon: 'pi pi-fw pi-file', routerLink: ['/teacher/materials'] }
+          { label: 'Rutas de Aprendizaje', icon: 'pi pi-fw pi-sitemap', routerLink: ['/admin/learning-paths'] }
         ]
       },
       {
         label: 'Herramientas',
         items: [
-          { label: 'Chat IA', icon: 'pi pi-fw pi-comments', routerLink: ['/chatgpt'] },
-          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/community'] }
+          { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] }
         ]
       },
       {
@@ -145,12 +138,6 @@ export class MenuService {
    */
   private getStudentMenu(): MenuItem[] {
     return [
-      {
-        label: 'Dashboard',
-        items: [
-          { label: 'Panel Principal', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
-        ]
-      },
       {
         label: 'Aprendizaje',
         items: [

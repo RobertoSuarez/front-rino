@@ -70,5 +70,10 @@ export const adminRoutes: Routes = [
         title: 'Editar Ruta de Aprendizaje'
       }
     ]
+  },
+  {
+    path: 'parameters',
+    loadComponent: () => import('./parameters/parameters.component').then(m => m.ParametersComponent),
+    title: 'Parámetros del Sistema'
   }
 ];

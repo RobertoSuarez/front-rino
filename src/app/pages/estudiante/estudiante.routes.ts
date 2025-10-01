@@ -12,6 +12,16 @@ import { CommunityComponent } from './community/community.component';
 export default [
     { path: 'explorar-cursos', component: ExplorarCursosComponent },
     { path: 'cursos', component: CursosListComponent },
+    { 
+        path: 'my-learning-paths', 
+        loadComponent: () => import('./my-learning-paths/my-learning-paths.component').then(m => m.MyLearningPathsComponent),
+        title: 'Mis Rutas de Aprendizaje'
+    },
+    { 
+        path: 'my-learning-paths/:id/detail', 
+        loadComponent: () => import('./my-learning-paths/learning-path-detail.component').then(m => m.LearningPathDetailComponent),
+        title: 'Detalle de Ruta'
+    },
     { path: 'classes', component: ClassesComponent },
     { path: 'evaluations', component: EvaluationsComponent },
     { path: 'achievements', component: AchievementsComponent },

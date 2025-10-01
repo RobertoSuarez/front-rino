@@ -66,6 +66,7 @@ export class MenuService {
         items: [
           { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/admin/users'] },
           { label: 'Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/admin/courses'] },
+          { label: 'Rutas de Aprendizaje', icon: 'pi pi-fw pi-sitemap', routerLink: ['/admin/learning-paths'] },
           { label: 'Capítulos', icon: 'pi pi-fw pi-bookmark', routerLink: ['/admin/chapters'] },
           { label: 'Temas', icon: 'pi pi-fw pi-list', routerLink: ['/admin/temas'] },
           { label: 'Estadísticas', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/admin/statistics'] }
@@ -118,6 +119,7 @@ export class MenuService {
         label: 'Contenido',
         items: [
           { label: 'Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/courses'] },
+          { label: 'Rutas de Aprendizaje', icon: 'pi pi-fw pi-sitemap', routerLink: ['/admin/learning-paths'] },
           { label: 'Materiales', icon: 'pi pi-fw pi-file', routerLink: ['/teacher/materials'] }
         ]
       },
@@ -153,6 +155,7 @@ export class MenuService {
         label: 'Aprendizaje',
         items: [
           { label: 'Mis Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/estudiante/cursos'] },
+          { label: 'Mis Rutas', icon: 'pi pi-fw pi-sitemap', routerLink: ['/estudiante/my-learning-paths'] },
           { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/estudiante/classes'] },
           { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/estudiante/evaluations'] }
         ]

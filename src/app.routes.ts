@@ -42,6 +42,10 @@ export const appRoutes: Routes = [
                 path: 'estudiante',
                 loadChildren: () => import('./app/pages/estudiante/estudiante.routes')
             },
+            {
+                path: 'teacher',
+                loadChildren: () => import('./app/pages/teacher/teacher.routes')
+            },
             { path: 'student-chat', loadChildren: () => import('./app/pages/student-chat/student-chat.module').then(m => m.StudentChatModule) }
         ]
     },

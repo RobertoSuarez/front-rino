@@ -102,9 +102,9 @@ export class MenuService {
   private getTeacherMenu(): MenuItem[] {
     return [
       {
-        label: 'Dashboard',
+        label: 'Principal',
         items: [
-          { label: 'Panel Principal', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
+          { label: 'Dashboard', icon: 'pi pi-fw pi-chart-line', routerLink: ['/teacher/dashboard'] }
         ]
       },
       {

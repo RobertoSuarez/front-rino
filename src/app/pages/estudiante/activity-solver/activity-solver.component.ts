@@ -133,6 +133,7 @@ export class ActivitySolverComponent implements OnInit {
   answerVerified = signal(false);
   showResultsModal = signal(false); // Modal de resultados
   showFeedbackDrawer = signal(false); // Drawer de feedback
+  showAIFeedbackModal = signal(false); // Modal de feedback de IA
   userIndicators = signal<UserIndicators | null>(null); // Indicadores del usuario
   
   // Getters seguros para evitar errores de nulos

@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { ProfileComponent } from './profile.component';
-import { ChangePasswordComponent } from './change-password.component';
 import { authGuard } from '../../core/guards/auth.guard';
 
 export const PROFILE_ROUTES: Routes = [
@@ -18,7 +17,7 @@ export const PROFILE_ROUTES: Routes = [
     },
     {
         path: 'change-password',
-        component: ChangePasswordComponent,
+        loadComponent: () => import('../change-password/change-password.component').then(m => m.ChangePasswordComponent),
         canActivate: [authGuard],
         title: 'Cambiar Contraseña'
     }

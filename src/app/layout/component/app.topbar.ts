@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, OnInit, OnDestroy, NO_ERRORS_SCHEMA, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,12 +10,14 @@ import { UserService, UserIndicators } from '../../core/services/user.service';
 import { Subject, takeUntil, interval } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { TumisShopModalComponent } from '../../shared/components/tumis-shop-modal/tumis-shop-modal.component';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
     schemas: [NO_ERRORS_SCHEMA],
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TooltipModule, ButtonModule],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TooltipModule, ButtonModule, TagModule, TumisShopModalComponent],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -42,7 +44,15 @@ import { ButtonModule } from 'primeng/button';
 
         <div class="layout-topbar-actions">
 
-            <div class="user-indicators flex items-center gap-2 mr-6 hidden md:flex" *ngIf="userIndicators">
+            <div class="user-indicators flex items-center gap-2 mr-6 hidden md:flex" *ngIf="userIndicators && currentUserType">
+                <!-- Tipo de Usuario -->
+                <p-tag 
+                    [value]="getUserTypeLabel(currentUserType)" 
+                    [severity]="getUserTypeColor(currentUserType)"
+                    icon="pi pi-user"
+                    class="text-xs">
+                </p-tag>
+                
                 <p-button severity="info" class="indicator-item flex items-center gap-1.5 px-3 py-1.5 text-sm" badge="{{userIndicators.yachay}} Yachay" pTooltip="Puntos de experiencia" tooltipPosition="bottom" rounded>
                     <i class="pi pi-star text-sm"></i>
                 </p-button>
@@ -52,10 +62,28 @@ import { ButtonModule } from 'primeng/button';
                 <p-button severity="warn" class="indicator-item flex items-center gap-1.5 px-3 py-1.5 text-sm" badge="{{userIndicators.mullu}} Mullu" pTooltip="Moneda virtual" tooltipPosition="bottom" rounded>
                     <i class="pi pi-dollar text-sm"></i>
                 </p-button>
+                
+                <!-- Botón de compra de Tumis -->
+                <button 
+                    (click)="openTumisShop()"
+                    class="indicator-item flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-full transition-all"
+                    pTooltip="Comprar Tumis (Vidas)" 
+                    tooltipPosition="bottom">
+                    <i class="pi pi-shopping-cart text-sm"></i>
+                    <span class="hidden lg:inline">Comprar</span>
+                </button>
             </div>
 
             <!-- Indicadores compactos para móviles y tablet - solo íconos -->
-            <div class="user-indicators-compact flex items-center gap-1 mr-2 md:hidden" *ngIf="userIndicators">
+            <div class="user-indicators-compact flex items-center gap-1 mr-2 md:hidden" *ngIf="userIndicators && currentUserType">
+                <!-- Tipo de Usuario (compacto) -->
+                <p-tag 
+                    [value]="getUserTypeLabel(currentUserType)" 
+                    [severity]="getUserTypeColor(currentUserType)"
+                    icon="pi pi-user"
+                    class="text-xs px-1 py-0.5">
+                </p-tag>
+                
                 <p-button severity="info" class="layout-topbar-action" badge="{{userIndicators.yachay}}" pTooltip="Yachay: {{userIndicators.yachay}}" tooltipPosition="bottom" [text]="true" rounded>
                     <i class="pi pi-star"></i>
                 </p-button>
@@ -141,11 +169,19 @@ import { ButtonModule } from 'primeng/button';
                 </div>
             </div>
         </div>
-    </div>`
+    </div>
+    
+    <!-- Modal de tienda de Tumis -->
+    <app-tumis-shop-modal 
+      #tumisShopModal
+      (onBuySuccess)="onTumisBuySuccess()">
+    </app-tumis-shop-modal>`
 })
 export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
     userIndicators: UserIndicators | null = null;
+    currentUserType: string = '';
+    @ViewChild('tumisShopModal') tumisShopModal!: TumisShopModalComponent;
     private destroy$ = new Subject<void>();
 
     constructor(
@@ -157,6 +193,7 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadUserIndicators();
+        this.loadCurrentUserType();  // ← AGREGADO
         // Actualizar indicadores cada 30 segundos
         interval(30000)
             .pipe(takeUntil(this.destroy$))
@@ -183,6 +220,36 @@ export class AppTopbar implements OnInit, OnDestroy {
         }
     }
 
+    loadCurrentUserType() {
+        if (this.authService.isAuthenticated()) {
+            this.authService.currentUser$.subscribe(user => {
+                if (user && user.typeUser) {
+                    this.currentUserType = user.typeUser;
+                }
+            });
+        }
+    }
+
+    getUserTypeLabel(typeUser: string): string {
+        const typeLabels: { [key: string]: string } = {
+            'student': 'Estudiante',
+            'teacher': 'Profesor',
+            'admin': 'Admin',
+            'parent': 'Padre'
+        };
+        return typeLabels[typeUser] || typeUser;
+    }
+
+    getUserTypeColor(typeUser: string): string {
+        const typeColors: { [key: string]: string } = {
+            'student': 'success',
+            'teacher': 'info',
+            'admin': 'warning',
+            'parent': 'help'
+        };
+        return typeColors[typeUser] || 'secondary';
+    }
+
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
@@ -193,5 +260,22 @@ export class AppTopbar implements OnInit, OnDestroy {
     logout() {
         this.authService.logout();
         this.router.navigate(['/auth/login']);
+    }
+
+    /**
+     * Abre el modal de tienda de Tumis
+     */
+    openTumisShop(): void {
+        if (this.tumisShopModal) {
+            this.tumisShopModal.openModal();
+        }
+    }
+
+    /**
+     * Callback cuando se compran Tumis exitosamente
+     */
+    onTumisBuySuccess(): void {
+        // Recargar indicadores del usuario
+        this.loadUserIndicators();
     }
 }

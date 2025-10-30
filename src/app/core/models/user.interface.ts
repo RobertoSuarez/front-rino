@@ -14,4 +14,10 @@ export interface User {
   requiredUpdate: boolean;
   isVerified: boolean;
   approved: boolean;
+  institutionId?: number;
+  institution?: {
+    id: number;
+    name: string;
+    logoUrl: string;
+  };
 }

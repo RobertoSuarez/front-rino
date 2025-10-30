@@ -15,6 +15,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ActivityService } from '@/core/services/activity.service';
 import { ExerciseService } from '@/core/services/exercise.service';
 import { UserService, UserIndicators } from '@/core/services/user.service';
+import { AuthService } from '@/core/services/auth.service';
 import { ActivityWithExercises as ApiActivityWithExercises } from '@/core/models/activity.interface';
 import { SingleSelectionExerciseComponent } from './exercises/single-selection-exercise/single-selection-exercise.component';
 import { MultipleSelectionExerciseComponent } from './exercises/multiple-selection-exercise/multiple-selection-exercise.component';
@@ -77,6 +78,7 @@ interface ActivityResult {
   accuracy: number;
   activity: string;
   gems: number;
+  mulluEarned?: number;
 }
 
 @Component({
@@ -116,6 +118,7 @@ export class ActivitySolverComponent implements OnInit {
   private activityService = inject(ActivityService);
   private exerciseService = inject(ExerciseService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -146,7 +149,7 @@ export class ActivitySolverComponent implements OnInit {
   }
   
   get safeActivityResult(): ActivityResult {
-    return this.activityResult() || { id: 0, progress: 0, score: 0, accuracy: 0, activity: '', gems: 0 };
+    return this.activityResult() || { id: 0, progress: 0, score: 0, accuracy: 0, activity: '', gems: 0, mulluEarned: 0 };
   }
 
   get safeUserIndicators(): UserIndicators {
@@ -421,8 +424,26 @@ export class ActivitySolverComponent implements OnInit {
       return;
     }
 
+    // Obtener el userId del usuario actual
+    let userId = 0;
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        userId = user.id;
+      }
+    }).unsubscribe();
+
+    if (!userId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo obtener el ID del usuario'
+      });
+      return;
+    }
+
     // Construir el objeto de respuesta con todos los campos requeridos
     const checkExerciseDto: any = {
+      userId: userId, // Agregar userId
       // Inicializar todos los campos con valores por defecto
       answerSelect: '',
       answerSelects: [],
@@ -451,6 +472,13 @@ export class ActivitySolverComponent implements OnInit {
         // Si la respuesta es incorrecta (calificación < 7), disminuir una vida (tumís)
         if (feedback.qualification < 7) {
           this.decreaseTumis();
+        }
+
+        // Si ganó Yachay, mostrar alerta especial
+        if (feedback.yachayEarned && feedback.yachayEarned > 0) {
+          this.showYachayReward(feedback.yachayEarned, feedback.difficulty || 'Fácil');
+          // Recargar indicadores del usuario para actualizar el balance
+          this.loadUserIndicators();
         }
 
         // Mostrar la retroalimentación en el drawer
@@ -559,6 +587,15 @@ export class ActivitySolverComponent implements OnInit {
         this.activityResult.set(result);
         this.activityCompleted.set(true);
         this.showResultsModal.set(true); // Abrir modal automáticamente
+        
+        // Si ganó Mullu, mostrar toast especial
+        if (result.mulluEarned && result.mulluEarned > 0) {
+          this.showMulluReward(result.mulluEarned, result.accuracy);
+        }
+        
+        // Recargar indicadores del usuario para actualizar el balance
+        this.loadUserIndicators();
+        
         this.submitting.set(false);
         this.cdr.detectChanges();
       },
@@ -716,5 +753,31 @@ export class ActivitySolverComponent implements OnInit {
   continueFromFeedback(): void {
     this.closeFeedbackDrawer();
     this.nextExercise();
+  }
+
+  /**
+   * Muestra una alerta especial cuando el usuario gana Yachay
+   */
+  showYachayReward(yachay: number, difficulty: string): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: '¡Felicitaciones! 🎉',
+      detail: `Has ganado ${yachay} Yachay por completar un ejercicio ${difficulty}`,
+      life: 5000,
+      styleClass: 'yachay-reward-toast'
+    });
+  }
+
+  /**
+   * Muestra una alerta especial cuando el usuario gana Mullu por completar actividad
+   */
+  showMulluReward(mullu: number, accuracy: number): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: '¡Actividad Completada! 🏆',
+      detail: `Has ganado ${mullu} Mullu por tu precisión del ${accuracy}%`,
+      life: 6000,
+      styleClass: 'mullu-reward-toast'
+    });
   }
 }

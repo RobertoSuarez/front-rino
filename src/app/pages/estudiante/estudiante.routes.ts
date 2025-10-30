@@ -29,5 +29,10 @@ export default [
     { path: 'cursos/:id/capitulos', component: CursoDetalleComponent },
     { path: 'cursos/:cursoId/chapters/:capituloId/temas', component: TemasActividadProgresoComponent },
     { path: 'leaderboard', component: LeaderboardComponent },
+    { 
+        path: 'change-password', 
+        loadComponent: () => import('../change-password/change-password.component').then(m => m.ChangePasswordComponent),
+        title: 'Cambiar Contraseña'
+    },
     { path: '', redirectTo: 'cursos', pathMatch: 'full' }
 ] as Routes;

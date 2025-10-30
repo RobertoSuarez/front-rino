@@ -10,6 +10,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { AdminDashboardService, AdminDashboardStats } from '../../core/services/admin-dashboard.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -42,60 +43,60 @@ import { AdminDashboardService, AdminDashboardStats } from '../../core/services/
 
             <ng-container *ngIf="!loading && stats">
                 <div class="col-span-12 md:col-span-6 lg:col-span-3">
-                    <p-card styleClass="h-full bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                    <p-card styleClass="h-full bg-blue-500 dark:bg-gradient-to-br dark:from-blue-500 dark:to-blue-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="text-white/80 font-medium mb-2">Total Usuarios</div>
-                                <div class="text-4xl font-bold">{{ stats.users.total }}</div>
-                                <div class="text-sm text-white/70 mt-2">{{ stats.users.active }} activos</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total Usuarios</div>
+                                <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.users.total }}</div>
+                                <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.users.active }} activos</div>
                             </div>
-                            <div class="flex items-center justify-center w-16 h-16 bg-white/20 border-round">
-                                <i class="pi pi-users text-3xl"></i>
+                            <div class="flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-white/20 border-round">
+                                <i class="pi pi-users text-3xl text-blue-600 dark:text-white"></i>
                             </div>
                         </div>
                     </p-card>
                 </div>
 
                 <div class="col-span-12 md:col-span-6 lg:col-span-3">
-                    <p-card styleClass="h-full bg-gradient-to-br from-green-500 to-green-600 text-white">
+                    <p-card styleClass="h-full bg-green-500 dark:bg-gradient-to-br dark:from-green-500 dark:to-green-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="text-white/80 font-medium mb-2">Total Cursos</div>
-                                <div class="text-4xl font-bold">{{ stats.content.courses }}</div>
-                                <div class="text-sm text-white/70 mt-2">{{ stats.content.chapters }} capítulos</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total Cursos</div>
+                                <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.content.courses }}</div>
+                                <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.content.chapters }} capítulos</div>
                             </div>
-                            <div class="flex items-center justify-center w-16 h-16 bg-white/20 border-round">
-                                <i class="pi pi-book text-3xl"></i>
+                            <div class="flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-white/20 border-round">
+                                <i class="pi pi-book text-3xl text-green-600 dark:text-white"></i>
                             </div>
                         </div>
                     </p-card>
                 </div>
 
                 <div class="col-span-12 md:col-span-6 lg:col-span-3">
-                    <p-card styleClass="h-full bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+                    <p-card styleClass="h-full bg-orange-500 dark:bg-gradient-to-br dark:from-orange-500 dark:to-orange-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="text-white/80 font-medium mb-2">Rutas de Aprendizaje</div>
-                                <div class="text-4xl font-bold">{{ stats.content.learningPaths }}</div>
-                                <div class="text-sm text-white/70 mt-2">{{ stats.subscriptions.active }} suscripciones</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Rutas de Aprendizaje</div>
+                                <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.content.learningPaths }}</div>
+                                <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.subscriptions.active }} suscripciones</div>
                             </div>
-                            <div class="flex items-center justify-center w-16 h-16 bg-white/20 border-round">
-                                <i class="pi pi-sitemap text-3xl"></i>
+                            <div class="flex items-center justify-center w-16 h-16 bg-orange-100 dark:bg-white/20 border-round">
+                                <i class="pi pi-sitemap text-3xl text-orange-600 dark:text-white"></i>
                             </div>
                         </div>
                     </p-card>
                 </div>
 
                 <div class="col-span-12 md:col-span-6 lg:col-span-3">
-                    <p-card styleClass="h-full bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                    <p-card styleClass="h-full bg-purple-500 dark:bg-gradient-to-br dark:from-purple-500 dark:to-purple-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="text-white/80 font-medium mb-2">Total Actividades</div>
-                                <div class="text-4xl font-bold">{{ stats.content.activities }}</div>
-                                <div class="text-sm text-white/70 mt-2">{{ stats.content.temas }} temas</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total Actividades</div>
+                                <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.content.activities }}</div>
+                                <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.content.temas }} temas</div>
                             </div>
-                            <div class="flex items-center justify-center w-16 h-16 bg-white/20 border-round">
-                                <i class="pi pi-check-square text-3xl"></i>
+                            <div class="flex items-center justify-center w-16 h-16 bg-purple-100 dark:bg-white/20 border-round">
+                                <i class="pi pi-check-square text-3xl text-purple-600 dark:text-white"></i>
                             </div>
                         </div>
                     </p-card>
@@ -201,13 +202,31 @@ export class Dashboard implements OnInit {
     constructor(
         private dashboardService: AdminDashboardService,
         private messageService: MessageService,
-        private router: Router
+        private router: Router,
+        private authService: AuthService
     ) {
         this.initChartOptions();
     }
 
     ngOnInit(): void {
-        this.loadDashboardStats();
+        // Verificar que el usuario sea admin
+        this.authService.currentUser$.subscribe(user => {
+            if (!user || user.typeUser !== 'admin') {
+                // Si no es admin, redirigir a su dashboard correspondiente
+                if (user?.typeUser === 'student') {
+                    this.router.navigate(['/estudiante/cursos']);
+                } else if (user?.typeUser === 'teacher') {
+                    this.router.navigate(['/teacher/dashboard']);
+                } else {
+                    this.router.navigate(['/auth/login']);
+                }
+                return;
+            }
+            // Solo cargar si es admin
+            if (user.typeUser === 'admin') {
+                this.loadDashboardStats();
+            }
+        });
     }
 
     loadDashboardStats(): void {

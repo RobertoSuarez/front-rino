@@ -45,4 +45,5 @@ export interface ActivityProgressResponse {
   accuracy: number;
   activity: string;
   gems: number;
+  mulluEarned?: number;
 }

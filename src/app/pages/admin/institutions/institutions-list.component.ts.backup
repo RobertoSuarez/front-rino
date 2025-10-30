@@ -1,0 +1,578 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+// PrimeNG Imports
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TagModule } from 'primeng/tag';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DialogModule } from 'primeng/dialog';
+import { RippleModule } from 'primeng/ripple';
+import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmationService, MessageService } from 'primeng/api';
+
+import { InstitutionService, ApiInstitutionResponse, ApiInstitutionSingleResponse } from '../../../core/services/institution.service';
+import { Institution, CreateInstitutionDto, UpdateInstitutionDto } from '../../../core/models/institution.interface';
+
+@Component({
+  selector: 'app-institutions-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    InputTextModule,
+    TagModule,
+    ConfirmDialogModule,
+    ToastModule,
+    ToolbarModule,
+    DialogModule,
+    RippleModule,
+    TooltipModule
+  ],
+  providers: [ConfirmationService, MessageService],
+  template: `
+    <div class="grid grid-cols-12">
+      <div class="col-span-12">
+        <div class="card px-6 py-6">
+          <p-toast></p-toast>
+          <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+          
+          <p-toolbar styleClass="mb-4 gap-2">
+            <ng-template pTemplate="left">
+              <div class="my-2">
+                <h2 class="text-2xl font-bold text-900 mb-0">Gestión de Instituciones</h2>
+                <p class="text-600 mt-1">Administra las instituciones educativas del sistema</p>
+              </div>
+            </ng-template>
+            
+            <ng-template pTemplate="right">
+              <button 
+                pButton 
+                pRipple 
+                label="Nueva Institución" 
+                icon="pi pi-plus" 
+                class="p-button-success"
+                (click)="openNew()">
+              </button>
+            </ng-template>
+          </p-toolbar>
+          
+          <p-table 
+            [value]="institutions" 
+            [tableStyle]="{ 'min-width': '60rem' }"
+            [loading]="loading">
+            
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 5rem">ID</th>
+                <th style="width: 8rem">Logo</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th style="width: 8rem">Usuarios</th>
+                <th style="width: 8rem">Estado</th>
+                <th style="width: 12rem">Acciones</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-institution>
+              <tr>
+                <td>{{ institution.id }}</td>
+                <td>
+                  <img 
+                    *ngIf="institution.logoUrl" 
+                    [src]="institution.logoUrl" 
+                    [alt]="institution.name"
+                    class="w-4rem h-4rem object-cover border-round"
+                    style="max-width: 64px; max-height: 64px;" />
+                  <div 
+                    *ngIf="!institution.logoUrl"
+                    class="w-4rem h-4rem flex align-items-center justify-content-center bg-primary-100 text-primary-700 border-round">
+                    <i class="pi pi-building text-2xl"></i>
+                  </div>
+                </td>
+                <td>
+                  <span class="font-semibold">{{ institution.name }}</span>
+                </td>
+                <td>
+                  <span class="text-600">{{ institution.description || 'Sin descripción' }}</span>
+                </td>
+                <td class="text-center">
+                  <p-tag 
+                    [value]="institution.userCount?.toString() || '0'" 
+                    severity="info"
+                    icon="pi pi-users">
+                  </p-tag>
+                </td>
+                <td>
+                  <p-tag 
+                    [value]="institution.status === 'active' ? 'Activa' : 'Inactiva'" 
+                    [severity]="institution.status === 'active' ? 'success' : 'danger'">
+                  </p-tag>
+                </td>
+                <td>
+                  <div class="flex gap-2">
+                    <button 
+                      pButton 
+                      pRipple 
+                      icon="pi pi-pencil" 
+                      class="p-button-rounded p-button-warning p-button-text"
+                      pTooltip="Editar"
+                      tooltipPosition="top"
+                      (click)="editInstitution(institution)">
+                    </button>
+                    <button 
+                      pButton 
+                      pRipple 
+                      icon="pi pi-trash" 
+                      class="p-button-rounded p-button-danger p-button-text"
+                      pTooltip="Eliminar"
+                      tooltipPosition="top"
+                      (click)="deleteInstitution(institution)">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7" class="text-center py-6">
+                  <div class="flex flex-column align-items-center gap-3">
+                    <i class="pi pi-building text-6xl text-400"></i>
+                    <p class="text-600 text-xl">No hay instituciones registradas</p>
+                    <button 
+                      pButton 
+                      pRipple 
+                      label="Crear Primera Institución" 
+                      icon="pi pi-plus"
+                      class="p-button-outlined"
+                      (click)="openNew()">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog para crear/editar institución -->
+    <p-dialog 
+      [visible]="institutionDialog" 
+      [header]="editMode ? 'Editar Institución' : 'Nueva Institución'"
+      [modal]="true" 
+      [style]="{ width: '500px' }"
+      [draggable]="false"
+      [resizable]="false"
+      (visibleChange)="onDialogVisibleChange($event)">
+      
+      <div class="flex flex-col gap-3 pt-3">
+        <!-- Nombre -->
+        <div class="field w-full">
+          <label for="name" class="block font-semibold mb-2">
+            Nombre <span class="text-red-500">*</span>
+          </label>
+          <input 
+            id="name"
+            type="text" 
+            pInputText 
+            [(ngModel)]="institution.name"
+            placeholder="Nombre de la institución"
+            class="w-full"
+            [class.ng-invalid]="submitted && !institution.name"
+            [class.ng-dirty]="submitted && !institution.name" />
+          <small class="text-red-500 block mt-1" *ngIf="submitted && !institution.name">
+            El nombre es requerido.
+          </small>
+        </div>
+
+        <!-- Descripción -->
+        <div class="field">
+          <label for="description" class="block font-semibold mb-2">Descripción</label>
+          <textarea 
+            id="description"
+            [(ngModel)]="institution.description"
+            placeholder="Descripción de la institución"
+            rows="3"
+            class="w-full p-3 border-1 surface-border border-round">
+          </textarea>
+        </div>
+
+        <!-- Logo -->
+        <div class="field">
+          <label class="block font-semibold mb-2">Logo de la Institución</label>
+          
+          <!-- Vista previa del logo -->
+          <div *ngIf="institution.logoUrl" class="mb-3 text-center">
+            <img 
+              [src]="institution.logoUrl" 
+              [alt]="institution.name || 'Logo'"
+              class="border-round shadow-2"
+              style="max-width: 200px; max-height: 200px; object-fit: contain; border: 2px solid var(--surface-border);"
+              (error)="onImageError()" />
+          </div>
+
+          <!-- Botón de subir imagen -->
+          <div class="flex flex-column gap-2">
+            <input 
+              #fileInput
+              type="file" 
+              accept="image/*"
+              style="display: none"
+              (change)="onFileSelected($event)" />
+            
+            <button 
+              pButton 
+              pRipple 
+              type="button"
+              label="Seleccionar Logo" 
+              icon="pi pi-upload" 
+              class="p-button-outlined w-full"
+              [loading]="uploadingImage"
+              (click)="fileInput.click()">
+            </button>
+
+            <small class="text-600 block">
+              <i class="pi pi-info-circle mr-1"></i>
+              Formatos aceptados: JPG, PNG, GIF (máx. 5MB)
+            </small>
+
+            <small *ngIf="selectedFile" class="text-primary block">
+              <i class="pi pi-file mr-1"></i>
+              Archivo seleccionado: {{ selectedFile.name }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <div class="flex justify-content-end gap-2">
+          <button 
+            pButton 
+            pRipple 
+            label="Cancelar" 
+            icon="pi pi-times" 
+            class="p-button-text"
+            (click)="hideDialog()">
+          </button>
+          <button 
+            pButton 
+            pRipple 
+            label="Guardar" 
+            icon="pi pi-check" 
+            class="p-button-primary"
+            [disabled]="uploadingImage"
+            (click)="saveInstitution()">
+          </button>
+        </div>
+      </ng-template>
+    </p-dialog>
+  `
+})
+export class InstitutionsListComponent implements OnInit {
+  institutions: Institution[] = [];
+  institution: Partial<Institution> = {};
+  institutionDialog = false;
+  loading = false;
+  submitted = false;
+  editMode = false;
+  uploadingImage = false;
+  selectedFile: File | null = null;
+
+  constructor(
+    private institutionService: InstitutionService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
+  ) {
+    console.log('InstitutionsListComponent constructor llamado');
+  }
+
+  ngOnInit(): void {
+    console.log('InstitutionsListComponent inicializado');
+    this.loadInstitutions();
+  }
+
+  loadInstitutions(): void {
+    this.loading = true;
+    this.institutionService.getAll().subscribe({
+      next: (response: ApiInstitutionResponse) => {
+        this.institutions = response.data || [];
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar instituciones:', error);
+        let errorMessage = 'No se pudieron cargar las instituciones';
+
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.error?.error) {
+          errorMessage = error.error.error;
+        } else if (error.status === 401) {
+          errorMessage = 'No tienes permisos para ver instituciones';
+        } else if (error.status === 403) {
+          errorMessage = 'Acceso denegado';
+        } else if (error.status >= 500) {
+          errorMessage = 'Error interno del servidor';
+        }
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al cargar instituciones',
+          detail: errorMessage
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  openNew(): void {
+    console.log('openNew() llamado');
+    this.institution = {
+      name: '',
+      description: '',
+      logoUrl: '',
+      status: 'active'
+    };
+    this.submitted = false;
+    this.editMode = false;
+    this.institutionDialog = true;
+    console.log('institutionDialog:', this.institutionDialog);
+  }
+
+  editInstitution(institution: Institution): void {
+    this.institution = { ...institution };
+    this.editMode = true;
+    this.institutionDialog = true;
+  }
+
+  hideDialog(): void {
+    this.institutionDialog = false;
+    this.submitted = false;
+    this.selectedFile = null;
+    this.uploadingImage = false;
+  }
+
+  onDialogVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.hideDialog();
+    }
+  }
+
+  saveInstitution(): void {
+    this.submitted = true;
+
+    if (!this.institution.name?.trim()) {
+      return;
+    }
+
+    if (this.editMode && this.institution.id) {
+      // Actualizar
+      const updateData: UpdateInstitutionDto = {
+        name: this.institution.name,
+        description: this.institution.description,
+        logoUrl: this.institution.logoUrl,
+        status: this.institution.status
+      };
+
+      this.institutionService.update(this.institution.id, updateData).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Institución actualizada correctamente'
+          });
+          this.loadInstitutions();
+          this.hideDialog();
+        },
+        error: (error) => {
+          console.error('Error al actualizar institución:', error);
+          let errorMessage = 'No se pudo actualizar la institución';
+
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          } else if (error.status === 400) {
+            errorMessage = 'Datos de institución inválidos';
+          } else if (error.status === 401) {
+            errorMessage = 'No tienes permisos para actualizar instituciones';
+          } else if (error.status === 403) {
+            errorMessage = 'Acceso denegado';
+          } else if (error.status === 404) {
+            errorMessage = 'Institución no encontrada';
+          } else if (error.status >= 500) {
+            errorMessage = 'Error interno del servidor';
+          }
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al actualizar institución',
+            detail: errorMessage
+          });
+        }
+      });
+    } else {
+      // Crear
+      const createData: CreateInstitutionDto = {
+        name: this.institution.name,
+        description: this.institution.description,
+        logoUrl: this.institution.logoUrl
+      };
+
+      this.institutionService.create(createData).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Institución creada correctamente'
+          });
+          this.loadInstitutions();
+          this.hideDialog();
+        },
+        error: (error) => {
+          console.error('Error al crear institución:', error);
+          let errorMessage = 'No se pudo crear la institución';
+
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          } else if (error.status === 400) {
+            errorMessage = 'Datos de institución inválidos';
+          } else if (error.status === 401) {
+            errorMessage = 'No tienes permisos para crear instituciones';
+          } else if (error.status === 403) {
+            errorMessage = 'Acceso denegado';
+          } else if (error.status >= 500) {
+            errorMessage = 'Error interno del servidor';
+          }
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al crear institución',
+            detail: errorMessage
+          });
+        }
+      });
+    }
+  }
+
+  deleteInstitution(institution: Institution): void {
+    this.confirmationService.confirm({
+      message: `¿Estás seguro de que deseas eliminar la institución "${institution.name}"?`,
+      header: 'Confirmar Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.institutionService.delete(institution.id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Institución eliminada correctamente'
+            });
+            this.loadInstitutions();
+          },
+          error: (error) => {
+            console.error('Error al eliminar institución:', error);
+            let errorMessage = 'No se pudo eliminar la institución';
+
+            if (error.error?.message) {
+              errorMessage = error.error.message;
+            } else if (error.error?.error) {
+              errorMessage = error.error.error;
+            } else if (error.status === 400) {
+              errorMessage = 'No se puede eliminar esta institución';
+            } else if (error.status === 401) {
+              errorMessage = 'No tienes permisos para eliminar instituciones';
+            } else if (error.status === 403) {
+              errorMessage = 'Acceso denegado';
+            } else if (error.status === 404) {
+              errorMessage = 'Institución no encontrada';
+            } else if (error.status >= 500) {
+              errorMessage = 'Error interno del servidor';
+            }
+
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error al eliminar institución',
+              detail: errorMessage
+            });
+          }
+        });
+      }
+    });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validar tamaño (máx 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El archivo es demasiado grande. Máximo 5MB.'
+      });
+      return;
+    }
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith('image/')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Solo se permiten archivos de imagen.'
+      });
+      return;
+    }
+
+    this.selectedFile = file;
+    this.uploadImage(file);
+  }
+
+  uploadImage(file: File): void {
+    this.uploadingImage = true;
+    this.institutionService.uploadImage(file).subscribe({
+      next: (response) => {
+        if (response && response.data?.url) {
+          this.institution.logoUrl = response.data.url;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Logo subido correctamente'
+          });
+        }
+        this.uploadingImage = false;
+      },
+      error: (error) => {
+        console.error('Error al subir imagen:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo subir la imagen'
+        });
+        this.uploadingImage = false;
+        this.selectedFile = null;
+      }
+    });
+  }
+
+  onImageError(): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Advertencia',
+      detail: 'No se pudo cargar la imagen del logo'
+    });
+  }
+}

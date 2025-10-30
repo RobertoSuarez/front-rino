@@ -5,6 +5,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService, UserIndicators } from '../../core/services/user.service';
+import { InstitutionService } from '../../core/services/institution.service';
+import { Institution } from '../../core/models/institution.interface';
 import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +17,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { SelectModule } from 'primeng/select';
 
 interface ProfileData {
   id: number;
@@ -30,6 +33,8 @@ interface ProfileData {
   gem: number;
   yachay: number;
   tumis: number;
+  typeUser: string;  // ← AGREGADO
+  institutionId?: number;
 }
 
 @Component({
@@ -47,7 +52,8 @@ interface ProfileData {
     InputMaskModule,
     ToastModule,
     TooltipModule,
-    RouterModule
+    RouterModule,
+    SelectModule
   ],
   providers: [MessageService],
   templateUrl: './profile.component.html',
@@ -62,11 +68,18 @@ export class ProfileComponent implements OnInit {
   savingChanges: boolean = false;
   userId: number | null = null;
   userIndicators: UserIndicators | null = null;
+  institutions: Institution[] = [];
+  loadingInstitutions: boolean = false;
+
+  get institutionsOptions(): Institution[] {
+    return this.institutions || [];
+  }
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
     private userService: UserService,
+    private institutionService: InstitutionService,
     private messageService: MessageService,
     private fb: FormBuilder
   ) {
@@ -75,13 +88,15 @@ export class ProfileComponent implements OnInit {
       lastName: ['', Validators.required],
       birthday: [''],
       whatsApp: [''],
-      urlAvatar: ['', Validators.required]
+      urlAvatar: ['', Validators.required],
+      institutionId: [null]
     });
   }
 
   ngOnInit(): void {
     this.loadProfileData();
     this.loadUserIndicators();
+    this.loadInstitutions();
   }
 
   loadUserIndicators(): void {
@@ -97,6 +112,44 @@ export class ProfileComponent implements OnInit {
         }
       });
     }
+  }
+
+  loadInstitutions(): void {
+    this.loadingInstitutions = true;
+    this.institutions = []; // Asegurar que siempre sea un array
+    
+    this.institutionService.getAll().subscribe({
+      next: (response: any) => {
+        console.log('Respuesta de instituciones en perfil:', response);
+        
+        // El interceptor del backend envuelve la respuesta, así que necesitamos extraer los datos correctamente
+        let institutions: Institution[] = [];
+        
+        if (response.data) {
+          // Si response.data tiene otra propiedad data (respuesta anidada)
+          if (response.data.data && Array.isArray(response.data.data)) {
+            institutions = response.data.data;
+          } 
+          // Si response.data es directamente el array
+          else if (Array.isArray(response.data)) {
+            institutions = response.data;
+          }
+          // Si response.data es un objeto con las instituciones
+          else if (typeof response.data === 'object') {
+            console.warn('Estructura de respuesta inesperada:', response.data);
+          }
+        }
+        
+        this.institutions = institutions || [];
+        console.log('Instituciones cargadas en perfil:', this.institutions.length);
+        this.loadingInstitutions = false;
+      },
+      error: (error) => {
+        console.error('Error loading institutions:', error);
+        this.institutions = []; // Asegurar que siempre sea un array vacío en caso de error
+        this.loadingInstitutions = false;
+      }
+    });
   }
 
   loadProfileData(): void {
@@ -174,7 +227,8 @@ export class ProfileComponent implements OnInit {
         lastName: this.profileData.lastName,
         birthday: this.profileData.birthday,
         whatsApp: this.profileData.whatsApp || '',
-        urlAvatar: this.profileData.urlAvatar
+        urlAvatar: this.profileData.urlAvatar,
+        institutionId: this.profileData.institutionId || null
       });
     }
   }
@@ -210,7 +264,7 @@ export class ProfileComponent implements OnInit {
     const updatedData = this.profileForm.value;
   
     
-    this.apiService.put(`users`, updatedData).subscribe({
+    this.apiService.put(`users/profile`, updatedData).subscribe({
       next: (response: any) => {
         if (response && response.data) {
           this.profileData = response.data;
@@ -294,5 +348,25 @@ export class ProfileComponent implements OnInit {
       console.error('Error al formatear fecha:', error);
       return dateString;
     }
+  }
+
+  getUserTypeLabel(typeUser: string): string {
+    const typeLabels: { [key: string]: string } = {
+      'student': 'Estudiante',
+      'teacher': 'Profesor',
+      'admin': 'Administrador',
+      'parent': 'Padre de Familia'
+    };
+    return typeLabels[typeUser] || typeUser;
+  }
+
+  getUserTypeColor(typeUser: string): string {
+    const typeColors: { [key: string]: string } = {
+      'student': 'success',
+      'teacher': 'info',
+      'admin': 'warning',
+      'parent': 'help'
+    };
+    return typeColors[typeUser] || 'secondary';
   }
 }

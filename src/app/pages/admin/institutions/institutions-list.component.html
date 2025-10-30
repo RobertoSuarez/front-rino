@@ -1,0 +1,236 @@
+<div class="grid grid-cols-12">
+  <div class="col-span-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+      
+      <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+          <div class="my-2">
+            <h2 class="text-2xl font-bold text-900 mb-0">Gestión de Instituciones</h2>
+            <p class="text-600 mt-1">Administra las instituciones educativas del sistema</p>
+          </div>
+        </ng-template>
+        
+        <ng-template pTemplate="right">
+          <button 
+            pButton 
+            pRipple 
+            label="Nueva Institución" 
+            icon="pi pi-plus" 
+            class="p-button-success"
+            (click)="openNew()">
+          </button>
+        </ng-template>
+      </p-toolbar>
+      
+      <p-table 
+        [value]="institutions" 
+        [tableStyle]="{ 'min-width': '60rem' }"
+        [loading]="loading">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 5rem">ID</th>
+            <th style="width: 8rem">Logo</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th style="width: 8rem">Usuarios</th>
+            <th style="width: 8rem">Estado</th>
+            <th style="width: 12rem">Acciones</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-institution>
+          <tr>
+            <td>{{ institution.id }}</td>
+            <td>
+              <img 
+                *ngIf="institution.logoUrl" 
+                [src]="institution.logoUrl" 
+                [alt]="institution.name"
+                class="w-4rem h-4rem object-cover border-round"
+                style="max-width: 64px; max-height: 64px;" />
+              <div 
+                *ngIf="!institution.logoUrl"
+                class="w-4rem h-4rem flex align-items-center justify-content-center bg-primary-100 text-primary-700 border-round">
+                <i class="pi pi-building text-2xl"></i>
+              </div>
+            </td>
+            <td>
+              <span class="font-semibold">{{ institution.name }}</span>
+            </td>
+            <td>
+              <span class="text-600">{{ institution.description || 'Sin descripción' }}</span>
+            </td>
+            <td class="text-center">
+              <p-tag 
+                [value]="institution.userCount?.toString() || '0'" 
+                severity="info"
+                icon="pi pi-users">
+              </p-tag>
+            </td>
+            <td>
+              <p-tag 
+                [value]="institution.status === 'active' ? 'Activa' : 'Inactiva'" 
+                [severity]="institution.status === 'active' ? 'success' : 'danger'">
+              </p-tag>
+            </td>
+            <td>
+              <div class="flex gap-2">
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-pencil" 
+                  class="p-button-rounded p-button-warning p-button-text"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                  (click)="editInstitution(institution)">
+                </button>
+                <button 
+                  pButton 
+                  pRipple 
+                  icon="pi pi-trash" 
+                  class="p-button-rounded p-button-danger p-button-text"
+                  pTooltip="Eliminar"
+                  tooltipPosition="top"
+                  (click)="deleteInstitution(institution)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center py-6">
+              <div class="flex flex-column align-items-center gap-3">
+                <i class="pi pi-building text-6xl text-400"></i>
+                <p class="text-600 text-xl">No hay instituciones registradas</p>
+                <button 
+                  pButton 
+                  pRipple 
+                  label="Crear Primera Institución" 
+                  icon="pi pi-plus"
+                  class="p-button-outlined"
+                  (click)="openNew()">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog para crear/editar institución -->
+<p-dialog 
+  [(visible)]="institutionDialog" 
+  [header]="editMode ? 'Editar Institución' : 'Nueva Institución'"
+  [modal]="true" 
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false">
+  
+  <div class="flex flex-col gap-3 pt-3">
+    <!-- Nombre -->
+    <div class="field">
+      <label for="name" class="block font-semibold mb-2">
+        Nombre <span class="text-red-500">*</span>
+      </label>
+      <input 
+        id="name"
+        type="text" 
+        pInputText 
+        [(ngModel)]="institution.name"
+        placeholder="Nombre de la institución"
+        class="w-full"
+        [class.ng-invalid]="submitted && !institution.name"
+        [class.ng-dirty]="submitted && !institution.name" />
+      <small class="text-red-500 block mt-1" *ngIf="submitted && !institution.name">
+        El nombre es requerido.
+      </small>
+    </div>
+
+    <!-- Descripción -->
+    <div class="field">
+      <label for="description" class="block font-semibold mb-2">Descripción</label>
+      <textarea 
+        id="description"
+        [(ngModel)]="institution.description"
+        placeholder="Descripción de la institución"
+        rows="3"
+        class="w-full p-3 border-1 surface-border border-round">
+      </textarea>
+    </div>
+
+    <!-- Logo -->
+    <div class="field">
+      <label class="block font-semibold mb-2">Logo de la Institución</label>
+      
+      <!-- Vista previa del logo -->
+      <div *ngIf="institution.logoUrl" class="mb-3 text-center">
+        <img 
+          [src]="institution.logoUrl" 
+          [alt]="institution.name || 'Logo'"
+          class="border-round shadow-2"
+          style="max-width: 200px; max-height: 200px; object-fit: contain; border: 2px solid var(--surface-border);"
+          (error)="onImageError()" />
+      </div>
+
+      <!-- Botón de subir imagen -->
+      <div class="flex flex-column gap-2">
+        <input 
+          #fileInput
+          type="file" 
+          accept="image/*"
+          style="display: none"
+          (change)="onFileSelected($event)" />
+        
+        <button 
+          pButton 
+          pRipple 
+          type="button"
+          label="Seleccionar Logo" 
+          icon="pi pi-upload" 
+          class="p-button-outlined w-full"
+          [loading]="uploadingImage"
+          (click)="fileInput.click()">
+        </button>
+
+        <small class="text-600 block">
+          <i class="pi pi-info-circle mr-1"></i>
+          Formatos aceptados: JPG, PNG, GIF (máx. 5MB)
+        </small>
+
+        <small *ngIf="selectedFile" class="text-primary block">
+          <i class="pi pi-file mr-1"></i>
+          Archivo seleccionado: {{ selectedFile.name }}
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <button 
+        pButton 
+        pRipple 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        class="p-button-text"
+        (click)="hideDialog()">
+      </button>
+      <button 
+        pButton 
+        pRipple 
+        label="Guardar" 
+        icon="pi pi-check" 
+        class="p-button-primary"
+        [disabled]="uploadingImage"
+        (click)="saveInstitution()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

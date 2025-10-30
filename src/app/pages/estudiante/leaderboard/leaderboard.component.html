@@ -5,9 +5,124 @@
       <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2">
         <i class="pi pi-trophy text-yellow-500 mr-2 sm:mr-3 text-2xl sm:text-3xl"></i>
         Leaderboard
+        <span *ngIf="isAdvancedMode" class="text-lg sm:text-xl md:text-2xl text-slate-600 dark:text-slate-300 ml-2">
+          Avanzado
+        </span>
       </h1>
-      <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 px-4">Clasificación de estudiantes en Cyber Imperium por Yachay</p>
+      <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 px-4">
+        <span *ngIf="!isAdvancedMode">Clasificación de estudiantes en Cyber Imperium por Yachay</span>
+        <span *ngIf="isAdvancedMode">
+          Clasificación por {{ getResourceLabel(selectedResourceType) }} 
+          <span *ngIf="meta && meta.period !== 'all'">- {{ getPeriodLabel(meta.period) }}</span>
+        </span>
+      </p>
     </div>
+
+    <!-- Mode Toggle Button -->
+    <div class="flex justify-center mt-4">
+      <p-button 
+        [label]="isAdvancedMode ? 'Vista Básica' : 'Vista Avanzada'"
+        [icon]="isAdvancedMode ? 'pi pi-list' : 'pi pi-cog'"
+        (onClick)="toggleMode()"
+        class="p-button-outlined">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Advanced Filters -->
+  <div *ngIf="isAdvancedMode" class="max-w-7xl mx-auto px-4 mb-6 sm:mb-8">
+    <p-card class="shadow-lg">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Period Filter -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Período
+          </label>
+          <p-select 
+            [options]="periodOptions" 
+            [(ngModel)]="selectedPeriod"
+            (onChange)="onPeriodChange()"
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Seleccionar período"
+            class="w-full">
+          </p-select>
+        </div>
+
+        <!-- Resource Type Filter -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Tipo de Recurso
+          </label>
+          <p-select 
+            [options]="resourceTypeOptions" 
+            [(ngModel)]="selectedResourceType"
+            (onChange)="onResourceTypeChange()"
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Seleccionar recurso"
+            class="w-full">
+          </p-select>
+        </div>
+
+        <!-- Institution Filter -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Institución
+          </label>
+          <p-select 
+            [options]="institutions" 
+            [(ngModel)]="selectedInstitutionId"
+            (onChange)="onInstitutionChange()"
+            optionLabel="name" 
+            optionValue="id"
+            placeholder="Todas las instituciones"
+            [showClear]="true"
+            class="w-full">
+          </p-select>
+        </div>
+
+        <!-- Custom Date Range -->
+        <div *ngIf="selectedPeriod === 'custom'" class="space-y-2 lg:col-span-2">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Rango de Fechas
+          </label>
+          <p-datepicker 
+            [(ngModel)]="dateRange"
+            (onChange)="onDateRangeChange()"
+            selectionMode="range"
+            [readonlyInput]="true"
+            dateFormat="yy-mm-dd"
+            placeholder="Seleccionar rango de fechas"
+            class="w-full">
+          </p-datepicker>
+        </div>
+      </div>
+
+      <!-- Meta Information -->
+      <div *ngIf="meta" class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex flex-wrap items-center justify-between text-sm text-slate-600 dark:text-slate-400">
+          <div class="flex items-center space-x-4">
+            <span>
+              <i class="pi pi-users mr-1"></i>
+              {{ meta.totalUsers }} usuarios
+            </span>
+            <span *ngIf="getInstitutionName(meta.institutionId)">
+              <i class="pi pi-building mr-1"></i>
+              {{ getInstitutionName(meta.institutionId) }}
+            </span>
+            <span>
+              <i class="pi pi-clock mr-1"></i>
+              Actualizado: {{ formatDate(meta.generatedAt) }}
+            </span>
+          </div>
+          <div *ngIf="meta.dateRange" class="text-xs">
+            {{ getResourceIcon(meta.resourceType) }} 
+            Del {{ formatDate(meta.dateRange.startDate) }} al {{ formatDate(meta.dateRange.endDate) }}
+          </div>
+        </div>
+      </div>
+    </p-card>
   </div>
 
   <!-- Loading State -->
@@ -28,8 +143,8 @@
 
   <!-- Leaderboard Content -->
   <div *ngIf="!loading" class="max-w-7xl mx-auto px-4">
-    <!-- Top 3 Podium -->
-    <div *ngIf="users.length >= 3" class="mb-8 sm:mb-12">
+    <!-- Basic View: Top 3 Podium -->
+    <div *ngIf="!isAdvancedMode && users.length >= 3" class="mb-8 sm:mb-12">
       <div class="flex justify-center items-end space-x-2 sm:space-x-4 md:space-x-6 lg:space-x-8 min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
         <!-- 2nd Place -->
         <div class="text-center transform hover:scale-105 transition-transform duration-300 order-1 sm:order-1">
@@ -78,8 +193,61 @@
       </div>
     </div>
 
-    <!-- Rest of the Rankings -->
-    <div class="space-y-1 sm:space-y-2 md:space-y-3">
+    <!-- Advanced View: Top 3 Enhanced -->
+    <div *ngIf="isAdvancedMode && advancedUsers.length >= 3" class="mb-8 sm:mb-12">
+      <div class="flex justify-center items-end space-x-2 sm:space-x-4 md:space-x-6 lg:space-x-8 min-h-[320px] sm:min-h-[370px] md:min-h-[420px]">
+        <!-- 2nd Place -->
+        <div class="text-center transform hover:scale-105 transition-transform duration-300 order-1 sm:order-1">
+          <div class="relative">
+            <img [src]="advancedUsers[1].url" [alt]="advancedUsers[1].firstName + ' ' + advancedUsers[1].lastName"
+                 class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-3 sm:border-4 border-gray-400 shadow-lg mx-auto mb-2 sm:mb-4">
+            <div class="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm">
+              2
+            </div>
+          </div>
+          <div class="bg-gradient-to-t from-gray-300 to-gray-400 rounded-t-lg p-4 h-36 flex flex-col justify-center">
+            <h3 class="font-bold text-gray-800 text-xs sm:text-sm md:text-base lg:text-lg w-16 sm:w-20 md:w-24 lg:w-28 xl:w-32 truncate mx-auto" pTooltip="{{ advancedUsers[1].firstName }} {{ advancedUsers[1].lastName }}" tooltipPosition="bottom">{{ advancedUsers[1].firstName }}</h3>
+            <p class="text-gray-600 text-xs font-semibold">{{ advancedUsers[1].periodScore }} {{ getResourceLabel(advancedUsers[1].resourceType) }}</p>
+            <p class="text-gray-500 text-xs">{{ advancedUsers[1].institutionName }}</p>
+          </div>
+        </div>
+
+        <!-- 1st Place -->
+        <div class="text-center transform hover:scale-105 transition-transform duration-300 order-2 sm:order-2">
+          <div class="relative">
+            <img [src]="advancedUsers[0].url" [alt]="advancedUsers[0].firstName + ' ' + advancedUsers[0].lastName"
+                 class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-4 border-yellow-400 shadow-xl mx-auto mb-3 sm:mb-4">
+            <div class="absolute -top-2 sm:-top-3 -right-2 sm:-right-3 w-8 h-8 sm:w-10 sm:h-10 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900 font-bold">
+              <i class="pi pi-crown text-base sm:text-lg"></i>
+            </div>
+          </div>
+          <div class="bg-gradient-to-t from-yellow-400 to-yellow-500 rounded-t-lg p-4 h-48 flex flex-col justify-center">
+            <h3 class="font-bold text-yellow-900 text-xs sm:text-sm md:text-base lg:text-xl w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36 truncate mx-auto" pTooltip="{{ advancedUsers[0].firstName }} {{ advancedUsers[0].lastName }}" tooltipPosition="bottom">{{ advancedUsers[0].firstName }}</h3>
+            <p class="text-yellow-800 text-xs sm:text-sm md:text-base font-semibold">{{ advancedUsers[0].periodScore }} {{ getResourceLabel(advancedUsers[0].resourceType) }}</p>
+            <p class="text-yellow-700 text-xs">{{ advancedUsers[0].institutionName }}</p>
+          </div>
+        </div>
+
+        <!-- 3rd Place -->
+        <div class="text-center transform hover:scale-105 transition-transform duration-300 order-3 sm:order-3">
+          <div class="relative">
+            <img [src]="advancedUsers[2].url" [alt]="advancedUsers[2].firstName + ' ' + advancedUsers[2].lastName"
+                 class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-3 sm:border-4 border-amber-600 shadow-lg mx-auto mb-2 sm:mb-4">
+            <div class="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm">
+              3
+            </div>
+          </div>
+          <div class="bg-gradient-to-t from-amber-600 to-amber-700 rounded-t-lg p-4 h-32 flex flex-col justify-center">
+            <h3 class="font-bold text-amber-50 text-xs w-14 sm:w-16 md:w-20 lg:w-24 xl:w-28 truncate mx-auto" pTooltip="{{ advancedUsers[2].firstName }} {{ advancedUsers[2].lastName }}" tooltipPosition="bottom">{{ advancedUsers[2].firstName }}</h3>
+            <p class="text-amber-200 text-xs font-semibold">{{ advancedUsers[2].periodScore }} {{ getResourceLabel(advancedUsers[2].resourceType) }}</p>
+            <p class="text-amber-300 text-xs">{{ advancedUsers[2].institutionName }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic View: Rest of the Rankings -->
+    <div *ngIf="!isAdvancedMode" class="space-y-1 sm:space-y-2 md:space-y-3">
       <div *ngFor="let user of users; let i = index; trackBy: trackByUser"
            class="bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 sm:hover:-translate-y-1 border-l-4"
            [class.border-yellow-400]="i === 0"
@@ -126,13 +294,83 @@
       </div>
     </div>
 
+    <!-- Advanced View: Enhanced Rankings -->
+    <div *ngIf="isAdvancedMode" class="space-y-1 sm:space-y-2 md:space-y-3">
+      <div *ngFor="let user of advancedUsers; let i = index; trackBy: trackByUser"
+           class="bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl shadow-md sm:shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 sm:hover:-translate-y-1 border-l-4"
+           [class.border-yellow-400]="i === 0"
+           [class.border-gray-400]="i === 1"
+           [class.border-amber-600]="i === 2"
+           [class.border-slate-200]="i > 2">
+        <div class="p-3 sm:p-4 md:p-5 lg:p-6">
+          <div class="flex items-center justify-between">
+            <!-- Rank and User Info -->
+            <div class="flex items-center space-x-2 sm:space-x-3 md:space-x-4 flex-1 min-w-0">
+              <!-- Rank Badge -->
+              <div class="flex-shrink-0">
+                <div [class]="'w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base lg:text-lg ' + getRankBadgeClass(user.rank)">
+                  {{ user.rank }}
+                </div>
+              </div>
+
+              <!-- Avatar -->
+              <div class="flex-shrink-0">
+                <img [src]="user.url" [alt]="user.firstName + ' ' + user.lastName"
+                     class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full border-2 border-slate-200 dark:border-slate-600 shadow-md">
+              </div>
+
+              <!-- User Details -->
+              <div class="flex-1 min-w-0">
+                <div class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-900 dark:text-white truncate">
+                  {{ user.firstName }} {{ user.lastName }}
+                </div>
+                <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 flex items-center space-x-2">
+                  <span>
+                    <i class="pi pi-building text-xs"></i>
+                    {{ user.institutionName }}
+                  </span>
+                </div>
+                <!-- Current Balances -->
+                <div class="flex items-center space-x-3 mt-1">
+                  <span class="text-xs text-blue-600 dark:text-blue-400">
+                    🧠 {{ user.currentYachay }}
+                  </span>
+                  <span class="text-xs text-purple-600 dark:text-purple-400">
+                    ⚡ {{ user.currentTumis }}
+                  </span>
+                  <span class="text-xs text-pink-600 dark:text-pink-400">
+                    💎 {{ user.currentMullu }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Period Score -->
+            <div class="text-right flex-shrink-0 ml-2 sm:ml-4">
+              <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 sm:px-4 md:px-5 py-2 sm:py-3 rounded-lg shadow-md">
+                <div class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold flex items-center justify-center">
+                  {{ getResourceIcon(user.resourceType) }}
+                  <span class="ml-1">{{ user.periodScore }}</span>
+                </div>
+                <div class="text-xs opacity-90">{{ getResourceLabel(user.resourceType) }}</div>
+                <div class="text-xs opacity-75 mt-1">en el período</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Empty State -->
-    <div *ngIf="users.length === 0" class="text-center py-12 sm:py-16">
+    <div *ngIf="(isAdvancedMode ? advancedUsers.length === 0 : users.length === 0)" class="text-center py-12 sm:py-16">
       <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
         <i class="pi pi-trophy text-2xl sm:text-3xl md:text-4xl text-slate-400"></i>
       </div>
       <h3 class="text-lg sm:text-xl font-semibold text-slate-600 dark:text-slate-300 mb-2">No hay datos disponibles</h3>
-      <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 px-4">Aún no hay estudiantes en el leaderboard</p>
+      <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 px-4">
+        <span *ngIf="!isAdvancedMode">Aún no hay estudiantes en el leaderboard</span>
+        <span *ngIf="isAdvancedMode">No hay transacciones en el período seleccionado</span>
+      </p>
     </div>
   </div>
 </div>

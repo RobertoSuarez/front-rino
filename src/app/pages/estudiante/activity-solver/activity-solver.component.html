@@ -432,7 +432,7 @@
         <p class="text-2xl text-slate-600">Has completado la actividad "{{ safeActivityResult.activity }}"</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 max-w-6xl mx-auto">
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl shadow-xl border border-blue-200">
           <div class="text-blue-600 text-5xl font-bold mb-3">{{ safeActivityResult.score }}</div>
           <div class="text-blue-700 font-semibold text-lg">Puntuación total</div>
@@ -446,6 +446,11 @@
         <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-8 rounded-2xl shadow-xl border border-amber-200">
           <div class="text-amber-600 text-5xl font-bold mb-3">+{{ safeActivityResult.gems }}</div>
           <div class="text-amber-700 font-semibold text-lg">Yachay ganados</div>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-2xl shadow-xl border border-purple-200">
+          <div class="text-purple-600 text-5xl font-bold mb-3">+{{ safeActivityResult.mulluEarned || 0 }}</div>
+          <div class="text-purple-700 font-semibold text-lg">Mullu ganados</div>
         </div>
       </div>
 

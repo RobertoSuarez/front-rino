@@ -65,6 +65,7 @@ export class MenuService {
         label: 'Administración',
         items: [
           { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/admin/users'] },
+          { label: 'Instituciones', icon: 'pi pi-fw pi-building', routerLink: ['/admin/institutions'] },
           { label: 'Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/admin/courses'] },
           { label: 'Rutas de Aprendizaje', icon: 'pi pi-fw pi-sitemap', routerLink: ['/admin/learning-paths'] },
           { label: 'Capítulos', icon: 'pi pi-fw pi-bookmark', routerLink: ['/admin/chapters'] },
@@ -87,7 +88,8 @@ export class MenuService {
       {
         label: 'Mi Cuenta',
         items: [
-          { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] }
+          { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] },
+          { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/admin/change-password'] }
         ]
       }
     ];
@@ -127,7 +129,7 @@ export class MenuService {
         label: 'Mi Cuenta',
         items: [
           { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] },
-          { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/profile/change-password'] }
+          { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/teacher/change-password'] }
         ]
       }
     ];
@@ -165,7 +167,7 @@ export class MenuService {
         label: 'Mi Cuenta',
         items: [
           { label: 'Perfil', icon: 'pi pi-fw pi-user', routerLink: ['/profile'] },
-          { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/profile/change-password'] }
+          { label: 'Cambiar Contraseña', icon: 'pi pi-fw pi-lock', routerLink: ['/estudiante/change-password'] }
         ]
       },
       {

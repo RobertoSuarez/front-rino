@@ -75,5 +75,15 @@ export const adminRoutes: Routes = [
     path: 'parameters',
     loadComponent: () => import('./parameters/parameters.component').then(m => m.ParametersComponent),
     title: 'Parámetros del Sistema'
+  },
+  {
+    path: 'institutions',
+    loadComponent: () => import('./institutions/institutions-list.component').then(m => m.InstitutionsListComponent),
+    title: 'Gestión de Instituciones'
+  },
+  {
+    path: 'change-password',
+    loadComponent: () => import('../change-password/change-password.component').then(m => m.ChangePasswordComponent),
+    title: 'Cambiar Contraseña'
   }
 ];

@@ -104,6 +104,7 @@ export interface UpdateExerciseRequest {
 }
 
 export interface CheckExerciseRequest {
+  userId: number;
   answerSelect?: string;
   answerSelects?: string[];
   answerOrderFragmentCode?: string[];
@@ -115,4 +116,6 @@ export interface CheckExerciseRequest {
 export interface FeedbackExerciseResponse {
   qualification: number;
   feedback: string;
+  yachayEarned?: number;
+  difficulty?: string;
 }

@@ -258,3 +258,54 @@ p-card {
     background-color: rgba(0, 0, 0, 0.7) !important;
   }
 }
+
+/* Estilos personalizados para toast de Yachay */
+:host ::ng-deep .yachay-reward-toast {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+  border-left: 4px solid #f59e0b !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3) !important;
+}
+
+:host ::ng-deep .yachay-reward-toast .p-toast-message-content {
+  color: #78350f !important;
+}
+
+:host ::ng-deep .yachay-reward-toast .p-toast-summary {
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+}
+
+/* Estilos personalizados para toast de Mullu */
+:host ::ng-deep .mullu-reward-toast {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%) !important;
+  border-left: 4px solid #9333ea !important;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3) !important;
+}
+
+:host ::ng-deep .mullu-reward-toast .p-toast-message-content {
+  color: #581c87 !important;
+}
+
+:host ::ng-deep .mullu-reward-toast .p-toast-summary {
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+}
+
+:host ::ng-deep .mullu-reward-toast .p-toast-icon-close {
+  color: #7c3aed !important;
+}
+
+/* Animación para los toasts de recompensa */
+@keyframes rewardPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+:host ::ng-deep .yachay-reward-toast,
+:host ::ng-deep .mullu-reward-toast {
+  animation: rewardPulse 0.5s ease-in-out;
+}

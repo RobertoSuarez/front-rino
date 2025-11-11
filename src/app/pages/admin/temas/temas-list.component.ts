@@ -76,6 +76,7 @@ export class TemasListComponent implements OnInit {
   theoryPrompt: string = '';
   generatedTheory: string = '';
   showTheoryPreview: boolean = false;
+
   difficultyOptions = [
     { label: 'Fácil', value: 'Fácil' },
     { label: 'Medio', value: 'Medio' },

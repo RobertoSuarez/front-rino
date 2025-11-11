@@ -8,8 +8,19 @@
   </div>
 </div>
 
+<!-- Fondo 3D con Three.js -->
+<div class="fixed inset-0 z-0">
+  <app-three-scene 
+    #threeScene
+    [width]="'100%'" 
+    [height]="'100%'"
+    [particleCount]="120"
+    [particleColor]="particleColor">
+  </app-three-scene>
+</div>
+
 <!-- Contenido principal - Diseño Duolingo -->
-<div class="h-full inset-0 absolute bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+<div class="h-full inset-0 absolute bg-gradient-to-br from-blue-50/80 to-indigo-100/80 flex flex-col z-10">
 
   <!-- Barra de progreso superior -->
   <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
@@ -218,94 +229,108 @@
   <!-- Contenido del drawer de feedback -->
   <div class="feedback-drawer-content" *ngIf="showFeedback() && currentFeedback()">
     <!-- Handle para arrastrar -->
-    <div class="flex justify-center py-2">
-      <div class="w-16 h-1 bg-gray-300 rounded-full"></div>
+    <div class="flex justify-center py-3">
+      <div class="w-12 h-1.5 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
     </div>
 
-    <div class="flex justify-center flex flex-col md:flex-row">
-      <!-- Contenido principal -->
-      <div class="justify-center w-full md:w-[70%] px-4 py-6">
-        <div [ngClass]="{
-          'bg-green-50 border-green-200': safeFeedback.qualification >= 7, 
-          'bg-amber-50 border-amber-200': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-          'bg-red-50 border-red-200': safeFeedback.qualification < 5
-        }" class="rounded-xl border p-6 shadow-sm">
-          
-          <div class="flex flex-col md:flex-row gap-1">
-            <!-- Columna Izquierda: Ícono -->
-            <div class="flex items-center justify-center">
+    <!-- Contenedor principal con gradiente -->
+    <div class="bg-gradient-to-br from-white to-gray-50">
+      <div class="flex flex-col gap-6 px-6 py-8 max-w-6xl mx-auto">
+      
+
+        <!-- Contenido principal (Centro) -->
+        <div class="w-full flex flex-col justify-center">
+          <!-- Card de feedback -->
+          <div [ngClass]="{
+            'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-lg shadow-green-200/30': safeFeedback.qualification >= 7, 
+            'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200 shadow-lg shadow-amber-200/30': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
+            'bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-lg shadow-red-200/30': safeFeedback.qualification < 5
+          }" class="rounded-2xl border-2 p-6 backdrop-blur-sm flex flex-auto flex-col">
+            
+            <!-- Header con ícono -->
+            <div class="flex items-start gap-4 mb-4">
               <div [ngClass]="{
-                'bg-green-100 text-green-600': safeFeedback.qualification >= 7, 
-                'bg-amber-100 text-amber-600': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                'bg-red-100 text-red-600': safeFeedback.qualification < 5
-              }" class="p-4 rounded-xl">
+                'bg-gradient-to-br from-green-400 to-emerald-500 text-white': safeFeedback.qualification >= 7, 
+                'bg-gradient-to-br from-amber-400 to-yellow-500 text-white': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
+                'bg-gradient-to-br from-red-400 to-rose-500 text-white': safeFeedback.qualification < 5
+              }" class="p-3 rounded-xl shadow-lg">
                 <i [ngClass]="{
                   'pi-check-circle': safeFeedback.qualification >= 7, 
                   'pi-exclamation-circle': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
                   'pi-times-circle': safeFeedback.qualification < 5
-                }" class="pi text-4xl"></i>
+                }" class="pi text-2xl"></i>
+              </div>
+              
+              <div class="flex-1">
+                <h3 [ngClass]="{
+                  'text-green-800': safeFeedback.qualification >= 7, 
+                  'text-amber-800': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
+                  'text-red-800': safeFeedback.qualification < 5
+                }" class="text-3xl font-bold mb-1">
+                  {{ safeFeedback.qualification >= 7 ? '¡Excelente!' : safeFeedback.qualification >= 5 ? '¡Buen intento!' : '¡Sigue practicando!' }}
+                </h3>
+                <p class="text-gray-600 text-sm font-medium">
+                  {{ safeFeedback.qualification >= 7 ? '¡Dominas este concepto!' : safeFeedback.qualification >= 5 ? 'Estás muy cerca' : 'Necesitas más práctica' }}
+                </p>
               </div>
             </div>
 
-            <!-- Columna Central: Contenido -->
-            <div class="flex-1">
-              <h3 [ngClass]="{
-                'text-green-800': safeFeedback.qualification >= 7, 
-                'text-amber-800': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                'text-red-800': safeFeedback.qualification < 5
-              }" class="text-2xl font-bold mb-1">
-                {{ safeFeedback.qualification >= 7 ? '¡Excelente trabajo!' : safeFeedback.qualification >= 5 ? 'Buen intento' : 'Revisa el concepto' }}
-              </h3>
-              <p class="text-gray-600 mb-1">
-                {{ safeFeedback.qualification >= 7 ? '¡Sigue así!' : safeFeedback.qualification >= 5 ? 'Estás cerca de dominarlo' : 'Necesitas practicar más' }}
-              </p>
-              
-              <!-- Puntuación -->
-              <div class="mb-1">
-                <span class="text-sm text-gray-600">Tu puntuación:</span>
-                <span [ngClass]="{
-                  'text-green-600': safeFeedback.qualification >= 7, 
-                  'text-amber-600': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                  'text-red-600': safeFeedback.qualification < 5
-                }" class="ml-2 text-xl font-bold">
-                  {{ safeFeedback.qualification }}/10
-                </span>
-              </div>
-
-              <!-- Botón de retroalimentación detallada -->
-              <button 
-                (click)="showAIFeedbackModal.set(true)" 
-                class="p-2 text-sm font-medium rounded-lg flex items-center gap-2 transition-all"
-                [ngClass]="{
-                  'text-green-700 hover:bg-green-100': safeFeedback.qualification >= 7, 
-                  'text-amber-700 hover:bg-amber-100': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                  'text-red-700 hover:bg-red-100': safeFeedback.qualification < 5
-                }">
-                <i class="pi pi-info-circle"></i>
-                <span>Ver retroalimentación detallada</span>
-                <i class="pi pi-chevron-right ml-1"></i>
-              </button>
+            <!-- Puntuación destacada -->
+            <div class="flex items-center gap-3 mb-4 p-4 rounded-xl" [ngClass]="{
+              'bg-green-100/50': safeFeedback.qualification >= 7, 
+              'bg-amber-100/50': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
+              'bg-red-100/50': safeFeedback.qualification < 5
+            }">
+              <span class="text-sm font-semibold text-gray-700">Puntuación:</span>
+              <span [ngClass]="{
+                'text-green-600': safeFeedback.qualification >= 7, 
+                'text-amber-600': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
+                'text-red-600': safeFeedback.qualification < 5
+              }" class="text-3xl font-bold">
+                {{ safeFeedback.qualification }}<span class="text-lg">/10</span>
+              </span>
             </div>
 
-            <!-- Columna Derecha: Botones de acción -->
-            <div class="flex flex-col gap-3 w-full md:w-48">
-              <button
-                pButton
-                label="Revisar respuesta"
-                icon="pi pi-eye"
-                class="p-button-outlined p-button-secondary"
-                (click)="closeFeedbackDrawer()">
-              </button>
-              
-              <button
-                pButton
-                [label]="isLastExercise ? 'Finalizar' : 'Siguiente'"
-                [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
-                [iconPos]="'right'"
-                [class]="isLastExercise ? 'p-button-success' : 'p-button-primary'"
-                (click)="isLastExercise ? finishActivity() : continueFromFeedback()">
-              </button>
-            </div>
+            <!-- Botón de retroalimentación detallada -->
+            <button 
+              (click)="showAIFeedbackModal.set(true)" 
+              class="w-full p-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer"
+              [ngClass]="{
+                'bg-green-100 text-green-700 hover:bg-green-200': safeFeedback.qualification >= 7, 
+                'bg-amber-100 text-amber-700 hover:bg-amber-200': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
+                'bg-red-100 text-red-700 hover:bg-red-200': safeFeedback.qualification < 5
+              }">
+              <i class="pi pi-lightbulb"></i>
+              <span>Ver retroalimentación detallada</span>
+              <i class="pi pi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de acción (Derecha) -->
+        <div class="w-full flex flex-col gap-3 justify-center">
+          <button
+            pButton
+            label="Revisar"
+            icon="pi pi-eye"
+            class="p-button-outlined p-button-secondary w-full font-semibold"
+            (click)="closeFeedbackDrawer()">
+          </button>
+          
+          <button
+            pButton
+            [label]="isLastExercise ? 'Finalizar' : 'Siguiente'"
+            [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
+            [iconPos]="'right'"
+            [class]="isLastExercise ? 'p-button-success w-full font-semibold' : 'p-button-primary w-full font-semibold'"
+            (click)="isLastExercise ? finishActivity() : continueFromFeedback()">
+          </button>
+
+          <!-- Indicador de progreso -->
+          <div class="text-center mt-2">
+            <span class="text-xs font-semibold text-gray-500">
+              Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
+            </span>
           </div>
         </div>
       </div>
@@ -317,73 +342,153 @@
 <p-dialog
   [(visible)]="showAIFeedbackModal"
   [modal]="true"
-  [style]="{width: '90vw', maxWidth: '900px'}"
-  [contentStyle]="{'padding': '0', 'border-radius': '16px', 'overflow': 'hidden', 'box-shadow': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'}"
+  header="Retroalimentación de Amauta"
+  [style]="{ width: '100rem' }"
   [closeOnEscape]="true"
   [dismissableMask]="true"
-  [closable]="false"
-  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
-  styleClass="ai-feedback-modal">
-  
-  <!-- Header del modal con botón de cerrar -->
-  <ng-template pTemplate="header">
-    <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-5 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <i class="pi pi-robot text-white text-xl"></i>
-        <h2 class="text-lg font-semibold text-white m-0">Retroalimentación detallada</h2>
-      </div>
-      <button 
-        type="button" 
-        (click)="showAIFeedbackModal.set(false)" 
-        class="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-  </ng-template>
+  [closable]="false">
+
   
   <!-- Contenido del modal -->
-  <div class="flex flex-col md:flex-row bg-white">
-    <!-- Lado izquierdo - Imagen -->
-    <div class="w-full md:w-2/5 bg-gradient-to-b from-blue-50 to-white p-8 flex flex-col items-center justify-center">
-      <div class="relative w-full max-w-xs">
-        <div class="absolute -top-6 -left-6 w-32 h-32 bg-blue-100 rounded-full opacity-50"></div>
-        <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-indigo-100 rounded-full opacity-50"></div>
-        <div class="relative z-10">
-          <img 
-            src="https://i.ibb.co/Zz3XV6xj/amauta.png" 
-            alt="Retroalimentación de IA" 
-            class="w-full h-auto max-h-64 object-contain"
-            onerror="this.src='assets/images/placeholder-feedback.svg'"
-          >
-        </div>
-      </div>
-      <div class="mt-8 text-center">
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">Análisis detallado</h3>
-        <p class="text-gray-600 text-sm">Esta retroalimentación ha sido generada automáticamente para ayudarte a mejorar.</p>
-      </div>
-    </div>
-    
-    <!-- Lado derecho - Feedback de IA -->
-    <div class="w-full md:w-3/5 p-8 max-h-[70vh] overflow-y-auto">
-      <div class="prose max-w-none">
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6">
-          <div class="flex items-start gap-3">
-            <i class="pi pi-lightbulk text-blue-600 mt-1"></i>
-            <div>
-              <h4 class="text-blue-800 font-medium mb-1">Consejo del sistema</h4>
-              <p class="text-blue-700 text-sm">Revisa detenidamente la retroalimentación para mejorar en los siguientes ejercicios.</p>
-            </div>
+  <div class="bg-gradient-to-b ">
+    <!-- Layout responsivo: columnas en desktop, filas en móvil -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-0 min-h-[500px]">
+      
+      <!-- Lado izquierdo - Imagen y contexto (2 columnas en desktop) -->
+      <div class="lg:col-span-2 bg-gradient-to-br from-[#12BA82]/5 via-[#12BA82]/3 to-transparent p-8 lg:p-10 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
+        <div class="relative w-full max-w-sm">
+          <!-- Elementos decorativos de fondo -->
+          <div class="absolute -top-8 -left-8 w-40 h-40 bg-[#12BA82]/10 rounded-full blur-3xl opacity-60"></div>
+          <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-[#0FA573]/10 rounded-full blur-3xl opacity-60"></div>
+          
+          <!-- Imagen -->
+          <div class="relative z-10">
+            <img 
+              src="https://i.ibb.co/Zz3XV6xj/amauta.png" 
+              alt="Amauta - Retroalimentación de IA" 
+              class="w-full h-auto max-h-72 object-contain drop-shadow-lg hover:drop-shadow-xl transition-shadow duration-300"
+              onerror="this.src='assets/images/placeholder-feedback.svg'"
+            >
           </div>
         </div>
         
-        <div class="prose prose-blue max-w-none" [innerHTML]="safeFeedback.feedback"></div>
-        
-        <div class="mt-8 pt-6 border-t border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
-              <i class="pi pi-thumbs-up"></i>
+        <!-- Información contextual -->
+        <div class="mt-10 text-center space-y-3">
+          <div class="inline-flex items-center gap-2 bg-[#12BA82]/10 px-4 py-2 rounded-full border border-[#12BA82]/20 hover:border-[#12BA82]/40 transition-colors duration-200">
+            <i class="pi pi-check-circle text-[#12BA82] text-sm"></i>
+            <span class="text-sm font-medium text-[#0D9B6A]">Análisis completado</span>
+          </div>
+          <h3 class="text-lg font-bold text-gray-800">Retroalimentación Personalizada</h3>
+          <p class="text-sm text-gray-600 leading-relaxed">Amauta ha analizado tu desempeño y preparado recomendaciones específicas para tu mejora continua.</p>
+        </div>
+      </div>
+      
+      <!-- Lado derecho - Feedback de IA (3 columnas en desktop) -->
+      <div class="lg:col-span-3 p-8 lg:p-10 flex flex-col">
+        <!-- Contenedor scrolleable -->
+        <div class="flex-1 overflow-y-auto pr-4 space-y-6 scrollbar-thin scrollbar-thumb-[#12BA82] scrollbar-track-slate-100 hover:scrollbar-thumb-[#0FA573]">
+          
+          <!-- Tarjeta de consejo del sistema -->
+          <div class="bg-gradient-to-r from-[#12BA82]/10 to-[#0FA573]/10 border border-[#12BA82]/30 rounded-xl p-5 backdrop-blur-sm hover:border-[#12BA82]/50 hover:shadow-md transition-all duration-300">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0">
+                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-[#12BA82]/20 group-hover:bg-[#12BA82]/30 transition-colors duration-200">
+                  <i class="pi pi-lightbulb text-[#12BA82] text-lg"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h4 class="text-sm font-bold text-[#0D9B6A] mb-1">Consejo de Amauta</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">Revisa cuidadosamente esta retroalimentación. Cada recomendación está diseñada para ayudarte a mejorar tu comprensión sobre ciberseguridad.</p>
+              </div>
             </div>
-            <p class="text-sm text-gray-600">¿Te resultó útil esta retroalimentación?</p>
+          </div>
+          
+          <!-- Contenido del feedback con estilos mejorados -->
+          <div class="space-y-4">
+            <div class="text-gray-700 text-sm leading-relaxed">
+              <!-- Estilos dinámicos para el contenido HTML -->
+              <div 
+                [innerHTML]="safeFeedback.feedback"
+                class="prose prose-sm max-w-none
+                  prose-headings:text-[#0D9B6A] prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
+                  prose-p:text-gray-700 prose-p:mb-3 prose-p:leading-relaxed
+                  prose-li:text-gray-700 prose-li:mb-2
+                  prose-code:bg-slate-100 prose-code:text-[#0D9B6A] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs
+                  prose-blockquote:border-l-4 prose-blockquote:border-[#12BA82] prose-blockquote:pl-4 prose-blockquote:text-gray-600 prose-blockquote:italic
+                  prose-strong:text-[#0D9B6A] prose-strong:font-bold
+                  prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-4
+                  prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-4">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Separador visual -->
+          <div class="flex items-center gap-3 py-4">
+            <div class="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
+            <span class="text-xs text-gray-500 font-medium whitespace-nowrap">Fin de la retroalimentación</span>
+            <div class="flex-1 h-px bg-gradient-to-l from-slate-200 to-transparent"></div>
+          </div>
+          
+          <!-- Sección de calificación con estrellas -->
+          <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-6 hover:border-yellow-300 transition-all duration-300">
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0">
+                  <div class="flex items-center justify-center h-10 w-10 rounded-full bg-yellow-100">
+                    <i class="pi pi-star-fill text-yellow-500 text-lg"></i>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-sm font-bold text-gray-800 mb-1">Califica esta retroalimentación</h4>
+                  <p class="text-xs text-gray-600">Tu opinión nos ayuda a mejorar la calidad de las respuestas de Amauta</p>
+                </div>
+              </div>
+              
+              <!-- Componente de estrellas -->
+              <div class="flex justify-center py-3">
+                <app-star-rating 
+                  [(rating)]="feedbackRating"
+                  (ratingChange)="onFeedbackRatingChange($event)"
+                  [disabled]="submittingRating">
+                </app-star-rating>
+              </div>
+              
+              <!-- Campo de comentario opcional -->
+              <div *ngIf="feedbackRating > 0" class="space-y-2" style="animation: fadeIn 0.3s ease-out;">
+                <label class="text-xs font-medium text-gray-700">Comentario (opcional)</label>
+                <textarea
+                  [(ngModel)]="feedbackComment"
+                  placeholder="Cuéntanos qué te pareció esta retroalimentación..."
+                  class="w-full px-3 py-2 text-xs border border-yellow-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent resize-none"
+                  rows="2"
+                  [disabled]="submittingRating">
+                </textarea>
+              </div>
+              
+              <!-- Botón de envío -->
+              <div *ngIf="feedbackRating > 0" class="flex gap-2 pt-2">
+                <button
+                  (click)="submitFeedbackRating()"
+                  [disabled]="submittingRating"
+                  class="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white text-xs font-medium rounded-lg transition-colors duration-200 active:scale-95">
+                  <i class="pi pi-check mr-1" *ngIf="!submittingRating"></i>
+                  <i class="pi pi-spin pi-spinner mr-1" *ngIf="submittingRating"></i>
+                  {{ submittingRating ? 'Enviando...' : 'Enviar calificación' }}
+                </button>
+                <button
+                  (click)="clearFeedbackRating()"
+                  [disabled]="submittingRating"
+                  class="px-4 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 text-xs font-medium rounded-lg transition-colors duration-200 active:scale-95">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+              
+              <!-- Mensaje de éxito -->
+              <div *ngIf="feedbackSubmitted" class="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg" style="animation: fadeIn 0.3s ease-out;">
+                <i class="pi pi-check-circle text-green-600"></i>
+                <span class="text-xs text-green-700 font-medium">¡Gracias por tu calificación!</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -392,16 +497,13 @@
   
   <!-- Footer del modal -->
   <ng-template pTemplate="footer">
-    <div class="flex justify-end p-4 border-t border-gray-200 bg-gray-50">
-      <button 
-        pButton 
+      <p-button 
         type="button" 
         label="Cerrar" 
         icon="pi pi-check"
-        class="p-button-text" 
+        class="p-button-rounded p-button-text text-gray-700 hover:bg-slate-100 hover:text-gray-900 transition-all duration-200 active:scale-95" 
         (click)="showAIFeedbackModal.set(false)">
-      </button>
-    </div>
+      </p-button>
   </ng-template>
 </p-dialog>
 

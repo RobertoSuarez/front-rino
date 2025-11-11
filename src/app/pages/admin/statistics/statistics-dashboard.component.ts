@@ -41,6 +41,7 @@ export class StatisticsDashboardComponent implements OnInit {
   topCoursesData: any;
   activitySuccessData: any;
   accessFrequencyData: any;
+  temasCompletionData: any;
   
   // Opciones de período
   periodOptions = [
@@ -93,6 +94,7 @@ export class StatisticsDashboardComponent implements OnInit {
     this.loadPopularCourses();
     this.loadActivitiesSuccess();
     this.loadAccessFrequency();
+    this.loadTemasCompletion();
   }
 
   loadDashboardStats() {
@@ -131,6 +133,8 @@ export class StatisticsDashboardComponent implements OnInit {
           };
         }
         this.loading = false;
+        // Cargar estadísticas de usuarios después de cargar el dashboard
+        this.loadUsersStats();
       },
       error: (error) => {
         this.messageService.add({
@@ -230,6 +234,15 @@ export class StatisticsDashboardComponent implements OnInit {
   loadUsersStats() {
     this.adminStatisticsService.getUsersStats().subscribe({
       next: (data: any) => {
+        // Actualizar dashboard con totales de estudiantes y profesores
+        if (data && data.totalStudents !== undefined && data.totalTeachers !== undefined) {
+          if (this.dashboardStats) {
+            this.dashboardStats.totalStudents = data.totalStudents || 0;
+            this.dashboardStats.totalTeachers = data.totalTeachers || 0;
+            this.dashboardStats.totalAdmins = data.totalAdmins || 0;
+          }
+        }
+
         if (data && data.usersByType && Array.isArray(data.usersByType) && data.usersByType.length > 0) {
           const labels = data.usersByType.map((item: any) => item.type || 'Sin tipo');
           const values = data.usersByType.map((item: any) => parseInt(item.count || '0'));
@@ -402,8 +415,43 @@ export class StatisticsDashboardComponent implements OnInit {
     });
   }
 
+  loadTemasCompletion() {
+    this.adminStatisticsService.getTemasCompletion(this.selectedPeriod).subscribe({
+      next: (data: any[]) => {
+        if (data && Array.isArray(data) && data.length > 0) {
+          const labels = data.map((item: any) => item.period);
+          const values = data.map((item: any) => item.count);
+          
+          this.temasCompletionData = {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Temas completados',
+                data: values,
+                fill: true,
+                backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                borderColor: 'rgb(168, 85, 247)',
+                tension: 0.4
+              }
+            ]
+          };
+        } else {
+          // Si no hay datos, mostrar un gráfico vacío
+          this.temasCompletionData = {
+            labels: [],
+            datasets: [{ label: 'Temas completados', data: [], fill: true, backgroundColor: 'rgba(168, 85, 247, 0.2)', borderColor: 'rgb(168, 85, 247)', tension: 0.4 }]
+          };
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar temas completados', error);
+      }
+    });
+  }
+
   onPeriodChange() {
     this.loadUsersGrowth();
     this.loadActiveUsers();
+    this.loadTemasCompletion();
   }
 }

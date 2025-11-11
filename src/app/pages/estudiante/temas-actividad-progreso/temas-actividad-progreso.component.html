@@ -124,34 +124,14 @@
                       
                       <!-- Botón de acción -->
                       <div class="flex gap-2">
-                        <!-- Botón Empezar -->
-                        <!-- <button *ngIf="obtenerEstadoTema(tema) === 'ready-to-start'" 
-                                pButton type="button" 
-                                label="EMPEZAR +50 YACHAY" 
-                                icon="pi pi-play"
-                                class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
-                                pTooltip="Iniciar este tema" tooltipPosition="top"
-                                (click)="iniciarTema(tema)">
-                        </button> -->
-                        
-                        <!-- Botón Continuar -->
-                        <button *ngIf="obtenerEstadoTema(tema) === 'in-progress'" 
-                                pButton type="button" 
-                                label="Continuar" 
-                                icon="pi pi-play"
-                                class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1"
-                                pTooltip="Continuar desde donde lo dejaste" tooltipPosition="top"
-                                (click)="continuarTema(tema)">
+                        <!-- Botón Ver Teoría -->
+                        <button pButton type="button" 
+                                label="Ver Teoría" 
+                                icon="pi pi-book"
+                                class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-1"
+                                pTooltip="Ver la teoría de este tema" tooltipPosition="top"
+                                (click)="abrirTeoria(tema)">
                         </button>
-                        
-                        <!-- Botón Completado -->
-                        <!-- <button *ngIf="obtenerEstadoTema(tema) === 'completed'" 
-                                pButton type="button" 
-                                label="Revisar" 
-                                icon="pi pi-eye"
-                                class="bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1"
-                                pTooltip="Revisar contenido completado" tooltipPosition="top">
-                        </button> -->
                         
                         <!-- Botón Bloqueado -->
                         <button *ngIf="obtenerEstadoTema(tema) === 'locked'" 
@@ -217,3 +197,83 @@
     </p-card>
   </div>
 </div>
+
+<!-- Modal de Teoría -->
+<p-dialog 
+  [visible]="showTeoriaModal()"
+  (visibleChange)="showTeoriaModal.set($event)"
+  [header]="temaSeleccionado()?.title"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '900px' }"
+  [maximizable]="true"
+  (onHide)="cerrarTeoria()">
+  
+  <div *ngIf="temaSeleccionado()" class="space-y-6">
+    <!-- Información del tema -->
+    <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
+      <h3 class="text-2xl font-bold text-slate-900 mb-3">{{ temaSeleccionado()?.title }}</h3>
+      <p class="text-slate-700 text-base leading-relaxed">{{ temaSeleccionado()?.shortDescription }}</p>
+    </div>
+
+    <!-- Contenido de la teoría -->
+    <div class="bg-white rounded-lg p-6 border border-slate-200 overflow-hidden">
+      <h4 class="text-xl font-semibold text-slate-800 mb-4">📚 Teoría del Tema</h4>
+      
+      <!-- Mostrar la teoría en HTML -->
+      <div *ngIf="temaSeleccionado()?.theory" 
+           class="prose prose-sm max-w-full text-slate-700 leading-relaxed overflow-x-auto"
+           style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;"
+           [innerHTML]="temaSeleccionado()?.theory">
+      </div>
+      
+      <!-- Si no hay teoría -->
+      <div *ngIf="!temaSeleccionado()?.theory" class="text-center py-8">
+        <i class="pi pi-inbox text-4xl text-slate-300 mb-3"></i>
+        <p class="text-slate-500">No hay contenido de teoría disponible para este tema.</p>
+      </div>
+    </div>
+
+    <!-- Estadísticas del tema -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-list text-2xl text-blue-600"></i>
+          <div>
+            <p class="text-sm text-slate-600">Actividades</p>
+            <p class="text-2xl font-bold text-blue-600">{{ temaSeleccionado()?.activitiesToComplete }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-check-circle text-2xl text-green-600"></i>
+          <div>
+            <p class="text-sm text-slate-600">Completadas</p>
+            <p class="text-2xl font-bold text-green-600">{{ temaSeleccionado()?.completedActivities }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-chart-line text-2xl text-purple-600"></i>
+          <div>
+            <p class="text-sm text-slate-600">Progreso</p>
+            <p class="text-2xl font-bold text-purple-600">{{ calcularProgreso(temaSeleccionado()!) }}%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer del modal -->
+  <ng-template #footer>
+    <button pButton type="button" 
+            label="Cerrar" 
+            icon="pi pi-times"
+            class="p-button-secondary"
+            (click)="cerrarTeoria()">
+    </button>
+  </ng-template>
+</p-dialog>

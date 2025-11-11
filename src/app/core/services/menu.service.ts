@@ -70,7 +70,7 @@ export class MenuService {
           { label: 'Rutas de Aprendizaje', icon: 'pi pi-fw pi-sitemap', routerLink: ['/admin/learning-paths'] },
           { label: 'Capítulos', icon: 'pi pi-fw pi-bookmark', routerLink: ['/admin/chapters'] },
           { label: 'Temas', icon: 'pi pi-fw pi-list', routerLink: ['/admin/temas'] },
-          { label: 'Estadísticas', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/admin/statistics'] }
+          // { label: 'Estadísticas', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/admin/statistics'] }
         ]
       },
       {
@@ -144,23 +144,23 @@ export class MenuService {
         label: 'Aprendizaje',
         items: [
           { label: 'Mis Cursos', icon: 'pi pi-fw pi-book', routerLink: ['/estudiante/cursos'] },
-          { label: 'Mis Rutas', icon: 'pi pi-fw pi-sitemap', routerLink: ['/estudiante/my-learning-paths'] },
-          { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/estudiante/classes'] },
-          { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/estudiante/evaluations'] }
+          { label: 'Mis Rutas', icon: 'pi pi-fw pi-sitemap', routerLink: ['/estudiante/my-learning-paths'] }
+          // { label: 'Mis Clases', icon: 'pi pi-fw pi-briefcase', routerLink: ['/estudiante/classes'] },
+          // { label: 'Evaluaciones', icon: 'pi pi-fw pi-check-square', routerLink: ['/estudiante/evaluations'] }
         ]
       },
       {
         label: 'Progreso',
         items: [
-          { label: 'Leaderboard', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/estudiante/leaderboard'] },
-          { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/estudiante/achievements'] }
+          { label: 'Leaderboard', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/estudiante/leaderboard'] }
+          // { label: 'Logros', icon: 'pi pi-fw pi-trophy', routerLink: ['/estudiante/achievements'] }
         ]
       },
       {
         label: 'Herramientas',
         items: [
-          { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] },
-          { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/estudiante/community'] }
+          { label: 'Chat con IA', icon: 'pi pi-fw pi-comments', routerLink: ['/student-chat'] }
+          // { label: 'Comunidad', icon: 'pi pi-fw pi-users', routerLink: ['/estudiante/community'] }
         ]
       },
       {

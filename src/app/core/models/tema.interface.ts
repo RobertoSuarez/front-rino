@@ -70,6 +70,7 @@ export interface TemaConProgreso {
   id: number;
   title: string;
   shortDescription: string;
+  theory?: string;
   urlBackground: string;
   index: number;
   completedActivities: number;

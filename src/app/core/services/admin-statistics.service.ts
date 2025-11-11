@@ -103,4 +103,12 @@ export class AdminStatisticsService {
   getResourceUsage(): Observable<any> {
     return this.http.get(`${this.apiUrl}/engagement/resource-usage`);
   }
+
+  /**
+   * Obtiene estadísticas de temas completados en un período específico
+   * @param period Período de tiempo (daily, weekly, monthly)
+   */
+  getTemasCompletion(period: string = 'monthly'): Observable<any> {
+    return this.http.get(`${this.apiUrl}/temas/completion`, { params: { period } });
+  }
 }

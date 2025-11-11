@@ -73,17 +73,6 @@ export class StudentChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userSubscription = this.authService.currentUser$.subscribe((user) => {
       if (user) {
-
-        if (user.typeUser !== 'student') {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Acceso Restringido',
-            detail: 'Esta funcionalidad está disponible solo para estudiantes.',
-          });
-          return;
-        }
-
-
         if (!this.hasLoadedChats) {
           this.hasLoadedChats = true;
           this.loadChats();

@@ -82,4 +82,15 @@ export class TemaService {
   getTemaConProgreso(chapterId: string): Observable<ApiResponse<TemaConProgreso[]>> {
     return this.http.get<ApiResponse<TemaConProgreso[]>>(`${environment.apiUrl}/chapters/${chapterId}/temas/progress`);
   }
+
+  /**
+   * Sube una imagen de fondo para un tema
+   * @param file Archivo de imagen a subir
+   * @returns Observable con la URL de la imagen subida
+   */
+  uploadImage(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/upload-image`, formData);
+  }
 }

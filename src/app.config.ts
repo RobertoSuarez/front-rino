@@ -5,6 +5,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
+import { provideQuillConfig } from 'ngx-quill/config';
 import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -12,6 +13,25 @@ export const appConfig: ApplicationConfig = {
         provideRouter(appRoutes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
         provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
         provideAnimationsAsync(),
-        providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } })
+        providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
+        provideQuillConfig({
+            modules: {
+                syntax: false,
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [false, 1, 2, 3, 4, 5, 6] }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': [] }],
+                    ['clean'],
+                    ['link', 'image', 'video']
+                ]
+            }
+        })
     ]
 };

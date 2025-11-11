@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { ExerciseService } from '../../../core/services/exercise.service';
 import { ActivityService } from '../../../core/services/activity.service';
-import { ExerciseListItem } from '../../../core/models/exercise.interface';
+import { ExerciseListItem, CreateExerciseRequest } from '../../../core/models/exercise.interface';
 import { TableModule } from 'primeng/table';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ToastModule } from 'primeng/toast';
@@ -26,6 +26,8 @@ import { VerticalOrderingComponent } from './components/vertical-ordering.compon
 import { HorizontalOrderingComponent } from './components/horizontal-ordering.component';
 import { PhishingSelectionMultipleComponent } from './components/phishing-selection-multiple.component';
 import { MatchPairsComponent } from './components/match-pairs.component';
+import { GenerateExercisesDialogComponent } from './components/generate-exercises-dialog.component';
+import { GeneratedExercise } from '../../../core/services/exercise-generation.service';
 
 @Component({
   selector: 'app-exercises-list',
@@ -49,7 +51,8 @@ import { MatchPairsComponent } from './components/match-pairs.component';
     VerticalOrderingComponent,
     HorizontalOrderingComponent,
     PhishingSelectionMultipleComponent,
-    MatchPairsComponent
+    MatchPairsComponent,
+    GenerateExercisesDialogComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './exercises-list.component.html',
@@ -88,6 +91,7 @@ export class ExercisesListComponent implements OnInit {
   ];
 
   @ViewChild('dt') dt!: Table;
+  @ViewChild(GenerateExercisesDialogComponent) generateDialog!: GenerateExercisesDialogComponent;
 
   constructor(
     private exerciseService: ExerciseService,
@@ -518,5 +522,23 @@ export class ExercisesListComponent implements OnInit {
     this.router.navigate(['/admin/activities'], {
       queryParams
     });
+  }
+
+  openGenerateDialog() {
+    if (this.generateDialog) {
+      this.generateDialog.open();
+    }
+  }
+
+  onExercisesGenerated(exercises: GeneratedExercise[]) {
+    // El diálogo ya guardó los ejercicios directamente en la BD
+    // Solo necesitamos recargar la lista
+    if (exercises.length === 0) {
+      this.loadExercises();
+    }
+  }
+
+  onDialogClosed() {
+    // Opcional: hacer algo cuando se cierra el diálogo
   }
 }

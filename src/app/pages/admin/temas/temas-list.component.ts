@@ -13,7 +13,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
 import { HttpClient } from '@angular/common/http';
@@ -24,6 +24,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AiService } from '../../../core/services/ai.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-temas-list',
@@ -40,9 +41,11 @@ import { TooltipModule } from 'primeng/tooltip';
     DialogModule,
     CheckboxModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    QuillModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './temas-list.component.html',
@@ -68,6 +71,11 @@ export class TemasListComponent implements OnInit {
   selectedCourseId: number | null = null;
   selectedChapterId: number | null = null;
   initialChapterId: number | null = null;
+  displayGenerateTheoryDialog: boolean = false;
+  generatingTheory: boolean = false;
+  theoryPrompt: string = '';
+  generatedTheory: string = '';
+  showTheoryPreview: boolean = false;
   difficultyOptions = [
     { label: 'Fácil', value: 'Fácil' },
     { label: 'Medio', value: 'Medio' },
@@ -157,7 +165,6 @@ export class TemasListComponent implements OnInit {
       title: ['', Validators.required],
       shortDescription: ['', Validators.required],
       theory: ['', Validators.required],
-      urlBackground: [''],
       difficulty: ['Fácil', Validators.required]
     });
   }
@@ -301,7 +308,6 @@ export class TemasListComponent implements OnInit {
       title: '',
       shortDescription: '',
       theory: '',
-      urlBackground: '',
       difficulty: 'Fácil'
     });
     this.currentTemaId = null;
@@ -325,7 +331,6 @@ export class TemasListComponent implements OnInit {
             title: response.data.title,
             shortDescription: response.data.shortDescription,
             theory: response.data.theory,
-            urlBackground: response.data.urlBackground || '',
             difficulty: response.data.difficulty
           });
           this.displayEditDialog = true;
@@ -553,5 +558,161 @@ export class TemasListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /**
+   * Abre el diálogo para generar teoría con IA
+   */
+  openGenerateTheoryDialog() {
+    this.theoryPrompt = '';
+    this.displayGenerateTheoryDialog = true;
+  }
+
+  /**
+   * Cierra el diálogo de generación de teoría
+   */
+  closeGenerateTheoryDialog() {
+    this.displayGenerateTheoryDialog = false;
+    this.theoryPrompt = '';
+  }
+
+  /**
+   * Genera teoría con IA usando el prompt personalizado
+   */
+  generateTheoryWithAI() {
+    if (!this.theoryPrompt.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor ingresa un prompt para generar la teoría'
+      });
+      return;
+    }
+
+    const title = this.temaForm.get('title')?.value;
+    if (!title) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor ingresa un título para el tema primero'
+      });
+      return;
+    }
+
+    if (!this.selectedChapterId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor selecciona un capítulo primero'
+      });
+      return;
+    }
+
+    this.generatingTheory = true;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Generando',
+      detail: 'Generando teoría con IA...'
+    });
+
+    // Obtener información del capítulo
+    this.chapterService.getChapterById(this.selectedChapterId).subscribe({
+      next: (chapterResponse: any) => {
+        if (chapterResponse && chapterResponse.data) {
+          const chapterTitle = chapterResponse.data.title;
+          
+          // Obtener información del curso
+          this.courseService.getCourseById(chapterResponse.data.courseId).subscribe({
+            next: (courseResponse: any) => {
+              if (courseResponse && courseResponse.data) {
+                const courseTitle = courseResponse.data.title;
+
+                // Generar teoría con prompt personalizado
+                this.aiService.generateTheoryWithPrompt(
+                  this.theoryPrompt,
+                  title,
+                  chapterTitle,
+                  courseTitle
+                ).subscribe({
+                  next: (response) => {
+                    if (response && response.data && response.data.theory) {
+                      this.generatedTheory = response.data.theory;
+                      this.showTheoryPreview = true;
+                      this.messageService.add({
+                        severity: 'success',
+                        summary: 'Éxito',
+                        detail: 'Teoría generada correctamente'
+                      });
+                    }
+                  },
+                  error: (err: any) => {
+                    console.error('Error al generar teoría', err);
+                    this.messageService.add({
+                      severity: 'error',
+                      summary: 'Error',
+                      detail: 'Error al generar teoría con IA'
+                    });
+                  },
+                  complete: () => this.generatingTheory = false
+                });
+              }
+            },
+            error: (err: any) => {
+              console.error('Error al obtener información del curso', err);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error al obtener información del curso'
+              });
+              this.generatingTheory = false;
+            }
+          });
+        }
+      },
+      error: (err: any) => {
+        console.error('Error al obtener información del capítulo', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al obtener información del capítulo'
+        });
+        this.generatingTheory = false;
+      }
+    });
+  }
+
+  /**
+   * Aprueba la teoría generada y la coloca en el editor
+   */
+  approveGeneratedTheory() {
+    if (this.generatedTheory) {
+      this.temaForm.patchValue({
+        theory: this.generatedTheory
+      });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Teoría aprobada y agregada al editor'
+      });
+      this.rejectGeneratedTheory();
+      this.closeGenerateTheoryDialog();
+    }
+  }
+
+  /**
+   * Rechaza la teoría generada y vuelve al formulario de prompt
+   */
+  rejectGeneratedTheory() {
+    this.generatedTheory = '';
+    this.showTheoryPreview = false;
+  }
+
+  /**
+   * Regenera la teoría manteniendo el prompt actual
+   */
+  regenerateTheory() {
+    this.showTheoryPreview = false;
+    this.generatedTheory = '';
+    this.generateTheoryWithAI();
   }
 }

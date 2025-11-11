@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -16,6 +16,9 @@ import { ActivityService } from '@/core/services/activity.service';
 import { ExerciseService } from '@/core/services/exercise.service';
 import { UserService, UserIndicators } from '@/core/services/user.service';
 import { AuthService } from '@/core/services/auth.service';
+import { AudioService } from '@/core/services/audio.service';
+import { AmaautaFeedbackRatingService } from '@/core/services/amauta-feedback-rating.service';
+import { StarRatingComponent } from '@/shared/components/star-rating/star-rating.component';
 import { ActivityWithExercises as ApiActivityWithExercises } from '@/core/models/activity.interface';
 import { SingleSelectionExerciseComponent } from './exercises/single-selection-exercise/single-selection-exercise.component';
 import { MultipleSelectionExerciseComponent } from './exercises/multiple-selection-exercise/multiple-selection-exercise.component';
@@ -27,6 +30,10 @@ import { VerticalOrderingExerciseComponent } from './exercises/vertical-ordering
 import { HorizontalOrderingExerciseComponent } from './exercises/horizontal-ordering-exercise/horizontal-ordering-exercise.component';
 import { PhishingSelectionMultipleExerciseComponent } from './exercises/phishing-selection-multiple-exercise/phishing-selection-multiple-exercise.component';
 import { MatchPairsExerciseComponent } from './exercises/match-pairs-exercise/match-pairs-exercise.component';
+import { ThreeSceneComponent } from '@/shared/components/three-scene/three-scene.component';
+import { ThreeSceneService } from '@/core/services/three-scene.service';
+import { InkaAvatarComponent } from '@/shared/components/inka-avatar/inka-avatar.component';
+import { InkaAvatar3dComponent } from '@/shared/components/inka-avatar-3d/inka-avatar-3d.component';
 
 interface Exercise {
   id: number;
@@ -104,7 +111,11 @@ interface ActivityResult {
     VerticalOrderingExerciseComponent,
     HorizontalOrderingExerciseComponent,
     PhishingSelectionMultipleExerciseComponent,
-    MatchPairsExerciseComponent
+    MatchPairsExerciseComponent,
+    StarRatingComponent,
+    ThreeSceneComponent,
+    InkaAvatarComponent,
+    InkaAvatar3dComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './activity-solver.component.html',
@@ -119,6 +130,8 @@ export class ActivitySolverComponent implements OnInit {
   private exerciseService = inject(ExerciseService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private audioService = inject(AudioService);
+  private feedbackRatingService = inject(AmaautaFeedbackRatingService);
   private cdr = inject(ChangeDetectorRef);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -138,6 +151,17 @@ export class ActivitySolverComponent implements OnInit {
   showFeedbackDrawer = signal(false); // Drawer de feedback
   showAIFeedbackModal = signal(false); // Modal de feedback de IA
   userIndicators = signal<UserIndicators | null>(null); // Indicadores del usuario
+  
+  // Propiedades para la calificación de retroalimentación
+  feedbackRating: number = 0;
+  feedbackComment: string = '';
+  submittingRating: boolean = false;
+  feedbackSubmitted: boolean = false;
+
+  // Propiedades para Three.js
+  particleColor: number = 0x00ff88; // Verde
+  @ViewChild(ThreeSceneComponent) threeScene!: ThreeSceneComponent;
+  private threeService!: ThreeSceneService;
   
   // Getters seguros para evitar errores de nulos
   get safeActivity(): ActivityWithExercises {
@@ -466,6 +490,17 @@ export class ActivitySolverComponent implements OnInit {
 
     this.exerciseService.checkAnswer(exerciseId, checkExerciseDto).subscribe({
       next: (feedback) => {
+        // 🔊 Reproducir audio según el resultado
+        if (feedback.qualification >= 7) {
+          this.audioService.playSuccessSound();
+          // 🎉 Efecto 3D de éxito
+          this.triggerSuccessEffect();
+        } else {
+          this.audioService.playErrorSound();
+          // ❌ Efecto 3D de error
+          this.triggerErrorEffect();
+        }
+
         // Actualizar la retroalimentación en el estado local
         this.updateFeedback(exerciseId, feedback);
 
@@ -486,6 +521,12 @@ export class ActivitySolverComponent implements OnInit {
         this.showFeedback.set(true);
         this.showFeedbackDrawer.set(true); // Abrir drawer
         this.answerVerified.set(true); // Marcar respuesta como verificada
+        
+        // 🎆 Efecto 3D especial al abrir el modal de feedback
+        setTimeout(() => {
+          this.triggerFeedbackModalEffect(feedback.qualification);
+        }, 300);
+        
         this.submitting.set(false);
         this.cdr.detectChanges();
       },
@@ -726,7 +767,7 @@ export class ActivitySolverComponent implements OnInit {
         message: '¿Estás seguro de que deseas abandonar la actividad? Tu progreso no se guardará.',
         icon: 'pi pi-exclamation-triangle',
         accept: () => {
-          this.router.navigate(['../'], { relativeTo: this.route });
+          this.router.navigate(['/estudiante/cursos']);
         }
       });
     }
@@ -779,5 +820,149 @@ export class ActivitySolverComponent implements OnInit {
       life: 6000,
       styleClass: 'mullu-reward-toast'
     });
+  }
+
+  /**
+   * Maneja el cambio de calificación en el componente de estrellas
+   */
+  onFeedbackRatingChange(rating: number): void {
+    this.feedbackRating = rating;
+    this.feedbackSubmitted = false; // Resetear estado de envío
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Envía la calificación de retroalimentación al backend
+   */
+  submitFeedbackRating(): void {
+    if (this.feedbackRating < 1 || this.feedbackRating > 5) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Calificación inválida',
+        detail: 'Por favor selecciona una calificación entre 1 y 5 estrellas'
+      });
+      return;
+    }
+
+    this.submittingRating = true;
+    this.cdr.detectChanges();
+
+    const currentExercise = this.safeActivity.exercises[this.currentExerciseIndex()];
+    const currentAnswer = this.answers()[this.currentExerciseIndex()];
+
+    const ratingData = {
+      rating: this.feedbackRating,
+      feedback: this.safeFeedback.feedback,
+      userAnswer: currentAnswer?.answerSelect || currentAnswer?.answerSelects?.join(', ') || '',
+      comment: this.feedbackComment,
+      exerciseType: currentExercise?.typeExercise,
+      exerciseId: currentExercise?.id,
+      activityName: this.safeActivity.title,
+      exerciseQualification: this.safeFeedback.qualification
+    };
+
+    console.log('📤 Enviando calificación:', ratingData);
+
+    this.feedbackRatingService.createRating(ratingData).subscribe({
+      next: () => {
+        this.feedbackSubmitted = true;
+        this.submittingRating = false;
+        this.cdr.detectChanges();
+
+        this.messageService.add({
+          severity: 'success',
+          summary: '¡Gracias!',
+          detail: 'Tu calificación ha sido registrada exitosamente',
+          life: 3000
+        });
+
+        // Limpiar después de 2 segundos
+        setTimeout(() => {
+          this.clearFeedbackRating();
+        }, 2000);
+      },
+      error: (error) => {
+        console.error('Error al enviar calificación:', error);
+        this.submittingRating = false;
+        this.cdr.detectChanges();
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo registrar tu calificación. Intenta nuevamente.',
+          life: 4000
+        });
+      }
+    });
+  }
+
+  /**
+   * Limpia la calificación de retroalimentación
+   */
+  clearFeedbackRating(): void {
+    this.feedbackRating = 0;
+    this.feedbackComment = '';
+    this.feedbackSubmitted = false;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Dispara el efecto 3D de éxito en los lados
+   */
+  triggerSuccessEffect(): void {
+    if (this.threeScene) {
+      this.threeService = this.threeScene.getThreeService();
+      // Efecto en lado izquierdo
+      this.threeService.createSuccessEffect({ x: -30, y: 0, z: 0 });
+      // Efecto en lado derecho
+      this.threeService.createSuccessEffect({ x: 30, y: 0, z: 0 });
+    }
+  }
+
+  /**
+   * Dispara el efecto 3D de error en los lados
+   */
+  triggerErrorEffect(): void {
+    if (this.threeScene) {
+      this.threeService = this.threeScene.getThreeService();
+      // Efecto en lado izquierdo
+      this.threeService.createErrorEffect({ x: -30, y: 0, z: 0 });
+      // Efecto en lado derecho
+      this.threeService.createErrorEffect({ x: 30, y: 0, z: 0 });
+    }
+  }
+
+  /**
+   * Crea una medalla 3D al completar la actividad
+   */
+  createCompletionMedal(): void {
+    if (this.threeScene && this.activityResult()) {
+      this.threeService = this.threeScene.getThreeService();
+      const medalType = this.activityResult()!.accuracy >= 90 ? 'gold' : 
+                       this.activityResult()!.accuracy >= 70 ? 'silver' : 'bronze';
+      const medal = this.threeService.createMedal(medalType, { x: 0, y: 0, z: 0 });
+      this.threeService.animateObject(medal, 2000);
+    }
+  }
+
+  /**
+   * Dispara efecto 3D especial al abrir el modal de feedback
+   */
+  triggerFeedbackModalEffect(qualification: number): void {
+    if (this.threeScene) {
+      this.threeService = this.threeScene.getThreeService();
+      
+      if (qualification >= 7) {
+        // Efecto de éxito: múltiples explosiones verdes
+        this.threeService.createSuccessEffect({ x: -40, y: 20, z: 0 });
+        setTimeout(() => this.threeService.createSuccessEffect({ x: 40, y: 20, z: 0 }), 100);
+        setTimeout(() => this.threeService.createSuccessEffect({ x: 0, y: -20, z: 0 }), 200);
+      } else {
+        // Efecto de error: múltiples explosiones rojas
+        this.threeService.createErrorEffect({ x: -40, y: 20, z: 0 });
+        setTimeout(() => this.threeService.createErrorEffect({ x: 40, y: 20, z: 0 }), 100);
+        setTimeout(() => this.threeService.createErrorEffect({ x: 0, y: -20, z: 0 }), 200);
+      }
+    }
   }
 }

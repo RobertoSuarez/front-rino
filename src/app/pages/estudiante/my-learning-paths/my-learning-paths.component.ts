@@ -13,6 +13,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ChipModule } from 'primeng/chip';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { LearningPathService } from '../../../core/services/learning-path.service';
@@ -31,7 +32,8 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
     ConfirmDialogModule,
     ChipModule,
     TagModule,
-    SkeletonModule
+    SkeletonModule,
+    ProgressBarModule
   ],
   providers: [MessageService, ConfirmationService],
   template: `
@@ -59,92 +61,154 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
       <!-- Loading State -->
       <ng-container *ngIf="loading">
         <div class="col-span-12 md:col-span-6 lg:col-span-4" *ngFor="let i of [1,2,3]">
-          <p-card>
-            <p-skeleton width="100%" height="150px"></p-skeleton>
-            <p-skeleton width="80%" height="1.5rem" styleClass="mt-3"></p-skeleton>
-            <p-skeleton width="60%" height="1rem" styleClass="mt-2"></p-skeleton>
-          </p-card>
+          <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+            <div class="bg-gradient-to-r from-primary-50 to-primary-100 p-6 border-b border-primary-200">
+              <p-skeleton width="60%" height="1.5rem" styleClass="mb-2"></p-skeleton>
+              <p-skeleton width="40%" height="1rem"></p-skeleton>
+            </div>
+            <div class="p-5">
+              <p-skeleton width="100%" height="0.75rem" styleClass="mb-3"></p-skeleton>
+              <p-skeleton width="100%" height="0.75rem" styleClass="mb-3"></p-skeleton>
+              <p-skeleton width="80%" height="0.75rem" styleClass="mb-4"></p-skeleton>
+              
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-blue-50 rounded-lg p-3">
+                  <p-skeleton width="50%" height="1rem" styleClass="mx-auto mb-1"></p-skeleton>
+                  <p-skeleton width="30%" height="1.5rem" styleClass="mx-auto"></p-skeleton>
+                </div>
+                <div class="bg-green-50 rounded-lg p-3">
+                  <p-skeleton width="50%" height="1rem" styleClass="mx-auto mb-1"></p-skeleton>
+                  <p-skeleton width="30%" height="1.5rem" styleClass="mx-auto"></p-skeleton>
+                </div>
+              </div>
+              
+              <p-skeleton height="2rem" styleClass="w-full"></p-skeleton>
+            </div>
+          </div>
         </div>
       </ng-container>
 
       <!-- Empty State -->
       <div class="col-span-12" *ngIf="!loading && subscriptions.length === 0">
-        <p-card>
-          <div class="text-center py-8">
-            <i class="pi pi-inbox text-6xl text-400 mb-4"></i>
-            <h3 class="text-xl font-semibold text-700 mb-2">No tienes rutas suscritas</h3>
-            <p class="text-600 mb-4">Únete a una ruta de aprendizaje usando el código proporcionado por tu profesor</p>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div class="text-center py-12">
+            <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="pi pi-map text-3xl text-primary-500"></i>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3">No tienes rutas de aprendizaje</h3>
+            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+              Únete a una ruta de aprendizaje usando el código proporcionado por tu profesor y comienza tu viaje en Cyber Imperium.
+            </p>
             <button 
               pButton 
               label="Unirme a una Ruta" 
               icon="pi pi-plus-circle" 
-              class="p-button-success"
+              class="p-button-primary p-button-raised px-8"
               (click)="showSubscribeDialog()">
             </button>
           </div>
-        </p-card>
+        </div>
       </div>
 
       <!-- Rutas Suscritas -->
       <div class="col-span-12 md:col-span-6 lg:col-span-4" *ngFor="let sub of subscriptions">
-        <p-card>
-          <ng-template pTemplate="header">
-            <div class="bg-gradient-to-r from-primary-500 to-primary-600 p-6 text-white">
+        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
+          <!-- Header con gradiente minimalista -->
+          <div class="relative">
+            <div class="bg-gradient-to-r from-primary-50 to-primary-100 p-6 border-b border-primary-200">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
-                  <h3 class="text-xl font-bold mb-1">{{ sub.learningPath.name }}</h3>
-                  <p class="text-sm opacity-90 font-mono">{{ sub.learningPath.code }}</p>
+                  <h3 class="text-xl font-bold text-gray-800 mb-1 line-clamp-2">{{ sub.learningPath.name }}</h3>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono bg-primary-200 text-primary-800 px-2 py-1 rounded-full">
+                      {{ sub.learningPath.code }}
+                    </span>
+                    <p-tag 
+                      [value]="sub.isActive ? 'Activo' : 'Inactivo'" 
+                      [severity]="sub.isActive ? 'success' : 'danger'"
+                      [rounded]="true"
+                      styleClass="text-xs">
+                    </p-tag>
+                  </div>
                 </div>
-                <p-tag 
-                  [value]="sub.isActive ? 'Activo' : 'Inactivo'" 
-                  [severity]="sub.isActive ? 'success' : 'danger'">
-                </p-tag>
+                <div class="flex-shrink-0 ml-4">
+                  <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
+                    <i class="pi pi-map text-white text-lg"></i>
+                  </div>
+                </div>
               </div>
             </div>
-          </ng-template>
-
-          <div class="space-y-3">
-            <p class="text-600 text-sm line-clamp-3">{{ sub.learningPath.description }}</p>
-
-            <div class="flex items-center gap-2">
-              <p-chip 
-                [label]="sub.learningPath.coursesCount + ' curso' + (sub.learningPath.coursesCount !== 1 ? 's' : '')" 
-                icon="pi pi-book"
-                styleClass="text-sm">
-              </p-chip>
-            </div>
-
-            <div class="text-sm text-600" *ngIf="sub.learningPath.createdBy">
-              <i class="pi pi-user mr-1"></i>
-              Creado por: {{ sub.learningPath.createdBy.firstName }} {{ sub.learningPath.createdBy.lastName }}
-            </div>
-
-            <div class="text-sm text-500">
-              <i class="pi pi-calendar mr-1"></i>
-              Suscrito: {{ sub.subscribedAt }}
-            </div>
           </div>
+  
+          <!-- Contenido principal -->
+          <div class="p-5 flex-grow flex flex-col">
+            <!-- Descripción -->
+            <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+              {{ sub.learningPath.description }}
+            </p>
 
-          <ng-template pTemplate="footer">
+            <!-- Métricas -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="bg-blue-50 rounded-lg p-3 text-center">
+                <i class="pi pi-book text-blue-600 text-lg mb-1"></i>
+                <div class="text-lg font-bold text-blue-900">{{ sub.learningPath.coursesCount || 0 }}</div>
+                <div class="text-xs text-blue-700">Cursos</div>
+              </div>
+              <div class="bg-green-50 rounded-lg p-3 text-center">
+                <i class="pi pi-check-circle text-green-600 text-lg mb-1"></i>
+                <div class="text-lg font-bold text-green-900">{{ sub.completedCourses || 0 }}</div>
+                <div class="text-xs text-green-700">Completados</div>
+              </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="space-y-2 mb-4 border-t border-gray-100 pt-4">
+              <div class="flex items-center text-sm text-gray-600" *ngIf="sub.learningPath.createdBy">
+                <i class="pi pi-user mr-2 text-primary-500"></i>
+                <span class="truncate">{{ sub.learningPath.createdBy.firstName }} {{ sub.learningPath.createdBy.lastName }}</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <i class="pi pi-calendar mr-2 text-gray-400"></i>
+                <span>Suscrito: {{ sub.subscribedAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+            
+            <!-- Barra de progreso -->
+            <div class="mb-4 mt-auto">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Progreso general</span>
+                <span class="text-sm font-bold bg-primary-100 text-primary px-2 py-1 rounded-full">
+                  {{ getProgressPercentage(sub) || 0 }}%
+                </span>
+              </div>
+              <p-progressBar 
+                [value]="getProgressPercentage(sub) || 0" 
+                [showValue]="false" 
+                styleClass="h-2 rounded-full" 
+                [style]="{'background': 'var(--surface-200)'}">
+              </p-progressBar>
+            </div>
+            
+            <!-- Botones de acción -->
             <div class="flex gap-2">
               <button 
                 pButton 
-                label="Ver Detalles" 
-                icon="pi pi-eye" 
-                class="p-button-primary flex-1"
+                label="Ver Ruta" 
+                icon="pi pi-arrow-right" 
+                class="p-button-primary p-button-raised flex-1"
                 (click)="viewDetails(sub.learningPath.id)">
               </button>
               <button 
                 pButton 
-                icon="pi pi-trash" 
-                class="p-button-danger p-button-outlined"
+                icon="pi pi-times" 
+                class="p-button-danger p-button-outlined p-button-sm"
                 (click)="confirmUnsubscribe(sub)"
                 pTooltip="Cancelar suscripción"
                 tooltipPosition="top">
               </button>
             </div>
-          </ng-template>
-        </p-card>
+          </div>
+        </div>
       </div>
 
       <!-- Diálogo de Suscripción -->
@@ -335,5 +399,14 @@ export class MyLearningPathsComponent implements OnInit {
         });
       }
     });
+  }
+
+  getProgressPercentage(subscription: any): number {
+    if (!subscription.learningPath.coursesCount || subscription.learningPath.coursesCount === 0) {
+      return 0;
+    }
+    const completed = subscription.completedCourses || 0;
+    const total = subscription.learningPath.coursesCount;
+    return Math.round((completed / total) * 100);
   }
 }

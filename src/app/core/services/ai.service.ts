@@ -57,4 +57,26 @@ export class AiService {
       courseTitle
     });
   }
+
+  /**
+   * Genera teoría para un tema con un prompt personalizado
+   * @param prompt Prompt personalizado del usuario
+   * @param temaTitle Título del tema
+   * @param chapterTitle Título del capítulo
+   * @param courseTitle Título del curso
+   * @returns Observable con la teoría generada en HTML
+   */
+  generateTheoryWithPrompt(
+    prompt: string,
+    temaTitle: string,
+    chapterTitle: string,
+    courseTitle: string
+  ): Observable<{ data: { theory: string } }> {
+    return this.http.post<{ data: { theory: string } }>(`${this.apiUrl}/generate-theory-with-prompt`, {
+      prompt,
+      temaTitle,
+      chapterTitle,
+      courseTitle
+    });
+  }
 }

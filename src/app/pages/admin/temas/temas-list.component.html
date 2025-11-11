@@ -184,18 +184,30 @@
         </div>
         
         <div class="field space-y-2">
-            <label for="theory" class="block text-sm font-medium text-gray-700">Teoría</label>
-            <textarea id="theory" formControlName="theory" rows="6"
-                      class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <div class="flex justify-between items-center">
+                <label for="theory" class="block text-sm font-medium text-gray-700">Teoría</label>
+                <p-button 
+                    type="button"
+                    label="Generar con IA"
+                    icon="pi pi-sparkles"
+                    severity="success"
+                    size="small"
+                    [outlined]="true"
+                    (onClick)="openGenerateTheoryDialog()"
+                    [loading]="generatingTheory">
+                </p-button>
+            </div>
+            <quill-editor 
+                id="theory"
+                formControlName="theory"
+                theme="snow"
+                placeholder="Escribe la teoría del tema aquí..."
+                [styles]="{'height': '300px'}"
+                class="bg-white">
+            </quill-editor>
             <small *ngIf="temaForm.get('theory')?.invalid && temaForm.get('theory')?.touched" class="text-red-500">
                 La teoría es requerida
             </small>
-        </div>
-        
-        <div class="field space-y-2">
-            <label for="urlBackground" class="block text-sm font-medium text-gray-700">URL de Imagen de Fondo</label>
-            <input id="urlBackground" pInputText formControlName="urlBackground"
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
         </div>
         
         <div class="field space-y-2">
@@ -228,6 +240,118 @@
                     class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
         </div>
     </form>
+</p-dialog>
+
+<!-- Modal para generar teoría con IA -->
+<p-dialog 
+    [(visible)]="displayGenerateTheoryDialog"
+    [header]="'Generar Teoría con IA'"
+    [modal]="true"
+    [style]="{width: '90vw', maxWidth: '1000px'}"
+    [draggable]="false"
+    [resizable]="false"
+    [maximizable]="true"
+    (onHide)="closeGenerateTheoryDialog()">
+    
+    <div class="space-y-4">
+        <!-- Sección de entrada de prompt (siempre visible) -->
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">
+                Describe qué contenido deseas generar para la teoría
+            </label>
+            <p class="text-xs text-gray-500 mb-2">
+                💡 Ejemplo: "Explica qué es el phishing, sus tipos y cómo protegerse"
+            </p>
+            <textarea 
+                [(ngModel)]="theoryPrompt"
+                rows="4"
+                placeholder="Ingresa tu prompt aquí... Por ejemplo: Genera una lección sobre ciberseguridad para estudiantes de 12-14 años..."
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                [disabled]="generatingTheory">
+            </textarea>
+        </div>
+
+        <div class="h-full inset-0 absolute bg-gradient-to-br from-blue-50/80 to-indigo-100/80 flex flex-col z-10">
+            <p class="text-xs text-blue-800">
+                <strong>✨ Consejos:</strong> Sé específico sobre el tema, el nivel de dificultad y el público objetivo. 
+                Incluye palabras clave importantes que desees que aparezcan en la teoría.
+            </p>
+        </div>
+
+        <!-- Sección de previsualización (visible cuando hay teoría generada) -->
+        <div *ngIf="showTheoryPreview" class="space-y-4">
+            <div class="border-t pt-4">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+                    <p class="text-xs text-amber-800">
+                        <strong>👀 Previsualización:</strong> Revisa cómo se ve el contenido generado. Puedes editar el prompt arriba y regenerar.
+                    </p>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg p-4 bg-white max-h-64 overflow-y-auto">
+                    <div [innerHTML]="generatedTheory" class="prose prose-sm max-w-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end gap-3">
+            <!-- Botones cuando no hay previsualización -->
+            <ng-container *ngIf="!showTheoryPreview">
+                <p-button 
+                    type="button"
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="closeGenerateTheoryDialog()"
+                    [disabled]="generatingTheory">
+                </p-button>
+                <p-button 
+                    type="button"
+                    label="Generar Teoría"
+                    icon="pi pi-sparkles"
+                    severity="success"
+                    [raised]="true"
+                    (onClick)="generateTheoryWithAI()"
+                    [loading]="generatingTheory"
+                    [disabled]="!theoryPrompt.trim() || generatingTheory">
+                </p-button>
+            </ng-container>
+
+            <!-- Botones cuando hay previsualización -->
+            <ng-container *ngIf="showTheoryPreview">
+                <p-button 
+                    type="button"
+                    label="👎 Rechazar"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="rejectGeneratedTheory()"
+                    [disabled]="generatingTheory">
+                </p-button>
+                <p-button 
+                    type="button"
+                    label="🔄 Regenerar"
+                    icon="pi pi-refresh"
+                    severity="info"
+                    [outlined]="true"
+                    (onClick)="regenerateTheory()"
+                    [loading]="generatingTheory"
+                    [disabled]="!theoryPrompt.trim() || generatingTheory">
+                </p-button>
+                <p-button 
+                    type="button"
+                    label="👍 Aprobar"
+                    icon="pi pi-check"
+                    severity="success"
+                    [raised]="true"
+                    (onClick)="approveGeneratedTheory()"
+                    [disabled]="generatingTheory">
+                </p-button>
+            </ng-container>
+        </div>
+    </ng-template>
 </p-dialog>
 
 <p-confirmDialog [style]="{ width: '450px' }" />

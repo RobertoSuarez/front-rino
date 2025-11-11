@@ -12,6 +12,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { KnobModule } from 'primeng/knob';
 import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { TemaConProgreso, ActividadConProgreso } from '@/core/models/tema.interface';
 
@@ -27,7 +28,8 @@ import { TemaConProgreso, ActividadConProgreso } from '@/core/models/tema.interf
     TooltipModule,
     ProgressBarModule,
     KnobModule,
-    ToastModule
+    ToastModule,
+    DialogModule
   ],
   providers: [MessageService],
   templateUrl: './temas-actividad-progreso.component.html',
@@ -51,6 +53,10 @@ export class TemasActividadProgresoComponent implements OnInit {
   capituloTitulo = signal<string>('');
   cursoId = signal<string>('');
   capituloId = signal<string>('');
+  
+  // Signals para el modal de teoría
+  showTeoriaModal = signal(false);
+  temaSeleccionado = signal<TemaConProgreso | null>(null);
 
   ngOnInit(): void {
     const capituloId = this.activatedRoute.snapshot.paramMap.get('capituloId');
@@ -216,5 +222,15 @@ export class TemasActividadProgresoComponent implements OnInit {
 
   volverAtras(): void {
     this.router.navigate(['/estudiante/cursos', this.cursoId(), 'capitulos']);
+  }
+
+  abrirTeoria(tema: TemaConProgreso): void {
+    this.temaSeleccionado.set(tema);
+    this.showTeoriaModal.set(true);
+  }
+
+  cerrarTeoria(): void {
+    this.showTeoriaModal.set(false);
+    this.temaSeleccionado.set(null);
   }
 }

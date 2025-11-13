@@ -146,8 +146,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
             <div class="space-y-3" *ngIf="stats.topLearningPaths.length > 0">
               <div 
                 *ngFor="let path of stats.topLearningPaths; let i = index"
-                class="flex items-center gap-3 p-3 border-1 surface-border border-round hover:bg-gray-50 transition-colors cursor-pointer"
-                (click)="goToPath(path.id)">
+                class="flex items-center gap-3 p-3 border-1 surface-border border-round hover:bg-gray-50 transition-colors">
                 <div class="flex items-center justify-center w-10 h-10 bg-primary text-white border-round font-bold">
                   {{ i + 1 }}
                 </div>

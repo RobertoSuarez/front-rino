@@ -390,16 +390,39 @@ export class ChaptersListComponent implements OnInit {
                   detail: 'Descripción generada correctamente'
                 });
               }
+              this.loading = false;
             },
             error: (err) => {
               console.error('Error al generar descripción', err);
+              
+              // Extraer mensaje de error del backend
+              let errorMessage = 'Error al generar descripción con IA';
+              let errorSummary = 'Error';
+              let severity = 'error';
+              
+              // Verificar si es un error de contenido inapropiado
+              if (err.error?.message) {
+                errorMessage = err.error.message;
+                
+                // Si contiene "No es posible" es contenido inapropiado
+                if (errorMessage.includes('No es posible')) {
+                  errorSummary = '⚠️ Contenido No Permitido';
+                  severity = 'warn';
+                }
+              } else if (err.message) {
+                errorMessage = err.message;
+              }
+              
               this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Error al generar descripción con IA'
+                severity: severity,
+                summary: errorSummary,
+                detail: errorMessage,
+                life: 5000 // Mostrar por 5 segundos
               });
-            },
-            complete: () => this.loading = false
+              
+              // Resetear loading en caso de error
+              this.loading = false;
+            }
           });
         }
       },

@@ -431,4 +431,53 @@ export class StudentChatComponent implements OnInit, OnDestroy {
     // Enfocar el input de mensaje después de cerrar el diálogo
     this.focusMessageInput();
   }
+
+  /**
+   * Elimina un chat
+   * @param chatId ID del chat a eliminar
+   * @param event Evento del click para evitar la propagación
+   */
+  deleteChat(chatId: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    // Confirmar eliminación
+    if (!confirm('¿Estás seguro de que deseas eliminar este chat? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    this.studentChatService.deleteChat(chatId).subscribe({
+      next: () => {
+        // Eliminar el chat de la lista
+        this.chats = this.chats.filter(chat => chat.id !== chatId);
+
+        // Si el chat eliminado era el seleccionado, seleccionar otro
+        if (this.selectedChat?.id === chatId) {
+          if (this.chats.length > 0) {
+            this.selectChat(this.chats[0]);
+          } else {
+            this.selectedChat = null;
+            this.messages = [];
+            this.newMessage = '';
+          }
+        }
+
+        // Mostrar mensaje de éxito
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Chat eliminado',
+          detail: 'El chat ha sido eliminado correctamente.',
+        });
+      },
+      error: (err) => {
+        console.error('Error deleting chat:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.message || 'No se pudo eliminar el chat',
+        });
+      },
+    });
+  }
 }

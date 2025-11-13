@@ -166,7 +166,8 @@ export class TemasListComponent implements OnInit {
       title: ['', Validators.required],
       shortDescription: ['', Validators.required],
       theory: ['', Validators.required],
-      difficulty: ['Fácil', Validators.required]
+      difficulty: ['Fácil', Validators.required],
+      urlBackground: [''] // Campo opcional para URL de fondo
     });
   }
 
@@ -309,7 +310,8 @@ export class TemasListComponent implements OnInit {
       title: '',
       shortDescription: '',
       theory: '',
-      difficulty: 'Fácil'
+      difficulty: 'Fácil',
+      urlBackground: ''
     });
     this.currentTemaId = null;
     this.displayCreateDialog = true;
@@ -332,7 +334,8 @@ export class TemasListComponent implements OnInit {
             title: response.data.title,
             shortDescription: response.data.shortDescription,
             theory: response.data.theory,
-            difficulty: response.data.difficulty
+            difficulty: response.data.difficulty,
+            urlBackground: response.data.urlBackground || ''
           });
           this.displayEditDialog = true;
         }
@@ -645,16 +648,39 @@ export class TemasListComponent implements OnInit {
                         detail: 'Teoría generada correctamente'
                       });
                     }
+                    this.generatingTheory = false;
                   },
                   error: (err: any) => {
                     console.error('Error al generar teoría', err);
+                    
+                    // Extraer mensaje de error del backend
+                    let errorMessage = 'Error al generar teoría con IA';
+                    let errorSummary = 'Error';
+                    let severity = 'error';
+                    
+                    // Verificar si es un error de contenido inapropiado
+                    if (err.error?.message) {
+                      errorMessage = err.error.message;
+                      
+                      // Si contiene "No es posible" es contenido inapropiado
+                      if (errorMessage.includes('No es posible')) {
+                        errorSummary = '⚠️ Contenido No Permitido';
+                        severity = 'warn';
+                      }
+                    } else if (err.message) {
+                      errorMessage = err.message;
+                    }
+                    
                     this.messageService.add({
-                      severity: 'error',
-                      summary: 'Error',
-                      detail: 'Error al generar teoría con IA'
+                      severity: severity,
+                      summary: errorSummary,
+                      detail: errorMessage,
+                      life: 5000 // Mostrar por 5 segundos
                     });
-                  },
-                  complete: () => this.generatingTheory = false
+                    
+                    // Resetear loading en caso de error
+                    this.generatingTheory = false;
+                  }
                 });
               }
             },

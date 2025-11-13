@@ -35,7 +35,7 @@ import { UserService } from '../../../core/services/user.service';
               <p class="text-sm opacity-90">Tu Mullu disponible</p>
               <p class="text-3xl font-bold">{{ userMultu }}</p>
             </div>
-            <div class="text-5xl">💎</div>
+            <div class="text-5xl">$</div>
           </div>
         </div>
 
@@ -78,7 +78,7 @@ import { UserService } from '../../../core/services/user.service';
                 <p class="text-xs text-slate-600 dark:text-slate-400">Costo</p>
                 <div class="flex items-center justify-center gap-2">
                   <span class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ offer.mulluCost }}</span>
-                  <span class="text-2xl">💎</span>
+                  <span class="text-2xl">$</span>
                 </div>
                 <p *ngIf="offer.discount" class="text-xs text-green-600 dark:text-green-400 mt-1 font-semibold">
                   ¡Ahorras {{ offer.discount }}%!

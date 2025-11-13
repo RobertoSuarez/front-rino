@@ -152,6 +152,9 @@
           (ngSubmit)="currentTemaId ? updateTema() : createTema()" 
           class="p-fluid space-y-4">
         
+        <!-- Campo oculto para chapterId -->
+        <input type="hidden" formControlName="chapterId" />
+        
         <div class="field space-y-2">
             <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
             <input id="title" pInputText formControlName="title" required 
@@ -271,7 +274,8 @@
             </textarea>
         </div>
 
-        <div class="h-full inset-0 absolute bg-gradient-to-br from-blue-50/80 to-indigo-100/80 flex flex-col z-10">
+        <!-- Sección de consejos -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p class="text-xs text-blue-800">
                 <strong>✨ Consejos:</strong> Sé específico sobre el tema, el nivel de dificultad y el público objetivo. 
                 Incluye palabras clave importantes que desees que aparezcan en la teoría.

@@ -229,7 +229,8 @@ export class CursoDetalleComponent implements OnInit {
     });
   }
 
-  irATemas(chapterId: string) {
+  irATemas(chapterId: string | number | undefined) {
+    if (!chapterId) return;
     this.router.navigate(['/estudiante/cursos', this.cursoId, 'chapters', chapterId, 'temas']);
   }
 }

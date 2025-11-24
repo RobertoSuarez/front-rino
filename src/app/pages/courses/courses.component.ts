@@ -65,6 +65,13 @@ export class CoursesComponent implements OnInit {
   };
   currentCourseId: string | null = null;
   courseForm: FormGroup;
+  
+  // Propiedades para el modal de generación con prompt
+  displayGenerateDescriptionDialog: boolean = false;
+  descriptionPrompt: string = '';
+  generatedDescription: string = '';
+  showDescriptionPreview: boolean = false;
+  generatingDescription: boolean = false;
 
   defaultImages: string[] = [
     'https://i.ibb.co/chdPzT1f/Quiero-un-logo-para-mi-aplicaci-n-web-gamificada-para-ense-ar-cyberseguridad.jpg',
@@ -343,7 +350,7 @@ export class CoursesComponent implements OnInit {
   }
 
   /**
-   * Genera una descripción para el curso utilizando IA
+   * Abre el modal para generar descripción con prompt personalizado
    */
   generateDescriptionWithAI() {
     const title = this.courseForm.get('title')?.value;
@@ -357,26 +364,37 @@ export class CoursesComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Generando',
-      detail: 'Generando descripción con IA...'
-    });
+    // Resetear el modal
+    this.descriptionPrompt = '';
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
+    this.displayGenerateDescriptionDialog = true;
+  }
 
-    this.aiService.generateCourseDescription(title).subscribe({
+  /**
+   * Genera la descripción basada en el prompt ingresado
+   */
+  generateDescriptionFromPrompt() {
+    const title = this.courseForm.get('title')?.value;
+    
+    if (!this.descriptionPrompt.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor, ingresa un prompt para generar la descripción'
+      });
+      return;
+    }
+
+    this.generatingDescription = true;
+
+    this.aiService.generateCourseDescriptionWithPrompt(title, this.descriptionPrompt).subscribe({
       next: (response) => {
         if (response && response.data.description) {
-          this.courseForm.patchValue({
-            description: response.data.description
-          });
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Descripción generada correctamente'
-          });
+          this.generatedDescription = response.data.description;
+          this.showDescriptionPreview = true;
         }
-        this.loading = false;
+        this.generatingDescription = false;
       },
       error: (err) => {
         console.error('Error al generar descripción', err);
@@ -403,12 +421,49 @@ export class CoursesComponent implements OnInit {
           severity: severity,
           summary: errorSummary,
           detail: errorMessage,
-          life: 5000 // Mostrar por 5 segundos
+          life: 5000
         });
         
-        // Resetear loading en caso de error
-        this.loading = false;
+        this.generatingDescription = false;
       }
     });
+  }
+
+  /**
+   * Aprueba la descripción generada y la coloca en el formulario
+   */
+  approveGeneratedDescription() {
+    this.courseForm.patchValue({
+      description: this.generatedDescription
+    });
+    this.displayGenerateDescriptionDialog = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Descripción aprobada y agregada'
+    });
+  }
+
+  /**
+   * Rechaza la descripción generada y limpia la previsualización
+   */
+  rejectGeneratedDescription() {
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Rechazado',
+      detail: 'Descripción rechazada. Puedes modificar el prompt e intentar de nuevo'
+    });
+  }
+
+  /**
+   * Cierra el modal de generación
+   */
+  closeGenerateDescriptionDialog() {
+    this.displayGenerateDescriptionDialog = false;
+    this.descriptionPrompt = '';
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
   }
 }

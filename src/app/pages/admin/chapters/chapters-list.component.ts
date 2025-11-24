@@ -66,6 +66,13 @@ export class ChaptersListComponent implements OnInit {
     { label: 'Difícil', value: 'Difícil' }
   ];
 
+  // Propiedades para el modal de generación con prompt
+  displayGenerateDescriptionDialog: boolean = false;
+  descriptionPrompt: string = '';
+  generatedDescription: string = '';
+  showDescriptionPreview: boolean = false;
+  generatingDescription: boolean = false;
+
   breadcrumbItems = [
     { label: 'Cursos', routerLink: '/courses' },
     { label: 'Capítulos', routerLink: '/admin/chapters' }
@@ -339,7 +346,7 @@ export class ChaptersListComponent implements OnInit {
   }
 
   /**
-   * Genera una descripción para el capítulo utilizando IA
+   * Abre el modal para generar descripción con prompt personalizado
    */
   generateDescriptionWithAI() {
     const title = this.chapterForm.get('title')?.value;
@@ -363,36 +370,53 @@ export class ChaptersListComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Generando',
-      detail: 'Generando descripción con IA...'
-    });
+    // Resetear el modal
+    this.descriptionPrompt = '';
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
+    this.displayGenerateDescriptionDialog = true;
+  }
 
-    // Primero obtenemos la información del curso
+  /**
+   * Genera la descripción basada en el prompt ingresado
+   */
+  generateDescriptionFromPrompt() {
+    const title = this.chapterForm.get('title')?.value;
+    const courseId = this.chapterForm.get('courseId')?.value;
+    
+    if (!this.descriptionPrompt.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor, ingresa un prompt para generar la descripción'
+      });
+      return;
+    }
+
+    this.generatingDescription = true;
+
+    // Obtener información del curso
     this.courseService.getCourseById(courseId).subscribe({
       next: (courseResponse: any) => {
         if (courseResponse && courseResponse.data) {
           const courseTitle = courseResponse.data.title;
           const courseDescription = courseResponse.data.description;
 
-          // Ahora generamos la descripción del capítulo
-          this.aiService.generateChapterDescription(title, courseTitle, courseDescription).subscribe({
-            next: (response) => {
+          // Generar descripción con prompt personalizado
+          this.aiService.generateChapterDescriptionWithPrompt(
+            title,
+            courseTitle,
+            courseDescription,
+            this.descriptionPrompt
+          ).subscribe({
+            next: (response: any) => {
               if (response && response.data && response.data.description) {
-                this.chapterForm.patchValue({
-                  shortDescription: response.data.description
-                });
-                this.messageService.add({
-                  severity: 'success',
-                  summary: 'Éxito',
-                  detail: 'Descripción generada correctamente'
-                });
+                this.generatedDescription = response.data.description;
+                this.showDescriptionPreview = true;
               }
-              this.loading = false;
+              this.generatingDescription = false;
             },
-            error: (err) => {
+            error: (err: any) => {
               console.error('Error al generar descripción', err);
               
               // Extraer mensaje de error del backend
@@ -417,11 +441,10 @@ export class ChaptersListComponent implements OnInit {
                 severity: severity,
                 summary: errorSummary,
                 detail: errorMessage,
-                life: 5000 // Mostrar por 5 segundos
+                life: 5000
               });
               
-              // Resetear loading en caso de error
-              this.loading = false;
+              this.generatingDescription = false;
             }
           });
         }
@@ -433,8 +456,46 @@ export class ChaptersListComponent implements OnInit {
           summary: 'Error',
           detail: 'Error al obtener información del curso'
         });
-        this.loading = false;
+        this.generatingDescription = false;
       }
     });
+  }
+
+  /**
+   * Aprueba la descripción generada y la coloca en el formulario
+   */
+  approveGeneratedDescription() {
+    this.chapterForm.patchValue({
+      shortDescription: this.generatedDescription
+    });
+    this.displayGenerateDescriptionDialog = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Descripción aprobada y agregada'
+    });
+  }
+
+  /**
+   * Rechaza la descripción generada y limpia la previsualización
+   */
+  rejectGeneratedDescription() {
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Rechazado',
+      detail: 'Descripción rechazada. Puedes modificar el prompt e intentar de nuevo'
+    });
+  }
+
+  /**
+   * Cierra el modal de generación
+   */
+  closeGenerateDescriptionDialog() {
+    this.displayGenerateDescriptionDialog = false;
+    this.descriptionPrompt = '';
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
   }
 }

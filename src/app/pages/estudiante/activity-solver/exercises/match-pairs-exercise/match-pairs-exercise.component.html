@@ -1,71 +1,68 @@
 <div class="space-y-6">
-  <p class="text-gray-600 mb-4 font-medium">Empareja los conceptos de la columna izquierda con sus definiciones en la columna derecha:</p>
+  <p class="text-gray-600 mb-4 font-medium">Haz clic en un concepto de la izquierda y luego en su definición a la derecha para conectarlos:</p>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Columna Izquierda -->
-    <div class="space-y-3">
-      <h3 class="text-lg font-semibold text-blue-700 mb-3">Conceptos</h3>
-      <div 
-        *ngFor="let item of leftOptions"
-        (click)="selectLeft(item)"
-        [class.selected]="selectedLeft === item"
-        [class.matched]="isLeftMatched(item)"
-        class="pair-card left-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <span class="text-gray-800 font-medium">{{item}}</span>
-          <i *ngIf="isLeftMatched(item)" class="pi pi-check-circle text-green-500 text-xl"></i>
-          <i *ngIf="selectedLeft === item && !isLeftMatched(item)" class="pi pi-circle text-blue-500 text-xl"></i>
-        </div>
-        <div *ngIf="isLeftMatched(item)" class="mt-2 text-sm text-green-600">
-          <i class="pi pi-arrow-right mr-1"></i>
-          Emparejado con: <strong>{{getRightMatch(item)}}</strong>
+  <div class="matching-container p-4">
+    <!-- Capa de Conexiones SVG -->
+    <svg class="connections-svg">
+      <g *ngFor="let line of connectionLines">
+        <!-- Línea visible -->
+        <path 
+          [attr.d]="line.path" 
+          [attr.stroke]="line.color"
+          class="connection-line"
+          (click)="removePair(line.pair)">
+          <title>Clic para eliminar conexión</title>
+        </path>
+      </g>
+    </svg>
+
+    <div class="grid grid-cols-2 gap-12 md:gap-24 relative z-20">
+      <!-- Columna Izquierda (Conceptos) -->
+      <div class="space-y-6">
+        <h3 class="text-lg font-semibold text-blue-700 mb-3 text-center bg-white/80 backdrop-blur-sm py-2 rounded-lg shadow-sm">Conceptos</h3>
+        <div 
+          #leftCard
+          *ngFor="let item of leftOptions"
+          (click)="selectLeft(item)"
+          [class.selected]="selectedLeft === item"
+          [class.matched]="isLeftMatched(item)"
+          [style.--pair-color]="getPairColor(item)"
+          class="pair-card left-card p-4 border-2 rounded-lg cursor-pointer flex items-center justify-between h-24">
+          
+          <span class="text-gray-800 font-medium text-sm md:text-base select-none">{{item}}</span>
+          
+          <!-- Punto de conexión derecho -->
+          <div class="connector-point"></div>
         </div>
       </div>
-    </div>
 
-    <!-- Columna Derecha -->
-    <div class="space-y-3">
-      <h3 class="text-lg font-semibold text-green-700 mb-3">Definiciones</h3>
-      <div 
-        *ngFor="let item of shuffledRightOptions"
-        (click)="selectRight(item)"
-        [class.selected]="selectedRight === item"
-        [class.matched]="isRightMatched(item)"
-        class="pair-card right-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <span class="text-gray-800 font-medium">{{item}}</span>
-          <i *ngIf="isRightMatched(item)" class="pi pi-check-circle text-green-500 text-xl"></i>
-          <i *ngIf="selectedRight === item && !isRightMatched(item)" class="pi pi-circle text-green-500 text-xl"></i>
+      <!-- Columna Derecha (Definiciones) -->
+      <div class="space-y-6">
+        <h3 class="text-lg font-semibold text-green-700 mb-3 text-center bg-white/80 backdrop-blur-sm py-2 rounded-lg shadow-sm">Definiciones</h3>
+        <div 
+          #rightCard
+          *ngFor="let item of shuffledRightOptions"
+          (click)="selectRight(item)"
+          [class.selected]="selectedRight === item"
+          [class.matched]="isRightMatched(item)"
+          [style.--pair-color]="getPairColorForRight(item)"
+          class="pair-card right-card p-4 border-2 rounded-lg cursor-pointer flex items-center justify-between h-24">
+          
+          <!-- Punto de conexión izquierdo -->
+          <div class="connector-point"></div>
+          
+          <span class="text-gray-800 font-medium text-sm md:text-base select-none text-right w-full">{{item}}</span>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Pares Emparejados -->
-  <div *ngIf="pairs.length > 0" class="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-    <h3 class="text-lg font-semibold text-purple-700 mb-3">Pares Emparejados ({{pairs.length}})</h3>
-    <div class="space-y-2">
-      <div *ngFor="let pair of pairs" class="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200">
-        <div class="flex items-center gap-3 flex-1">
-          <span class="text-blue-600 font-medium">{{pair.left}}</span>
-          <i class="pi pi-arrow-right text-purple-500"></i>
-          <span class="text-green-600 font-medium">{{pair.right}}</span>
-        </div>
-        <p-button 
-          icon="pi pi-times" 
-          severity="danger"
-          size="small"
-          class="p-button-rounded p-button-text"
-          (onClick)="removePair(pair)"></p-button>
       </div>
     </div>
   </div>
 
-  <!-- Instrucciones -->
-  <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-    <p class="text-sm text-blue-700">
-      <i class="pi pi-info-circle mr-2"></i>
-      Selecciona un concepto de la izquierda y una definición de la derecha para emparejarlos
+  <!-- Instrucciones flotantes si no hay pares -->
+  <div *ngIf="pairs.length === 0" class="text-center p-4 bg-blue-50 border border-blue-100 rounded-lg animate-pulse">
+    <p class="text-blue-600">
+      <i class="pi pi-arrow-left mr-2"></i>
+      Selecciona círculos de ambos lados para conectar
+      <i class="pi pi-arrow-right ml-2"></i>
     </p>
   </div>
 </div>

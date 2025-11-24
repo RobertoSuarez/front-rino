@@ -484,6 +484,12 @@ export class ActivitySolverComponent implements OnInit {
     checkExerciseDto.answerOrderLineCode = currentAnswer.answerOrderLineCode || [];
     checkExerciseDto.answerWriteCode = currentAnswer.answerWriteCode || '';
     checkExerciseDto.answerFindError = currentAnswer.answerFindError || '';
+    
+    // Nuevos tipos de ejercicios
+    checkExerciseDto.answerVerticalOrdering = currentAnswer.answerVerticalOrdering || [];
+    checkExerciseDto.answerHorizontalOrdering = currentAnswer.answerHorizontalOrdering || [];
+    checkExerciseDto.answerPhishingSelection = currentAnswer.answerPhishingSelection || [];
+    checkExerciseDto.answerMatchPairs = currentAnswer.answerMatchPairs || [];
 
     // Enviar la respuesta al backend para validación
     this.submitting.set(true);

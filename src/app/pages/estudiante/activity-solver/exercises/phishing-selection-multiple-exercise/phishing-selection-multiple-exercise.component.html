@@ -25,13 +25,12 @@
       (click)="toggleOption(option)"
       [class.selected]="isSelected(option)"
       class="option-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 pointer-events-none">
         <p-checkbox 
           [binary]="true"
-          [(ngModel)]="selectedValues"
-          [value]="option"
-          (onChange)="onSelectionChange()"
-          [inputId]="'option_' + i">
+          [ngModel]="isSelected(option)"
+          [inputId]="'option_' + i"
+          [readonly]="true">
         </p-checkbox>
         <label [for]="'option_' + i" class="flex-1 cursor-pointer text-gray-800 font-medium">
           {{option}}

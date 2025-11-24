@@ -29,9 +29,21 @@ export interface GeneratedExercise {
   answerFindError?: string;
   code?: string;
   hint?: string;
+  
+  // Match Pairs
   leftItems?: string[];
   rightItems?: string[];
   pairs?: Array<{ left: string; right: string }>;
+
+  // Nuevos campos
+  optionsVerticalOrdering?: string[];
+  answerVerticalOrdering?: string[];
+  optionsHorizontalOrdering?: string[];
+  answerHorizontalOrdering?: string[];
+  optionsPhishingSelection?: string[];
+  answerPhishingSelection?: string[];
+  phishingContext?: string;
+  phishingImageUrl?: string;
 }
 
 export interface GenerateExercisesResponse {

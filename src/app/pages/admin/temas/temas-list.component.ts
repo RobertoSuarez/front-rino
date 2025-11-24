@@ -25,6 +25,7 @@ import { AiService } from '../../../core/services/ai.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { QuillModule } from 'ngx-quill';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-temas-list',
@@ -77,6 +78,16 @@ export class TemasListComponent implements OnInit {
   generatedTheory: string = '';
   showTheoryPreview: boolean = false;
 
+  // Propiedades para el modal de generación de descripción corta con prompt
+  displayGenerateDescriptionDialog: boolean = false;
+  descriptionPrompt: string = '';
+  generatedDescription: string = '';
+  showDescriptionPreview: boolean = false;
+  generatingDescription: boolean = false;
+
+  // Propiedad para almacenar HTML sanitizado
+  sanitizedTheory: SafeHtml = '';
+
   difficultyOptions = [
     { label: 'Fácil', value: 'Fácil' },
     { label: 'Medio', value: 'Medio' },
@@ -95,7 +106,8 @@ export class TemasListComponent implements OnInit {
     private messageService: MessageService,
     private aiService: AiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer
   ) {
     this.temaForm = this.createForm();
   }
@@ -470,7 +482,7 @@ export class TemasListComponent implements OnInit {
   }
 
   /**
-   * Genera contenido para el tema utilizando IA
+   * Abre el modal para generar descripción corta con prompt personalizado
    */
   generateContentWithAI() {
     const title = this.temaForm.get('title')?.value;
@@ -494,49 +506,96 @@ export class TemasListComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Generando',
-      detail: 'Generando contenido con IA...'
-    });
+    // Resetear el modal
+    this.descriptionPrompt = '';
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
+    this.displayGenerateDescriptionDialog = true;
+  }
 
-    // Primero obtenemos la información del capítulo
+  /**
+   * Genera la descripción corta basada en el prompt ingresado
+   */
+  generateDescriptionFromPrompt() {
+    const title = this.temaForm.get('title')?.value;
+    const chapterId = this.selectedChapterId;
+    
+    if (!this.descriptionPrompt.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor, ingresa un prompt para generar la descripción'
+      });
+      return;
+    }
+
+    if (!chapterId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Por favor, selecciona un capítulo primero'
+      });
+      return;
+    }
+
+    this.generatingDescription = true;
+
+    // Obtener información del capítulo
     this.chapterService.getChapterById(chapterId).subscribe({
       next: (chapterResponse: any) => {
         if (chapterResponse && chapterResponse.data) {
           const chapterTitle = chapterResponse.data.title;
           
-          // Ahora obtenemos la información del curso
+          // Obtener información del curso
           this.courseService.getCourseById(chapterResponse.data.courseId).subscribe({
             next: (courseResponse: any) => {
               if (courseResponse && courseResponse.data) {
                 const courseTitle = courseResponse.data.title;
 
-                // Ahora generamos el contenido del tema
-                this.aiService.generateTemaContent(title, chapterTitle, courseTitle).subscribe({
-                  next: (response) => {
-                    if (response) {
-                      this.temaForm.patchValue({
-                        shortDescription: response.data.shortDescription,
-                        theory: response.data.theory
-                      });
-                      this.messageService.add({
-                        severity: 'success',
-                        summary: 'Éxito',
-                        detail: 'Contenido generado correctamente'
-                      });
+                // Generar descripción con prompt personalizado
+                this.aiService.generateTemaDescriptionWithPrompt(
+                  title,
+                  chapterTitle,
+                  courseTitle,
+                  this.descriptionPrompt
+                ).subscribe({
+                  next: (response: any) => {
+                    if (response && response.data && response.data.description) {
+                      this.generatedDescription = response.data.description;
+                      this.showDescriptionPreview = true;
                     }
+                    this.generatingDescription = false;
                   },
                   error: (err: any) => {
-                    console.error('Error al generar contenido', err);
+                    console.error('Error al generar descripción', err);
+                    
+                    // Extraer mensaje de error del backend
+                    let errorMessage = 'Error al generar descripción con IA';
+                    let errorSummary = 'Error';
+                    let severity = 'error';
+                    
+                    // Verificar si es un error de contenido inapropiado
+                    if (err.error?.message) {
+                      errorMessage = err.error.message;
+                      
+                      // Si contiene "No es posible" es contenido inapropiado
+                      if (errorMessage.includes('No es posible')) {
+                        errorSummary = '⚠️ Contenido No Permitido';
+                        severity = 'warn';
+                      }
+                    } else if (err.message) {
+                      errorMessage = err.message;
+                    }
+                    
                     this.messageService.add({
-                      severity: 'error',
-                      summary: 'Error',
-                      detail: 'Error al generar contenido con IA'
+                      severity: severity,
+                      summary: errorSummary,
+                      detail: errorMessage,
+                      life: 5000
                     });
-                  },
-                  complete: () => this.loading = false
+                    
+                    this.generatingDescription = false;
+                  }
                 });
               }
             },
@@ -547,7 +606,7 @@ export class TemasListComponent implements OnInit {
                 summary: 'Error',
                 detail: 'Error al obtener información del curso'
               });
-              this.loading = false;
+              this.generatingDescription = false;
             }
           });
         }
@@ -559,9 +618,47 @@ export class TemasListComponent implements OnInit {
           summary: 'Error',
           detail: 'Error al obtener información del capítulo'
         });
-        this.loading = false;
+        this.generatingDescription = false;
       }
     });
+  }
+
+  /**
+   * Aprueba la descripción generada y la coloca en el formulario
+   */
+  approveGeneratedDescription() {
+    this.temaForm.patchValue({
+      shortDescription: this.generatedDescription
+    });
+    this.displayGenerateDescriptionDialog = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Descripción aprobada y agregada'
+    });
+  }
+
+  /**
+   * Rechaza la descripción generada y limpia la previsualización
+   */
+  rejectGeneratedDescription() {
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Rechazado',
+      detail: 'Descripción rechazada. Puedes modificar el prompt e intentar de nuevo'
+    });
+  }
+
+  /**
+   * Cierra el modal de generación de descripción
+   */
+  closeGenerateDescriptionDialog() {
+    this.displayGenerateDescriptionDialog = false;
+    this.descriptionPrompt = '';
+    this.generatedDescription = '';
+    this.showDescriptionPreview = false;
   }
 
   /**
@@ -578,6 +675,9 @@ export class TemasListComponent implements OnInit {
   closeGenerateTheoryDialog() {
     this.displayGenerateTheoryDialog = false;
     this.theoryPrompt = '';
+    this.generatedTheory = '';
+    this.sanitizedTheory = '';
+    this.showTheoryPreview = false;
   }
 
   /**
@@ -641,6 +741,7 @@ export class TemasListComponent implements OnInit {
                   next: (response) => {
                     if (response && response.data && response.data.theory) {
                       this.generatedTheory = response.data.theory;
+                      this.sanitizedTheory = this.sanitizer.bypassSecurityTrustHtml(response.data.theory);
                       this.showTheoryPreview = true;
                       this.messageService.add({
                         severity: 'success',
@@ -731,6 +832,7 @@ export class TemasListComponent implements OnInit {
    */
   rejectGeneratedTheory() {
     this.generatedTheory = '';
+    this.sanitizedTheory = '';
     this.showTheoryPreview = false;
   }
 
@@ -740,6 +842,7 @@ export class TemasListComponent implements OnInit {
   regenerateTheory() {
     this.showTheoryPreview = false;
     this.generatedTheory = '';
+    this.sanitizedTheory = '';
     this.generateTheoryWithAI();
   }
 }

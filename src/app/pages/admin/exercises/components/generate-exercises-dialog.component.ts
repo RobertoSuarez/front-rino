@@ -258,7 +258,6 @@ export class GenerateExercisesDialogComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         // Guardar los ejercicios generados en la BD
-        debugger;
         this.saveGeneratedExercises(response.data.exercises);
       },
       error: (err) => {
@@ -277,7 +276,6 @@ export class GenerateExercisesDialogComponent implements OnInit {
   private saveGeneratedExercises(exercises: GeneratedExercise[]) {
     let savedCount = 0;
     let errorCount = 0;
-    debugger;
 
     for (const exercise of exercises) {
       const exerciseData: CreateExerciseRequest = {
@@ -297,14 +295,15 @@ export class GenerateExercisesDialogComponent implements OnInit {
         answerOrderLineCode: exercise.answerOrderLineCode || [],
         answerFindError: exercise.answerFindError || '',
         answerWriteCode: '',
-        optionsVerticalOrdering: exercise.optionSelectOptions || [],
-        answerVerticalOrdering: exercise.answerSelectsCorrect || [],
-        optionsHorizontalOrdering: exercise.optionSelectOptions || [],
-        answerHorizontalOrdering: exercise.answerSelectsCorrect || [],
-        optionsPhishingSelection: exercise.optionSelectOptions || [],
-        answerPhishingSelection: exercise.answerSelectsCorrect || [],
-        phishingContext: '',
-        phishingImageUrl: '',
+        // Campos específicos mapeados correctamente
+        optionsVerticalOrdering: exercise.optionsVerticalOrdering || [],
+        answerVerticalOrdering: exercise.answerVerticalOrdering || [],
+        optionsHorizontalOrdering: exercise.optionsHorizontalOrdering || [],
+        answerHorizontalOrdering: exercise.answerHorizontalOrdering || [],
+        optionsPhishingSelection: exercise.optionsPhishingSelection || [],
+        answerPhishingSelection: exercise.answerPhishingSelection || [],
+        phishingContext: exercise.phishingContext || '',
+        phishingImageUrl: exercise.phishingImageUrl || '',
         optionsMatchPairsLeft: exercise.leftItems || [],
         optionsMatchPairsRight: exercise.rightItems || [],
         answerMatchPairs: exercise.pairs || []

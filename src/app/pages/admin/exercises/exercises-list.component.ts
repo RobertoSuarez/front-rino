@@ -62,8 +62,7 @@ import { GeneratedExercise } from '../../../core/services/exercise-generation.se
 export class ExercisesListComponent implements OnInit {
   exercises: ExerciseListItem[] = [];
   loading: boolean = true;
-  displayCreateDialog: boolean = false;
-  displayEditDialog: boolean = false;
+  displayDialog: boolean = false; // Reemplaza a displayCreateDialog y displayEditDialog
   currentExerciseId: number | null = null;
   exerciseForm: FormGroup;
   activityId: number | null = null;
@@ -75,6 +74,13 @@ export class ExercisesListComponent implements OnInit {
   returnChapterId: number | null = null;
   returnTemaId: number | null = null;
   
+  // Tipos de ejercicios disponibles
+  // - selection_single: El usuario selecciona UNA opción correcta (múltiple choice)
+  // - selection_multiple: El usuario selecciona VARIAS opciones correctas (checkboxes)
+  // - vertical_ordering: El usuario ordena elementos verticalmente (drag & drop)
+  // - horizontal_ordering: El usuario ordena elementos horizontalmente (drag & drop)
+  // - phishing_selection_multiple: El usuario identifica emails de phishing (selección múltiple)
+  // - match_pairs: El usuario empareja conceptos de dos columnas (matching)
   exerciseTypes = [
     { label: 'Selección Simple', value: 'selection_single' },
     { label: 'Selección Múltiple', value: 'selection_multiple' },
@@ -237,7 +243,7 @@ export class ExercisesListComponent implements OnInit {
       answerMatchPairs: []
     });
     this.currentExerciseId = null;
-    this.displayCreateDialog = true;
+    this.displayDialog = true;
   }
 
   showEditDialog(exercise: ExerciseListItem) {
@@ -245,7 +251,13 @@ export class ExercisesListComponent implements OnInit {
     this.loading = true;
     
     this.exerciseService.getExerciseById(exercise.id).subscribe({
-      next: (response) => {
+      next: (response: any) => {
+        // Normalizar datos: el backend a veces devuelve optionSelectionOptions en lugar de optionSelectOptions
+        const normalizedData = {
+          ...response,
+          optionSelectOptions: response.optionSelectionOptions || response.optionSelectOptions || []
+        };
+
         this.exerciseForm.patchValue({
           activityId: response.activityId,
           statement: response.statement,
@@ -253,7 +265,7 @@ export class ExercisesListComponent implements OnInit {
           difficulty: response.difficulty,
           hind: response.hind,
           typeExercise: response.typeExercise,
-          optionSelectOptions: response.optionSelectOptions,
+          optionSelectOptions: normalizedData.optionSelectOptions,
           optionOrderFragmentCode: response.optionOrderFragmentCode,
           optionOrderLineCode: response.optionOrderLineCode,
           optionsFindErrorCode: response.optionsFindErrorCode,
@@ -276,10 +288,10 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: response.answerMatchPairs
         });
         
-        // Cargar datos para el componente específico
-        this.exerciseTypeData = response;
+        // Cargar datos para el componente específico usando los datos normalizados
+        this.exerciseTypeData = normalizedData;
         
-        this.displayEditDialog = true;
+        this.displayDialog = true;
         this.loading = false;
       },
       error: (err) => {
@@ -298,6 +310,10 @@ export class ExercisesListComponent implements OnInit {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
+  /**
+   * Se ejecuta cuando el usuario cambia el tipo de ejercicio
+   * Limpia los campos específicos del tipo anterior y prepara los campos para el nuevo tipo
+   */
   onExerciseTypeChange() {
     // Limpiar datos del tipo anterior
     this.exerciseTypeData = {};
@@ -306,16 +322,21 @@ export class ExercisesListComponent implements OnInit {
     const typeExercise = this.exerciseForm.get('typeExercise')?.value;
     
     switch (typeExercise) {
+      // SELECCIÓN SIMPLE: Una respuesta correcta
       case 'selection_single':
         this.exerciseForm.patchValue({
           answerSelectsCorrect: []
         });
         break;
+      
+      // SELECCIÓN MÚLTIPLE: Varias respuestas correctas
       case 'selection_multiple':
         this.exerciseForm.patchValue({
           answerSelectCorrect: ''
         });
         break;
+      
+      // ORDENAMIENTO VERTICAL: Ordenar elementos verticalmente
       case 'vertical_ordering':
         this.exerciseForm.patchValue({
           answerSelectCorrect: '',
@@ -329,6 +350,8 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: []
         });
         break;
+      
+      // ORDENAMIENTO HORIZONTAL: Ordenar elementos horizontalmente
       case 'horizontal_ordering':
         this.exerciseForm.patchValue({
           answerSelectCorrect: '',
@@ -342,6 +365,8 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: []
         });
         break;
+      
+      // DETECCIÓN DE PHISHING: Identificar emails de phishing
       case 'phishing_selection_multiple':
         this.exerciseForm.patchValue({
           answerSelectCorrect: '',
@@ -355,6 +380,8 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: []
         });
         break;
+      
+      // EMPAREJAR CONCEPTOS: Conectar elementos de dos columnas
       case 'match_pairs':
         this.exerciseForm.patchValue({
           answerSelectCorrect: '',
@@ -412,7 +439,7 @@ export class ExercisesListComponent implements OnInit {
             summary: 'Éxito',
             detail: 'Ejercicio creado correctamente'
           });
-          this.displayCreateDialog = false;
+          this.displayDialog = false;
           this.loadExercises();
         },
         error: (err) => {
@@ -440,7 +467,7 @@ export class ExercisesListComponent implements OnInit {
             summary: 'Éxito',
             detail: 'Ejercicio actualizado correctamente'
           });
-          this.displayEditDialog = false;
+          this.displayDialog = false;
           this.loadExercises();
         },
         error: (err) => {
@@ -492,11 +519,7 @@ export class ExercisesListComponent implements OnInit {
   }
 
   hideDialog() {
-    if (this.currentExerciseId) {
-      this.displayEditDialog = false;
-    } else {
-      this.displayCreateDialog = false;
-    }
+    this.displayDialog = false;
     this.currentExerciseId = null;
     this.exerciseForm.reset();
   }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { WelcomeService } from '../../core/services/welcome.service';
 import { ApiResponse, AuthData } from '../../core/models';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,13 +13,45 @@ import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
+import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
+import { MessageService } from 'primeng/api';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, DividerModule, TooltipModule, AppFloatingConfigurator, NgIf],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, DividerModule, TooltipModule, ToastModule, DialogModule, AppFloatingConfigurator, NgIf],
+    providers: [MessageService, WelcomeService],
     template: `
+        <p-toast></p-toast>
+        
+        <!-- Modal de Bienvenida -->
+        <p-dialog 
+            [(visible)]="showWelcomeDialog" 
+            [modal]="true" 
+            [closable]="false"
+            [draggable]="false"
+            [header]="welcomeTitle"
+            [contentStyle]="{'padding': '2rem'}"
+            styleClass="welcome-dialog"
+            [style]="{'width': '90vw', 'max-width': '500px'}">
+            <div class="text-center">
+                <div class="mb-4">
+                    <i [class]="'pi ' + welcomeIcon" style="font-size: 3rem; color: var(--primary-color);"></i>
+                </div>
+                <p class="text-lg mb-6">{{ welcomeMessage }}</p>
+                <button 
+                    pButton 
+                    label="Continuar" 
+                    icon="pi pi-arrow-right"
+                    (click)="closeWelcomeDialog()"
+                    class="w-full"
+                    [style]="{'background': 'var(--primary-color)', 'border': 'none'}">
+                </button>
+            </div>
+        </p-dialog>
+
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
             <div class="flex flex-col items-center justify-center">
@@ -85,8 +118,18 @@ export class Login {
     checked: boolean = false;
     loading: boolean = false;
     errorMessage: string = '';
+    
+    // Propiedades para el diálogo de bienvenida
+    showWelcomeDialog: boolean = false;
+    welcomeTitle: string = '';
+    welcomeMessage: string = '';
+    welcomeIcon: string = 'pi-check-circle';
 
-    constructor(private authService: AuthService, private router: Router) {}
+    constructor(
+        private authService: AuthService,
+        private welcomeService: WelcomeService,
+        private router: Router
+    ) {}
 
     onSubmit(): void {
         this.loading = true;
@@ -97,19 +140,46 @@ export class Login {
                 this.loading = false;
                 
                 if (response.statusCode === 200) {
-                    // Verificar si es el primer login para posible redirección especial
-                    const isFirstLogin = response.data.firstLogin;
+                    // Preparar datos del diálogo de bienvenida
+                    const user = response.data.user;
+                    const { firstName, lastName, typeUser } = user;
+                    const fullName = `${firstName} ${lastName}`.trim();
+
+                    // Mensajes personalizados por tipo de usuario
+                    const messages: { [key: string]: { title: string; message: string; icon: string } } = {
+                        student: {
+                            title: '¡Bienvenido de nuevo! 🎓',
+                            message: `Hola ${fullName}, ¡es un placer verte de nuevo! Continúa aprendiendo sobre ciberseguridad y demuestra tus habilidades.`,
+                            icon: 'pi-graduation-cap'
+                        },
+                        teacher: {
+                            title: '¡Bienvenido de nuevo! 👨‍🏫',
+                            message: `Hola ${fullName}, ¡qué bueno verte nuevamente! Accede a tus cursos y gestiona el aprendizaje de tus estudiantes.`,
+                            icon: 'pi-briefcase'
+                        },
+                        admin: {
+                            title: '¡Bienvenido de nuevo! 👨‍💼',
+                            message: `Hola ${fullName}, ¡es un honor contar contigo! Revisa las estadísticas y gestiona la plataforma.`,
+                            icon: 'pi-shield'
+                        }
+                    };
+
+                    const welcomeData = messages[typeUser] || {
+                        title: '¡Bienvenido de nuevo! 👋',
+                        message: `Hola ${fullName}, ¡es un placer verte nuevamente en Cyber Imperium!`,
+                        icon: 'pi-check-circle'
+                    };
+
+                    // Mostrar el diálogo de bienvenida
+                    this.welcomeTitle = welcomeData.title;
+                    this.welcomeMessage = welcomeData.message;
+                    this.welcomeIcon = welcomeData.icon;
+                    this.showWelcomeDialog = true;
                     
-                    if (this.checked) {
-                        // Lógica para recordar sesión si es necesario
-                    }
-                    
-                    // Si el usuario requiere actualización, redirigir a la página de actualización de perfil
-                    if (response.data.user.requiredUpdate) {
-                        this.router.navigate(['/profile']);
-                    } else {
-                        this.router.navigate(['/dashboard']);
-                    }
+                    // Guardar la información para la redirección después de cerrar el diálogo
+                    this.userDataForNavigation = {
+                        requiredUpdate: response.data.user.requiredUpdate
+                    };
                 } else {
                     this.errorMessage = response.message || 'Error al iniciar sesión';
                 }
@@ -127,4 +197,19 @@ export class Login {
             }
         });
     }
+
+    closeWelcomeDialog(): void {
+        this.showWelcomeDialog = false;
+        
+        // Redirigir después de cerrar el diálogo
+        if (this.userDataForNavigation) {
+            if (this.userDataForNavigation.requiredUpdate) {
+                this.router.navigate(['/profile']);
+            } else {
+                this.router.navigate(['/dashboard']);
+            }
+        }
+    }
+
+    private userDataForNavigation: any = null;
 }

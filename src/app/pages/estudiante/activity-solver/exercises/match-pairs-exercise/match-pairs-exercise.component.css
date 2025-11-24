@@ -1,8 +1,76 @@
-.pair-card {
-  border-color: #d1d5db;
-  background-color: white;
+.matching-container {
+  position: relative;
+  min-height: 400px;
 }
 
+.connections-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.connection-line {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: d 0.3s ease;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
+
+.connection-line:hover {
+  stroke-width: 6;
+  cursor: pointer;
+}
+
+.pair-card {
+  position: relative;
+  border-color: #e2e8f0;
+  background-color: white;
+  z-index: 20;
+  transition: all 0.2s ease;
+}
+
+/* Puntos de conexión */
+.connector-point {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  border: 3px solid white;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.left-card .connector-point {
+  right: -8px;
+}
+
+.right-card .connector-point {
+  left: -8px;
+}
+
+.pair-card:hover .connector-point {
+  background-color: #94a3b8;
+  transform: translateY(-50%) scale(1.2);
+}
+
+.pair-card.selected .connector-point {
+  background-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+}
+
+.pair-card.matched .connector-point {
+  background-color: var(--pair-color, #10b981);
+}
+
+/* Estilos de tarjetas */
 .left-card:hover {
   border-color: #3b82f6;
   background-color: #eff6ff;
@@ -10,17 +78,39 @@
 
 .right-card:hover {
   border-color: #10b981;
-  background-color: #f0fdf4;
+  background-color: #ecfdf5;
 }
 
 .pair-card.selected {
   border-color: #8b5cf6;
-  background-color: #faf5ff;
-  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+  background-color: #f5f3ff;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
 }
 
 .pair-card.matched {
-  border-color: #10b981;
-  background-color: #f0fdf4;
-  opacity: 0.8;
+  border-color: var(--pair-color, #10b981);
+  background-color: #f8fafc;
+}
+
+.pair-card.matched span {
+  color: #64748b;
+}
+
+/* Animación de pulso para la selección */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.selected .connector-point::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid #8b5cf6;
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }

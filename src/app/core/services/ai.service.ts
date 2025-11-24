@@ -79,4 +79,64 @@ export class AiService {
       courseTitle
     });
   }
+
+  /**
+   * Genera una descripción para un curso con un prompt personalizado
+   * @param courseTitle Título del curso
+   * @param prompt Prompt personalizado del usuario
+   * @returns Observable con la descripción generada
+   */
+  generateCourseDescriptionWithPrompt(
+    courseTitle: string,
+    prompt: string
+  ): Observable<{ data: { description: string } }> {
+    return this.http.post<{ data: { description: string } }>(`${this.apiUrl}/generate-course-description-with-prompt`, {
+      courseTitle,
+      prompt
+    });
+  }
+
+  /**
+   * Genera una descripción para un capítulo con un prompt personalizado
+   * @param chapterTitle Título del capítulo
+   * @param courseTitle Título del curso
+   * @param courseDescription Descripción del curso
+   * @param prompt Prompt personalizado del usuario
+   * @returns Observable con la descripción generada
+   */
+  generateChapterDescriptionWithPrompt(
+    chapterTitle: string,
+    courseTitle: string,
+    courseDescription: string,
+    prompt: string
+  ): Observable<{ data: { description: string } }> {
+    return this.http.post<{ data: { description: string } }>(`${this.apiUrl}/generate-chapter-description-with-prompt`, {
+      chapterTitle,
+      courseTitle,
+      courseDescription,
+      prompt
+    });
+  }
+
+  /**
+   * Genera una descripción corta para un tema con un prompt personalizado
+   * @param temaTitle Título del tema
+   * @param chapterTitle Título del capítulo
+   * @param courseTitle Título del curso
+   * @param prompt Prompt personalizado del usuario
+   * @returns Observable con la descripción generada
+   */
+  generateTemaDescriptionWithPrompt(
+    temaTitle: string,
+    chapterTitle: string,
+    courseTitle: string,
+    prompt: string
+  ): Observable<{ data: { description: string } }> {
+    return this.http.post<{ data: { description: string } }>(`${this.apiUrl}/generate-tema-description-with-prompt`, {
+      temaTitle,
+      chapterTitle,
+      courseTitle,
+      prompt
+    });
+  }
 }

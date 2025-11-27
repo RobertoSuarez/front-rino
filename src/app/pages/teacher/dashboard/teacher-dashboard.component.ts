@@ -52,7 +52,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
       <!-- Stats Cards -->
       <ng-container *ngIf="!loading && stats">
         <!-- Total Estudiantes -->
-        <div class="col-span-12 md:col-span-6 lg:col-span-3">
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
@@ -67,7 +67,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
         </div>
 
         <!-- Total Rutas -->
-        <div class="col-span-12 md:col-span-6 lg:col-span-3">
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
@@ -82,7 +82,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
         </div>
 
         <!-- Total Cursos -->
-        <div class="col-span-12 md:col-span-6 lg:col-span-3">
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
@@ -97,7 +97,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
         </div>
 
         <!-- Suscripciones Activas -->
-        <div class="col-span-12 md:col-span-6 lg:col-span-3">
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
@@ -111,8 +111,39 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           </p-card>
         </div>
 
+        <!-- Precisión Global (Accuracy) -->
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
+          <p-card styleClass="h-full">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-500 font-medium mb-2">Precisión Global</div>
+                <div class="text-4xl font-bold text-900">{{ stats.averageAccuracy }}%</div>
+              </div>
+              <div class="flex items-center justify-center w-16 h-16 bg-cyan-100 border-round">
+                <i class="pi pi-chart-pie text-3xl text-cyan-500"></i>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Estudiantes en Riesgo -->
+        <div class="col-span-12 md:col-span-6 lg:col-span-4">
+          <p-card styleClass="h-full">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-500 font-medium mb-2">Estudiantes en Riesgo</div>
+                <div class="text-4xl font-bold text-red-600">{{ stats.studentsAtRiskCount }}</div>
+                <div class="text-sm text-600 mt-1">Precisión < 70%</div>
+              </div>
+              <div class="flex items-center justify-center w-16 h-16 bg-red-100 border-round">
+                <i class="pi pi-exclamation-triangle text-3xl text-red-500"></i>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
         <!-- Gráfico de Distribución de Estudiantes -->
-        <div class="col-span-12 lg:col-span-6">
+        <div class="col-span-12 lg:col-span-8">
           <p-card>
             <ng-template pTemplate="header">
               <div class="px-6 pt-6">
@@ -134,7 +165,67 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           </p-card>
         </div>
 
-        <!-- Top Rutas de Aprendizaje -->
+        <!-- Precisión General (Gráfico Dona) -->
+        <div class="col-span-12 lg:col-span-4">
+          <p-card styleClass="h-full">
+            <ng-template pTemplate="header">
+              <div class="px-6 pt-6">
+                <h3 class="text-xl font-bold text-900 mb-1">Precisión General</h3>
+                <p class="text-600 text-sm">Promedio de aciertos en actividades</p>
+              </div>
+            </ng-template>
+            <div class="flex flex-column items-center justify-center py-4" *ngIf="pieData">
+              <p-chart type="doughnut" [data]="pieData" [options]="pieOptions" width="200px" height="200px"></p-chart>
+              <div class="mt-4 text-center">
+                <span class="text-3xl font-bold text-900">{{ stats.averageAccuracy }}%</span>
+                <div class="text-sm text-600">Precisión Media</div>
+              </div>
+            </div>
+            <div *ngIf="!pieData" class="text-center py-8 text-600">
+              <i class="pi pi-chart-pie text-4xl mb-3"></i>
+              <p>No hay datos suficientes</p>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Alertas de Rendimiento (Estudiantes Bajos) -->
+        <div class="col-span-12 lg:col-span-6">
+          <p-card styleClass="h-full">
+            <ng-template pTemplate="header">
+              <div class="px-6 pt-6 flex justify-between items-center">
+                <div>
+                  <h3 class="text-xl font-bold text-900 mb-1">Alertas de Rendimiento</h3>
+                  <p class="text-600 text-sm">Estudiantes con precisión baja (< 70%)</p>
+                </div>
+              </div>
+            </ng-template>
+            <div class="space-y-3" *ngIf="stats.lowPerformanceStudents && stats.lowPerformanceStudents.length > 0">
+              <div 
+                *ngFor="let student of stats.lowPerformanceStudents"
+                class="flex items-center gap-3 p-3 border-1 surface-border border-round border-left-3 border-red-500">
+                <p-avatar 
+                  [image]="student.avatar" 
+                  [label]="student.name.charAt(0)"
+                  shape="circle">
+                </p-avatar>
+                <div class="flex-1 overflow-hidden">
+                  <div class="font-semibold text-900 truncate">{{ student.name }}</div>
+                  <div class="text-sm text-red-600 font-medium">Necesita refuerzo</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-red-600">{{ student.averageAccuracy }}%</div>
+                  <div class="text-xs text-500">Precisión</div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!stats.lowPerformanceStudents || stats.lowPerformanceStudents.length === 0" class="text-center py-8 text-600">
+              <i class="pi pi-check-circle text-4xl mb-3 text-green-500"></i>
+              <p>¡Excelente! No hay estudiantes en riesgo crítico</p>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Top Rutas de Aprendizaje (Mantenido) -->
         <div class="col-span-12 lg:col-span-6">
           <p-card>
             <ng-template pTemplate="header">
@@ -264,6 +355,8 @@ export class TeacherDashboardComponent implements OnInit {
   loading = false;
   chartData: any;
   chartOptions: any;
+  pieData: any;
+  pieOptions: any;
 
   constructor(
     private dashboardService: TeacherDashboardService,
@@ -298,26 +391,42 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   prepareChartData(): void {
-    if (!this.stats || this.stats.studentsByPath.length === 0) {
+    if (!this.stats) return;
+
+    // Gráfico de Barras (Estudiantes por Ruta)
+    if (this.stats.studentsByPath.length > 0) {
+      this.chartData = {
+        labels: this.stats.studentsByPath.map(item => item.pathName),
+        datasets: [
+          {
+            label: 'Estudiantes',
+            data: this.stats.studentsByPath.map(item => item.count),
+            backgroundColor: '#3B82F6',
+            borderColor: '#2563EB',
+            borderWidth: 1
+          }
+        ]
+      };
+    } else {
       this.chartData = null;
-      return;
     }
 
-    this.chartData = {
-      labels: this.stats.studentsByPath.map(item => item.pathName),
+    // Gráfico de Dona (Precisión)
+    const accuracy = this.stats.averageAccuracy || 0;
+    this.pieData = {
+      labels: ['Precisión', 'Margen de Mejora'],
       datasets: [
         {
-          label: 'Estudiantes',
-          data: this.stats.studentsByPath.map(item => item.count),
-          backgroundColor: '#3B82F6',
-          borderColor: '#2563EB',
-          borderWidth: 1
+          data: [accuracy, 100 - accuracy],
+          backgroundColor: ['#06b6d4', '#e5e7eb'], // Cyan-500 y Gray-200
+          hoverBackgroundColor: ['#0891b2', '#d1d5db']
         }
       ]
     };
   }
 
   initChartOptions(): void {
+    // Opciones Barras
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -331,6 +440,22 @@ export class TeacherDashboardComponent implements OnInit {
           beginAtZero: true,
           ticks: {
             stepSize: 1
+          }
+        }
+      }
+    };
+
+    // Opciones Dona
+    this.pieOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            color: '#4b5563'
           }
         }
       }

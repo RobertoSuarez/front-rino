@@ -8,7 +8,15 @@ export interface DashboardStats {
   totalLearningPaths: number;
   totalCourses: number;
   activeSubscriptions: number;
-  averageProgress: number;
+  averageAccuracy: number; // Nueva métrica
+  averageScore: number; // Nueva métrica
+  studentsAtRiskCount: number;
+  lowPerformanceStudents: Array<{ // Nueva lista de riesgo
+    id: number;
+    name: string;
+    avatar: string;
+    averageAccuracy: number;
+  }>;
   recentStudents: Array<{
     id: number;
     firstName: string;

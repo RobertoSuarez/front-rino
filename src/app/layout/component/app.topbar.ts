@@ -53,14 +53,20 @@ import { TumisShopModalComponent } from '../../shared/components/tumis-shop-moda
                     class="text-xs">
                 </p-tag>
                 
-                <p-button severity="info" class="indicator-item flex items-center gap-1.5 px-3 py-1.5 text-sm" badge="{{userIndicators.yachay}} Yachay" pTooltip="Puntos de experiencia" tooltipPosition="bottom" rounded>
-                    <i class="pi pi-star text-sm"></i>
+                <p-button severity="info" class="indicator-item flex items-center gap-2 pl-1 pr-3 py-1 text-sm" badge="{{userIndicators.yachay}} Yachay" pTooltip="Puntos de experiencia" tooltipPosition="bottom" rounded>
+                    <div class="bg-white rounded-full w-7 h-7 flex items-center justify-center shadow-sm">
+                        <img src="assets/elementos/yachay.png" alt="Yachay" class="w-10 h-10 object-contain">
+                    </div>
                 </p-button>
-                <p-button severity="danger" class="indicator-item flex items-center gap-1.5 px-3 py-1.5 text-sm" badge="{{userIndicators.tumis}} Tumis" pTooltip="Vidas disponibles" tooltipPosition="bottom" rounded>
-                    <i class="pi pi-heart text-sm"></i>
+                <p-button severity="danger" class="indicator-item flex items-center gap-2 pl-1 pr-3 py-1 text-sm" badge="{{userIndicators.tumis}} Tumis" pTooltip="Vidas disponibles" tooltipPosition="bottom" rounded>
+                    <div class="bg-white rounded-full w-7 h-7 flex items-center justify-center shadow-sm">
+                        <img src="assets/elementos/corazon_de_tumi.png" alt="Tumis" class="w-10 h-10 object-contain">
+                    </div>
                 </p-button>
-                <p-button severity="warn" class="indicator-item flex items-center gap-1.5 px-3 py-1.5 text-sm" badge="{{userIndicators.mullu}} Mullu" pTooltip="Moneda virtual" tooltipPosition="bottom" rounded>
-                    <i class="pi pi-dollar text-sm"></i>
+                <p-button severity="warn" class="indicator-item flex items-center gap-2 pl-1 pr-3 py-1 text-sm" badge="{{userIndicators.mullu}} Mullu" pTooltip="Moneda virtual" tooltipPosition="bottom" rounded>
+                    <div class="bg-white rounded-full w-7 h-7 flex items-center justify-center shadow-sm">
+                        <img src="assets/elementos/mullu.png" alt="Mullu" class="w-10 h-10 object-contain">
+                    </div>
                 </p-button>
                 
                 <!-- Botón de compra de Tumis -->
@@ -85,13 +91,19 @@ import { TumisShopModalComponent } from '../../shared/components/tumis-shop-moda
                 </p-tag>
                 
                 <p-button severity="info" class="layout-topbar-action" badge="{{userIndicators.yachay}}" pTooltip="Yachay: {{userIndicators.yachay}}" tooltipPosition="bottom" [text]="true" rounded>
-                    <i class="pi pi-star"></i>
+                    <div class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow-2 border-1 border-gray-100">
+                        <img src="assets/elementos/yachay.png" alt="Yachay" class="w-6 h-6 object-contain">
+                    </div>
                 </p-button>
                 <p-button severity="danger" class="layout-topbar-action" badge="{{userIndicators.tumis}}" pTooltip="Tumis: {{userIndicators.tumis}}" tooltipPosition="bottom" [text]="true" rounded>
-                    <i class="pi pi-heart"></i>
+                    <div class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow-2 border-1 border-gray-100">
+                        <img src="assets/elementos/corazon_de_tumi.png" alt="Tumis" class="w-6 h-6 object-contain">
+                    </div>
                 </p-button>
                 <p-button severity="warn" class="layout-topbar-action" badge="{{userIndicators.mullu}}" pTooltip="Mullu: {{userIndicators.mullu}}" tooltipPosition="bottom" [text]="true" rounded>
-                    <i class="pi pi-dollar"></i>
+                    <div class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow-2 border-1 border-gray-100">
+                        <img src="assets/elementos/mullu.png" alt="Mullu" class="w-6 h-6 object-contain">
+                    </div>
                 </p-button>
             </div>
 
@@ -134,7 +146,8 @@ import { TumisShopModalComponent } from '../../shared/components/tumis-shop-moda
                             leaveActiveClass="animate-fadeout"
                             [hideOnOutsideClick]="true"
                         >
-                            <i class="pi pi-user"></i>
+                            <img *ngIf="currentUserAvatar" [src]="currentUserAvatar" alt="Perfil" class="w-12 h-12 rounded-full object-cover shadow-1 border-1 border-white">
+                            <i *ngIf="!currentUserAvatar" class="pi pi-user"></i>
                             <span>Perfil</span>
                         </button>
                         <div class="hidden absolute right-0 top-full mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 z-10">
@@ -181,6 +194,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
     userIndicators: UserIndicators | null = null;
     currentUserType: string = '';
+    currentUserAvatar: string = ''; // Nueva propiedad para el avatar
     @ViewChild('tumisShopModal') tumisShopModal!: TumisShopModalComponent;
     private destroy$ = new Subject<void>();
 
@@ -193,7 +207,7 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadUserIndicators();
-        this.loadCurrentUserType();  // ← AGREGADO
+        this.loadCurrentUserType();
         // Actualizar indicadores cada 30 segundos
         interval(30000)
             .pipe(takeUntil(this.destroy$))
@@ -223,8 +237,13 @@ export class AppTopbar implements OnInit, OnDestroy {
     loadCurrentUserType() {
         if (this.authService.isAuthenticated()) {
             this.authService.currentUser$.subscribe(user => {
-                if (user && user.typeUser) {
-                    this.currentUserType = user.typeUser;
+                if (user) {
+                    if (user.typeUser) {
+                        this.currentUserType = user.typeUser;
+                    }
+                    if (user.urlAvatar) {
+                        this.currentUserAvatar = user.urlAvatar;
+                    }
                 }
             });
         }

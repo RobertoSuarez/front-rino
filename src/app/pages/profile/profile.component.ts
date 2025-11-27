@@ -34,6 +34,7 @@ interface ProfileData {
   yachay: number;
   tumis: number;
   typeUser: string;  // ← AGREGADO
+  gender?: string;   // ← AGREGADO
   institutionId?: number;
 }
 
@@ -70,6 +71,8 @@ export class ProfileComponent implements OnInit {
   userIndicators: UserIndicators | null = null;
   institutions: Institution[] = [];
   loadingInstitutions: boolean = false;
+  availableAvatars: string[] = [];
+  selectedAvatarPath: string = '';
 
   get institutionsOptions(): Institution[] {
     return this.institutions || [];
@@ -89,6 +92,7 @@ export class ProfileComponent implements OnInit {
       birthday: [''],
       whatsApp: [''],
       urlAvatar: ['', Validators.required],
+      gender: [''],
       institutionId: [null]
     });
   }
@@ -97,6 +101,7 @@ export class ProfileComponent implements OnInit {
     this.loadProfileData();
     this.loadUserIndicators();
     this.loadInstitutions();
+    this.loadAvailableAvatars();
   }
 
   loadUserIndicators(): void {
@@ -228,9 +233,28 @@ export class ProfileComponent implements OnInit {
         birthday: this.profileData.birthday,
         whatsApp: this.profileData.whatsApp || '',
         urlAvatar: this.profileData.urlAvatar,
+        gender: this.profileData.gender || '',
         institutionId: this.profileData.institutionId || null
       });
+      this.selectedAvatarPath = this.profileData.urlAvatar;
     }
+  }
+
+  loadAvailableAvatars(): void {
+    // Cargar los avatares disponibles desde la carpeta assets/avatares
+    this.availableAvatars = [
+      '/assets/avatares/avatares_1.png',
+      '/assets/avatares/avatares_2.png',
+      '/assets/avatares/avatares_3.png',
+      '/assets/avatares/avatares_4.png',
+      '/assets/avatares/avatares_5.png',
+      '/assets/avatares/avatares_6.png'
+    ];
+  }
+
+  selectAvatar(avatarPath: string): void {
+    this.selectedAvatarPath = avatarPath;
+    this.profileForm.patchValue({ urlAvatar: avatarPath });
   }
   
   toggleEditMode(): void {

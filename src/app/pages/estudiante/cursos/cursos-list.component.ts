@@ -52,12 +52,13 @@ export class CursosListComponent implements OnInit {
   ];
 
   filtroSeleccionado = 'progreso';
-  
+
   // Modal variables
   displayModal: boolean = false;
   selectedCourse: CourseDetail | null = null;
   courseChapters: Chapter[] = [];
   loadingModal: boolean = false;
+  subscribingToId: number | null = null;
 
   private cursosService = inject(CursosService);
   private router = inject(Router);
@@ -74,7 +75,7 @@ export class CursosListComponent implements OnInit {
     this.loading = true;
     this.cursosService.getCourseSubscription().subscribe({
       next: (response) => {
-        
+
         this.cursos = response.data;
         this.loading = false;
       },
@@ -98,7 +99,7 @@ export class CursosListComponent implements OnInit {
     event.stopPropagation();
     this.loadingModal = true;
     this.displayModal = true;
-    
+
     // Cargar detalles del curso
     this.cursosService.getCourseById(curso.id).subscribe({
       next: (response) => {
@@ -147,6 +148,10 @@ export class CursosListComponent implements OnInit {
     }
   }
 
+  isSubscribed(cursoId: number): boolean {
+    return this.cursos.some(c => c.id === cursoId);
+  }
+
   getColorEstado(progress: number): string {
     if (progress === 100) {
       return 'success';
@@ -158,51 +163,57 @@ export class CursosListComponent implements OnInit {
   }
 
   inscribirseEnCurso(curso: Course, event: Event) {
-      event.stopPropagation(); // Evitar que se active el click del card
-      
-      this.cursosService.inscribirseEnCurso(curso.id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            // Suscripción exitosa
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: `Te has inscrito exitosamente en el curso "${curso.title}"`
-            });
-            
-            // Redirigir a la página de mis cursos después de un breve delay
-            setTimeout(() => {
-              this.router.navigate(['/estudiante/cursos']);
-            }, 2000);
-          } else if (response.alreadySubscribed) {
-            // Ya está suscrito
-            this.messageService.add({
-              severity: 'info',
-              summary: 'Información',
-              detail: `Ya estás suscrito al curso "${curso.title}"`
-            });
-            
-            // Opcional: redirigir a la página de mis cursos
-            setTimeout(() => {
-              this.router.navigate(['/estudiante/cursos']);
-            }, 2000);
-          } else {
-            // Otro tipo de error
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: response.message || 'No se pudo completar la inscripción. Inténtalo de nuevo.'
-            });
-          }
-        },
-        error: (error) => {
+    event.stopPropagation(); // Evitar que se active el click del card
+
+    this.subscribingToId = curso.id;
+
+    this.cursosService.inscribirseEnCurso(curso.id).subscribe({
+      next: (response) => {
+        this.subscribingToId = null;
+        if (response.success) {
+          // Suscripción exitosa
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: `Te has inscrito exitosamente en el curso "${curso.title}"`
+          });
+
+          // Recargar los cursos y cambiar el tab después de un breve delay
+          setTimeout(() => {
+            this.cargarCursos();
+            this.filtroSeleccionado = 'progreso';
+          }, 2000);
+        } else if (response.alreadySubscribed) {
+          // Ya está suscrito
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Información',
+            detail: `Ya estás suscrito al curso "${curso.title}"`
+          });
+
+          // Recargar los cursos y cambiar el tab
+          setTimeout(() => {
+            this.cargarCursos();
+            this.filtroSeleccionado = 'progreso';
+          }, 2000);
+        } else {
+          // Otro tipo de error
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudo completar la inscripción. Inténtalo de nuevo.'
+            detail: response.message || 'No se pudo completar la inscripción. Inténtalo de nuevo.'
           });
-          console.error('Error al inscribirse en el curso', error);
         }
-      });
-    }
+      },
+      error: (error) => {
+        this.subscribingToId = null;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo completar la inscripción. Inténtalo de nuevo.'
+        });
+        console.error('Error al inscribirse en el curso', error);
+      }
+    });
+  }
 }

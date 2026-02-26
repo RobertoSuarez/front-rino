@@ -181,9 +181,11 @@
               <button 
                 pButton 
                 type="button" 
-                label="Inscribirse" 
-                icon="pi pi-plus"
+                [label]="isSubscribed(curso.id) ? 'Suscrito' : 'Inscribirse'" 
+                [icon]="isSubscribed(curso.id) ? 'pi pi-check' : 'pi pi-plus'"
                 class="p-button-sm flex-1"
+                [disabled]="isSubscribed(curso.id) || subscribingToId !== null"
+                [loading]="subscribingToId === curso.id"
                 (click)="inscribirseEnCurso(curso, $event)"
               ></button>
             </div>

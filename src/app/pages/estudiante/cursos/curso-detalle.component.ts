@@ -19,6 +19,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { KnobModule } from 'primeng/knob';
 import { TagModule } from 'primeng/tag';
 import { catchError, of } from 'rxjs';
+import { MarkdownToHtmlPipe } from '@/shared/pipes/markdown-to-html.pipe';
 
 // Servicios
 import { CursosService } from '../../../core/services';
@@ -65,6 +66,7 @@ interface TimelineEvent {
     KnobModule,
     TagModule,
     TooltipModule,
+    MarkdownToHtmlPipe
 ],
   providers: [MessageService],
   templateUrl: './curso-detalle.component.html',

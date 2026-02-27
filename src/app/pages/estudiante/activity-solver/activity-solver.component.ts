@@ -32,14 +32,33 @@ import { PhishingSelectionMultipleExerciseComponent } from './exercises/phishing
 import { MatchPairsExerciseComponent } from './exercises/match-pairs-exercise/match-pairs-exercise.component';
 import { ThreeSceneComponent } from '@/shared/components/three-scene/three-scene.component';
 import { ThreeSceneService } from '@/core/services/three-scene.service';
-import { InkaAvatarComponent } from '@/shared/components/inka-avatar/inka-avatar.component';
-import { InkaAvatar3dComponent } from '@/shared/components/inka-avatar-3d/inka-avatar-3d.component';
+import { LayoutService } from '@/layout/service/layout.service';
+
+type ExerciseType =
+  | 'selection_single'
+  | 'selection_multiple'
+  | 'order_fragment_code'
+  | 'order_line_code'
+  | 'write_code'
+  | 'find_error_code'
+  | 'vertical_ordering'
+  | 'horizontal_ordering'
+  | 'phishing_selection_multiple'
+  | 'match_pairs';
+
+interface ExerciseGuide {
+  label: string;
+  icon: string;
+  objective: string;
+  action: string;
+  tip: string;
+}
 
 interface Exercise {
   id: number;
   statement: string;
   code: string;
-  typeExercise: 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';
+  typeExercise: ExerciseType;
   approach: string;
   hind: string;
   optionSelectOptions: string[];
@@ -63,7 +82,7 @@ interface ActivityWithExercises {
 
 interface ExerciseAnswer {
   exerciseId: number;
-  type: 'selection_single' | 'selection_multiple' | 'order_fragment_code' | 'order_line_code' | 'write_code' | 'find_error_code' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';
+  type: ExerciseType;
   answerSelect?: string;
   answerSelects?: string[];
   answerOrderFragmentCode?: string[];
@@ -112,10 +131,7 @@ interface ActivityResult {
     HorizontalOrderingExerciseComponent,
     PhishingSelectionMultipleExerciseComponent,
     MatchPairsExerciseComponent,
-    StarRatingComponent,
-    ThreeSceneComponent,
-    InkaAvatarComponent,
-    InkaAvatar3dComponent
+    StarRatingComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './activity-solver.component.html',
@@ -132,6 +148,7 @@ export class ActivitySolverComponent implements OnInit {
   private authService = inject(AuthService);
   private audioService = inject(AudioService);
   private feedbackRatingService = inject(AmaautaFeedbackRatingService);
+  private layoutService = inject(LayoutService);
   private cdr = inject(ChangeDetectorRef);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -147,6 +164,7 @@ export class ActivitySolverComponent implements OnInit {
   activityCompleted = signal(false);
   activityResult = signal<ActivityResult | null>(null);
   answerVerified = signal(false);
+  isDarkMode = signal(false);
   showResultsModal = signal(false); // Modal de resultados
   showFeedbackDrawer = signal(false); // Drawer de feedback
   showAIFeedbackModal = signal(false); // Modal de feedback de IA
@@ -162,6 +180,78 @@ export class ActivitySolverComponent implements OnInit {
   particleColor: number = 0x00ff88; // Verde
   @ViewChild(ThreeSceneComponent) threeScene!: ThreeSceneComponent;
   private threeService!: ThreeSceneService;
+  private readonly exerciseGuides: Record<ExerciseType, ExerciseGuide> = {
+    selection_single: {
+      label: 'Selección única',
+      icon: 'pi pi-check-circle',
+      objective: 'Elige la opción correcta entre varias alternativas.',
+      action: 'Lee la pregunta, compara opciones y selecciona una sola respuesta.',
+      tip: 'Descarta primero las opciones claramente incorrectas.'
+    },
+    selection_multiple: {
+      label: 'Selección múltiple',
+      icon: 'pi pi-list-check',
+      objective: 'Selecciona todas las respuestas correctas.',
+      action: 'Marca varias opciones si son válidas.',
+      tip: 'Verifica que no falte ninguna opción clave.'
+    },
+    order_fragment_code: {
+      label: 'Ordenar fragmentos',
+      icon: 'pi pi-sort-alt',
+      objective: 'Ordena los bloques de código para formar una solución.',
+      action: 'Arrastra o mueve fragmentos hasta lograr el flujo correcto.',
+      tip: 'Piensa en inicio, proceso y resultado.'
+    },
+    order_line_code: {
+      label: 'Ordenar líneas',
+      icon: 'pi pi-bars',
+      objective: 'Ordena líneas de código en secuencia lógica.',
+      action: 'Reorganiza las líneas hasta crear un código coherente.',
+      tip: 'Busca primero la declaración inicial y el cierre.'
+    },
+    write_code: {
+      label: 'Escribir código',
+      icon: 'pi pi-code',
+      objective: 'Redacta una solución en código.',
+      action: 'Escribe tu respuesta en el editor con buena estructura.',
+      tip: 'Empieza simple y luego mejora detalles.'
+    },
+    find_error_code: {
+      label: 'Detectar error',
+      icon: 'pi pi-search',
+      objective: 'Identifica el error en el código mostrado.',
+      action: 'Analiza el código y selecciona la opción con el error real.',
+      tip: 'Revisa nombres, sintaxis y lógica paso a paso.'
+    },
+    vertical_ordering: {
+      label: 'Orden vertical',
+      icon: 'pi pi-arrow-down',
+      objective: 'Organiza elementos en el orden correcto.',
+      action: 'Reordena cada elemento desde el primero hasta el último.',
+      tip: 'Imagina una secuencia cronológica o de pasos.'
+    },
+    horizontal_ordering: {
+      label: 'Orden horizontal',
+      icon: 'pi pi-arrow-right',
+      objective: 'Ordena conceptos en una secuencia de izquierda a derecha.',
+      action: 'Ubica cada elemento en su posición correcta.',
+      tip: 'Identifica qué debería ir al inicio y al final.'
+    },
+    phishing_selection_multiple: {
+      label: 'Detectar phishing',
+      icon: 'pi pi-shield',
+      objective: 'Reconoce señales de riesgo en mensajes o enlaces.',
+      action: 'Marca todas las opciones sospechosas.',
+      tip: 'Desconfía de urgencias, enlaces raros y remitentes extraños.'
+    },
+    match_pairs: {
+      label: 'Emparejar conceptos',
+      icon: 'pi pi-link',
+      objective: 'Relaciona correctamente elementos de dos columnas.',
+      action: 'Une cada concepto con su par correspondiente.',
+      tip: 'Empieza por las parejas que estés seguro para reducir opciones.'
+    }
+  };
   
   // Getters seguros para evitar errores de nulos
   get safeActivity(): ActivityWithExercises {
@@ -180,7 +270,81 @@ export class ActivitySolverComponent implements OnInit {
     return this.userIndicators() || { yachay: 0, tumis: 0, mullu: 0 };
   }
 
+  get currentExerciseGuide(): ExerciseGuide {
+    const type = this.currentExercise.typeExercise;
+    return this.exerciseGuides[type];
+  }
+
+  get currentActionStep(): string {
+    if (this.answerVerified()) {
+      return 'Paso 3: revisa la retroalimentación y continúa';
+    }
+
+    if (this.hasAnswer()) {
+      return 'Paso 2: verifica tu respuesta';
+    }
+
+    return 'Paso 1: responde el ejercicio';
+  }
+
+  get currentSequenceStep(): number {
+    if (this.answerVerified()) {
+      return 3;
+    }
+
+    if (this.hasAnswer()) {
+      return 2;
+    }
+
+    return 1;
+  }
+
+  get currentQuestionBadge(): string {
+    const total = this.safeActivity.exercises.length;
+    if (total === 0) {
+      return 'Pregunta 0 de 0';
+    }
+
+    return `Pregunta ${this.currentExerciseIndex() + 1} de ${total}`;
+  }
+
+  get currentSelectionSummary(): string {
+    const currentAnswer = this.answers()[this.currentExerciseIndex()];
+    if (!currentAnswer) {
+      return 'Seleccionadas: 0';
+    }
+
+    switch (currentAnswer.type) {
+      case 'selection_single':
+        return `Seleccionada: ${currentAnswer.answerSelect ? 1 : 0}`;
+      case 'selection_multiple':
+        return `Seleccionadas: ${currentAnswer.answerSelects?.length || 0}`;
+      case 'order_fragment_code':
+        return `Fragmentos ordenados: ${currentAnswer.answerOrderFragmentCode?.length || 0}`;
+      case 'order_line_code':
+        return `Líneas ordenadas: ${currentAnswer.answerOrderLineCode?.length || 0}`;
+      case 'write_code': {
+        const lines = (currentAnswer.answerWriteCode || '').trim() ? currentAnswer.answerWriteCode!.split('\n').length : 0;
+        return `Código escrito: ${lines} línea(s)`;
+      }
+      case 'find_error_code':
+        return `Seleccionada: ${currentAnswer.answerFindError ? 1 : 0}`;
+      case 'vertical_ordering':
+        return `Elementos ordenados: ${currentAnswer.answerVerticalOrdering?.length || 0}`;
+      case 'horizontal_ordering':
+        return `Elementos ordenados: ${currentAnswer.answerHorizontalOrdering?.length || 0}`;
+      case 'phishing_selection_multiple':
+        return `Seleccionadas: ${currentAnswer.answerPhishingSelection?.length || 0}`;
+      case 'match_pairs':
+        return `Pares conectados: ${currentAnswer.answerMatchPairs?.length || 0}`;
+      default:
+        return 'Seleccionadas: 0';
+    }
+  }
+
   ngOnInit(): void {
+    this.syncThemeMode();
+
     const activityId = this.route.snapshot.paramMap.get('activityId');
     
     if (activityId) {
@@ -194,6 +358,23 @@ export class ActivitySolverComponent implements OnInit {
       });
       this.navigateBack();
     }
+  }
+
+  syncThemeMode(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const isDark = document.documentElement.classList.contains('app-dark') || localStorage.getItem('app-theme') === 'dark';
+    this.isDarkMode.set(isDark);
+  }
+
+  toggleLightDarkMode(): void {
+    const nextTheme: 'light' | 'dark' = this.isDarkMode() ? 'light' : 'dark';
+    this.layoutService.setThemeMode(nextTheme);
+    localStorage.setItem('app-theme', nextTheme);
+    this.isDarkMode.set(nextTheme === 'dark');
+    this.cdr.detectChanges();
   }
 
   loadActivity(activityId: number): void {

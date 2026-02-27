@@ -186,3 +186,26 @@
 .dark .messages-area::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
+
+.chat-list-item {
+  position: relative;
+}
+
+.chat-item-active {
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.14);
+}
+
+.chat-item-active::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 9999px;
+  background: var(--primary-500);
+}
+
+.chat-item-loading {
+  opacity: 0.9;
+}

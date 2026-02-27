@@ -27,6 +27,13 @@ export class WriteCodeExerciseComponent {
 
   codeValue: string = '';
 
+  get lineCount(): number {
+    if (!this.codeValue) {
+      return 0;
+    }
+    return this.codeValue.split('\n').length;
+  }
+
   ngOnChanges() {
     this.codeValue = this.code || '';
   }

@@ -90,15 +90,22 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
 
       <!-- Empty State -->
       <div class="col-span-12" *ngIf="!loading && subscriptions.length === 0">
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div class="text-center py-12">
-            <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <i class="pi pi-map text-3xl text-primary-500"></i>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
+          <div class="empty-state-wrap">
+            <div class="empty-state-icon">
+              <i class="pi pi-map"></i>
             </div>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-3">No tienes rutas de aprendizaje</h3>
-            <p class="text-gray-600 mb-8 max-w-md mx-auto">
-              Únete a una ruta de aprendizaje usando el código proporcionado por tu profesor y comienza tu viaje en Cyber Imperium.
+
+            <h3 class="empty-state-title">No tienes rutas de aprendizaje</h3>
+            <p class="empty-state-description">
+              Únete con el código que te compartió tu profesor para empezar tu recorrido en Cyber Imperium.
             </p>
+
+            <div class="empty-state-tips">
+              <span><i class="pi pi-check-circle"></i> Usa el código exacto de la ruta</span>
+              <span><i class="pi pi-info-circle"></i> Formato sugerido: LP-AAAAMMDD-XXXX</span>
+            </div>
+
             <button 
               pButton 
               label="Unirme a una Ruta" 
@@ -285,6 +292,70 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+
+    .empty-state-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      min-height: 320px;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.9rem;
+    }
+
+    .empty-state-icon {
+      width: 5.5rem;
+      height: 5.5rem;
+      border-radius: 9999px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #dcfce7, #d1fae5);
+      color: #10b981;
+      font-size: 2rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .empty-state-title {
+      margin: 0;
+      color: #1f2937;
+      font-size: clamp(1.6rem, 2.4vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .empty-state-description {
+      margin: 0;
+      color: #4b5563;
+      font-size: 1.03rem;
+      line-height: 1.65;
+      max-width: 52ch;
+      text-align: center;
+    }
+
+    .empty-state-tips {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .empty-state-tips span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      border-radius: 9999px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
   `]
 })
 export class MyLearningPathsComponent implements OnInit {
@@ -356,7 +427,12 @@ export class MyLearningPathsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al suscribirse:', error);
-        this.codeError = error.error?.message || 'Código inválido o ruta no encontrada';
+        const rawMessage = String(error.error?.message || '').toLowerCase();
+        if (rawMessage.includes('duplicate key')) {
+          this.codeError = 'Tu suscripción previa se está reactivando. Intenta nuevamente en unos segundos.';
+        } else {
+          this.codeError = error.error?.message || 'Código inválido o ruta no encontrada';
+        }
         this.subscribing = false;
       }
     });

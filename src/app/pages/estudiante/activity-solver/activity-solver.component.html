@@ -8,207 +8,240 @@
   </div>
 </div>
 
-<!-- Fondo 3D con Three.js -->
-<div class="fixed inset-0 z-0">
-  <app-three-scene 
-    #threeScene
-    [width]="'100%'" 
-    [height]="'100%'"
-    [particleCount]="120"
-    [particleColor]="particleColor">
-  </app-three-scene>
-</div>
+<!-- Contenido principal -->
+<div class="activity-page h-full inset-0 absolute flex flex-col z-10">
 
-<!-- Contenido principal - Diseño Duolingo -->
-<div class="h-full inset-0 absolute bg-gradient-to-br from-blue-50/80 to-indigo-100/80 flex flex-col z-10">
+  <!-- Barra superior -->
+  <div class="activity-topbar px-4 sm:px-6 py-2 sm:py-3">
+    <div class="max-w-6xl mx-auto">
+      <div class="summary-card">
+        <div class="summary-layout">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <p-button icon="pi pi-arrow-left"
+                     styleClass="p-button-rounded p-button-text p-button-secondary h-10 w-10 flex items-center justify-center"
+                     (click)="navigateBack()"
+                     pTooltip="Volver atrás"
+                     tooltipPosition="bottom">
+            </p-button>
 
-  <!-- Barra de progreso superior -->
-  <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-    <div class="max-w-4xl mx-auto">
-      <!-- Contador de ejercicios (arriba, centrado) -->
+            <div class="header-controls">
+              <span class="exercise-chip">
+                <i [class]="currentExerciseGuide.icon"></i>
+                {{ currentExerciseGuide.label }}
+              </span>
+              <p-button
+                [icon]="isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"
+                [label]="isDarkMode() ? 'Modo Claro' : 'Modo Oscuro'"
+                styleClass="theme-toggle-btn"
+                (onClick)="toggleLightDarkMode()"
+                [pTooltip]="isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+                tooltipPosition="bottom">
+              </p-button>
+            </div>
+          </div>
 
-      <div class="flex flex-col items-center justify-center mb-3">
-        <span class="text-sm font-medium text-gray-600">
-          Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
-        </span>
-      </div>
+          <div class="space-y-1">
+            <h1 class="activity-title">{{ safeActivity.title || 'Aventura de aprendizaje' }}</h1>
+            <p class="activity-step">{{ currentActionStep }}</p>
+          </div>
 
-      <!-- Fila principal con botón, barra de progreso y tumis -->
-      <div class="flex items-center justify-between h-12">
-        
-        <!-- Botón de retroceso -->
-        <div class="flex items-center h-full">
-          <p-button icon="pi pi-arrow-left"
-                   styleClass="p-button-rounded p-button-text p-button-secondary h-10 w-10 flex items-center justify-center"
-                   (click)="navigateBack()"
-                   pTooltip="Volver atrás" 
-                   tooltipPosition="bottom">
-          </p-button>
-        </div>
+          <div class="flex items-center gap-3">
+            <div class="flex-grow">
+              <p-progressBar [value]="progress" [showValue]="false" styleClass="h-3 bg-gray-200"></p-progressBar>
+            </div>
+            <div class="lives-chip">
+              <i class="pi pi-heart-fill"></i>
+              <span class="font-bold">{{ safeUserIndicators.tumis }}</span>
+              <span>tumis</span>
+            </div>
+          </div>
 
-        <!-- Barra de progreso (ocupa el espacio disponible) -->
-        <div class="flex-grow mx-4 h-full flex flex-col justify-center">
-          <p-progressBar [value]="progress" [showValue]="false" styleClass="h-2 bg-gray-200"></p-progressBar>
-        </div>
-
-        <!-- Indicador de Tumis (vidas) -->
-        <div class="flex items-center h-full">
-          <div class="flex items-center gap-2 bg-gradient-to-r from-red-50 to-pink-50 px-4 py-2 rounded-full border border-red-200 shadow-sm h-10">
-            <i class="pi pi-heart-fill text-red-500 text-xl"></i>
-            <span class="text-red-700 font-semibold text-lg">{{ safeUserIndicators.tumis }}</span>
-            <span class="text-red-600 text-sm font-medium">tumis</span>
+          <div class="meta-compact-row">
+            <span class="meta-stat">Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}</span>
+            <div class="steps-row">
+              <span class="step-pill" [class.step-pill-active]="!hasAnswer() && !answerVerified()">1. Lee</span>
+              <span class="step-pill" [class.step-pill-active]="hasAnswer() && !answerVerified()">2. Verifica</span>
+              <span class="step-pill" [class.step-pill-active]="answerVerified()">3. Continúa</span>
+            </div>
+            <span class="meta-stat">{{ progress.toFixed(0) }}% completado</span>
           </div>
         </div>
-
       </div>
-
-      <div class="flex flex-col items-center justify-center mb-3">
-        <span class="text-xs text-gray-500">
-          {{ progress.toFixed(0) }}% completado
-        </span>
-      </div>
-
-
     </div>
   </div>
 
-  <!-- Contenido del ejercicio con scroll automático -->
-  <div class="flex-1 px-6 py-1 overflow-y-auto">
-    <div class="flex justify-center">
-      <div class="w-[98%] sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-none py-1">
-      <div *ngIf="currentExercise" class="bg-white rounded-2xl shadow-xl">
-        <div class="p-8">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-slate-800 mb-4">{{ currentExercise.statement }}</h2>
-          
-          <!-- Pista del ejercicio -->
-          <div *ngIf="currentExercise.hind" class="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-blue-500">
-            <div class="flex items-start gap-3">
-              <i class="pi pi-info-circle text-blue-500 text-xl mt-1"></i>
-              <div>
-                <h3 class="text-lg font-semibold text-blue-700 mb-1">Pista</h3>
-                <p class="text-blue-800">{{ currentExercise.hind }}</p>
-              </div>
+  <!-- Contenido del ejercicio -->
+  <div class="flex-1 px-4 sm:px-6 pb-6 overflow-y-auto">
+    <div class="max-w-6xl mx-auto w-full py-1">
+      <div *ngIf="currentExercise" class="solver-layout">
+        <aside class="mission-panel">
+          <div class="mission-card">
+            <div class="mission-title">
+              <i [class]="currentExerciseGuide.icon"></i>
+              <span>MISIÓN ACTUAL</span>
+            </div>
+            <p class="mission-text">{{ currentExerciseGuide.action }}</p>
+            <p class="mission-tip">Tip: {{ currentExerciseGuide.tip }}</p>
+          </div>
+
+          <div *ngIf="currentExercise.hind" class="hint-side-card">
+            <div class="hint-side-title">
+              <i class="pi pi-lightbulb"></i>
+              <span>Pista Desbloqueada</span>
+            </div>
+            <p>{{ currentExercise.hind }}</p>
+          </div>
+
+          <div class="sequence-card">
+            <div class="sequence-head">
+              <span>SEQUENCE</span>
+              <span>STEP {{ currentSequenceStep }} / 3</span>
+            </div>
+            <div class="sequence-track">
+              <span class="sequence-node" [class.sequence-node-active]="currentSequenceStep >= 1"></span>
+              <span class="sequence-node" [class.sequence-node-active]="currentSequenceStep >= 2"></span>
+              <span class="sequence-node" [class.sequence-node-active]="currentSequenceStep >= 3"></span>
             </div>
           </div>
-          
-          <!-- Código del ejercicio (si existe) -->
-          <div *ngIf="currentExercise.code" class="bg-slate-800 text-white p-4 rounded-lg mb-6 overflow-x-auto">
-            <pre class="whitespace-pre-wrap"><code>{{ currentExercise.code }}</code></pre>
+        </aside>
+
+        <section class="exercise-card question-stage">
+          <div class="p-5 sm:p-7">
+            <div class="question-head">
+              <span class="question-badge">
+                <i class="pi pi-circle-fill"></i>
+                {{ currentQuestionBadge }}
+              </span>
+              <i class="pi pi-shield question-ghost"></i>
+            </div>
+
+            <div class="mb-6">
+              <h2 class="question-title">{{ currentExercise.statement }}</h2>
+              <p class="exercise-objective">{{ currentExerciseGuide.objective }}</p>
+
+              <!-- Código del ejercicio (si existe) -->
+              <div *ngIf="currentExercise.code" class="question-code-block">
+                <pre class="whitespace-pre-wrap"><code>{{ currentExercise.code }}</code></pre>
+              </div>
+            </div>
+
+            <!-- Componente específico según el tipo de ejercicio -->
+            <div [ngSwitch]="currentExercise.typeExercise" class="mb-6">
+              <app-single-selection-exercise
+                *ngSwitchCase="'selection_single'"
+                [options]="currentExercise.optionSelectOptions"
+                [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-single-selection-exercise>
+
+              <app-multiple-selection-exercise
+                *ngSwitchCase="'selection_multiple'"
+                [options]="currentExercise.optionSelectOptions"
+                [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-multiple-selection-exercise>
+
+              <app-order-fragment-code-exercise
+                *ngSwitchCase="'order_fragment_code'"
+                [fragments]="currentExercise.optionOrderFragmentCode"
+                [orderedFragments]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderFragmentCode : []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-order-fragment-code-exercise>
+
+              <app-order-line-code-exercise
+                *ngSwitchCase="'order_line_code'"
+                [lines]="currentExercise.optionOrderLineCode"
+                [orderedLines]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderLineCode : []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-order-line-code-exercise>
+
+              <app-write-code-exercise
+                *ngSwitchCase="'write_code'"
+                [code]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerWriteCode : ''"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-write-code-exercise>
+
+              <app-find-error-code-exercise
+                *ngSwitchCase="'find_error_code'"
+                [options]="currentExercise.optionFindErrorCode"
+                [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-find-error-code-exercise>
+
+              <app-vertical-ordering-exercise
+                *ngSwitchCase="'vertical_ordering'"
+                [fragments]="currentExercise.optionsVerticalOrdering"
+                [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-vertical-ordering-exercise>
+
+              <app-horizontal-ordering-exercise
+                *ngSwitchCase="'horizontal_ordering'"
+                [lines]="currentExercise.optionsHorizontalOrdering"
+                [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-horizontal-ordering-exercise>
+
+              <app-phishing-selection-multiple-exercise
+                *ngSwitchCase="'phishing_selection_multiple'"
+                [options]="currentExercise.optionsPhishingSelection"
+                [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
+                [phishingContext]="currentExercise.phishingContext"
+                [phishingImageUrl]="currentExercise.phishingImageUrl"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-phishing-selection-multiple-exercise>
+
+              <app-match-pairs-exercise
+                *ngSwitchCase="'match_pairs'"
+                [leftOptions]="currentExercise.optionsMatchPairsLeft"
+                [rightOptions]="currentExercise.optionsMatchPairsRight"
+                [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-match-pairs-exercise>
+            </div>
           </div>
-        </div>
-        
-        <!-- Componente específico según el tipo de ejercicio -->
-        <div [ngSwitch]="currentExercise.typeExercise" class="mb-6">
-          <app-single-selection-exercise 
-            *ngSwitchCase="'selection_single'"
-            [options]="currentExercise.optionSelectOptions"
-            [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-single-selection-exercise>
-          
-          <app-multiple-selection-exercise 
-            *ngSwitchCase="'selection_multiple'"
-            [options]="currentExercise.optionSelectOptions"
-            [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-multiple-selection-exercise>
-          
-          <app-order-fragment-code-exercise 
-            *ngSwitchCase="'order_fragment_code'"
-            [fragments]="currentExercise.optionOrderFragmentCode"
-            [orderedFragments]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderFragmentCode : []"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-order-fragment-code-exercise>
-          
-          <app-order-line-code-exercise 
-            *ngSwitchCase="'order_line_code'"
-            [lines]="currentExercise.optionOrderLineCode"
-            [orderedLines]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderLineCode : []"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-order-line-code-exercise>
-          
-          <app-write-code-exercise 
-            *ngSwitchCase="'write_code'"
-            [code]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerWriteCode : ''"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-write-code-exercise>
-          
-          <app-find-error-code-exercise 
-            *ngSwitchCase="'find_error_code'"
-            [options]="currentExercise.optionFindErrorCode"
-            [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-find-error-code-exercise>
 
-          <app-vertical-ordering-exercise 
-            *ngSwitchCase="'vertical_ordering'"
-            [fragments]="currentExercise.optionsVerticalOrdering"
-            [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-vertical-ordering-exercise>
+          <!-- Acciones -->
+          <div class="action-panel">
+            <div class="action-top-row">
+              <p class="action-selection">{{ currentSelectionSummary }}</p>
+              <div *ngIf="!answerVerified()" class="verify-inline">
+                <p-button
+                  label="Verificar análisis"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  styleClass="primary-cta"
+                  (onClick)="verifyAnswer()"
+                  [loading]="submitting()"
+                  [disabled]="!hasAnswer()">
+                </p-button>
+              </div>
+            </div>
 
-          <app-horizontal-ordering-exercise 
-            *ngSwitchCase="'horizontal_ordering'"
-            [lines]="currentExercise.optionsHorizontalOrdering"
-            [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-horizontal-ordering-exercise>
+            <p class="action-helper" *ngIf="!answerVerified() && !hasAnswer()">
+              Responde primero para activar.
+            </p>
 
-          <app-phishing-selection-multiple-exercise 
-            *ngSwitchCase="'phishing_selection_multiple'"
-            [options]="currentExercise.optionsPhishingSelection"
-            [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
-            [phishingContext]="currentExercise.phishingContext"
-            [phishingImageUrl]="currentExercise.phishingImageUrl"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-phishing-selection-multiple-exercise>
+            <!-- Botones Siguiente/Anterior -->
+            <div *ngIf="answerVerified()" class="flex flex-col sm:flex-row justify-end gap-3">
+              <p-button
+                *ngIf="!isFirstExercise"
+                label="Anterior"
+                icon="pi pi-arrow-left"
+                styleClass="secondary-cta"
+                (onClick)="previousExercise()">
+              </p-button>
 
-          <app-match-pairs-exercise 
-            *ngSwitchCase="'match_pairs'"
-            [leftOptions]="currentExercise.optionsMatchPairsLeft"
-            [rightOptions]="currentExercise.optionsMatchPairsRight"
-            [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
-            (answerSubmitted)="onAnswerSubmitted($event)">
-          </app-match-pairs-exercise>
-        </div>
-        
-        </div>
-        
-        <!-- Botones de acción -->
-        <div class="flex justify-center mt-8 mb-8">
-          <!-- Botón Verificar Respuesta (antes de verificar) -->
-          <div *ngIf="!answerVerified()" class="flex gap-4 mb-8">
-            <p-button
-              label="Verificar Respuesta"
-              icon="pi pi-check"
-              styleClass="p-button-primary px-8 py-3 text-lg"
-              (onClick)="verifyAnswer()"
-              [loading]="submitting()"
-              [disabled]="!hasAnswer()">
-            </p-button>
+              <p-button
+                [label]="isLastExercise ? 'Finalizar Actividad' : 'Siguiente'"
+                [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
+                [styleClass]="isLastExercise ? 'success-cta' : 'primary-cta'"
+                (onClick)="nextExercise()"
+                [loading]="submitting()">
+              </p-button>
+            </div>
           </div>
-
-          <!-- Botones Siguiente/Anterior (después de verificar) -->
-          <div *ngIf="answerVerified()" class="flex gap-4 mb-8">
-            <p-button
-              *ngIf="!isFirstExercise"
-              label="Anterior"
-              icon="pi pi-arrow-left"
-              styleClass="p-button-secondary"
-              (onClick)="previousExercise()">
-            </p-button>
-
-            <p-button
-              [label]="isLastExercise ? 'Finalizar Actividad' : 'Siguiente'"
-              [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
-              [styleClass]="isLastExercise ? 'p-button-success' : 'p-button-primary'"
-              (onClick)="nextExercise()"
-              [loading]="submitting()">
-            </p-button>
-          </div>
-        </div>
-        </div>
+        </section>
       </div>
     </div>
   </div>

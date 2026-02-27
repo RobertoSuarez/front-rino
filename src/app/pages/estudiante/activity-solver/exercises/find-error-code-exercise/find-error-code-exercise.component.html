@@ -1,17 +1,20 @@
-<div class="exercise-container">
-  <div class="instructions">
-    <p>Selecciona la línea que contiene el error en el código.</p>
-  </div>
+<div class="exercise-surface" role="radiogroup" aria-label="Opciones de error">
+  <p class="exercise-instruction">Selecciona la línea que contiene el error.</p>
 
   <div class="options-container">
-    <div *ngFor="let option of options; let i = index"
-         class="option-item"
-         [class.selected]="selectedValue === option"
-         (click)="onSelectionChange(option)">
-      <div class="custom-radio" [class.selected]="selectedValue === option"></div>
-      <span class="option-label">
-        <code class="error-code">{{ option }}</code>
-      </span>
-    </div>
+    <button
+      *ngFor="let option of options; let i = index"
+      type="button"
+      class="option-item"
+      [class.selected]="selectedValue === option"
+      (click)="onSelectionChange(option)"
+      (keydown.enter)="onSelectionChange(option)"
+      (keydown.space)="onSelectionChange(option); $event.preventDefault()"
+      [attr.aria-checked]="selectedValue === option"
+      role="radio">
+      <span class="option-index">{{ i + 1 }}</span>
+      <code class="option-label">{{ option }}</code>
+      <span class="selection-indicator" aria-hidden="true"></span>
+    </button>
   </div>
 </div>

@@ -1,23 +1,31 @@
 <div class="exercise-container">
-  <div class="instructions">
-    <p>Escribe el código para resolver el ejercicio.</p>
+  <div class="instructions" role="note">
+    <p>Escribe tu solución paso a paso. Prioriza que sea clara y legible.</p>
+  </div>
+
+  <div class="meta-row">
+    <span class="meta-item">Líneas: {{ lineCount }}</span>
+    <span class="meta-item">Caracteres: {{ codeValue.length }}</span>
   </div>
 
   <div class="code-editor-container">
     <div class="code-editor-header">
       <span class="code-editor-title">solution.py</span>
-      <div class="code-editor-dots">
+      <div class="code-editor-dots" aria-hidden="true">
         <span class="dot-red"></span>
         <span class="dot-yellow"></span>
         <span class="dot-green"></span>
       </div>
     </div>
     <div class="code-editor-wrapper">
+      <label for="codeEditor" class="sr-only">Editor de código</label>
       <textarea
+        id="codeEditor"
         class="code-editor"
         [ngModel]="codeValue"
         (ngModelChange)="onCodeChange($event)"
         rows="15"
+        spellcheck="false"
         placeholder="def solution():
     # Escribe tu código aquí
     pass">

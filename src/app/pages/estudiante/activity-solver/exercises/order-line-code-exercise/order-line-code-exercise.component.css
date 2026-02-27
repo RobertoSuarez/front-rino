@@ -4,8 +4,8 @@
 
 /* Instrucciones mejoradas */
 .instructions {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  border: 1px solid #10b981;
+  background: var(--as-primary-soft, linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%));
+  border: 1px solid var(--as-border, #10b981);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -14,7 +14,7 @@
 
 .instructions p {
   margin: 0;
-  color: #064e3b;
+  color: var(--as-ink, #064e3b);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5;
@@ -28,15 +28,15 @@
   margin-top: 1rem;
   min-height: 200px;
   padding: 1rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 2px dashed #cbd5e1;
+  background: var(--as-surface-soft, linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%));
+  border: 2px dashed var(--as-border, #cbd5e1);
   border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .lines-container:hover {
-  border-color: #94a3b8;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-color: var(--as-primary, #94a3b8);
+  background: var(--as-primary-soft, linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%));
 }
 
 /* Líneas individuales */
@@ -45,9 +45,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--as-border, #e2e8f0);
   border-radius: 12px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--as-surface, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
   cursor: grab;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -62,15 +62,15 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(180deg, #10b981, #059669);
+  background: linear-gradient(180deg, var(--as-success, #10b981), var(--as-success, #059669));
   border-radius: 2px 0 0 2px;
 }
 
 .line-item:hover {
-  border-color: #10b981;
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: var(--as-success, #10b981);
+  background: var(--as-primary-soft, linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%));
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 12px 32px var(--as-focus, rgba(16, 185, 129, 0.25));
 }
 
 .line-item:active {
@@ -94,7 +94,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, var(--as-success, #10b981), var(--as-success, #059669));
   color: white;
   font-weight: bold;
   font-size: 0.875rem;
@@ -108,11 +108,11 @@
   font-size: 0.95rem;
   line-height: 1.6;
   white-space: pre-wrap;
-  color: #1e293b;
-  background: rgba(241, 245, 249, 0.8);
+  color: var(--as-ink, #1e293b);
+  background: var(--as-surface-soft, rgba(241, 245, 249, 0.8));
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--as-border, #e2e8f0);
   flex: 1;
   word-break: break-all;
 }
@@ -124,39 +124,39 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  color: #64748b;
+  color: var(--as-muted, #64748b);
   cursor: grab;
   transition: all 0.2s ease;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--as-surface, rgba(255, 255, 255, 0.8));
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.5);
+  border: 1px solid var(--as-border, rgba(226, 232, 240, 0.5));
   flex-shrink: 0;
   z-index: 2;
 }
 
 .line-handle:active {
   cursor: grabbing;
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: var(--as-primary-soft, rgba(16, 185, 129, 0.1));
+  color: var(--as-primary, #10b981);
 }
 
 .line-handle:hover {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: var(--as-primary-soft, rgba(16, 185, 129, 0.1));
+  color: var(--as-primary, #10b981);
   transform: scale(1.1);
 }
 
 /* Estados de drag and drop */
 .cdk-drag-preview {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 0 4px 12px var(--as-focus, rgba(16, 185, 129, 0.15));
   transform: rotate(3deg) scale(1.05);
   border-radius: 12px;
 }
 
 .cdk-drag-placeholder {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  border: 2px dashed #10b981;
+  background: var(--as-primary-soft, linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%));
+  border: 2px dashed var(--as-primary, #10b981);
   border-radius: 12px;
   min-height: 60px;
   opacity: 0.6;

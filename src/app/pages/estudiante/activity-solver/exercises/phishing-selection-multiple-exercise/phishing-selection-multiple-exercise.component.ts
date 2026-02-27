@@ -1,15 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   selector: 'app-phishing-selection-multiple-exercise',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    CheckboxModule
+    FormsModule
   ],
   templateUrl: './phishing-selection-multiple-exercise.component.html',
   styleUrl: './phishing-selection-multiple-exercise.component.css',

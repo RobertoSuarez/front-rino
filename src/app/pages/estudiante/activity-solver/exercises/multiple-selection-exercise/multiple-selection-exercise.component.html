@@ -1,11 +1,21 @@
-<div class="exercise-container">
+<div class="exercise-surface" role="group" aria-label="Opciones de respuesta múltiple">
+  <p class="exercise-instruction">Puedes elegir más de una respuesta.</p>
+
   <div class="options-container">
-    <div *ngFor="let option of options; let i = index"
-         class="option-item"
-         [class.selected]="isSelected(option)"
-         (click)="toggleSelection(option)">
-      <div class="custom-checkbox" [class.selected]="isSelected(option)"></div>
+    <button
+      *ngFor="let option of options; let i = index"
+      type="button"
+      class="option-item"
+      [class.selected]="isSelected(option)"
+      (click)="toggleSelection(option)"
+      (keydown.enter)="toggleSelection(option)"
+      (keydown.space)="toggleSelection(option); $event.preventDefault()"
+      [attr.aria-pressed]="isSelected(option)">
+      <span class="option-index">{{ i + 1 }}</span>
       <span class="option-label">{{ option }}</span>
-    </div>
+      <span class="selection-indicator" aria-hidden="true">✓</span>
+    </button>
   </div>
+
+  <p class="selection-counter">Seleccionadas: {{ selectedValues.length }}</p>
 </div>

@@ -33,9 +33,10 @@
                 {{ curso?.title }}
               </h1>
 
-              <p class="text-xl text-slate-600 mb-4 leading-relaxed">
-                {{ curso?.description }}
-              </p>
+              <div
+                class="course-markdown markdown-render mb-4"
+                [innerHTML]="(curso?.description || 'Sin descripción disponible.') | markdownToHtml">
+              </div>
 
               <div class="flex flex-wrap items-center gap-6 text-base mb-4">
 
@@ -116,7 +117,10 @@
                             </div>
                             <div>
                               <h3 class="text-2xl font-bold text-slate-900 m-0 mb-1">{{ event.title }}</h3>
-                              <p class="text-slate-600 text-sm m-0 line-clamp-2">{{ event.subtitle }}</p>
+                              <div
+                                class="chapter-markdown markdown-render markdown-compact text-sm m-0"
+                                [innerHTML]="(event.description || event.subtitle || 'Sin descripción del capítulo.') | markdownToHtml">
+                              </div>
                             </div>
                           </div>
                           <div class="card-status-section">
@@ -200,7 +204,10 @@
                     </div>
                     <div class="flex-1">
                       <h3 class="text-xl font-bold text-slate-900 m-0 mb-1">{{ event.title }}</h3>
-                      <p class="text-slate-600 text-sm m-0 line-clamp-2">{{ event.subtitle }}</p>
+                      <div
+                        class="chapter-markdown markdown-render markdown-compact text-sm m-0"
+                        [innerHTML]="(event.description || event.subtitle || 'Sin descripción del capítulo.') | markdownToHtml">
+                      </div>
                     </div>
                     <div class="card-status-section">
                       <p-tag

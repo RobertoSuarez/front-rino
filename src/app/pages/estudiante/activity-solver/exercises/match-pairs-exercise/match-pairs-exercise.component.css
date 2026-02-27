@@ -1,6 +1,39 @@
+.match-surface {
+  display: block;
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.match-instruction {
+  margin: 0;
+  color: var(--as-ink, #334155);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.match-progress {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--as-muted, #0f766e);
+  background: var(--as-primary-soft, #ecfdf5);
+  border: 1px solid var(--as-border, #86efac);
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+}
+
 .matching-container {
   position: relative;
-  min-height: 400px;
+  min-height: 360px;
+  background: var(--as-surface-soft, #f8fafc);
+  border: 1px solid var(--as-border, #e2e8f0);
+  border-radius: 0.85rem;
 }
 
 .connections-svg {
@@ -18,7 +51,7 @@
   stroke-width: 4;
   stroke-linecap: round;
   transition: d 0.3s ease;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
 }
 
 .connection-line:hover {
@@ -26,66 +59,82 @@
   cursor: pointer;
 }
 
+.column-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 0.45rem;
+  border-radius: 0.6rem;
+}
+
+.column-title.left {
+  color: var(--as-ink, #1d4ed8);
+  background: var(--as-primary-soft, #dbeafe);
+}
+
+.column-title.right {
+  color: var(--as-ink, #166534);
+  background: var(--as-primary-soft, #dcfce7);
+}
+
 .pair-card {
   position: relative;
-  border-color: #e2e8f0;
-  background-color: white;
+  border-color: var(--as-border, #e2e8f0);
+  background-color: var(--as-surface, white);
   z-index: 20;
   transition: all 0.2s ease;
 }
 
-/* Puntos de conexión */
+.pair-label {
+  color: var(--as-ink, #1f2937);
+}
+
 .connector-point {
   position: absolute;
   top: 50%;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #cbd5e1;
-  border: 3px solid white;
+  background-color: var(--as-border, #cbd5e1);
+  border: 3px solid var(--as-surface, white);
   transform: translateY(-50%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
 
-.left-card .connector-point {
-  right: -8px;
-}
-
-.right-card .connector-point {
-  left: -8px;
-}
+.left-card .connector-point { right: -8px; }
+.right-card .connector-point { left: -8px; }
 
 .pair-card:hover .connector-point {
-  background-color: #94a3b8;
+  background-color: var(--as-muted, #94a3b8);
   transform: translateY(-50%) scale(1.2);
 }
 
 .pair-card.selected .connector-point {
-  background-color: #8b5cf6;
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+  background-color: var(--as-primary, #8b5cf6);
+  box-shadow: 0 0 0 4px var(--as-focus, rgba(139, 92, 246, 0.2));
 }
 
 .pair-card.matched .connector-point {
   background-color: var(--pair-color, #10b981);
 }
 
-/* Estilos de tarjetas */
 .left-card:hover {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
+  border-color: var(--as-primary, #3b82f6);
+  background-color: var(--as-primary-soft, #eff6ff);
 }
 
 .right-card:hover {
-  border-color: #10b981;
-  background-color: #ecfdf5;
+  border-color: var(--as-success, #10b981);
+  background-color: var(--as-primary-soft, #ecfdf5);
 }
 
 .pair-card.selected {
-  border-color: #8b5cf6;
-  background-color: #f5f3ff;
+  border-color: var(--as-primary, #8b5cf6);
+  background-color: var(--as-primary-soft, #f5f3ff);
   transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 4px 12px var(--as-focus, rgba(139, 92, 246, 0.15));
 }
 
 .pair-card.matched {
@@ -94,10 +143,21 @@
 }
 
 .pair-card.matched span {
-  color: #64748b;
+  color: var(--as-muted, #64748b);
 }
 
-/* Animación de pulso para la selección */
+.empty-state {
+  margin-top: 0.7rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--as-muted, #0f766e);
+  background: var(--as-primary-soft, #ecfdf5);
+  border: 1px solid var(--as-border, #a7f3d0);
+  border-radius: 0.65rem;
+  padding: 0.5rem;
+}
+
 @keyframes pulse-ring {
   0% { transform: scale(0.8); opacity: 0.5; }
   100% { transform: scale(2); opacity: 0; }
@@ -111,6 +171,6 @@
   right: -4px;
   bottom: -4px;
   border-radius: 50%;
-  border: 2px solid #8b5cf6;
+  border: 2px solid var(--as-primary, #8b5cf6);
   animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }

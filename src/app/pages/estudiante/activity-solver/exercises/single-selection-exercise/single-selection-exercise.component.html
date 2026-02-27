@@ -1,11 +1,20 @@
-<div class="exercise-container">
+<div class="exercise-surface" role="radiogroup" aria-label="Opciones de respuesta única">
+  <p class="exercise-instruction">Elige una sola respuesta correcta.</p>
+
   <div class="options-container">
-    <div *ngFor="let option of options; let i = index"
-         class="option-item"
-         [class.selected]="selectedValue === option"
-         (click)="onSelectionChange(option)">
-      <div class="custom-radio" [class.selected]="selectedValue === option"></div>
+    <button
+      *ngFor="let option of options; let i = index"
+      type="button"
+      class="option-item"
+      [class.selected]="selectedValue === option"
+      (click)="onSelectionChange(option)"
+      (keydown.enter)="onSelectionChange(option)"
+      (keydown.space)="onSelectionChange(option); $event.preventDefault()"
+      [attr.aria-checked]="selectedValue === option"
+      role="radio">
+      <span class="option-index">{{ i + 1 }}</span>
       <span class="option-label">{{ option }}</span>
-    </div>
+      <span class="selection-indicator" aria-hidden="true"></span>
+    </button>
   </div>
 </div>

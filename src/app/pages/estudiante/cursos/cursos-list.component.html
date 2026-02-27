@@ -273,9 +273,10 @@
             <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 leading-tight">
               {{ selectedCourse.title }}
             </h1>
-            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
-              {{ selectedCourse.description || 'Descripción no disponible para este curso.' }}
-            </p>
+            <div
+              class="course-markdown markdown-render mb-6"
+              [innerHTML]="(selectedCourse.description || 'Descripción no disponible para este curso.') | markdownToHtml">
+            </div>
             
         
           </div>
@@ -393,9 +394,10 @@
                   <h4 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
                     {{ chapter.title }}
                   </h4>
-                  <p class="text-gray-600 mb-4 leading-relaxed">
-                    {{ chapter.shortDescription || 'Sin descripción disponible' }}
-                  </p>
+                  <div
+                    class="chapter-markdown markdown-render markdown-compact mb-4"
+                    [innerHTML]="(chapter.shortDescription || 'Sin descripción disponible') | markdownToHtml">
+                  </div>
                   
                   <div class="flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">

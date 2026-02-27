@@ -1,49 +1,33 @@
-<div class="space-y-4">
-  <!-- Contexto del Phishing -->
-  <div *ngIf="phishingContext" class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg mb-4">
-    <div class="flex items-start gap-3">
-      <i class="pi pi-exclamation-triangle text-red-500 text-xl mt-1"></i>
-      <div>
-        <h3 class="text-lg font-semibold text-red-700 mb-2">Escenario de Phishing</h3>
-        <p class="text-red-800">{{phishingContext}}</p>
-      </div>
+<div class="exercise-surface">
+  <div *ngIf="phishingContext" class="phishing-context" role="note">
+    <i class="pi pi-exclamation-triangle"></i>
+    <div>
+      <h3>Escenario</h3>
+      <p>{{ phishingContext }}</p>
     </div>
   </div>
 
-  <!-- Imagen del Phishing (si existe) -->
-  <div *ngIf="phishingImageUrl" class="mb-4">
-    <img [src]="phishingImageUrl" alt="Ejemplo de phishing" class="w-full max-w-2xl mx-auto rounded-lg shadow-lg border-2 border-gray-200">
+  <div *ngIf="phishingImageUrl" class="phishing-image-wrapper">
+    <img [src]="phishingImageUrl" alt="Ejemplo de posible phishing" class="phishing-image">
   </div>
 
-  <!-- Instrucciones -->
-  <p class="text-gray-600 mb-4 font-medium">Selecciona todos los indicadores que son señales de phishing:</p>
-  
-  <!-- Opciones -->
-  <div class="space-y-3">
-    <div 
+  <p class="exercise-instruction">Marca todas las señales que indiquen phishing.</p>
+
+  <div class="options-container" role="group" aria-label="Indicadores de phishing">
+    <button
       *ngFor="let option of options; let i = index"
-      (click)="toggleOption(option)"
+      type="button"
+      class="option-item"
       [class.selected]="isSelected(option)"
-      class="option-card p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md">
-      <div class="flex items-center gap-3 pointer-events-none">
-        <p-checkbox 
-          [binary]="true"
-          [ngModel]="isSelected(option)"
-          [inputId]="'option_' + i"
-          [readonly]="true">
-        </p-checkbox>
-        <label [for]="'option_' + i" class="flex-1 cursor-pointer text-gray-800 font-medium">
-          {{option}}
-        </label>
-      </div>
-    </div>
+      (click)="toggleOption(option)"
+      (keydown.enter)="toggleOption(option)"
+      (keydown.space)="toggleOption(option); $event.preventDefault()"
+      [attr.aria-pressed]="isSelected(option)">
+      <span class="option-index">{{ i + 1 }}</span>
+      <span class="option-label">{{ option }}</span>
+      <span class="selection-indicator" aria-hidden="true">✓</span>
+    </button>
   </div>
 
-  <!-- Contador de selecciones -->
-  <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-    <p class="text-sm text-blue-700">
-      <i class="pi pi-info-circle mr-2"></i>
-      Has seleccionado <strong>{{selectedValues.length}}</strong> indicador(es) de phishing
-    </p>
-  </div>
+  <p class="selection-counter">Seleccionadas: {{ selectedValues.length }}</p>
 </div>

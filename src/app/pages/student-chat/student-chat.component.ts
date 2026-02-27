@@ -58,6 +58,10 @@ export class StudentChatComponent implements OnInit, OnDestroy {
   messages: Message[] = [];
   newMessage = '';
   loading = false;
+  loadingChats = false;
+  loadingMessages = false;
+  creatingChat = false;
+  switchingChatId: number | null = null;
   private hasLoadedChats = false;
   isSending = false;
   private userSubscription?: Subscription;
@@ -93,28 +97,64 @@ export class StudentChatComponent implements OnInit, OnDestroy {
     this.userSubscription?.unsubscribe();
   }
 
+  private syncLoadingState(): void {
+    this.loading = this.loadingChats || this.loadingMessages || this.creatingChat;
+  }
+
+  isChatActive(chat: Chat): boolean {
+    return this.selectedChat?.id === chat.id;
+  }
+
+  isChatSwitching(chat: Chat): boolean {
+    return this.loadingMessages && this.switchingChatId === chat.id;
+  }
+
+  isComposerDisabled(): boolean {
+    return this.isSending || this.loadingMessages || this.creatingChat;
+  }
+
   startNewChat(): void {
+    if (this.creatingChat) {
+      return;
+    }
+
     // Limpiar mensajes y estado actual antes de iniciar un nuevo chat
     this.messages = [];
     this.newMessage = '';
     this.isSending = false;
     this.selectedChat = null;
-    
-    // Mostrar indicador de carga
-    this.loading = true;
+    this.switchingChatId = null;
+    this.loadingMessages = false;
+    this.creatingChat = true;
+    this.syncLoadingState();
     
     // Inicializar nuevo chat
     this.initializeChat();
   }
 
   initializeChat(): void {
-    this.loading = true;
+    this.creatingChat = true;
+    this.syncLoadingState();
     this.studentChatService.createChat().subscribe({
       next: (data) => {
+        if (!data || !data.id) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo crear el chat correctamente',
+          });
+          this.creatingChat = false;
+          this.syncLoadingState();
+          return;
+        }
+
         this.selectedChat = data;
         this.messages = [];
         this.upsertChat(data);
-        this.loading = false;
+        this.creatingChat = false;
+        this.loadingMessages = false;
+        this.switchingChatId = null;
+        this.syncLoadingState();
         this.focusMessageInput();
       },
       error: (err) => {
@@ -126,7 +166,8 @@ export class StudentChatComponent implements OnInit, OnDestroy {
             err.message ||
             'No se pudo inicializar el chat. Verifica que estés logueado como estudiante.',
         });
-        this.loading = false;
+        this.creatingChat = false;
+        this.syncLoadingState();
       },
     });
   }
@@ -150,6 +191,10 @@ export class StudentChatComponent implements OnInit, OnDestroy {
   }
 
   selectChat(chat: Chat): void {
+    if (this.creatingChat) {
+      return;
+    }
+
     // Si ya está seleccionado, solo enfoca el input
     if (this.selectedChat?.id === chat.id) {
       this.focusMessageInput();
@@ -161,21 +206,17 @@ export class StudentChatComponent implements OnInit, OnDestroy {
     this.isSending = false;
     this.messages = [];
     
-    // Mostrar indicador de carga
-    this.loading = true;
-    
     // Actualizar chat seleccionado
     this.selectedChat = chat;
+    this.switchingChatId = chat.id;
     
     // Cargar mensajes del chat seleccionado
     this.loadMessages(chat.id);
-    
-    // Actualizar la posición del chat en la lista (moverlo al principio)
-    this.upsertChat(chat);
   }
 
   private loadChats(): void {
-    this.loading = true;
+    this.loadingChats = true;
+    this.syncLoadingState();
     this.studentChatService.getChats().subscribe({
       next: (data) => {
         this.chats = data;
@@ -183,13 +224,17 @@ export class StudentChatComponent implements OnInit, OnDestroy {
         if (data.length > 0) {
           this.selectedChat = data[0];
           this.messages = [];
+          this.switchingChatId = data[0].id;
+          this.loadingChats = false;
+          this.syncLoadingState();
           this.loadMessages(data[0].id);
           return;
         }
 
         this.selectedChat = null;
         this.messages = [];
-        this.loading = false;
+        this.loadingChats = false;
+        this.syncLoadingState();
         this.focusMessageInput();
       },
       error: (err) => {
@@ -199,30 +244,45 @@ export class StudentChatComponent implements OnInit, OnDestroy {
           summary: 'Error',
           detail: err.message || 'No se pudieron cargar los chats',
         });
-        this.loading = false;
+        this.loadingChats = false;
+        this.syncLoadingState();
       },
     });
   }
 
   private loadMessages(chatId: number): void {
-    this.loading = true;
+    this.loadingMessages = true;
+    this.switchingChatId = chatId;
+    this.syncLoadingState();
     this.messages = [];
     this.isSending = false;
     this.studentChatService.getChatMessages(chatId).subscribe({
       next: (data) => {
+        if (this.selectedChat?.id !== chatId) {
+          return;
+        }
+
         this.messages = data;
-        this.loading = false;
+        this.loadingMessages = false;
+        this.switchingChatId = null;
+        this.syncLoadingState();
         this.scrollToBottom();
         this.focusMessageInput();
       },
       error: (err) => {
+        if (this.selectedChat?.id !== chatId) {
+          return;
+        }
+
         console.error('Error loading messages:', err);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: err.message || 'No se pudieron cargar los mensajes del chat',
         });
-        this.loading = false;
+        this.loadingMessages = false;
+        this.switchingChatId = null;
+        this.syncLoadingState();
       },
     });
   }
@@ -242,8 +302,13 @@ export class StudentChatComponent implements OnInit, OnDestroy {
   }
 
   private createChatAndSendMessage(): void {
+    if (this.creatingChat) {
+      return;
+    }
+
     const messageToSend = this.newMessage;
-    this.loading = true;
+    this.creatingChat = true;
+    this.syncLoadingState();
 
 
     this.studentChatService.createChat().subscribe({
@@ -256,13 +321,16 @@ export class StudentChatComponent implements OnInit, OnDestroy {
             summary: 'Error',
             detail: 'La respuesta del servidor no contiene un ID de chat válido',
           });
-          this.loading = false;
+          this.creatingChat = false;
+          this.syncLoadingState();
           return;
         }
 
         this.selectedChat = data;
         this.messages = [];
         this.upsertChat(data);
+        this.creatingChat = false;
+        this.syncLoadingState();
         this.newMessage = messageToSend;
 
         setTimeout(() => {
@@ -277,7 +345,8 @@ export class StudentChatComponent implements OnInit, OnDestroy {
           summary: 'Error',
           detail: err.message || 'No se pudo crear el chat',
         });
-        this.loading = false;
+        this.creatingChat = false;
+        this.syncLoadingState();
       },
     });
   }
@@ -319,6 +388,22 @@ export class StudentChatComponent implements OnInit, OnDestroy {
     this.studentChatService.sendMessage(chatId, content).subscribe({
       next: (data) => {
         this.messages = [...this.messages, ...data];
+
+        // Reordenar la lista por actividad reciente: el chat con mensaje nuevo va arriba.
+        const latestMessageTimestamp =
+          Array.isArray(data) && data.length > 0
+            ? data[data.length - 1]?.createdAt
+            : null;
+
+        if (this.selectedChat) {
+          const refreshedChat: Chat = {
+            ...this.selectedChat,
+            updatedAt: latestMessageTimestamp || this.selectedChat.updatedAt,
+          };
+          this.selectedChat = refreshedChat;
+          this.upsertChat(refreshedChat);
+        }
+
         this.isSending = false;
         this.scrollToBottom();
         this.focusMessageInput();

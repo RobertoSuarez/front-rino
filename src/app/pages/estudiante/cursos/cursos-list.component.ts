@@ -14,6 +14,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
+import { MarkdownToHtmlPipe } from '@/shared/pipes/markdown-to-html.pipe';
 
 // Servicios
 import { CursosService } from '../../../core/services';
@@ -35,7 +36,8 @@ import { Chapter } from '@/core/models/chapter.interface';
     SkeletonModule,
     TagModule,
     DialogModule,
-    DividerModule
+    DividerModule,
+    MarkdownToHtmlPipe
   ],
   providers: [MessageService],
   templateUrl: './cursos-list.component.html',

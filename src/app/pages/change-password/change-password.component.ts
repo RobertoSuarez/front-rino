@@ -38,7 +38,7 @@ export class ChangePasswordComponent implements OnInit {
     private apiService: ApiService,
     private messageService: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -46,29 +46,75 @@ export class ChangePasswordComponent implements OnInit {
 
   initForm(): void {
     this.changePasswordForm = this.fb.group({
-      oldPassword: ['', [Validators.required, Validators.minLength(6)]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(6)]]
+      oldPassword: ['', [Validators.required]],
+      newPassword: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-+])[A-Za-z\d@$!%*?&._\-+]{8,}$/)
+      ]],
+      confirmPassword: ['', [Validators.required]]
     }, {
       validators: this.passwordMatchValidator
     });
   }
 
+  get newPasswordValue(): string {
+    return this.changePasswordForm.get('newPassword')?.value || '';
+  }
+
+  hasMinLength(): boolean {
+    return this.newPasswordValue.length >= 8;
+  }
+
+  hasUppercase(): boolean {
+    return /[A-Z]/.test(this.newPasswordValue);
+  }
+
+  hasNumber(): boolean {
+    return /\d/.test(this.newPasswordValue);
+  }
+
+  hasSpecialChar(): boolean {
+    return /[@$!%*?&._\-+]/.test(this.newPasswordValue);
+  }
+
+  get passwordStrengthCount(): number {
+    return [this.hasMinLength(), this.hasUppercase(), this.hasNumber(), this.hasSpecialChar()]
+      .filter(v => v).length;
+  }
+
+  get passwordStrengthLabel(): string {
+    const count = this.passwordStrengthCount;
+    if (count === 0) return '';
+    if (count <= 1) return 'Débil';
+    if (count <= 3) return 'Media';
+    return 'Fuerte';
+  }
+
+  get passwordStrengthClass(): string {
+    const count = this.passwordStrengthCount;
+    if (count === 0) return '';
+    if (count <= 1) return 'weak';
+    if (count <= 3) return 'medium';
+    return 'strong';
+  }
+
   passwordMatchValidator(form: FormGroup) {
     const newPassword = form.get('newPassword');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     }
-    
+
     return null;
   }
 
   onSubmit(): void {
     this.submitted = true;
 
+    // Check custom requirements separately from simple form.invalid if pattern fails but we manually show it
     if (this.changePasswordForm.invalid) {
       this.messageService.add({
         severity: 'error',
@@ -92,12 +138,10 @@ export class ChangePasswordComponent implements OnInit {
           summary: 'Éxito',
           detail: response.message || 'Contraseña actualizada correctamente'
         });
-        
-        // Resetear el formulario
+
         this.changePasswordForm.reset();
         this.submitted = false;
-        
-        // Redirigir al perfil después de 2 segundos
+
         setTimeout(() => {
           this.router.navigate(['/profile']);
         }, 2000);

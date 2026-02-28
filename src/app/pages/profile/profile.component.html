@@ -1,24 +1,10 @@
 <p-toast></p-toast>
 <div class="grid grid-cols-12 gap-4 md:gap-8">
     <div class="col-span-12">
-        <!-- Header con gradiente -->
-        <div class="card mb-0 overflow-hidden">
-            <div class="flex flex-col md:flex-row md:align-items-center md:justify-between p-3 md:p-4">
-                <div class="flex align-items-center gap-3 md:gap-4 mb-3 md:mb-0">
-                    <i class="pi pi-user text-900 !text-2xl md:!text-3xl mr-2 md:mr-3"></i>
-                    <div>
-                        <div class="text-900 m-0 font-bold text-lg md:text-xl">Mi Perfil</div>
-                        <div class="text-600 m-0 text-sm md:text-base">Gestiona tu información personal</div  >
-                    </div>
-                </div>
-                @if (!editMode && profileData) {
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <button pButton label="Editar Perfil" icon="pi pi-user-edit"
-                        class="p-button-outlined p-button-rounded w-full sm:w-auto" (click)="toggleEditMode()"></button>
-                    <button pButton label="Cambiar Contraseña" icon="pi pi-lock"
-                        class="p-button-outlined p-button-rounded p-button-secondary w-full sm:w-auto" routerLink="/teacher/change-password"></button>
-                </div>
-                }
+        <div class="profile-modern-header card mb-0">
+            <div class="profile-modern-header__copy">
+                <h1>Mi Perfil</h1>
+                <p>Gestiona tu información personal y visualiza tu progreso en el imperio.</p>
             </div>
         </div>
 
@@ -48,337 +34,300 @@
 
         <!-- Modo visualización -->
         @if (profileData && !loading && !editMode) {
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-            <!-- Tarjeta de perfil principal -->
-            <div class="col-span-1 md:col-span-6">
-                <div class="card text-center h-full">
-                    <div class="relative inline-block mb-4">
-                        <img [src]="profileData.urlAvatar" class="rounded-3xl shadow-4 w-[150px] h-[150px] md:w-[180px] md:h-[180px]"
-                            style="object-fit: cover; border: 4px solid var(--surface-border);"
-                            alt="Avatar de usuario">
-                        <div class="absolute bg-green-500 border-circle shadow-2 w-5 h-5 md:w-6 md:h-6"
-                            style="bottom: 8px; right: 8px; border: 3px solid white;">
-                        </div>
+        <div class="profile-modern-grid">
+            <section class="profile-card-main card">
+                <div class="profile-card-main__head">
+                    <div class="profile-avatar-wrap">
+                        <img [src]="profileData.urlAvatar" alt="Avatar de usuario">
+                        <span class="profile-online-dot"></span>
                     </div>
-
-                    <h2 class="text-900 font-bold text-xl md:text-2xl m-0 mb-2">{{ profileData.firstName }} {{ profileData.lastName
-                        }}</h2>
-                    <p class="text-600 text-base md:text-lg mb-4">{{ profileData.email }}</p>
-
-                    <!-- Tipo de Usuario -->
-                    <div class="mb-4">
-                        <p-tag 
-                            [value]="getUserTypeLabel(profileData.typeUser)" 
-                            [severity]="getUserTypeColor(profileData.typeUser)"
-                            icon="pi pi-user">
+                    <div class="profile-main-identity">
+                        <span class="profile-progress-chip">{{ getProfileCompletion() }}%</span>
+                        <h2>{{ profileData.firstName }} {{ profileData.lastName }}</h2>
+                        <p>{{ profileData.email }}</p>
+                        <p-tag [value]="getUserTypeLabel(profileData.typeUser)"
+                            [severity]="getUserTypeColor(profileData.typeUser)" icon="pi pi-user">
                         </p-tag>
                     </div>
+                </div>
 
-                    <div class="surface-100 border-round-lg p-3 mb-3 flex align-items-center justify-content-between">
-                        <div class="flex align-items-center">
-                            <i class="pi pi-calendar text-primary mr-2"></i>
-                            <span class="text-700 font-medium text-sm md:text-base">Miembro desde:</span>
+                <div class="profile-meta-grid">
+                    <div class="profile-meta-item">
+                        <i class="pi pi-calendar text-primary"></i>
+                        <div>
+                            <span>Miembro desde</span>
+                            <strong>{{ formatDateShort(profileData.createdAt) }}</strong>
                         </div>
-                        <span class="text-900 font-bold text-sm md:text-base ml-2">{{ formatDate(profileData.createdAt) }}</span>
                     </div>
-
-                    <div *ngIf="profileData.birthday" class="surface-100 border-round-lg p-3 mb-3 flex align-items-center justify-content-between">
-                        <div class="flex align-items-center">
-                            <i class="pi pi-gift text-pink-500 mr-2"></i>
-                            <span class="text-700 font-medium text-sm md:text-base">Cumpleaños:</span>
+                    <div class="profile-meta-item" *ngIf="profileData.birthday">
+                        <i class="pi pi-gift text-pink-500"></i>
+                        <div>
+                            <span>Cumpleaños</span>
+                            <strong>{{ formatDateShort(profileData.birthday) }}</strong>
                         </div>
-                        <span class="text-900 font-bold text-sm md:text-base ml-2">{{ formatDate(profileData.birthday) }}</span>
-                    </div>
-
-                    <div *ngIf="profileData.whatsApp" class="surface-100 border-round-lg p-3 mb-3 flex align-items-center justify-content-between">
-                        <div class="flex align-items-center">
-                            <i class="pi pi-whatsapp text-green-500 mr-2"></i>
-                            <span class="text-700 font-medium text-sm md:text-base">WhatsApp:</span>
-                        </div>
-                        <span class="text-900 font-bold text-sm md:text-base ml-2">{{ profileData.whatsApp }}</span>
-                    </div>
-
-                    <div *ngIf="profileData.gender" class="surface-100 border-round-lg p-3 flex align-items-center justify-content-between">
-                        <div class="flex align-items-center">
-                            <i class="pi pi-heart text-rose-500 mr-2"></i>
-                            <span class="text-700 font-medium text-sm md:text-base">Género:</span>
-                        </div>
-                        <span class="text-900 font-bold text-sm md:text-base ml-2">
-                            {{ profileData.gender === 'masculino' ? 'Masculino' : profileData.gender === 'femenino' ? 'Femenino' : profileData.gender }}
-                        </span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Estadísticas del Usuario -->
-            <div class="col-span-1 md:col-span-6">
-                <div class="card h-full">
-                    <div class="flex mb-4 gap-4 items-center w-full">
-                        <i class="pi pi-chart-bar text-primary text-xl md:text-2xl"></i>
-                        <h3 class="text-900 font-bold text-lg md:text-xl m-0">Indicadores del Usuario</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 xl:gap-8" *ngIf="userIndicators">
-                        <!-- Yachay Card -->
-                        <div class="col-span-1">
-                            <div
-                                class="surface-card min-h-[180px] md:min-h-[220px] p-3 md:p-5 text-center shadow-2 hover:shadow-4 transition-all transition-duration-300 cursor-pointer transform hover:scale-102 border-1 border-blue-200"
-                                style="border-radius: 25px;"
-                                pTooltip="Puntos de experiencia acumulados" tooltipPosition="bottom">
-                                <div class="inline-flex items-center justify-center mb-4"
-                                    style="width: 80px; height: 80px;">
-                                    <img src="assets/elementos/yachay.png" alt="Yachay" class="w-full h-full object-contain rounded-xl">
-                                </div>
-                                <div class="text-900 font-bold text-3xl md:text-4xl mb-2">{{ userIndicators.yachay }}</div>
-                                <div class="text-600 font-semibold text-lg md:text-xl mb-3">Yachay</div>
-                            </div>
-                        </div>
-
-                        <!-- Tumis Card -->
-                        <div class="col-span-1">
-                            <div
-                                class="surface-card min-h-[180px] md:min-h-[220px] p-3 md:p-5 text-center shadow-2 hover:shadow-4 transition-all transition-duration-300 cursor-pointer transform hover:scale-102 border-1 border-red-200"
-                                style="border-radius: 25px;"
-                                pTooltip="Vidas disponibles" tooltipPosition="bottom">
-                                <div class="inline-flex items-center justify-center mb-4"
-                                    style="width: 80px; height: 80px;">
-                                    <img src="assets/elementos/corazon_de_tumi.png" alt="Tumis" class="w-full h-full object-contain rounded-xl">
-                                </div>
-                                <div class="text-900 font-bold text-3xl md:text-4xl mb-2">{{ userIndicators.tumis }}</div>
-                                <div class="text-600 font-semibold text-lg md:text-xl mb-3">Tumis</div>
-                            </div>
-                        </div>
-
-                        <!-- Mullu Card -->
-                        <div class="col-span-1">
-                            <div
-                                class="surface-card min-h-[180px] md:min-h-[220px] p-3 md:p-5 text-center shadow-2 hover:shadow-4 transition-all transition-duration-300 cursor-pointer transform hover:scale-102 border-1 border-yellow-200"
-                                style="border-radius: 25px;"
-                                pTooltip="Moneda virtual disponible" tooltipPosition="bottom">
-                                <div class="inline-flex items-center justify-center mb-4"
-                                    style="width: 80px; height: 80px;">
-                                    <img src="assets/elementos/mullu.png" alt="Mullu" class="w-full h-full object-contain rounded-xl">
-                                </div>
-                                <div class="text-900 font-bold text-3xl md:text-4xl mb-2">{{ userIndicators.mullu }}</div>
-                                <div class="text-600 font-semibold text-lg md:text-xl mb-3">Mullu</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Progreso del perfil integrado -->
-                    <div class="mt-4 pt-4 border-top-1 surface-border">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="text-900 font-bold m-0">Progreso del Perfil</h4>
-                            <span class="text-900 font-bold">85%</span>
-                        </div>
-                        <div class="bg-gray-200 border-round-lg overflow-hidden mb-3" style="height: 8px;">
-                            <div class="bg-primary border-round-lg h-full transition-all transition-duration-1000"
-                                style="width: 85%;"></div>
-                        </div>
-                        <p class="text-600 text-sm m-0">¡Completa tu información para desbloquear más funciones!</p>
+                <div class="profile-achievements">
+                    <h4>Logros Recientes</h4>
+                    <div class="profile-achievements__list">
+                        <span class="achievement-item achievement-item--gold"><i class="pi pi-trophy"></i></span>
+                        <span class="achievement-item achievement-item--blue"><i class="pi pi-star"></i></span>
+                        <span class="achievement-item achievement-item--violet"><i class="pi pi-send"></i></span>
+                        <span class="achievement-item achievement-item--empty"><i class="pi pi-plus"></i></span>
                     </div>
                 </div>
-            </div>
+
+                <!-- Botones de acción contextuales -->
+                <div class="profile-card-actions">
+                    <button type="button" class="profile-action-btn profile-action-btn--primary"
+                        (click)="toggleEditMode()">
+                        <i class="pi pi-user-edit"></i>
+                        <span>Editar Perfil</span>
+                    </button>
+                    <button type="button" class="profile-action-btn profile-action-btn--secondary"
+                        routerLink="/teacher/change-password">
+                        <i class="pi pi-lock"></i>
+                        <span>Cambiar Contraseña</span>
+                    </button>
+                </div>
+            </section>
+
+            <aside class="profile-card-side">
+                <div class="profile-indicators card">
+                    <div class="profile-indicators__head">
+                        <h3>Indicadores</h3>
+                        <button type="button">Ver Historial</button>
+                    </div>
+                    <div class="indicator-row">
+                        <div class="indicator-left">
+                            <div class="indicator-icon indicator-icon--blue"><i class="pi pi-sparkles"></i></div>
+                            <div>
+                                <span>YACHAY</span>
+                                <strong>{{ userIndicators?.yachay || 0 }}</strong>
+                            </div>
+                        </div>
+                        <small class="indicator-up">+12% ↗</small>
+                    </div>
+                    <div class="indicator-row">
+                        <div class="indicator-left">
+                            <div class="indicator-icon indicator-icon--red"><i class="pi pi-heart-fill"></i></div>
+                            <div>
+                                <span>TUMIS</span>
+                                <strong>{{ userIndicators?.tumis || 0 }}</strong>
+                            </div>
+                        </div>
+                        <small class="indicator-up">+5% ↗</small>
+                    </div>
+                    <div class="indicator-row">
+                        <div class="indicator-left">
+                            <div class="indicator-icon indicator-icon--amber"><i class="pi pi-dollar"></i></div>
+                            <div>
+                                <span>MULLU</span>
+                                <strong>{{ userIndicators?.mullu || 0 }}</strong>
+                            </div>
+                        </div>
+                        <small class="indicator-muted">0% →</small>
+                    </div>
+                </div>
+
+                <div class="profile-mission card">
+                    <div class="profile-mission__head">
+                        <h4>Misión: Perfil Completo</h4>
+                        <span>{{ getProfileCompletion() }}%</span>
+                    </div>
+                    <p>Completa tu información para ganar 500 Mullu extra.</p>
+                    <div class="mission-progress">
+                        <span [style.width.%]="getProfileCompletion()"></span>
+                    </div>
+                    <div class="mission-footer">
+                        <small>{{ 3 - (getProfileCompletion() >= 100 ? 3 : 2) }} pasos restantes</small>
+                        <button type="button">Continuar Misión <i class="pi pi-arrow-right"></i></button>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="profile-activity card">
+                <div class="profile-activity__head">
+                    <h3>Actividad Reciente</h3>
+                    <button type="button">Ver Todo</button>
+                </div>
+                <div class="profile-activity__list">
+                    <div class="activity-item" *ngFor="let activity of recentActivity">
+                        <div class="activity-left">
+                            <span class="activity-icon" [class.activity-icon--login]="activity.type === 'login'">
+                                <i class="pi" [ngClass]="activity.icon"></i>
+                            </span>
+                            <div>
+                                <strong>{{ activity.title }}</strong>
+                                <p>{{ activity.time }}</p>
+                            </div>
+                        </div>
+                        <small [class.activity-reward]="activity.reward">{{ activity.reward || '' }}</small>
+                    </div>
+                </div>
+            </section>
         </div>
-
         }
 
-        <!-- Modo edición mejorado -->
+        <!-- Modo edición -->
         @if (profileData && !loading && editMode) {
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-            <div class="col-span-1 md:col-span-12">
-                <div class="w-full p-4 md:p-8 rounded-lg bg-white">
-                    <div class="flex flex-col md:flex-row w-full md:justify-between mb-4 md:mb-0">
-                        <div class="flex items-center gap-2 mb-3 md:mb-0">
-                            <i class="pi pi-user-edit text-primary !text-xl md:!text-2xl mr-2 md:mr-3"></i>
-                            <div class="flex flex-col">
-                                <div class="text-900 font-bold text-lg md:text-xl m-0">Editar Perfil</div>
-                                <p class="text-600 m-0 text-sm md:text-base">Actualiza tu información personal</p>
-                            </div>
+        <div class="profile-edit-wrapper">
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile($event)">
+
+                <!-- Header del editor -->
+                <div class="profile-edit-header">
+                    <div class="profile-edit-header__left">
+                        <div class="profile-edit-icon">
+                            <i class="pi pi-user-edit"></i>
                         </div>
-                        <button pButton type="button" icon="pi pi-times !text-xl md:!text-2xl"
-                            class="p-button-rounded p-button-text p-button-plain self-end md:self-auto" (click)="cancelEdit()"></button>
+                        <div>
+                            <h2>Editar Perfil</h2>
+                            <p>Actualiza tu información personal y avatar</p>
+                        </div>
                     </div>
-
-                    <form [formGroup]="profileForm" (ngSubmit)="saveProfile($event)" class="p-fluid">
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-                            <!-- Sección de Avatar -->
-                            <div class="col-span-1 md:col-span-6">
-                                <div class="surface-50 border-round-lg p-3 md:p-4 text-center h-full">
-                                    <h4 class="text-900 font-bold mb-4 text-lg md:text-xl">Foto de Perfil</h4>
-
-                                    <!-- Preview del Avatar Seleccionado -->
-                                    <div class="relative inline-block mb-6">
-                                        <img [src]="selectedAvatarPath || 'https://via.placeholder.com/180x180/e2e8f0/64748b?text=Avatar'"
-                                            class="rounded-3xl shadow-3 w-[150px] h-[150px] md:w-[180px] md:h-[180px]"
-                                            style="object-fit: cover; border: 4px solid var(--primary-color);"
-                                            alt="Avatar de usuario">
-                                    </div>
-
-                                    <!-- Grid de Avatares Disponibles -->
-                                    <div class="mb-4">
-                                        <label class="font-medium text-900 text-sm md:text-base block mb-3">Selecciona tu Avatar</label>
-                                        <div class="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-3">
-                                            @for (avatar of availableAvatars; track avatar) {
-                                            <div class="cursor-pointer transition-all transition-duration-200 hover:scale-110"
-                                                (click)="selectAvatar(avatar)"
-                                                [ngClass]="{'ring-2 ring-primary rounded-2xl': selectedAvatarPath === avatar}">
-                                                <img [src]="avatar"
-                                                    class="w-full h-auto rounded-2xl shadow-1 hover:shadow-3 transition-all transition-duration-200"
-                                                    style="aspect-ratio: 1; object-fit: cover;"
-                                                    alt="Avatar option"
-                                                    [ngClass]="{'ring-2 ring-primary': selectedAvatarPath === avatar}">
-                                            </div>
-                                            }
-                                        </div>
-                                        <small
-                                            *ngIf="profileForm.get('urlAvatar')?.invalid && profileForm.get('urlAvatar')?.touched"
-                                            class="p-error block mt-2">
-                                            <i class="pi pi-exclamation-circle mr-1"></i>Debes seleccionar un avatar
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Formulario de datos personales -->
-                            <div class="col-span-1 md:col-span-6">
-                                <div class="surface-50 border-round-lg p-3 md:p-4 h-full">
-                                    <h4 class="text-900 font-bold mb-4 text-lg md:text-xl">Información Personal</h4>
-
-                                    <div class="flex flex-col w-full gap-3 md:gap-4">
-                                        
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label for="firstName" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-user mr-2 text-primary"></i>Nombre
-                                            </label>
-                                            <div class="flex-1">
-                                                <input id="firstName" type="text" pInputText formControlName="firstName"
-                                                    class="w-full" placeholder="Ingresa tu nombre">
-                                                <small
-                                                    *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
-                                                    class="p-error block mt-1">
-                                                    <i class="pi pi-exclamation-circle mr-1"></i>Nombre es requerido
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label for="lastName" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-user mr-2 text-primary"></i>Apellido
-                                            </label>
-                                            <div class="flex-1">
-                                                <input id="lastName" type="text" pInputText formControlName="lastName"
-                                                    class="w-full" placeholder="Ingresa tu apellido">
-                                                <small
-                                                    *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
-                                                    class="p-error block mt-1">
-                                                    <i class="pi pi-exclamation-circle mr-1"></i>Apellido es requerido
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label for="birthday" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-calendar mr-2 text-pink-500"></i>Fecha de Nacimiento
-                                            </label>
-                                            <div class="flex-1">
-                                                <input id="birthday" type="text" pInputText formControlName="birthday"
-                                                    class="w-full" placeholder="DD/MM/YYYY">
-                                                <small class="text-600 block mt-1 text-xs md:text-sm">Formato: DD/MM/YYYY</small>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label for="whatsApp" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-whatsapp mr-2 text-green-500"></i>WhatsApp
-                                            </label>
-                                            <div class="flex-1">
-                                                <p-inputMask id="whatsApp" mask="(999) 999-9999"
-                                                    formControlName="whatsApp"
-                                                    placeholder="(123) 456-7890">
-                                                </p-inputMask>
-                                                <small class="text-600 block mt-1 text-xs md:text-sm">Opcional - Para contacto directo</small>
-                                                <small
-                                                    *ngIf="profileForm.get('whatsApp')?.invalid && profileForm.get('whatsApp')?.touched"
-                                                    class="p-error block mt-1">
-                                                    <i class="pi pi-exclamation-circle mr-1"></i>WhatsApp es requerido
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label for="gender" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-heart mr-2 text-rose-500"></i>Género
-                                            </label>
-                                            <div class="flex-1">
-                                                <p-select 
-                                                    id="gender"
-                                                    formControlName="gender"
-                                                    [options]="[
-                                                        { label: 'Selecciona tu género', value: '' },
-                                                        { label: 'Masculino', value: 'masculino' },
-                                                        { label: 'Femenino', value: 'femenino' }
-                                                    ]"
-                                                    optionLabel="label"
-                                                    optionValue="value"
-                                                    placeholder="Selecciona tu género"
-                                                    [showClear]="true"
-                                                    class="w-full">
-                                                </p-select>
-                                                <small class="text-600 block mt-1 text-xs md:text-sm">Opcional - Selecciona tu género</small>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label for="institutionId" class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-building mr-2 text-purple-500"></i>Institución
-                                            </label>
-                                            <div class="flex-1">
-                                                <p-select 
-                                                    id="institutionId"
-                                                    formControlName="institutionId"
-                                                    [options]="institutionsOptions"
-                                                    optionLabel="name"
-                                                    optionValue="id"
-                                                    placeholder="Selecciona tu institución"
-                                                    [showClear]="true"
-                                                    [loading]="loadingInstitutions"
-                                                    class="w-full">
-                                                </p-select>
-                                                <small class="text-600 block mt-1 text-xs md:text-sm">Opcional - Selecciona tu institución educativa</small>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-full flex flex-col md:flex-row gap-2 md:gap-4 md:items-center p-2">
-                                            <label class="font-medium text-900 text-sm md:text-base md:min-w-[100px]">
-                                                <i class="pi pi-envelope mr-2 text-blue-500"></i>Email
-                                            </label>
-                                            <div class="flex-1">
-                                                <input type="text" pInputText [value]="profileData.email" disabled
-                                                    class="w-full">
-                                                <small class="text-600 block mt-1 text-xs md:text-sm">
-                                                    <i class="pi pi-lock mr-1"></i>El email no se puede modificar por seguridad
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Botones de acción -->
-                        <div class="flex flex-col sm:flex-row gap-3 mt-4 py-4 border-top-1 surface-border justify-end">
-                            <button pButton type="button" label="Cancelar" icon="pi pi-times"
-                                class="p-button-outlined p-button-secondary w-full sm:w-auto order-2 sm:order-1" (click)="cancelEdit()"></button>
-
-                            <button pButton type="submit" label="Guardar Cambios" icon="pi pi-check"
-                                [disabled]="profileForm.invalid || savingChanges" [loading]="savingChanges"
-                                class="w-full sm:w-auto px-4 order-1 sm:order-2"></button>
-                        </div>
-                    </form>
                 </div>
-            </div>
+
+                <!-- Cuerpo: dos columnas -->
+                <div class="profile-edit-body">
+
+                    <!-- Izquierda: Avatar -->
+                    <aside class="profile-edit-avatar-panel">
+                        <h4 class="profile-edit-section-title">
+                            <i class="pi pi-image"></i> Elige tu avatar
+                        </h4>
+                        <div class="profile-edit-avatar-preview">
+                            <img [src]="selectedAvatarPath || profileData.urlAvatar" alt="Avatar seleccionado">
+                            <span class="profile-edit-avatar-badge"><i class="pi pi-check"></i></span>
+                        </div>
+                        <div class="profile-edit-avatar-grid">
+                            @for (avatar of availableAvatars; track avatar) {
+                            <button type="button" class="avatar-option" [class.selected]="selectedAvatarPath === avatar"
+                                (click)="selectAvatar(avatar)">
+                                <img [src]="avatar" alt="Avatar">
+                            </button>
+                            }
+                        </div>
+                        <small class="profile-edit-hint">
+                            <i class="pi pi-info-circle"></i> Haz clic en un avatar para seleccionarlo
+                        </small>
+                    </aside>
+
+                    <!-- Derecha: Campos -->
+                    <div class="profile-edit-fields">
+                        <h4 class="profile-edit-section-title">
+                            <i class="pi pi-id-card"></i> Información Personal
+                        </h4>
+
+                        <div class="edit-fields-grid">
+
+                            <!-- Nombre -->
+                            <div class="edit-field">
+                                <label for="ef-firstName" class="edit-label">
+                                    <i class="pi pi-user"></i> Nombre
+                                </label>
+                                <input id="ef-firstName" type="text" pInputText formControlName="firstName"
+                                    placeholder="Tu nombre" class="w-full">
+                                <small class="edit-error"
+                                    *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                                    <i class="pi pi-exclamation-circle"></i> Nombre es requerido
+                                </small>
+                            </div>
+
+                            <!-- Apellido -->
+                            <div class="edit-field">
+                                <label for="ef-lastName" class="edit-label">
+                                    <i class="pi pi-user"></i> Apellido
+                                </label>
+                                <input id="ef-lastName" type="text" pInputText formControlName="lastName"
+                                    placeholder="Tu apellido" class="w-full">
+                                <small class="edit-error"
+                                    *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                                    <i class="pi pi-exclamation-circle"></i> Apellido es requerido
+                                </small>
+                            </div>
+
+                            <!-- Cumpleaños -->
+                            <div class="edit-field">
+                                <label for="ef-birthday" class="edit-label">
+                                    <i class="pi pi-calendar"></i> Fecha de Nacimiento
+                                </label>
+                                <input id="ef-birthday" type="text" pInputText formControlName="birthday"
+                                    placeholder="DD/MM/YYYY" class="w-full">
+                                <small class="edit-hint">Formato: DD/MM/YYYY</small>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div class="edit-field">
+                                <label for="ef-whatsApp" class="edit-label">
+                                    <i class="pi pi-whatsapp"></i> WhatsApp
+                                </label>
+                                <p-inputMask id="ef-whatsApp" mask="(999) 999-9999" formControlName="whatsApp"
+                                    placeholder="(123) 456-7890" styleClass="w-full">
+                                </p-inputMask>
+                                <small class="edit-hint">Opcional — para contacto directo</small>
+                            </div>
+
+                            <!-- Género -->
+                            <div class="edit-field">
+                                <label for="ef-gender" class="edit-label">
+                                    <i class="pi pi-heart"></i> Género
+                                </label>
+                                <p-select id="ef-gender" formControlName="gender" [options]="[
+                        { label: 'Prefiero no indicar', value: '' },
+                        { label: 'Masculino', value: 'masculino' },
+                        { label: 'Femenino', value: 'femenino' }
+                      ]" optionLabel="label" optionValue="value" placeholder="Selecciona" [showClear]="true"
+                                    styleClass="w-full">
+                                </p-select>
+                                <small class="edit-hint">Opcional</small>
+                            </div>
+
+                            <!-- Institución -->
+                            <div class="edit-field">
+                                <label for="ef-institution" class="edit-label">
+                                    <i class="pi pi-building"></i> Institución
+                                </label>
+                                <p-select id="ef-institution" formControlName="institutionId"
+                                    [options]="institutionsOptions" optionLabel="name" optionValue="id"
+                                    placeholder="Selecciona tu institución" [showClear]="true"
+                                    [loading]="loadingInstitutions" styleClass="w-full">
+                                </p-select>
+                                <small class="edit-hint">Opcional</small>
+                            </div>
+
+                            <!-- Email (solo lectura) -->
+                            <div class="edit-field edit-field--full">
+                                <label class="edit-label edit-label--muted">
+                                    <i class="pi pi-envelope"></i> Email
+                                </label>
+                                <div class="edit-readonly-field">
+                                    <span>{{ profileData.email }}</span>
+                                    <span class="edit-readonly-badge">
+                                        <i class="pi pi-lock"></i> No editable
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer: botones -->
+                <div class="profile-edit-footer">
+                    <button type="button" class="edit-btn edit-btn--cancel" (click)="cancelEdit()">
+                        <i class="pi pi-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="edit-btn edit-btn--save"
+                        [disabled]="profileForm.invalid || savingChanges">
+                        <i class="pi" [ngClass]="savingChanges ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+                        {{ savingChanges ? 'Guardando...' : 'Guardar Cambios' }}
+                    </button>
+                </div>
+
+            </form>
         </div>
         }
+
     </div>
 </div>

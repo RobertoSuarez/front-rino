@@ -73,6 +73,22 @@ export class ProfileComponent implements OnInit {
   loadingInstitutions: boolean = false;
   availableAvatars: string[] = [];
   selectedAvatarPath: string = '';
+  recentActivity = [
+    {
+      type: 'module',
+      icon: 'pi-check-circle',
+      title: 'Completaste el módulo "Ciberseguridad Básica"',
+      time: 'Hace 2 horas',
+      reward: '+100 Yachay'
+    },
+    {
+      type: 'login',
+      icon: 'pi-sign-in',
+      title: 'Inicio de sesión exitoso',
+      time: 'Ayer a las 10:30',
+      reward: ''
+    }
+  ];
 
   get institutionsOptions(): Institution[] {
     return this.institutions || [];
@@ -392,5 +408,54 @@ export class ProfileComponent implements OnInit {
       'parent': 'help'
     };
     return typeColors[typeUser] || 'secondary';
+  }
+
+  formatDateShort(dateString: string | undefined): string {
+    if (!dateString) return '';
+    try {
+      let date: Date;
+
+      if (dateString.includes('/')) {
+        const datePart = dateString.split(' ')[0];
+        const parts = datePart.split('/');
+        if (parts.length === 3) {
+          const day = parts[0].padStart(2, '0');
+          const month = parts[1].padStart(2, '0');
+          const year = parts[2];
+          date = new Date(`${year}-${month}-${day}`);
+        } else {
+          return this.formatDate(dateString);
+        }
+      } else {
+        date = new Date(dateString);
+      }
+
+      if (isNaN(date.getTime())) return this.formatDate(dateString);
+
+      const options: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'America/Guayaquil'
+      };
+      return new Intl.DateTimeFormat('es-ES', options).format(date);
+    } catch {
+      return this.formatDate(dateString);
+    }
+  }
+
+  getProfileCompletion(): number {
+    if (!this.profileData) return 0;
+    const fields = [
+      this.profileData.firstName,
+      this.profileData.lastName,
+      this.profileData.email,
+      this.profileData.urlAvatar,
+      this.profileData.birthday,
+      this.profileData.whatsApp,
+      this.profileData.gender
+    ];
+    const completed = fields.filter((value) => !!value && String(value).trim() !== '').length;
+    return Math.round((completed / fields.length) * 100);
   }
 }

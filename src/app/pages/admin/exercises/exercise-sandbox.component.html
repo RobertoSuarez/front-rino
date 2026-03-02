@@ -1,0 +1,249 @@
+<p-toast></p-toast>
+
+<!-- Loader -->
+<div *ngIf="loading()" class="loader-wrap">
+    <div class="spinner"></div>
+</div>
+
+<!-- Página principal -->
+<div *ngIf="!loading()" class="sandbox-page">
+
+    <!-- ── Topbar ─────────────────────────────────────────────────────────── -->
+    <div class="sandbox-topbar">
+        <!-- Botón salir -->
+        <p-button icon="pi pi-arrow-left" label="Salir del Sandbox" severity="secondary" [outlined]="true" size="small"
+            (onClick)="goBack()">
+        </p-button>
+
+        <!-- Badge modo sandbox -->
+        <span class="sandbox-badge">
+            <i class="pi pi-eye"></i>
+            Modo Sandbox — Vista del Profesor
+        </span>
+
+        <!-- Título actividad -->
+        <span class="topbar-activity-title">{{ safeActivity.title }}</span>
+
+        <!-- Progreso -->
+        <div class="topbar-progress">
+            <span>{{ currentExerciseIndex() + 1 }}/{{ safeActivity.exercises.length }}</span>
+            <div class="progress-bar-wrap">
+                <p-progressBar [value]="progress" [showValue]="false"></p-progressBar>
+            </div>
+            <span>{{ progress }}%</span>
+        </div>
+    </div>
+
+    <!-- ── Body ───────────────────────────────────────────────────────────── -->
+    <div class="sandbox-body">
+
+        <!-- Estado vacío -->
+        <div *ngIf="safeActivity.exercises.length === 0" class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p style="font-size:1.1rem; font-weight:600; color:#e2e8f0;">Esta actividad no tiene ejercicios aún.</p>
+            <p style="font-size:0.85rem; margin-top:8px;">Crea el primer ejercicio desde la lista para poder
+                previsualizarlo aquí.</p>
+        </div>
+
+        <!-- Ejercicio actual -->
+        <div *ngIf="safeActivity.exercises.length > 0" class="exercise-card">
+
+            <!-- Card header -->
+            <div class="exercise-card-head">
+                <div class="exercise-type-chip">
+                    <i [class]="typeInfo.icon"></i>
+                    {{ typeInfo.label }}
+                </div>
+                <span class="exercise-number">
+                    Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
+                </span>
+            </div>
+
+            <!-- Card body -->
+            <div class="exercise-card-body">
+
+                <!-- Enunciado -->
+                <h2 class="exercise-statement">{{ currentExercise.statement }}</h2>
+
+                <!-- Pista -->
+                <div *ngIf="currentExercise.hind" class="exercise-hint">
+                    <i class="pi pi-lightbulb"></i>
+                    <span><strong>Pista:</strong> {{ currentExercise.hind }}</span>
+                </div>
+
+                <!-- Código (si tiene) -->
+                <div *ngIf="currentExercise.code" class="code-block">
+                    <pre><code>{{ currentExercise.code }}</code></pre>
+                </div>
+
+                <!-- Componente de ejercicio -->
+                <div class="exercise-component-wrap" [ngSwitch]="currentExercise.typeExercise">
+
+                    <app-single-selection-exercise *ngSwitchCase="'selection_single'"
+                        [options]="currentExercise.optionSelectOptions" [selectedOption]="currentAnswer?.answerSelect"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-single-selection-exercise>
+
+                    <app-multiple-selection-exercise *ngSwitchCase="'selection_multiple'"
+                        [options]="currentExercise.optionSelectOptions"
+                        [selectedOptions]="currentAnswer?.answerSelects || []"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-multiple-selection-exercise>
+
+                    <app-order-fragment-code-exercise *ngSwitchCase="'order_fragment_code'"
+                        [fragments]="currentExercise.optionOrderFragmentCode"
+                        [orderedFragments]="currentAnswer?.answerOrderFragmentCode || []"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-order-fragment-code-exercise>
+
+                    <app-order-line-code-exercise *ngSwitchCase="'order_line_code'"
+                        [lines]="currentExercise.optionOrderLineCode"
+                        [orderedLines]="currentAnswer?.answerOrderLineCode || []"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-order-line-code-exercise>
+
+                    <app-write-code-exercise *ngSwitchCase="'write_code'" [code]="currentAnswer?.answerWriteCode || ''"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-write-code-exercise>
+
+                    <app-find-error-code-exercise *ngSwitchCase="'find_error_code'"
+                        [options]="currentExercise.optionFindErrorCode" [selectedError]="currentAnswer?.answerFindError"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-find-error-code-exercise>
+
+                    <app-vertical-ordering-exercise *ngSwitchCase="'vertical_ordering'"
+                        [fragments]="currentExercise.optionsVerticalOrdering"
+                        [orderedFragments]="currentAnswer?.answerVerticalOrdering || []"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-vertical-ordering-exercise>
+
+                    <app-horizontal-ordering-exercise *ngSwitchCase="'horizontal_ordering'"
+                        [lines]="currentExercise.optionsHorizontalOrdering"
+                        [orderedLines]="currentAnswer?.answerHorizontalOrdering || []"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-horizontal-ordering-exercise>
+
+                    <app-phishing-selection-multiple-exercise *ngSwitchCase="'phishing_selection_multiple'"
+                        [options]="currentExercise.optionsPhishingSelection"
+                        [selectedOptions]="currentAnswer?.answerPhishingSelection || []"
+                        [phishingContext]="currentExercise.phishingContext"
+                        [phishingImageUrl]="currentExercise.phishingImageUrl"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-phishing-selection-multiple-exercise>
+
+                    <app-match-pairs-exercise *ngSwitchCase="'match_pairs'"
+                        [leftOptions]="currentExercise.optionsMatchPairsLeft"
+                        [rightOptions]="currentExercise.optionsMatchPairsRight"
+                        [matchedPairs]="currentAnswer?.answerMatchPairs || []"
+                        (answerSubmitted)="onAnswerSubmitted($event)">
+                    </app-match-pairs-exercise>
+                </div>
+            </div>
+
+            <!-- ── Action bar ── -->
+            <div class="action-bar">
+                <!-- Navegación -->
+                <div class="action-nav">
+                    <p-button *ngIf="!isFirstExercise" icon="pi pi-arrow-left" label="Anterior" severity="secondary"
+                        [outlined]="true" (onClick)="previousExercise()">
+                    </p-button>
+
+                    <p-button *ngIf="!isLastExercise" icon="pi pi-arrow-right" iconPos="right" label="Siguiente"
+                        severity="secondary" [outlined]="true" (onClick)="nextExercise()">
+                    </p-button>
+                </div>
+
+                <!-- Verificar / Reintentar -->
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <p-button *ngIf="answerSubmitted()" icon="pi pi-refresh" label="Reintentar" severity="secondary"
+                        [outlined]="true" size="small" (onClick)="restartCurrentExercise()">
+                    </p-button>
+
+                    <p-button *ngIf="!answerSubmitted()" icon="pi pi-check" iconPos="right" label="Verificar respuesta"
+                        [loading]="submitting()" [disabled]="!hasAnswer()" (onClick)="verifyAnswer()">
+                    </p-button>
+
+                    <p-button *ngIf="answerSubmitted()" icon="pi pi-eye" iconPos="right" label="Ver feedback"
+                        severity="info" (onClick)="showFeedbackDrawer.set(true)">
+                    </p-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ── Dialog de Feedback ─────────────────────────────────────────────────── -->
+<p-dialog [(visible)]="showFeedbackDrawer" [modal]="true" [draggable]="false" [resizable]="false" [showHeader]="false"
+    [closable]="false"
+    [style]="{'width': '680px', 'max-width': '95vw', 'border-radius': '20px', 'overflow': 'hidden', 'padding': '0'}"
+    [contentStyle]="{'padding': '0', 'border-radius': '20px'}">
+
+    <div class="fd-wrap" *ngIf="currentFeedback()">
+
+        <!-- Colored header banner -->
+        <div class="fd-header" [class]="'fd-header--' + feedbackClass">
+            <div class="fd-header-left">
+                <div class="fd-icon" [class]="'fd-icon--' + feedbackClass">
+                    <i class="pi" [ngClass]="{
+                        'pi-check-circle':      feedbackClass === 'success',
+                        'pi-exclamation-circle': feedbackClass === 'partial',
+                        'pi-times-circle':       feedbackClass === 'error'
+                    }"></i>
+                </div>
+                <div>
+                    <div class="fd-title">{{ feedbackTitle }}</div>
+                    <div class="fd-subtitle">Ejercicio {{ currentExerciseIndex() + 1 }} de {{
+                        activity()?.exercises?.length }}</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div class="fd-score" [class]="'fd-score--' + feedbackClass">
+                    <span class="fd-score-num">{{ safeFeedback.qualification }}</span>
+                    <span class="fd-score-den">/10</span>
+                </div>
+                <!-- Close X -->
+                <button class="fd-close-btn" (click)="closeFeedbackDrawer()" type="button" aria-label="Cerrar">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable body -->
+        <div class="fd-body">
+            <!-- Label -->
+            <div class="fd-label">
+                <i class="pi pi-comment"></i>
+                Retroalimentación del sistema
+            </div>
+
+            <!-- Feedback text -->
+            <div class="fd-text" [innerHTML]="safeFeedback.feedback"></div>
+
+            <!-- Sandbox notice -->
+            <div class="fd-notice">
+                <span class="sandbox-badge" style="font-size:0.65rem; white-space:nowrap;">
+                    <i class="pi pi-eye"></i> Sandbox — sin guardar
+                </span>
+                <span class="fd-notice-text">
+                    Las respuestas <strong>no se guardan</strong> ni afectan estadísticas de alumnos.
+                </span>
+            </div>
+        </div>
+
+        <!-- Footer actions -->
+        <div class="fd-footer">
+            <p-button icon="pi pi-refresh" label="Reintentar" severity="secondary" [outlined]="true"
+                (onClick)="restartCurrentExercise()">
+            </p-button>
+            <div style="flex:1;"></div>
+            <p-button *ngIf="!isLastExercise" icon="pi pi-arrow-right" iconPos="right" label="Siguiente ejercicio"
+                (onClick)="nextExercise()">
+            </p-button>
+            <p-button *ngIf="isLastExercise" icon="pi pi-flag-fill" label="Finalizar sandbox" severity="success"
+                (onClick)="goBack()">
+            </p-button>
+        </div>
+    </div>
+
+</p-dialog>

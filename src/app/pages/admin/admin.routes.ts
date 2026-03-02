@@ -42,6 +42,11 @@ export const adminRoutes: Routes = [
     title: 'Gestión de Actividades'
   },
   {
+    path: 'exercises/:activityId/sandbox',
+    loadComponent: () => import('./exercises/exercise-sandbox.component').then(m => m.ExerciseSandboxComponent),
+    title: 'Sandbox — Vista Previa de Ejercicios'
+  },
+  {
     path: 'exercises/:activityId',
     loadComponent: () => import('./exercises/exercises-list.component').then(m => m.ExercisesListComponent),
     title: 'Gestión de Ejercicios'

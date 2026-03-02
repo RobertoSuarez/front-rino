@@ -2,41 +2,24 @@
 <div class="card">
     <div class="flex justify-between items-center mb-4">
         <div class="font-semibold text-xl">Ejercicios de la Actividad: {{activityTitle}}</div>
-        <p-button 
-            icon="pi pi-arrow-left" 
-            label="Volver a Actividades" 
-            class="p-button-outlined"
+        <p-button icon="pi pi-arrow-left" label="Volver a Actividades" class="p-button-outlined"
             (click)="navigateBackToActivities()"></p-button>
     </div>
 
-    <p-table
-        #dt
-        [value]="exercises"
-        dataKey="id"
-        [rows]="10"
-        [loading]="loading"
-        [rowHover]="true"
-        [showGridlines]="true"
-        [paginator]="true"
-        [globalFilterFields]="['id', 'statement', 'typeExercise', 'approach']"
-        responsiveLayout="scroll"
-    >
+    <p-table #dt [value]="exercises" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
+        [showGridlines]="true" [paginator]="true" [globalFilterFields]="['id', 'statement', 'typeExercise', 'approach']"
+        responsiveLayout="scroll">
         <ng-template pTemplate="caption">
             <div class="flex justify-between items-center flex-column sm:flex-row gap-2">
                 <div class="flex gap-2">
-                    <p-button 
-                            label="Nuevo Ejercicio" 
-                            icon="pi pi-plus" 
-                            class="p-button-rounded"
-                            [disabled]="!activityId"
-                            (click)="showCreateDialog()"></p-button>
-                    <p-button 
-                            label="Generar con IA" 
-                            icon="pi pi-sparkles" 
-                            severity="info"
-                            class="p-button-rounded"
-                            [disabled]="!activityId"
-                            (click)="openGenerateDialog()"></p-button>
+                    <p-button label="Nuevo Ejercicio" icon="pi pi-plus" class="p-button-rounded"
+                        [disabled]="!activityId" (click)="showCreateDialog()"></p-button>
+                    <p-button label="Generar con IA" icon="pi pi-sparkles" severity="info" class="p-button-rounded"
+                        [disabled]="!activityId" (click)="openGenerateDialog()"></p-button>
+                    <p-button label="Probar Ejercicios" icon="pi pi-play" severity="warn" class="p-button-rounded"
+                        [disabled]="!activityId || exercises.length === 0"
+                        pTooltip="Abrir sandbox para previsualizar y probar los ejercicios como estudiante"
+                        tooltipPosition="bottom" (click)="openSandbox()"></p-button>
                 </div>
                 <p-iconField iconPosition="left" class="ml-auto">
                     <p-inputIcon>
@@ -71,19 +54,14 @@
                     <span *ngIf="exercise.typeExercise === 'match_pairs'">Emparejar Conceptos</span>
                 </td>
                 <td>
-                    <p-tag [value]="exercise.approach" 
-                           [severity]="exercise.approach === 'Teórica' ? 'info' : 'success'"></p-tag>
+                    <p-tag [value]="exercise.approach"
+                        [severity]="exercise.approach === 'Teórica' ? 'info' : 'success'"></p-tag>
                 </td>
                 <td>{{exercise.createdAt }}</td>
                 <td class="flex gap-2">
-                    <p-button pButton 
-                            icon="pi pi-pencil" 
-                            class="p-button-rounded p-button-text"
-                            (click)="showEditDialog(exercise)"></p-button>
-                    <p-button 
-                        icon="pi pi-trash" 
-                        severity="danger"
-                        class="p-button-rounded p-button-text"
+                    <p-button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text"
+                        (click)="showEditDialog(exercise)"></p-button>
+                    <p-button icon="pi pi-trash" severity="danger" class="p-button-rounded p-button-text"
                         (click)="confirmDelete(exercise)"></p-button>
                 </td>
             </tr>
@@ -104,41 +82,34 @@
     </p-table>
 </div>
 
-<p-dialog [header]="currentExerciseId ? 'Editar Ejercicio' : 'Nuevo Ejercicio'" 
-         [(visible)]="displayDialog" 
-         (onHide)="hideDialog()"
-         [style]="{width: '70vw', height: '90vh'}" 
-         [modal]="true"
-         [closable]="true"
-         class="rounded-lg shadow-xl">
-    <form [formGroup]="exerciseForm" 
-          (ngSubmit)="currentExerciseId ? updateExercise() : createExercise()" 
-          class="p-fluid space-y-4">
-        
+<p-dialog [header]="currentExerciseId ? 'Editar Ejercicio' : 'Nuevo Ejercicio'" [(visible)]="displayDialog"
+    (onHide)="hideDialog()" [style]="{width: '70vw', height: '90vh'}" [modal]="true" [closable]="true"
+    class="rounded-lg shadow-xl">
+    <form [formGroup]="exerciseForm" (ngSubmit)="currentExerciseId ? updateExercise() : createExercise()"
+        class="p-fluid space-y-4">
+
         <div class="field space-y-2">
             <label for="typeExercise" class="block text-sm font-medium text-gray-700">Tipo de Ejercicio</label>
-            <select id="typeExercise" 
-                   formControlName="typeExercise"
-                   (change)="onExerciseTypeChange()"
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <select id="typeExercise" formControlName="typeExercise" (change)="onExerciseTypeChange()"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option *ngFor="let option of exerciseTypes" [value]="option.value">{{option.label}}</option>
             </select>
         </div>
 
         <div class="field space-y-2">
             <label for="statement" class="block text-sm font-medium text-gray-700">Enunciado</label>
-            <textarea id="statement" pInputTextarea formControlName="statement" rows="3" required 
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
-            <small *ngIf="exerciseForm.get('statement')?.invalid && exerciseForm.get('statement')?.touched" class="text-red-500">
+            <textarea id="statement" pInputTextarea formControlName="statement" rows="3" required
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <small *ngIf="exerciseForm.get('statement')?.invalid && exerciseForm.get('statement')?.touched"
+                class="text-red-500">
                 El enunciado es requerido
             </small>
         </div>
 
         <div class="field space-y-2">
             <label for="difficulty" class="block text-sm font-medium text-gray-700">Dificultad</label>
-            <select id="difficulty" 
-                   formControlName="difficulty"
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <select id="difficulty" formControlName="difficulty"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option *ngFor="let option of difficultyOptions" [value]="option.value">{{option.label}}</option>
             </select>
         </div>
@@ -146,13 +117,13 @@
         <div class="field space-y-2">
             <label for="code" class="block text-sm font-medium text-gray-700">Código (si aplica)</label>
             <textarea id="code" pInputTextarea formControlName="code" rows="5"
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
         </div>
 
         <div class="field space-y-2">
             <label for="hind" class="block text-sm font-medium text-gray-700">Pista</label>
             <textarea id="hind" pInputTextarea formControlName="hind" rows="2" required
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
             <small *ngIf="exerciseForm.get('hind')?.invalid && exerciseForm.get('hind')?.touched" class="text-red-500">
                 La pista es requerida
             </small>
@@ -161,52 +132,37 @@
         <!-- Componentes dinámicos según el tipo de ejercicio -->
         <div class="field space-y-2">
             <label class="block text-sm font-medium text-gray-700 mb-3">Configuración del Ejercicio</label>
-            
-            <app-selection-single 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_single'"
-                [initialData]="exerciseTypeData"
-                (dataChange)="onExerciseDataChange($event)">
+
+            <app-selection-single *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_single'"
+                [initialData]="exerciseTypeData" (dataChange)="onExerciseDataChange($event)">
             </app-selection-single>
 
-            <app-selection-multiple 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_multiple'"
-                [initialData]="exerciseTypeData"
-                (dataChange)="onExerciseDataChange($event)">
+            <app-selection-multiple *ngIf="exerciseForm.get('typeExercise')?.value === 'selection_multiple'"
+                [initialData]="exerciseTypeData" (dataChange)="onExerciseDataChange($event)">
             </app-selection-multiple>
 
-            <app-vertical-ordering 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'vertical_ordering'"
-                [initialData]="exerciseTypeData"
-                (dataChange)="onExerciseDataChange($event)">
+            <app-vertical-ordering *ngIf="exerciseForm.get('typeExercise')?.value === 'vertical_ordering'"
+                [initialData]="exerciseTypeData" (dataChange)="onExerciseDataChange($event)">
             </app-vertical-ordering>
 
-            <app-horizontal-ordering 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'horizontal_ordering'"
-                [initialData]="exerciseTypeData"
-                (dataChange)="onExerciseDataChange($event)">
+            <app-horizontal-ordering *ngIf="exerciseForm.get('typeExercise')?.value === 'horizontal_ordering'"
+                [initialData]="exerciseTypeData" (dataChange)="onExerciseDataChange($event)">
             </app-horizontal-ordering>
 
-            <app-phishing-selection-multiple 
+            <app-phishing-selection-multiple
                 *ngIf="exerciseForm.get('typeExercise')?.value === 'phishing_selection_multiple'"
-                [initialData]="exerciseTypeData"
-                (dataChange)="onExerciseDataChange($event)">
+                [initialData]="exerciseTypeData" (dataChange)="onExerciseDataChange($event)">
             </app-phishing-selection-multiple>
 
-            <app-match-pairs 
-                *ngIf="exerciseForm.get('typeExercise')?.value === 'match_pairs'"
-                [initialData]="exerciseTypeData"
-                (dataChange)="onExerciseDataChange($event)">
+            <app-match-pairs *ngIf="exerciseForm.get('typeExercise')?.value === 'match_pairs'"
+                [initialData]="exerciseTypeData" (dataChange)="onExerciseDataChange($event)">
             </app-match-pairs>
         </div>
-        
+
         <div class="flex justify-end gap-3 mt-6">
-            <p-button type="button" label="Cancelar" 
-                    class=""
-                    (onClick)="hideDialog()"></p-button>
-            <p-button type="submit" 
-                    [label]="currentExerciseId ? 'Actualizar' : 'Crear'" 
-                    [disabled]="exerciseForm.invalid"
-                    class=""></p-button>
+            <p-button type="button" label="Cancelar" class="" (onClick)="hideDialog()"></p-button>
+            <p-button type="submit" [label]="currentExerciseId ? 'Actualizar' : 'Crear'"
+                [disabled]="exerciseForm.invalid" class=""></p-button>
         </div>
     </form>
 </p-dialog>
@@ -214,8 +170,6 @@
 <p-confirmDialog [style]="{ width: '450px' }" />
 
 <!-- Diálogo de Generación de Ejercicios con IA -->
-<app-generate-exercises-dialog
-    [activityId]="activityId"
-    (exercisesGenerated)="onExercisesGenerated($event)"
+<app-generate-exercises-dialog [activityId]="activityId" (exercisesGenerated)="onExercisesGenerated($event)"
     (dialogClosed)="onDialogClosed()">
 </app-generate-exercises-dialog>

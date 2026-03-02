@@ -5,29 +5,29 @@
 .phishing-context {
   display: flex;
   gap: 0.7rem;
-  background: var(--as-life-bg, #fef2f2);
-  border: 1px solid var(--as-life-border, #fca5a5);
-  border-left: 4px solid var(--as-danger, #dc2626);
+  background: var(--surface-card, #ffffff);
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-left: 4px solid var(--primary-color, #3b82f6);
   border-radius: 0.8rem;
   padding: 0.8rem 0.9rem;
   margin-bottom: 0.85rem;
 }
 
 .phishing-context i {
-  color: var(--as-danger, #dc2626);
+  color: var(--primary-color, #3b82f6);
   margin-top: 0.1rem;
 }
 
 .phishing-context h3 {
   margin: 0;
-  color: var(--as-danger, #991b1b);
+  color: var(--text-color, #1e293b);
   font-size: 0.9rem;
   font-weight: 800;
 }
 
 .phishing-context p {
   margin: 0.15rem 0 0;
-  color: var(--as-ink, #7f1d1d);
+  color: var(--text-color-secondary, #475569);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -39,12 +39,12 @@
 .phishing-image {
   width: 100%;
   border-radius: 0.8rem;
-  border: 2px solid var(--as-border, #e2e8f0);
+  border: 2px solid var(--surface-border, #e2e8f0);
 }
 
 .exercise-instruction {
   margin: 0 0 0.75rem;
-  color: var(--as-ink, #334155);
+  color: var(--text-color, #334155);
   font-size: 0.95rem;
   font-weight: 700;
 }
@@ -62,36 +62,36 @@
   align-items: center;
   gap: 0.8rem;
   padding: 0.9rem 1rem;
-  border: 2px solid var(--as-life-border, #fecaca);
+  border: 2px solid var(--surface-border, #e2e8f0);
   border-radius: 0.9rem;
-  background: var(--as-life-bg, #fff1f2);
+  background: var(--surface-card, #ffffff);
   text-align: left;
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 .option-item:hover {
-  border-color: var(--as-danger, #fb7185);
+  border-color: var(--primary-color, #3b82f6);
   transform: translateY(-1px);
 }
 
 .option-item:focus-visible {
-  outline: 3px solid var(--as-focus, rgba(244, 63, 94, 0.3));
+  outline: 3px solid var(--primary-color, rgba(59, 130, 246, 0.3));
   outline-offset: 2px;
 }
 
 .option-item.selected {
-  border-color: var(--as-danger, #e11d48);
-  background: var(--as-primary-soft, #ffe4e6);
-  box-shadow: 0 8px 16px var(--as-focus, rgba(225, 29, 72, 0.14));
+  border-color: var(--primary-color, #3b82f6);
+  background: var(--surface-hover, #f1f5f9);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.14);
 }
 
 .option-index {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  background: var(--as-surface-soft, #fecdd3);
-  color: var(--as-danger, #9f1239);
+  background: var(--surface-ground, #f8fafc);
+  color: var(--text-color, #334155);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -100,21 +100,21 @@
 }
 
 .option-item.selected .option-index {
-  background: var(--as-danger, #e11d48);
-  color: var(--as-surface, #fff);
+  background: var(--primary-color, #3b82f6);
+  color: var(--primary-color-text, #ffffff);
 }
 
 .option-label {
   font-size: 0.96rem;
   line-height: 1.4;
   font-weight: 600;
-  color: var(--as-ink, #881337);
+  color: var(--text-color, #1e293b);
 }
 
 .selection-indicator {
   width: 1.2rem;
   height: 1.2rem;
-  border: 2px solid var(--as-life-border, #fb7185);
+  border: 2px solid var(--surface-border, #cbd5e1);
   border-radius: 0.35rem;
   display: inline-flex;
   align-items: center;
@@ -125,14 +125,14 @@
 }
 
 .option-item.selected .selection-indicator {
-  border-color: var(--as-danger, #e11d48);
-  background: var(--as-danger, #e11d48);
-  color: var(--as-surface, #fff);
+  border-color: var(--primary-color, #3b82f6);
+  background: var(--primary-color, #3b82f6);
+  color: var(--primary-color-text, #ffffff);
 }
 
 .selection-counter {
   margin: 0.8rem 0 0;
-  color: var(--as-muted, #9f1239);
+  color: var(--text-color-secondary, #64748b);
   font-size: 0.85rem;
   font-weight: 700;
 }

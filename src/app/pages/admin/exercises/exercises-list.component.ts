@@ -68,12 +68,12 @@ export class ExercisesListComponent implements OnInit {
   activityId: number | null = null;
   activityTitle: string = '';
   exerciseTypeData: any = {};
-  
+
   // Parámetros para volver a la página de actividades
   returnCourseId: number | null = null;
   returnChapterId: number | null = null;
   returnTemaId: number | null = null;
-  
+
   // Tipos de ejercicios disponibles
   // - selection_single: El usuario selecciona UNA opción correcta (múltiple choice)
   // - selection_multiple: El usuario selecciona VARIAS opciones correctas (checkboxes)
@@ -119,17 +119,17 @@ export class ExercisesListComponent implements OnInit {
         this.loadExercises();
       }
     });
-    
+
     // Obtener los parámetros de retorno de la URL si existen
     this.route.queryParams.subscribe(params => {
       if (params['returnCourseId']) {
         this.returnCourseId = +params['returnCourseId'];
       }
-      
+
       if (params['returnChapterId']) {
         this.returnChapterId = +params['returnChapterId'];
       }
-      
+
       if (params['returnTemaId']) {
         this.returnTemaId = +params['returnTemaId'];
       }
@@ -249,7 +249,7 @@ export class ExercisesListComponent implements OnInit {
   showEditDialog(exercise: ExerciseListItem) {
     this.currentExerciseId = exercise.id;
     this.loading = true;
-    
+
     this.exerciseService.getExerciseById(exercise.id).subscribe({
       next: (response: any) => {
         // Normalizar datos: el backend a veces devuelve optionSelectionOptions en lugar de optionSelectOptions
@@ -287,10 +287,10 @@ export class ExercisesListComponent implements OnInit {
           optionsMatchPairsRight: response.optionsMatchPairsRight,
           answerMatchPairs: response.answerMatchPairs
         });
-        
+
         // Cargar datos para el componente específico usando los datos normalizados
         this.exerciseTypeData = normalizedData;
-        
+
         this.displayDialog = true;
         this.loading = false;
       },
@@ -317,10 +317,10 @@ export class ExercisesListComponent implements OnInit {
   onExerciseTypeChange() {
     // Limpiar datos del tipo anterior
     this.exerciseTypeData = {};
-    
+
     // Limpiar campos específicos según el tipo de ejercicio seleccionado
     const typeExercise = this.exerciseForm.get('typeExercise')?.value;
-    
+
     switch (typeExercise) {
       // SELECCIÓN SIMPLE: Una respuesta correcta
       case 'selection_single':
@@ -328,14 +328,14 @@ export class ExercisesListComponent implements OnInit {
           answerSelectsCorrect: []
         });
         break;
-      
+
       // SELECCIÓN MÚLTIPLE: Varias respuestas correctas
       case 'selection_multiple':
         this.exerciseForm.patchValue({
           answerSelectCorrect: ''
         });
         break;
-      
+
       // ORDENAMIENTO VERTICAL: Ordenar elementos verticalmente
       case 'vertical_ordering':
         this.exerciseForm.patchValue({
@@ -350,7 +350,7 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: []
         });
         break;
-      
+
       // ORDENAMIENTO HORIZONTAL: Ordenar elementos horizontalmente
       case 'horizontal_ordering':
         this.exerciseForm.patchValue({
@@ -365,7 +365,7 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: []
         });
         break;
-      
+
       // DETECCIÓN DE PHISHING: Identificar emails de phishing
       case 'phishing_selection_multiple':
         this.exerciseForm.patchValue({
@@ -380,7 +380,7 @@ export class ExercisesListComponent implements OnInit {
           answerMatchPairs: []
         });
         break;
-      
+
       // EMPAREJAR CONCEPTOS: Conectar elementos de dos columnas
       case 'match_pairs':
         this.exerciseForm.patchValue({
@@ -431,7 +431,7 @@ export class ExercisesListComponent implements OnInit {
     if (this.exerciseForm.valid) {
       this.loading = true;
       const data = this.exerciseForm.value;
-      
+
       this.exerciseService.createExercise(data).subscribe({
         next: () => {
           this.messageService.add({
@@ -459,7 +459,7 @@ export class ExercisesListComponent implements OnInit {
     if (this.exerciseForm.valid && this.currentExerciseId) {
       const data = this.exerciseForm.value;
       this.loading = true;
-      
+
       this.exerciseService.updateExercise(this.currentExerciseId, data).subscribe({
         next: () => {
           this.messageService.add({
@@ -491,7 +491,7 @@ export class ExercisesListComponent implements OnInit {
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: () => this.deleteExercise(exercise.id),
-      reject: () => {}
+      reject: () => { }
     });
   }
 
@@ -523,28 +523,37 @@ export class ExercisesListComponent implements OnInit {
     this.currentExerciseId = null;
     this.exerciseForm.reset();
   }
-  
+
   /**
    * Navega de vuelta a la página de actividades preservando el estado
    */
   navigateBackToActivities() {
     const queryParams: any = {};
-    
+
     if (this.returnCourseId) {
       queryParams.courseId = this.returnCourseId;
     }
-    
+
     if (this.returnChapterId) {
       queryParams.chapterId = this.returnChapterId;
     }
-    
+
     if (this.returnTemaId) {
       queryParams.temaId = this.returnTemaId;
     }
-    
+
     this.router.navigate(['/admin/activities'], {
       queryParams
     });
+  }
+
+  openSandbox() {
+    if (!this.activityId) return;
+    const queryParams: any = {};
+    if (this.returnTemaId) queryParams['returnTemaId'] = this.returnTemaId;
+    if (this.returnCourseId) queryParams['returnCourseId'] = this.returnCourseId;
+    if (this.returnChapterId) queryParams['returnChapterId'] = this.returnChapterId;
+    this.router.navigate(['/admin/exercises', this.activityId, 'sandbox'], { queryParams });
   }
 
   openGenerateDialog() {

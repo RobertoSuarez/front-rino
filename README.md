@@ -1,6 +1,11 @@
-# Sakai19
+# Sakai19 (Rino Frontend)
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.5.
+
+## ✨ Características Principales
+- **Ejercicios Interactivos**: Soporte para más de 10 tipos de ejercicios (Phishing, Encontrar Errores de Código, Emparejamiento, etc).
+- **IA Feedback**: Renderizado nativo de Markdown usando `marked` para la retroalimentación generada por Gemini AI.
+- **Diseño Moderno**: Integración nativa con PrimeNG y utilidades visuales dinámicas.
 
 ## Development server
 

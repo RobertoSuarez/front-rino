@@ -45,17 +45,28 @@
           <tr>
             <td>{{ institution.id }}</td>
             <td>
-              <img 
-                *ngIf="institution.logoUrl" 
-                [src]="institution.logoUrl" 
-                [alt]="institution.name"
-                class="w-4rem h-4rem object-cover border-round"
-                style="max-width: 64px; max-height: 64px;" />
-              <div 
-                *ngIf="!institution.logoUrl"
-                class="w-4rem h-4rem flex align-items-center justify-content-center bg-primary-100 text-primary-700 border-round">
-                <i class="pi pi-building text-2xl"></i>
-              </div>
+              <!-- Intentar mostrar siempre la imagen si existe logoUrl -->
+              <ng-container *ngIf="institution.logoUrl; else noLogo">
+                <img 
+                  [src]="getImageUrl(institution.logoUrl)" 
+                  [alt]="institution.name"
+                  class="border-round shadow-1"
+                  style="width: 48px; height: 48px; object-fit: contain; background: white; padding: 2px;"
+                  (error)="imgError.style.display='flex'; imgEl.style.display='none'"
+                  #imgEl />
+                <div #imgError
+                  style="display:none; width:48px; height:48px;"
+                  class="flex align-items-center justify-content-center bg-primary-100 text-primary-700 border-round">
+                  <i class="pi pi-building text-2xl"></i>
+                </div>
+              </ng-container>
+              <ng-template #noLogo>
+                <div 
+                  class="flex align-items-center justify-content-center bg-primary-100 text-primary-700 border-round"
+                  style="width: 48px; height: 48px;">
+                  <i class="pi pi-building text-2xl"></i>
+                </div>
+              </ng-template>
             </td>
             <td>
               <span class="font-semibold">{{ institution.name }}</span>
@@ -170,44 +181,64 @@
       <label class="block font-semibold mb-2">Logo de la Institución</label>
       
       <!-- Vista previa del logo -->
-      <div *ngIf="institution.logoUrl" class="mb-3 text-center">
-        <img 
-          [src]="institution.logoUrl" 
-          [alt]="institution.name || 'Logo'"
-          class="border-round shadow-2"
-          style="max-width: 200px; max-height: 200px; object-fit: contain; border: 2px solid var(--surface-border);"
-          (error)="onImageError()" />
+      <div *ngIf="previewUrl || institution.logoUrl" class="mb-3 flex justify-content-center">
+        <div class="relative inline-block border-round shadow-2" style="border: 2px solid var(--surface-border); background-color: white;">
+          <img 
+            [src]="previewUrl || getImageUrl(institution.logoUrl)" 
+            [alt]="institution.name || 'Logo'"
+            class="border-round"
+            style="width: 150px; height: 150px; object-fit: contain; padding: 0.5rem;"
+            (error)="onImageError()" />
+            
+          <button 
+            pButton 
+            pRipple 
+            icon="pi pi-trash" 
+            class="p-button-danger p-button-rounded p-button-sm absolute shadow-2" 
+            style="top: -12px; right: -12px; width: 2.2rem; height: 2.2rem;"
+            (click)="removeImage()"
+            pTooltip="Eliminar logo"
+            tooltipPosition="top">
+          </button>
+        </div>
       </div>
 
       <!-- Botón de subir imagen -->
-      <div class="flex flex-column gap-2">
+      <div class="flex flex-column gap-2 mt-2">
         <input 
           #fileInput
           type="file" 
           accept="image/*"
           style="display: none"
           (change)="onFileSelected($event)" />
-        
-        <button 
+          
+        <!-- Selector vacío -->
+        <div *ngIf="!(previewUrl || institution.logoUrl)" 
+             class="flex flex-column align-items-center justify-content-center p-4 border-2 border-dashed surface-border border-round cursor-pointer hover:surface-hover transition-colors"
+             style="background-color: var(--surface-50);"
+             (click)="fileInput.click()">
+          <i class="pi pi-image text-4xl text-500 mb-3"></i>
+          <span class="font-medium text-700 mb-1">Haz clic para subir un logo</span>
+          <span class="text-sm text-500">Formatos aceptados: JPG, PNG, GIF (máx. 5MB)</span>
+        </div>
+
+        <!-- Opción Cambiar cuando ya hay -->
+        <button *ngIf="previewUrl || institution.logoUrl"
           pButton 
           pRipple 
           type="button"
-          label="Seleccionar Logo" 
+          label="Cambiar Logo" 
           icon="pi pi-upload" 
           class="p-button-outlined w-full"
           [loading]="uploadingImage"
           (click)="fileInput.click()">
         </button>
 
-        <small class="text-600 block">
-          <i class="pi pi-info-circle mr-1"></i>
-          Formatos aceptados: JPG, PNG, GIF (máx. 5MB)
-        </small>
-
-        <small *ngIf="selectedFile" class="text-primary block">
-          <i class="pi pi-file mr-1"></i>
-          Archivo seleccionado: {{ selectedFile.name }}
-        </small>
+        <div class="text-center mt-2" *ngIf="uploadingImage">
+          <small class="text-primary font-semibold">
+            <i class="pi pi-spin pi-spinner mr-1"></i> Subiendo al servidor...
+          </small>
+        </div>
       </div>
     </div>
   </div>

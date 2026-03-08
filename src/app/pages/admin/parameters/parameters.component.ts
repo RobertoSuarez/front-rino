@@ -88,10 +88,10 @@ import { TooltipModule } from 'primeng/tooltip';
                   <div class="font-semibold">{{ key.keyName }}</div>
                 </td>
                 <td>
-                  <code class="text-sm bg-gray-100 px-2 py-1 border-round">{{ key.maskedValue }}</code>
+                  <code class="text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 border-round">{{ key.maskedValue }}</code>
                 </td>
                 <td>
-                  <div class="text-sm text-600">{{ key.description || 'Sin descripción' }}</div>
+                  <div class="text-sm text-600 dark:text-400">{{ key.description || 'Sin descripción' }}</div>
                 </td>
                 <td>
                   <p-tag 

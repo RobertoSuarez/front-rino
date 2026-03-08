@@ -17,6 +17,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { InstitutionService, ApiInstitutionResponse, ApiInstitutionSingleResponse } from '../../../core/services/institution.service';
 import { Institution, CreateInstitutionDto, UpdateInstitutionDto } from '../../../core/models/institution.interface';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-institutions-list',
@@ -47,6 +48,7 @@ export class InstitutionsListComponent implements OnInit {
   editMode = false;
   uploadingImage = false;
   selectedFile: File | null = null;
+  previewUrl: string | null = null;
 
   constructor(
     private institutionService: InstitutionService,
@@ -86,7 +88,8 @@ export class InstitutionsListComponent implements OnInit {
         }
         
         this.institutions = institutions;
-        console.log('Instituciones cargadas:', this.institutions.length);
+        // Log para verificar los datos recibidos
+        console.log('Primera institución de muestra:', institutions[0]);
         this.loading = false;
       },
       error: (error) => {
@@ -117,6 +120,7 @@ export class InstitutionsListComponent implements OnInit {
 
   openNew(): void {
     console.log('openNew() llamado');
+    this.previewUrl = null;
     this.institution = {
       name: '',
       description: '',
@@ -129,9 +133,17 @@ export class InstitutionsListComponent implements OnInit {
     console.log('institutionDialog:', this.institutionDialog);
   }
 
+  getImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/uploads/')) return `${environment.apiUrl}${url}`;
+    return `${environment.apiUrl}/uploads/${url}`;
+  }
+
   editInstitution(institution: Institution): void {
     this.institution = { ...institution };
     this.editMode = true;
+    this.previewUrl = null;
     this.institutionDialog = true;
   }
 
@@ -140,6 +152,7 @@ export class InstitutionsListComponent implements OnInit {
     this.submitted = false;
     this.selectedFile = null;
     this.uploadingImage = false;
+    this.previewUrl = null;
   }
 
   saveInstitution(): void {
@@ -315,7 +328,27 @@ export class InstitutionsListComponent implements OnInit {
     }
 
     this.selectedFile = file;
+
+    // Crear preview local
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.previewUrl = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
     this.uploadImage(file);
+  }
+
+  removeImage(): void {
+    this.institution.logoUrl = '';
+    this.previewUrl = null;
+    this.selectedFile = null;
+    // Resetear el input file nativo para que el evento 'change' se dispare
+    // incluso si el usuario intenta seleccionar el mismo archivo otra vez
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
   uploadImage(file: File): void {

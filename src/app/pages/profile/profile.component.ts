@@ -138,19 +138,19 @@ export class ProfileComponent implements OnInit {
   loadInstitutions(): void {
     this.loadingInstitutions = true;
     this.institutions = []; // Asegurar que siempre sea un array
-    
+
     this.institutionService.getAll().subscribe({
       next: (response: any) => {
         console.log('Respuesta de instituciones en perfil:', response);
-        
+
         // El interceptor del backend envuelve la respuesta, así que necesitamos extraer los datos correctamente
         let institutions: Institution[] = [];
-        
+
         if (response.data) {
           // Si response.data tiene otra propiedad data (respuesta anidada)
           if (response.data.data && Array.isArray(response.data.data)) {
             institutions = response.data.data;
-          } 
+          }
           // Si response.data es directamente el array
           else if (Array.isArray(response.data)) {
             institutions = response.data;
@@ -160,7 +160,7 @@ export class ProfileComponent implements OnInit {
             console.warn('Estructura de respuesta inesperada:', response.data);
           }
         }
-        
+
         this.institutions = institutions || [];
         console.log('Instituciones cargadas en perfil:', this.institutions.length);
         this.loadingInstitutions = false;
@@ -176,7 +176,7 @@ export class ProfileComponent implements OnInit {
   loadProfileData(): void {
     // Primero intentar obtener el usuario actual
     this.authService.getCurrentUser();
-    
+
     this.authService.currentUser$.subscribe(currentUser => {
       if (!currentUser || !currentUser.id) {
         // Si no hay usuario, intentar cargar desde el token
@@ -189,7 +189,7 @@ export class ProfileComponent implements OnInit {
         }
         return;
       }
-      
+
       this.userId = currentUser.id;
       this.fetchProfileData(currentUser.id);
     });
@@ -216,7 +216,7 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
-  
+
   fetchProfileData(userId: number): void {
     this.apiService.get(`users/${userId}/profile`).subscribe({
       next: (response: any) => {
@@ -240,7 +240,7 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
-  
+
   initForm(): void {
     if (this.profileData) {
       this.profileForm.patchValue({
@@ -272,14 +272,14 @@ export class ProfileComponent implements OnInit {
     this.selectedAvatarPath = avatarPath;
     this.profileForm.patchValue({ urlAvatar: avatarPath });
   }
-  
+
   toggleEditMode(): void {
     this.editMode = !this.editMode;
     if (this.editMode) {
       this.initForm();
     }
   }
-  
+
   saveProfile(event: Event): void {
     event.preventDefault();
     if (this.profileForm.invalid) {
@@ -290,7 +290,7 @@ export class ProfileComponent implements OnInit {
       });
       return;
     }
-    
+
     if (!this.userId) {
       this.messageService.add({
         severity: 'error',
@@ -299,11 +299,11 @@ export class ProfileComponent implements OnInit {
       });
       return;
     }
-    
+
     this.savingChanges = true;
     const updatedData = this.profileForm.value;
-  
-    
+
+
     this.apiService.put(`users/profile`, updatedData).subscribe({
       next: (response: any) => {
         if (response && response.data) {
@@ -336,7 +336,7 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
-  
+
   cancelEdit(): void {
     this.editMode = false;
     this.initForm();
@@ -344,10 +344,10 @@ export class ProfileComponent implements OnInit {
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return '';
-    
+
     try {
       let date: Date;
-      
+
       // Intentar diferentes formatos de fecha
       if (dateString.includes('/')) {
         // Formato DD/MM/YYYY HH:MM:SS o DD/MM/YYYY
@@ -369,12 +369,12 @@ export class ProfileComponent implements OnInit {
         // Intentar parsear directamente
         date = new Date(dateString);
       }
-      
+
       // Verificar si la fecha es válida
       if (isNaN(date.getTime())) {
         return dateString;
       }
-      
+
       // Formatear la fecha en español
       const options: Intl.DateTimeFormatOptions = {
         day: 'numeric',
@@ -382,7 +382,7 @@ export class ProfileComponent implements OnInit {
         year: 'numeric',
         timeZone: 'America/Guayaquil'
       };
-      
+
       return new Intl.DateTimeFormat('es-ES', options).format(date);
     } catch (error) {
       console.error('Error al formatear fecha:', error);

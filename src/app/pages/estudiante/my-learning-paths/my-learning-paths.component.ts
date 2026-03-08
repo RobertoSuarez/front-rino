@@ -45,8 +45,8 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
       <div class="col-span-12">
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h2 class="text-3xl font-bold text-900 mb-2">Mis Rutas de Aprendizaje</h2>
-            <p class="text-600">Explora y gestiona las rutas a las que estás suscrito</p>
+            <h2 class="text-3xl font-bold text-900 dark:text-white mb-2">Mis Rutas de Aprendizaje</h2>
+            <p class="text-600 dark:text-gray-400">Explora y gestiona las rutas a las que estás suscrito</p>
           </div>
           <button 
             pButton 
@@ -90,27 +90,27 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
 
       <!-- Empty State -->
       <div class="col-span-12" *ngIf="!loading && subscriptions.length === 0">
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div class="empty-state-wrap">
-            <div class="empty-state-icon">
+            <div class="empty-state-icon dark:bg-emerald-900/40 dark:text-emerald-400">
               <i class="pi pi-map"></i>
             </div>
 
-            <h3 class="empty-state-title">No tienes rutas de aprendizaje</h3>
-            <p class="empty-state-description">
+            <h3 class="empty-state-title text-gray-800 dark:text-white">No tienes rutas de aprendizaje</h3>
+            <p class="empty-state-description text-gray-600 dark:text-gray-400">
               Únete con el código que te compartió tu profesor para empezar tu recorrido en Cyber Imperium.
             </p>
 
             <div class="empty-state-tips">
-              <span><i class="pi pi-check-circle"></i> Usa el código exacto de la ruta</span>
-              <span><i class="pi pi-info-circle"></i> Formato sugerido: LP-AAAAMMDD-XXXX</span>
+              <span class="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"><i class="pi pi-check-circle"></i> Usa el código exacto de la ruta</span>
+              <span class="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"><i class="pi pi-info-circle"></i> Formato sugerido: LP-AAAAMMDD-XXXX</span>
             </div>
 
             <button 
               pButton 
               label="Unirme a una Ruta" 
               icon="pi pi-plus-circle" 
-              class="p-button-primary p-button-raised px-8"
+              class="p-button-primary p-button-raised px-8 mt-4"
               (click)="showSubscribeDialog()">
             </button>
           </div>
@@ -119,15 +119,15 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
 
       <!-- Rutas Suscritas -->
       <div class="col-span-12 md:col-span-6 lg:col-span-4" *ngFor="let sub of subscriptions">
-        <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
           <!-- Header con gradiente minimalista -->
           <div class="relative">
-            <div class="bg-gradient-to-r from-primary-50 to-primary-100 p-6 border-b border-primary-200">
+            <div class="bg-gradient-to-r from-primary-50 to-primary-100 dark:from-emerald-900/30 dark:to-emerald-800/20 p-6 border-b border-primary-200 dark:border-emerald-800/30">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
-                  <h3 class="text-xl font-bold text-gray-800 mb-1 line-clamp-2">{{ sub.learningPath.name }}</h3>
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs font-mono bg-primary-200 text-primary-800 px-2 py-1 rounded-full">
+                  <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-1 line-clamp-2">{{ sub.learningPath.name }}</h3>
+                  <div class="flex items-center gap-2 mt-2">
+                    <span class="text-xs font-mono bg-primary-200 dark:bg-emerald-900/40 text-primary-800 dark:text-emerald-300 px-2 py-1 rounded-full border border-transparent dark:border-emerald-800/50">
                       {{ sub.learningPath.code }}
                     </span>
                     <p-tag 
@@ -139,7 +139,7 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
                   </div>
                 </div>
                 <div class="flex-shrink-0 ml-4">
-                  <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
+                  <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 dark:from-emerald-500 dark:to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
                     <i class="pi pi-map text-white text-lg"></i>
                   </div>
                 </div>
@@ -150,41 +150,41 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
           <!-- Contenido principal -->
           <div class="p-5 flex-grow flex flex-col">
             <!-- Descripción -->
-            <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3 leading-relaxed">
               {{ sub.learningPath.description }}
             </p>
 
             <!-- Métricas -->
             <div class="grid grid-cols-2 gap-3 mb-4">
-              <div class="bg-blue-50 rounded-lg p-3 text-center">
-                <i class="pi pi-book text-blue-600 text-lg mb-1"></i>
-                <div class="text-lg font-bold text-blue-900">{{ sub.learningPath.coursesCount || 0 }}</div>
-                <div class="text-xs text-blue-700">Cursos</div>
+              <div class="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-3 text-center border border-transparent dark:border-blue-800/30">
+                <i class="pi pi-book text-blue-600 dark:text-blue-400 text-lg mb-1"></i>
+                <div class="text-lg font-bold text-blue-900 dark:text-blue-200">{{ sub.learningPath.coursesCount || 0 }}</div>
+                <div class="text-xs text-blue-700 dark:text-blue-300">Cursos</div>
               </div>
-              <div class="bg-green-50 rounded-lg p-3 text-center">
-                <i class="pi pi-check-circle text-green-600 text-lg mb-1"></i>
-                <div class="text-lg font-bold text-green-900">{{ sub.completedCourses || 0 }}</div>
-                <div class="text-xs text-green-700">Completados</div>
+              <div class="bg-green-50 dark:bg-emerald-900/40 rounded-lg p-3 text-center border border-transparent dark:border-emerald-800/30">
+                <i class="pi pi-check-circle text-green-600 dark:text-emerald-400 text-lg mb-1"></i>
+                <div class="text-lg font-bold text-green-900 dark:text-emerald-200">{{ sub.completedCourses || 0 }}</div>
+                <div class="text-xs text-green-700 dark:text-emerald-300">Completados</div>
               </div>
             </div>
 
             <!-- Información adicional -->
-            <div class="space-y-2 mb-4 border-t border-gray-100 pt-4">
-              <div class="flex items-center text-sm text-gray-600" *ngIf="sub.learningPath.createdBy">
-                <i class="pi pi-user mr-2 text-primary-500"></i>
+            <div class="space-y-2 mb-4 border-t border-gray-100 dark:border-gray-700 pt-4">
+              <div class="flex items-center text-sm text-gray-600 dark:text-gray-400" *ngIf="sub.learningPath.createdBy">
+                <i class="pi pi-user mr-2 text-primary-500 dark:text-emerald-400"></i>
                 <span class="truncate">{{ sub.learningPath.createdBy.firstName }} {{ sub.learningPath.createdBy.lastName }}</span>
               </div>
-              <div class="flex items-center text-sm text-gray-500">
-                <i class="pi pi-calendar mr-2 text-gray-400"></i>
+              <div class="flex items-center text-sm text-gray-500 dark:text-gray-500">
+                <i class="pi pi-calendar mr-2"></i>
                 <span>Suscrito: {{ sub.subscribedAt | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
             
             <!-- Barra de progreso -->
-            <div class="mb-4 mt-auto">
+            <div class="mb-5 mt-auto">
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-medium text-gray-700">Progreso general</span>
-                <span class="text-sm font-bold bg-primary-100 text-primary px-2 py-1 rounded-full">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progreso general</span>
+                <span class="text-xs font-bold bg-primary-100 dark:bg-emerald-900/40 text-primary dark:text-emerald-400 px-2 py-1 rounded-full border border-transparent dark:border-emerald-800/30">
                   {{ getProgressPercentage(sub) || 0 }}%
                 </span>
               </div>
@@ -320,7 +320,6 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
 
     .empty-state-title {
       margin: 0;
-      color: #1f2937;
       font-size: clamp(1.6rem, 2.4vw, 2rem);
       font-weight: 700;
       line-height: 1.2;
@@ -328,7 +327,6 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
 
     .empty-state-description {
       margin: 0;
-      color: #4b5563;
       font-size: 1.03rem;
       line-height: 1.65;
       max-width: 52ch;
@@ -350,7 +348,6 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
       gap: 0.4rem;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      color: #334155;
       border-radius: 9999px;
       padding: 0.35rem 0.75rem;
       font-size: 0.84rem;
@@ -371,7 +368,7 @@ export class MyLearningPathsComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadSubscriptions();

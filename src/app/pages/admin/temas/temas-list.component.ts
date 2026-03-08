@@ -94,6 +94,19 @@ export class TemasListComponent implements OnInit {
     { label: 'Difícil', value: 'Difícil' }
   ];
 
+  viewMode: 'table' | 'grid' = 'table';
+  searchTerm: string = '';
+
+  get filteredTemas(): Tema[] {
+    if (!this.searchTerm) return this.temas;
+    const term = this.searchTerm.toLowerCase();
+    return this.temas.filter(t =>
+      t.title.toLowerCase().includes(term) ||
+      (t.shortDescription && t.shortDescription.toLowerCase().includes(term)) ||
+      (t.difficulty && t.difficulty.toLowerCase().includes(term))
+    );
+  }
+
   @ViewChild('dt') dt!: Table;
 
   constructor(
@@ -259,12 +272,12 @@ export class TemasListComponent implements OnInit {
     if (!dateString || typeof dateString !== 'string') {
       return dateString;
     }
-    
+
     const parts = dateString.split(' ');
     if (parts.length === 2) {
       const dateParts = parts[0].split('/');
       const timeParts = parts[1].split(':');
-      
+
       if (dateParts.length === 3 && timeParts.length >= 2) {
         try {
           const day = parseInt(dateParts[0], 10);
@@ -273,7 +286,7 @@ export class TemasListComponent implements OnInit {
           const hour = parseInt(timeParts[0], 10);
           const minute = parseInt(timeParts[1], 10);
           const second = timeParts.length > 2 ? parseInt(timeParts[2], 10) : 0;
-          
+
           return new Date(year, month, day, hour, minute, second).toISOString();
         } catch (error) {
           console.error('Error al convertir fecha:', error);
@@ -281,7 +294,7 @@ export class TemasListComponent implements OnInit {
         }
       }
     }
-    
+
     return dateString;
   }
 
@@ -332,7 +345,7 @@ export class TemasListComponent implements OnInit {
   showEditDialog(tema: Tema) {
     this.currentTemaId = tema.id;
     this.loading = true;
-    
+
     this.temaService.getTemaById(tema.id).subscribe({
       next: (response) => {
         if (response && response.data) {
@@ -340,7 +353,7 @@ export class TemasListComponent implements OnInit {
           if (response.data.createdAt) {
             response.data.createdAt = this.convertStringToDate(response.data.createdAt);
           }
-          
+
           this.temaForm.patchValue({
             chapterId: response.data.chapterId || this.selectedChapterId,
             title: response.data.title,
@@ -372,7 +385,7 @@ export class TemasListComponent implements OnInit {
     if (this.temaForm.valid) {
       this.loading = true;
       const data = this.temaForm.value;
-      
+
       this.temaService.createTema(data).subscribe({
         next: () => {
           this.messageService.add({
@@ -400,7 +413,7 @@ export class TemasListComponent implements OnInit {
     if (this.temaForm.valid && this.currentTemaId) {
       const data = this.temaForm.value;
       this.loading = true;
-      
+
       this.temaService.updateTema(this.currentTemaId, data).subscribe({
         next: () => {
           this.messageService.add({
@@ -432,7 +445,7 @@ export class TemasListComponent implements OnInit {
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: () => this.deleteTema(tema.id),
-      reject: () => {}
+      reject: () => { }
     });
   }
 
@@ -471,7 +484,7 @@ export class TemasListComponent implements OnInit {
     this.currentTemaId = null;
     this.temaForm.reset();
   }
-  
+
   /**
    * Navega a la página de actividades para el tema seleccionado
    * @param temaId ID del tema
@@ -487,7 +500,7 @@ export class TemasListComponent implements OnInit {
   generateContentWithAI() {
     const title = this.temaForm.get('title')?.value;
     const chapterId = this.selectedChapterId;
-    
+
     if (!title) {
       this.messageService.add({
         severity: 'warn',
@@ -519,7 +532,7 @@ export class TemasListComponent implements OnInit {
   generateDescriptionFromPrompt() {
     const title = this.temaForm.get('title')?.value;
     const chapterId = this.selectedChapterId;
-    
+
     if (!this.descriptionPrompt.trim()) {
       this.messageService.add({
         severity: 'warn',
@@ -545,7 +558,7 @@ export class TemasListComponent implements OnInit {
       next: (chapterResponse: any) => {
         if (chapterResponse && chapterResponse.data) {
           const chapterTitle = chapterResponse.data.title;
-          
+
           // Obtener información del curso
           this.courseService.getCourseById(chapterResponse.data.courseId).subscribe({
             next: (courseResponse: any) => {
@@ -568,16 +581,16 @@ export class TemasListComponent implements OnInit {
                   },
                   error: (err: any) => {
                     console.error('Error al generar descripción', err);
-                    
+
                     // Extraer mensaje de error del backend
                     let errorMessage = 'Error al generar descripción con IA';
                     let errorSummary = 'Error';
                     let severity = 'error';
-                    
+
                     // Verificar si es un error de contenido inapropiado
                     if (err.error?.message) {
                       errorMessage = err.error.message;
-                      
+
                       // Si contiene "No es posible" es contenido inapropiado
                       if (errorMessage.includes('No es posible')) {
                         errorSummary = '⚠️ Contenido No Permitido';
@@ -586,14 +599,14 @@ export class TemasListComponent implements OnInit {
                     } else if (err.message) {
                       errorMessage = err.message;
                     }
-                    
+
                     this.messageService.add({
                       severity: severity,
                       summary: errorSummary,
                       detail: errorMessage,
                       life: 5000
                     });
-                    
+
                     this.generatingDescription = false;
                   }
                 });
@@ -724,7 +737,7 @@ export class TemasListComponent implements OnInit {
       next: (chapterResponse: any) => {
         if (chapterResponse && chapterResponse.data) {
           const chapterTitle = chapterResponse.data.title;
-          
+
           // Obtener información del curso
           this.courseService.getCourseById(chapterResponse.data.courseId).subscribe({
             next: (courseResponse: any) => {
@@ -753,16 +766,16 @@ export class TemasListComponent implements OnInit {
                   },
                   error: (err: any) => {
                     console.error('Error al generar teoría', err);
-                    
+
                     // Extraer mensaje de error del backend
                     let errorMessage = 'Error al generar teoría con IA';
                     let errorSummary = 'Error';
                     let severity = 'error';
-                    
+
                     // Verificar si es un error de contenido inapropiado
                     if (err.error?.message) {
                       errorMessage = err.error.message;
-                      
+
                       // Si contiene "No es posible" es contenido inapropiado
                       if (errorMessage.includes('No es posible')) {
                         errorSummary = '⚠️ Contenido No Permitido';
@@ -771,14 +784,14 @@ export class TemasListComponent implements OnInit {
                     } else if (err.message) {
                       errorMessage = err.message;
                     }
-                    
+
                     this.messageService.add({
                       severity: severity,
                       summary: errorSummary,
                       detail: errorMessage,
                       life: 5000 // Mostrar por 5 segundos
                     });
-                    
+
                     // Resetear loading en caso de error
                     this.generatingTheory = false;
                   }

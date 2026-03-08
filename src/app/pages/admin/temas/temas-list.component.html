@@ -1,63 +1,64 @@
 <p-toast></p-toast>
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Gestión de Temas</div>
-
-    <div class="mb-4 flex flex-col md:flex-row gap-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Curso</label>
-            <select class="p-2 border border-gray-300 rounded-md w-3xl" 
-                    (change)="onCourseChange($event)"
-                    [value]="selectedCourseId">
-                <option value="" disabled>Selecciona un curso</option>
-                <option *ngFor="let course of courses" [value]="course.value" [selected]="course.value === selectedCourseId">{{course.label}}</option>
-            </select>
-        </div>
-        
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Capítulo</label>
-            <select class="p-2 border border-gray-300 rounded-md w-3xl" 
-                    (change)="onChapterChange($event)"
-                    [value]="selectedChapterId"
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-6">
+        <div class="flex flex-col gap-2 w-full lg:w-1/3">
+            <div class="font-semibold text-2xl text-gray-800">Gestión de Temas</div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <select
+                    class="p-2.5 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all text-gray-700 font-medium cursor-pointer"
+                    (change)="onCourseChange($event)" [value]="selectedCourseId">
+                    <option value="" disabled>Selecciona un curso</option>
+                    <option *ngFor="let course of courses" [value]="course.value"
+                        [selected]="course.value === selectedCourseId">{{course.label}}</option>
+                </select>
+                <select
+                    class="p-2.5 border border-gray-300 rounded-xl w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all text-gray-700 font-medium cursor-pointer"
+                    (change)="onChapterChange($event)" [value]="selectedChapterId"
                     [disabled]="!selectedCourseId || chapters.length === 0">
-                <option value="" disabled>Selecciona un capítulo</option>
-                <option *ngFor="let chapter of chapters" [value]="chapter.value" [selected]="chapter.value === selectedChapterId">{{chapter.label}}</option>
-            </select>
+                    <option value="" disabled>Selecciona un capítulo</option>
+                    <option *ngFor="let chapter of chapters" [value]="chapter.value"
+                        [selected]="chapter.value === selectedChapterId">{{chapter.label}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <p-iconField iconPosition="left" class="w-full sm:w-64 lg:w-72">
+                <p-inputIcon>
+                    <i class="pi pi-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" [(ngModel)]="searchTerm" placeholder="Buscar tema..."
+                    class="w-full rounded-xl"
+                    (input)="viewMode === 'table' ? dt.filterGlobal($any($event.target).value, 'contains') : null" />
+            </p-iconField>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <div
+                    class="bg-gray-100 p-1.5 rounded-xl flex items-center gap-1 shrink-0 border border-gray-200 shadow-inner">
+                    <button (click)="viewMode = 'table'"
+                        [class]="viewMode === 'table' ? 'bg-white shadow-sm text-blue-600 rounded-lg' : 'text-gray-500 hover:text-gray-700 rounded-lg'"
+                        class="px-4 py-2 transition-all duration-300 flex items-center gap-2 font-semibold">
+                        <i class="pi pi-list"></i>
+                        <span class="hidden sm:inline">Tabla</span>
+                    </button>
+                    <button (click)="viewMode = 'grid'"
+                        [class]="viewMode === 'grid' ? 'bg-white shadow-sm text-blue-600 rounded-lg' : 'text-gray-500 hover:text-gray-700 rounded-lg'"
+                        class="px-4 py-2 transition-all duration-300 flex items-center gap-2 font-semibold">
+                        <i class="pi pi-th-large"></i>
+                        <span class="hidden sm:inline">Tarjetas</span>
+                    </button>
+                </div>
+
+                <p-button label="Nuevo" icon="pi pi-plus" severity="success" [raised]="true"
+                    [disabled]="!selectedChapterId" (click)="showCreateDialog()"
+                    class="shadow-md hover:shadow-lg transition-all duration-300 shrink-0"></p-button>
+            </div>
         </div>
     </div>
 
-    <p-table
-        #dt
-        [value]="temas"
-        dataKey="id"
-        [rows]="10"
-        [loading]="loading"
-        [rowHover]="true"
-        [showGridlines]="true"
-        [paginator]="true"
-        [globalFilterFields]="['id', 'title', 'difficulty']"
-        responsiveLayout="scroll"
-    >
-        <ng-template pTemplate="caption">
-            <div class="flex justify-between items-center flex-column sm:flex-row">
-                <p-button
-                        label="Nuevo Tema"
-                        icon="pi pi-plus"
-                        severity="success"
-                        [raised]="true"
-                        [disabled]="!selectedChapterId"
-                        (click)="showCreateDialog()"
-                        class="shadow-lg hover:shadow-xl transition-all duration-200"
-                        pTooltip="Crear un nuevo tema"
-                        tooltipPosition="bottom"></p-button>
-                <p-iconField iconPosition="left" class="ml-auto">
-                    <p-inputIcon>
-                        <i class="pi pi-search"></i>
-                    </p-inputIcon>
-                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar tema" />
-                </p-iconField>
-            </div>
-        </ng-template>
-
+    @if (viewMode === 'table') {
+    <p-table #dt [value]="temas" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true" [showGridlines]="true"
+        [paginator]="true" [globalFilterFields]="['id', 'title', 'difficulty']" responsiveLayout="scroll">
         <ng-template pTemplate="header">
             <tr>
                 <th>ID</th>
@@ -70,34 +71,20 @@
 
         <ng-template pTemplate="body" let-tema>
             <tr>
-                <td>{{tema.id}}</td>
-                <td>{{tema.title}}</td>
+                <td class="text-gray-500 font-medium">{{tema.id}}</td>
+                <td class="font-medium text-gray-800">{{tema.title}}</td>
                 <td>
-                    <p-tag [value]="tema.difficulty" 
-                           [severity]="tema.difficulty === 'Fácil' ? 'success' : (tema.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
+                    <p-tag [value]="tema.difficulty"
+                        [severity]="tema.difficulty === 'Fácil' ? 'success' : (tema.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
                 </td>
-                <td>{{tema.createdAt}}</td>
+                <td class="text-gray-500">{{tema.createdAt}}</td>
                 <td class="flex gap-2">
-                    <p-button
-                            icon="pi pi-pencil"
-                            [raised]="true"
-                            severity="info"
-                            (click)="showEditDialog(tema)"
-                            pTooltip="Editar tema"
-                            tooltipPosition="top"></p-button>
-                    <p-button
-                        icon="pi pi-trash"
-                        [raised]="true"
-                        severity="danger"
-                        (click)="confirmDelete(tema)"
-                        pTooltip="Eliminar tema"
-                        tooltipPosition="top"></p-button>
-                    <p-button
-                        icon="pi pi-list"
-                        [raised]="true"
-                        severity="success"
-                        (click)="navigateToActivities(tema.id)"
-                        pTooltip="Ver actividades"
+                    <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
+                        (click)="showEditDialog(tema)" pTooltip="Editar" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                        (click)="confirmDelete(tema)" pTooltip="Eliminar" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-list" [outlined]="true" severity="success" size="small" label="Actividades"
+                        (click)="navigateToActivities(tema.id)" pTooltip="Ver actividades"
                         tooltipPosition="top"></p-button>
                 </td>
             </tr>
@@ -105,167 +92,207 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="5" class="text-center p-4">
-                    <div *ngIf="selectedChapterId; else selectChapter">
-                        No se encontraron temas para este capítulo.
+                <td colspan="5" class="text-center py-12">
+                    <div *ngIf="selectedChapterId; else selectChapter" class="flex flex-col items-center">
+                        <i class="pi pi-inbox text-5xl text-gray-300 mb-4"></i>
+                        <span class="text-lg font-medium text-gray-500">No se encontraron temas para este
+                            capítulo.</span>
                     </div>
                     <ng-template #selectChapter>
-                        <div *ngIf="selectedCourseId; else selectCourse">
-                            Selecciona un capítulo para ver sus temas.
+                        <div class="flex flex-col items-center">
+                            <i class="pi pi-hand-pointer text-5xl text-blue-300 mb-4"></i>
+                            <span class="text-lg font-medium text-blue-600">Selecciona un curso y capítulo arriba para
+                                ver sus temas.</span>
                         </div>
-                        <ng-template #selectCourse>
-                            Selecciona un curso y un capítulo para ver sus temas.
-                        </ng-template>
                     </ng-template>
                 </td>
             </tr>
         </ng-template>
     </p-table>
+    }
+
+    @if (viewMode === 'grid') {
+    @if (!selectedChapterId) {
+    <div
+        class="w-full py-16 flex flex-col items-center justify-center bg-blue-50 rounded-3xl border-2 border-dashed border-blue-200">
+        <i class="pi pi-hand-pointer text-6xl text-blue-300 mb-4 animate-bounce"></i>
+        <h3 class="text-2xl font-bold text-blue-800 mb-2">¡Prepara el Temario!</h3>
+        <p class="text-blue-600 text-center max-w-md">Selecciona un curso y luego un capítulo para descubrir o añadir
+            temas.</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (tema of filteredTemas; track tema.id; let i = $index) {
+        <div
+            class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 hover:border-indigo-100 transition-all duration-300 overflow-hidden flex flex-col group hover:-translate-y-1">
+
+            <div class="p-6 flex-1 flex flex-col relative">
+                <!-- Background gentle gradient -->
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-bl-full -z-10 opacity-70">
+                </div>
+
+                <div class="flex justify-between items-start mb-4 gap-2">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="bg-indigo-100 text-indigo-600 font-bold rounded-full w-10 h-10 flex items-center justify-center text-lg flex-shrink-0">
+                            {{ i + 1 }}
+                        </div>
+                        <p-tag [value]="tema.difficulty"
+                            [severity]="tema.difficulty === 'Fácil' ? 'success' : (tema.difficulty === 'Medio' ? 'warning' : 'danger')"
+                            styleClass="font-bold"></p-tag>
+                    </div>
+                </div>
+
+                <h3
+                    class="text-xl font-extrabold text-gray-800 mb-3 leading-tight group-hover:text-indigo-600 transition-colors">
+                    {{ tema.title }}</h3>
+                <p class="text-gray-500 mb-6 flex-1 text-sm leading-relaxed">{{ tema.shortDescription || 'Sin
+                    descripción' }}</p>
+
+                <div class="flex items-center gap-3 text-xs font-semibold text-gray-400 mb-5">
+                    <div class="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                        <i class="pi pi-calendar-plus text-gray-500"></i>
+                        <span>{{ tema.createdAt }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"
+                        *ngIf="tema.id">
+                        <i class="pi pi-hashtag text-gray-500"></i>
+                        <span>ID: {{ tema.id }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 w-full pt-4"></div>
+
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex gap-1 -ml-2">
+                        <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
+                            (click)="showEditDialog(tema)" pTooltip="Editar"></p-button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                            (click)="confirmDelete(tema)" pTooltip="Eliminar"></p-button>
+                        <p-button label="Actividades" icon="pi pi-arrow-right" [outlined]="true" severity="success"
+                            size="small" (click)="navigateToActivities(tema.id)"
+                            class="shadow-sm hover:shadow"></p-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    @if (filteredTemas.length === 0) {
+    <div
+        class="w-full py-16 flex flex-col items-center justify-center bg-gray-50 rounded-3xl border border-dashed border-gray-300">
+        <img src="assets/elementos/cursos.png" alt="Temas" class="w-32 h-32 object-contain opacity-50 mb-6"
+            onerror="this.src=''; this.className='hidden'; this.nextElementSibling.className='pi pi-folder-open text-6xl text-gray-300 mb-6 block';" />
+        <i class="hidden"></i>
+        <h3 class="text-xl font-bold text-gray-700 mb-2">Aún no hay temas</h3>
+        <p class="text-gray-500 mb-8 text-center max-w-md">No se encontraron temas o no hay coincidencias con tu
+            búsqueda. ¡Crea el primero!</p>
+        <p-button label="Crear Nuevo Tema" icon="pi pi-plus" [raised]="true" severity="success" size="large"
+            (click)="showCreateDialog()"></p-button>
+    </div>
+    }
+    }
+    }
 </div>
 
-<p-dialog [header]="currentTemaId ? 'Editar Tema' : 'Nuevo Tema'"
-         [visible]="displayCreateDialog || displayEditDialog"
-         (onHide)="hideDialog()"
-         [style]="{width: '60vw', height: '80vh'}"
-         [modal]="true"
-         [closable]="false"
-         class="rounded-lg shadow-xl">
+<p-dialog [header]="currentTemaId ? 'Editar Tema' : 'Nuevo Tema'" [visible]="displayCreateDialog || displayEditDialog"
+    (onHide)="hideDialog()" [style]="{width: '60vw', height: '80vh'}" [modal]="true" [closable]="false"
+    class="rounded-lg shadow-xl">
     <ng-template pTemplate="header">
         <div class="flex justify-between items-center w-full">
             <h3 class="text-lg font-semibold text-gray-800 m-0">
                 {{ currentTemaId ? 'Editar Tema' : 'Nuevo Tema' }}
             </h3>
-            <p-button
-                icon="pi pi-times"
-                [rounded]="true"
-                severity="secondary"
-                size="small"
-                [text]="true"
-                (onClick)="hideDialog()"
-                class="hover:bg-gray-100 transition-colors duration-200"
-                pTooltip="Cerrar"
+            <p-button icon="pi pi-times" [rounded]="true" severity="secondary" size="small" [text]="true"
+                (onClick)="hideDialog()" class="hover:bg-gray-100 transition-colors duration-200" pTooltip="Cerrar"
                 tooltipPosition="bottom">
             </p-button>
         </div>
     </ng-template>
-    <form [formGroup]="temaForm" 
-          (ngSubmit)="currentTemaId ? updateTema() : createTema()" 
-          class="p-fluid space-y-4">
-        
+    <form [formGroup]="temaForm" (ngSubmit)="currentTemaId ? updateTema() : createTema()" class="p-fluid space-y-4">
+
         <!-- Campo oculto para chapterId -->
         <input type="hidden" formControlName="chapterId" />
-        
+
         <div class="field space-y-2">
             <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
-            <input id="title" pInputText formControlName="title" required 
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+            <input id="title" pInputText formControlName="title" required
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
             <small *ngIf="temaForm.get('title')?.invalid && temaForm.get('title')?.touched" class="text-red-500">
                 El título es requerido
             </small>
         </div>
-        
+
         <div class="field space-y-2">
             <div class="flex justify-between items-center">
                 <label for="shortDescription" class="block text-sm font-medium text-gray-700">Descripción Corta</label>
-                <p-button type="button"
-                         label="Generar con IA"
-                         icon="pi pi-bolt"
-                         severity="info"
-                         size="small"
-                         [outlined]="true"
-                         [loading]="loading"
-                         (onClick)="generateContentWithAI()"
-                         class="transition-all duration-200 hover:shadow-md"
-                         pTooltip="Generar contenido automáticamente"
-                         tooltipPosition="top"></p-button>
+                <p-button type="button" label="Generar con IA" icon="pi pi-bolt" severity="info" size="small"
+                    [outlined]="true" [loading]="loading" (onClick)="generateContentWithAI()"
+                    class="transition-all duration-200 hover:shadow-md" pTooltip="Generar contenido automáticamente"
+                    tooltipPosition="top"></p-button>
             </div>
             <textarea id="shortDescription" formControlName="shortDescription" rows="2"
-                      class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
-            <small *ngIf="temaForm.get('shortDescription')?.invalid && temaForm.get('shortDescription')?.touched" class="text-red-500">
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <small *ngIf="temaForm.get('shortDescription')?.invalid && temaForm.get('shortDescription')?.touched"
+                class="text-red-500">
                 La descripción es requerida
             </small>
         </div>
-        
+
         <div class="field space-y-2">
             <div class="flex justify-between items-center">
                 <label for="theory" class="block text-sm font-medium text-gray-700">Teoría</label>
-                <p-button 
-                    type="button"
-                    label="Generar con IA"
-                    icon="pi pi-sparkles"
-                    severity="success"
-                    size="small"
-                    [outlined]="true"
-                    (onClick)="openGenerateTheoryDialog()"
-                    [loading]="generatingTheory">
+                <p-button type="button" label="Generar con IA" icon="pi pi-sparkles" severity="success" size="small"
+                    [outlined]="true" (onClick)="openGenerateTheoryDialog()" [loading]="generatingTheory">
                 </p-button>
             </div>
-            <quill-editor 
-                id="theory"
-                formControlName="theory"
-                theme="snow"
-                placeholder="Escribe la teoría del tema aquí..."
-                [styles]="{'height': '300px'}"
-                class="bg-white">
+            <quill-editor id="theory" formControlName="theory" theme="snow"
+                placeholder="Escribe la teoría del tema aquí..." [styles]="{'height': '300px'}" class="bg-white">
             </quill-editor>
             <small *ngIf="temaForm.get('theory')?.invalid && temaForm.get('theory')?.touched" class="text-red-500">
                 La teoría es requerida
             </small>
         </div>
-        
+
         <div class="field space-y-2">
             <label for="difficulty" class="block text-sm font-medium text-gray-700">Dificultad</label>
-            <select id="difficulty" 
-                   formControlName="difficulty"
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <select id="difficulty" formControlName="difficulty"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option *ngFor="let option of difficultyOptions" [value]="option.value">{{option.label}}</option>
             </select>
-            <small *ngIf="temaForm.get('difficulty')?.invalid && temaForm.get('difficulty')?.touched" class="text-red-500">
+            <small *ngIf="temaForm.get('difficulty')?.invalid && temaForm.get('difficulty')?.touched"
+                class="text-red-500">
                 La dificultad es requerida
             </small>
         </div>
-        
+
         <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-            <p-button type="button"
-                    label="Cancelar"
-                    icon="pi pi-times"
-                    severity="secondary"
-                    [outlined]="true"
-                    (onClick)="hideDialog()"
-                    class="transition-all duration-200 hover:shadow-md"></p-button>
-            <p-button type="submit"
-                    [label]="currentTemaId ? 'Actualizar Tema' : 'Crear Tema'"
-                    icon="pi pi-check"
-                    severity="success"
-                    [raised]="true"
-                    [disabled]="temaForm.invalid || loading"
-                    [loading]="loading"
-                    class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
+            <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true"
+                (onClick)="hideDialog()" class="transition-all duration-200 hover:shadow-md"></p-button>
+            <p-button type="submit" [label]="currentTemaId ? 'Actualizar Tema' : 'Crear Tema'" icon="pi pi-check"
+                severity="success" [raised]="true" [disabled]="temaForm.invalid || loading" [loading]="loading"
+                class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
         </div>
     </form>
 </p-dialog>
 
 <!-- Modal para Generar Descripción Corta con Prompt -->
-<p-dialog 
-    header="Generar Descripción Corta con IA" 
-    [(visible)]="displayGenerateDescriptionDialog" 
-    [style]="{width: '90vw', 'max-width': '1000px'}"
-    [modal]="true"
-    [closable]="true"
-    (visibleChange)="closeGenerateDescriptionDialog()"
-    class="rounded-lg shadow-xl">
-    
+<p-dialog header="Generar Descripción Corta con IA" [(visible)]="displayGenerateDescriptionDialog"
+    [style]="{width: '90vw', 'max-width': '1000px'}" [modal]="true" [closable]="true"
+    (visibleChange)="closeGenerateDescriptionDialog()" class="rounded-lg shadow-xl">
+
     <div class="space-y-4">
         <!-- Sección de Entrada del Prompt -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="pi pi-lightbulb mr-2"></i>Ingresa tu prompt personalizado
             </label>
-            <textarea 
-                [value]="descriptionPrompt"
-                (input)="descriptionPrompt = $any($event.target).value"
-                placeholder="Ej: Explica los conceptos clave de phishing y cómo protegerse..."
-                rows="4"
+            <textarea [value]="descriptionPrompt" (input)="descriptionPrompt = $any($event.target).value"
+                placeholder="Ej: Explica los conceptos clave de phishing y cómo protegerse..." rows="4"
                 class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 [disabled]="showDescriptionPreview"></textarea>
             <p class="text-xs text-gray-500 mt-2">
@@ -277,51 +304,22 @@
         <div class="flex gap-2 justify-end">
             <!-- Sin previsualización: mostrar botón Generar -->
             <div *ngIf="!showDescriptionPreview" class="w-full flex gap-2">
-                <p-button 
-                    type="button"
-                    label="Cancelar"
-                    icon="pi pi-times"
-                    severity="secondary"
-                    [raised]="true"
-                    (onClick)="closeGenerateDescriptionDialog()"
-                    class="flex-1"></p-button>
-                <p-button 
-                    type="button"
-                    label="Generar Descripción"
-                    icon="pi pi-bolt"
-                    severity="info"
-                    [raised]="true"
-                    [loading]="generatingDescription"
-                    [disabled]="!descriptionPrompt.trim() || generatingDescription"
-                    (onClick)="generateDescriptionFromPrompt()"
-                    class="flex-1"></p-button>
+                <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" [raised]="true"
+                    (onClick)="closeGenerateDescriptionDialog()" class="flex-1"></p-button>
+                <p-button type="button" label="Generar Descripción" icon="pi pi-bolt" severity="info" [raised]="true"
+                    [loading]="generatingDescription" [disabled]="!descriptionPrompt.trim() || generatingDescription"
+                    (onClick)="generateDescriptionFromPrompt()" class="flex-1"></p-button>
             </div>
 
             <!-- Con previsualización: mostrar botones Rechazar, Regenerar, Aprobar -->
             <div *ngIf="showDescriptionPreview" class="w-full flex gap-2">
-                <p-button 
-                    type="button"
-                    label="👎 Rechazar"
-                    severity="danger"
-                    [raised]="true"
-                    (onClick)="rejectGeneratedDescription()"
-                    class="flex-1"></p-button>
-                <p-button 
-                    type="button"
-                    label="🔄 Regenerar"
-                    severity="secondary"
-                    [raised]="true"
-                    [loading]="generatingDescription"
-                    [disabled]="generatingDescription"
-                    (onClick)="generateDescriptionFromPrompt()"
-                    class="flex-1"></p-button>
-                <p-button 
-                    type="button"
-                    label="👍 Aprobar"
-                    severity="success"
-                    [raised]="true"
-                    (onClick)="approveGeneratedDescription()"
-                    class="flex-1"></p-button>
+                <p-button type="button" label="👎 Rechazar" severity="danger" [raised]="true"
+                    (onClick)="rejectGeneratedDescription()" class="flex-1"></p-button>
+                <p-button type="button" label="🔄 Regenerar" severity="secondary" [raised]="true"
+                    [loading]="generatingDescription" [disabled]="generatingDescription"
+                    (onClick)="generateDescriptionFromPrompt()" class="flex-1"></p-button>
+                <p-button type="button" label="👍 Aprobar" severity="success" [raised]="true"
+                    (onClick)="approveGeneratedDescription()" class="flex-1"></p-button>
             </div>
         </div>
 
@@ -338,16 +336,10 @@
 </p-dialog>
 
 <!-- Modal para generar teoría con IA -->
-<p-dialog 
-    [(visible)]="displayGenerateTheoryDialog"
-    [header]="'Generar Teoría con IA'"
-    [modal]="true"
-    [style]="{width: '90vw', maxWidth: '1000px'}"
-    [draggable]="false"
-    [resizable]="false"
-    [maximizable]="true"
+<p-dialog [(visible)]="displayGenerateTheoryDialog" [header]="'Generar Teoría con IA'" [modal]="true"
+    [style]="{width: '90vw', maxWidth: '1000px'}" [draggable]="false" [resizable]="false" [maximizable]="true"
     (onHide)="closeGenerateTheoryDialog()">
-    
+
     <div class="space-y-4">
         <!-- Sección de entrada de prompt (siempre visible) -->
         <div class="space-y-2">
@@ -357,9 +349,7 @@
             <p class="text-xs text-gray-500 mb-2">
                 💡 Ejemplo: "Explica qué es el phishing, sus tipos y cómo protegerse"
             </p>
-            <textarea 
-                [(ngModel)]="theoryPrompt"
-                rows="4"
+            <textarea [(ngModel)]="theoryPrompt" rows="4"
                 placeholder="Ingresa tu prompt aquí... Por ejemplo: Genera una lección sobre ciberseguridad para estudiantes de 12-14 años..."
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
                 [disabled]="generatingTheory">
@@ -369,7 +359,7 @@
         <!-- Sección de consejos -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p class="text-xs text-blue-800">
-                <strong>✨ Consejos:</strong> Sé específico sobre el tema, el nivel de dificultad y el público objetivo. 
+                <strong>✨ Consejos:</strong> Sé específico sobre el tema, el nivel de dificultad y el público objetivo.
                 Incluye palabras clave importantes que desees que aparezcan en la teoría.
             </p>
         </div>
@@ -379,7 +369,8 @@
             <div class="border-t pt-4">
                 <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
                     <p class="text-xs text-amber-800">
-                        <strong>👀 Previsualización:</strong> Revisa cómo se ve el contenido generado. Puedes editar el prompt arriba y regenerar.
+                        <strong>👀 Previsualización:</strong> Revisa cómo se ve el contenido generado. Puedes editar el
+                        prompt arriba y regenerar.
                     </p>
                 </div>
 
@@ -394,56 +385,26 @@
         <div class="flex justify-end gap-3">
             <!-- Botones cuando no hay previsualización -->
             <ng-container *ngIf="!showTheoryPreview">
-                <p-button 
-                    type="button"
-                    label="Cancelar"
-                    icon="pi pi-times"
-                    severity="secondary"
-                    [outlined]="true"
-                    (onClick)="closeGenerateTheoryDialog()"
-                    [disabled]="generatingTheory">
+                <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true"
+                    (onClick)="closeGenerateTheoryDialog()" [disabled]="generatingTheory">
                 </p-button>
-                <p-button 
-                    type="button"
-                    label="Generar Teoría"
-                    icon="pi pi-sparkles"
-                    severity="success"
-                    [raised]="true"
-                    (onClick)="generateTheoryWithAI()"
-                    [loading]="generatingTheory"
+                <p-button type="button" label="Generar Teoría" icon="pi pi-sparkles" severity="success" [raised]="true"
+                    (onClick)="generateTheoryWithAI()" [loading]="generatingTheory"
                     [disabled]="!theoryPrompt.trim() || generatingTheory">
                 </p-button>
             </ng-container>
 
             <!-- Botones cuando hay previsualización -->
             <ng-container *ngIf="showTheoryPreview">
-                <p-button 
-                    type="button"
-                    label="👎 Rechazar"
-                    icon="pi pi-times"
-                    severity="secondary"
-                    [outlined]="true"
-                    (onClick)="rejectGeneratedTheory()"
-                    [disabled]="generatingTheory">
+                <p-button type="button" label="👎 Rechazar" icon="pi pi-times" severity="secondary" [outlined]="true"
+                    (onClick)="rejectGeneratedTheory()" [disabled]="generatingTheory">
                 </p-button>
-                <p-button 
-                    type="button"
-                    label="🔄 Regenerar"
-                    icon="pi pi-refresh"
-                    severity="info"
-                    [outlined]="true"
-                    (onClick)="regenerateTheory()"
-                    [loading]="generatingTheory"
+                <p-button type="button" label="🔄 Regenerar" icon="pi pi-refresh" severity="info" [outlined]="true"
+                    (onClick)="regenerateTheory()" [loading]="generatingTheory"
                     [disabled]="!theoryPrompt.trim() || generatingTheory">
                 </p-button>
-                <p-button 
-                    type="button"
-                    label="👍 Aprobar"
-                    icon="pi pi-check"
-                    severity="success"
-                    [raised]="true"
-                    (onClick)="approveGeneratedTheory()"
-                    [disabled]="generatingTheory">
+                <p-button type="button" label="👍 Aprobar" icon="pi pi-check" severity="success" [raised]="true"
+                    (onClick)="approveGeneratedTheory()" [disabled]="generatingTheory">
                 </p-button>
             </ng-container>
         </div>

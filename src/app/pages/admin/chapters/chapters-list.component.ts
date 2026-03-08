@@ -11,7 +11,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
 import { HttpClient } from '@angular/common/http';
@@ -38,9 +38,10 @@ import { Router } from '@angular/router';
     IconFieldModule,
     InputIconModule,
     InputTextModule,
-    DialogModule,
     CheckboxModule,
     ReactiveFormsModule,
+    FormsModule,
+    DialogModule,
     ButtonModule,
     ConfirmDialogModule,
     BreadcrumbModule,
@@ -65,6 +66,19 @@ export class ChaptersListComponent implements OnInit {
     { label: 'Medio', value: 'Medio' },
     { label: 'Difícil', value: 'Difícil' }
   ];
+
+  viewMode: 'table' | 'grid' = 'table';
+  searchTerm: string = '';
+
+  get filteredChapters(): Chapter[] {
+    if (!this.searchTerm) return this.chapters;
+    const term = this.searchTerm.toLowerCase();
+    return this.chapters.filter(c =>
+      c.title.toLowerCase().includes(term) ||
+      (c.shortDescription && c.shortDescription.toLowerCase().includes(term)) ||
+      (c.difficulty && c.difficulty.toLowerCase().includes(term))
+    );
+  }
 
   // Propiedades para el modal de generación con prompt
   displayGenerateDescriptionDialog: boolean = false;
@@ -188,7 +202,7 @@ export class ChaptersListComponent implements OnInit {
   showEditDialog(chapter: Chapter) {
     this.currentChapterId = chapter.id;
     this.loading = true;
-    
+
     this.chapterService.getChapterById(chapter.id).subscribe({
       next: (response) => {
         if (response && response.data) {
@@ -221,7 +235,7 @@ export class ChaptersListComponent implements OnInit {
     if (this.chapterForm.valid) {
       this.loading = true;
       const data = this.chapterForm.value;
-      
+
       this.chapterService.createChapter(data).subscribe({
         next: () => {
           this.messageService.add({
@@ -249,7 +263,7 @@ export class ChaptersListComponent implements OnInit {
     if (this.chapterForm.valid && this.currentChapterId) {
       const data = this.chapterForm.value;
       this.loading = true;
-      
+
       this.chapterService.updateChapter(this.currentChapterId, data).subscribe({
         next: () => {
           this.messageService.add({
@@ -281,7 +295,7 @@ export class ChaptersListComponent implements OnInit {
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: () => this.deleteChapter(chapter.id),
-      reject: () => {}
+      reject: () => { }
     });
   }
 
@@ -351,7 +365,7 @@ export class ChaptersListComponent implements OnInit {
   generateDescriptionWithAI() {
     const title = this.chapterForm.get('title')?.value;
     const courseId = this.chapterForm.get('courseId')?.value;
-    
+
     if (!title) {
       this.messageService.add({
         severity: 'warn',
@@ -383,7 +397,7 @@ export class ChaptersListComponent implements OnInit {
   generateDescriptionFromPrompt() {
     const title = this.chapterForm.get('title')?.value;
     const courseId = this.chapterForm.get('courseId')?.value;
-    
+
     if (!this.descriptionPrompt.trim()) {
       this.messageService.add({
         severity: 'warn',
@@ -418,16 +432,16 @@ export class ChaptersListComponent implements OnInit {
             },
             error: (err: any) => {
               console.error('Error al generar descripción', err);
-              
+
               // Extraer mensaje de error del backend
               let errorMessage = 'Error al generar descripción con IA';
               let errorSummary = 'Error';
               let severity = 'error';
-              
+
               // Verificar si es un error de contenido inapropiado
               if (err.error?.message) {
                 errorMessage = err.error.message;
-                
+
                 // Si contiene "No es posible" es contenido inapropiado
                 if (errorMessage.includes('No es posible')) {
                   errorSummary = '⚠️ Contenido No Permitido';
@@ -436,14 +450,14 @@ export class ChaptersListComponent implements OnInit {
               } else if (err.message) {
                 errorMessage = err.message;
               }
-              
+
               this.messageService.add({
                 severity: severity,
                 summary: errorSummary,
                 detail: errorMessage,
                 life: 5000
               });
-              
+
               this.generatingDescription = false;
             }
           });

@@ -118,7 +118,7 @@ export class Login {
     checked: boolean = false;
     loading: boolean = false;
     errorMessage: string = '';
-    
+
     // Propiedades para el diálogo de bienvenida
     showWelcomeDialog: boolean = false;
     welcomeTitle: string = '';
@@ -129,16 +129,16 @@ export class Login {
         private authService: AuthService,
         private welcomeService: WelcomeService,
         private router: Router
-    ) {}
+    ) { }
 
     onSubmit(): void {
         this.loading = true;
         this.errorMessage = '';
-        
+
         this.authService.login(this.email, this.password).subscribe({
             next: (response: ApiResponse<AuthData>) => {
                 this.loading = false;
-                
+
                 if (response.statusCode === 200) {
                     // Preparar datos del diálogo de bienvenida
                     const user = response.data.user;
@@ -175,7 +175,7 @@ export class Login {
                     this.welcomeMessage = welcomeData.message;
                     this.welcomeIcon = welcomeData.icon;
                     this.showWelcomeDialog = true;
-                    
+
                     // Guardar la información para la redirección después de cerrar el diálogo
                     this.userDataForNavigation = {
                         requiredUpdate: response.data.user.requiredUpdate
@@ -186,13 +186,13 @@ export class Login {
             },
             error: (error) => {
                 this.loading = false;
-                
+
                 if (error.error && error.error.message) {
                     this.errorMessage = error.error.message;
                 } else {
                     this.errorMessage = 'Error al iniciar sesión. Por favor, verifica tus credenciales.';
                 }
-                
+
                 console.error('Error de login:', error);
             }
         });
@@ -200,7 +200,7 @@ export class Login {
 
     closeWelcomeDialog(): void {
         this.showWelcomeDialog = false;
-        
+
         // Redirigir después de cerrar el diálogo
         if (this.userDataForNavigation) {
             if (this.userDataForNavigation.requiredUpdate) {

@@ -1,50 +1,58 @@
 <p-toast></p-toast>
 <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4"></p-breadcrumb>
 <div class="card">
-    <div class="font-semibold text-xl mb-4">Gestión de Capítulos</div>
+    <!-- Header Controls -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-6">
+        <div class="flex flex-col gap-2 w-full lg:w-1/3">
+            <div class="font-semibold text-2xl text-gray-800 dark:text-white">Gestión de Capítulos</div>
+            <select
+                class="p-2.5 border border-gray-300 dark:border-gray-600 rounded-xl w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 shadow-sm transition-all text-gray-700 dark:text-gray-200 font-medium cursor-pointer"
+                (change)="onCourseChange($event)" [value]="selectedCourseId">
+                <option value="" disabled>Selecciona un curso para ver sus capítulos</option>
+                <option *ngFor="let course of courses" [value]="course.value"
+                    [selected]="course.value === selectedCourseId">{{course.label}}</option>
+            </select>
+        </div>
 
-    <div class="mb-4">
-        <select class="p-2 border border-gray-300 rounded-md w-3xl" 
-                (change)="onCourseChange($event)"
-                [value]="selectedCourseId">
-            <option value="" disabled>Selecciona un curso</option>
-            <option *ngFor="let course of courses" [value]="course.value" [selected]="course.value === selectedCourseId">{{course.label}}</option>
-        </select>
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <p-iconField iconPosition="left" class="w-full sm:w-64 lg:w-72">
+                <p-inputIcon>
+                    <i class="pi pi-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" [(ngModel)]="searchTerm" placeholder="Buscar capítulo..."
+                    class="w-full rounded-xl"
+                    (input)="viewMode === 'table' ? dt.filterGlobal($any($event.target).value, 'contains') : null" />
+            </p-iconField>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <div
+                    class="bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl flex items-center gap-1 shrink-0 border border-transparent dark:border-gray-700 shadow-inner">
+                    <button (click)="viewMode = 'table'"
+                        [class]="viewMode === 'table' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400 rounded-lg' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg'"
+                        class="px-4 py-2 transition-all duration-300 flex items-center gap-2 font-semibold">
+                        <i class="pi pi-list"></i>
+                        <span class="hidden sm:inline">Tabla</span>
+                    </button>
+                    <button (click)="viewMode = 'grid'"
+                        [class]="viewMode === 'grid' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400 rounded-lg' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg'"
+                        class="px-4 py-2 transition-all duration-300 flex items-center gap-2 font-semibold">
+                        <i class="pi pi-th-large"></i>
+                        <span class="hidden sm:inline">Tarjetas</span>
+                    </button>
+                </div>
+
+                <p-button label="Nuevo" icon="pi pi-plus" severity="success" [raised]="true"
+                    [disabled]="!selectedCourseId" (click)="showCreateDialog()"
+                    class="shadow-md hover:shadow-lg transition-all duration-300 shrink-0"></p-button>
+            </div>
+        </div>
     </div>
 
-    <p-table
-        #dt
-        [value]="chapters"
-        dataKey="id"
-        [rows]="10"
-        [loading]="loading"
-        [rowHover]="true"
-        [showGridlines]="true"
-        [paginator]="true"
+    @if (viewMode === 'table') {
+    <p-table #dt [value]="chapters" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
+        [showGridlines]="true" [paginator]="true"
         [globalFilterFields]="['title', 'shortDescription', 'difficulty', 'createAt', 'updatedAt']"
-        responsiveLayout="scroll"
-    >
-        <ng-template pTemplate="caption">
-            <div class="flex justify-between items-center flex-column sm:flex-row">
-                <p-button
-                        label="Nuevo Capítulo"
-                        icon="pi pi-plus"
-                        severity="success"
-                        [raised]="true"
-                        [disabled]="!selectedCourseId"
-                        (click)="showCreateDialog()"
-                        class="shadow-lg hover:shadow-xl transition-all duration-200"
-                        pTooltip="Crear un nuevo capítulo"
-                        tooltipPosition="bottom"></p-button>
-                <p-iconField iconPosition="left" class="ml-auto">
-                    <p-inputIcon>
-                        <i class="pi pi-search"></i>
-                    </p-inputIcon>
-                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar capítulo" />
-                </p-iconField>
-            </div>
-        </ng-template>
-
+        responsiveLayout="scroll">
         <ng-template pTemplate="header">
             <tr>
                 <th>Título</th>
@@ -57,175 +65,207 @@
 
         <ng-template pTemplate="body" let-chapter>
             <tr>
-                <td>{{chapter.title}}</td>
+                <td class="font-medium text-gray-800 dark:text-white">{{chapter.title}}</td>
                 <td>
-                    <p-tag [value]="chapter.difficulty" 
-                           [severity]="chapter.difficulty === 'Fácil' ? 'success' : (chapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
+                    <p-tag [value]="chapter.difficulty"
+                        [severity]="chapter.difficulty === 'Fácil' ? 'success' : (chapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
                 </td>
-                <td>{{chapter.createdAt}}</td>
-                <td>{{chapter.updatedAt}}</td>
+                <td class="text-gray-500 dark:text-gray-400">{{chapter.createdAt}}</td>
+                <td class="text-gray-500 dark:text-gray-400">{{chapter.updatedAt}}</td>
                 <td class="flex gap-2">
-                    <p-button
-                            icon="pi pi-eye"
-                            [raised]="true"
-                            severity="warn"
-                            (click)="viewChapterDetails(chapter)"
-                            pTooltip="Ver detalles"
-                            tooltipPosition="top"></p-button>
-                    <p-button
-                            icon="pi pi-pencil"
-                            [raised]="true"
-                            severity="info"
-                            (click)="showEditDialog(chapter)"
-                            pTooltip="Editar capítulo"
-                            tooltipPosition="top"></p-button>
-                    <p-button
-                        icon="pi pi-trash"
-                        [raised]="true"
-                        severity="danger"
-                        (onClick)="confirmDelete(chapter)"
-                        pTooltip="Eliminar capítulo"
-                        tooltipPosition="top"></p-button>
-                    <p-button
-                        icon="pi pi-list"
-                        [raised]="true"
-                        severity="success"
-                        (click)="navigateToThemes(chapter)"
-                        pTooltip="Ver temas"
-                        tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-eye" [text]="true" [rounded]="true" severity="secondary"
+                        (click)="viewChapterDetails(chapter)" pTooltip="Ver detalles" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
+                        (click)="showEditDialog(chapter)" pTooltip="Editar" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                        (onClick)="confirmDelete(chapter)" pTooltip="Eliminar" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-list" [outlined]="true" severity="success" size="small" label="Temas"
+                        (click)="navigateToThemes(chapter)" pTooltip="Esquema/Temas" tooltipPosition="top"></p-button>
                 </td>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="6" class="text-center p-4">
-                    <div *ngIf="selectedCourseId; else selectCourse">
-                        No se encontraron capítulos para este curso.
+                <td colspan="6" class="text-center py-12">
+                    <div *ngIf="selectedCourseId; else selectCourse" class="flex flex-col items-center">
+                        <i class="pi pi-inbox text-5xl text-gray-300 dark:text-gray-500 mb-4"></i>
+                        <span class="text-lg font-medium text-gray-500 dark:text-gray-400">No se encontraron capítulos
+                            para este curso.</span>
                     </div>
                     <ng-template #selectCourse>
-                        Selecciona un curso para ver sus capítulos.
+                        <div class="flex flex-col items-center">
+                            <i class="pi pi-hand-pointer text-5xl text-blue-300 dark:text-blue-500 mb-4"></i>
+                            <span class="text-lg font-medium text-blue-600 dark:text-blue-400">Selecciona un curso
+                                arriba para ver sus capítulos.</span>
+                        </div>
                     </ng-template>
                 </td>
             </tr>
         </ng-template>
     </p-table>
+    }
+
+    @if (viewMode === 'grid') {
+    @if (!selectedCourseId) {
+    <div
+        class="w-full py-16 flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 rounded-3xl border-2 border-dashed border-blue-200 dark:border-blue-800">
+        <i class="pi pi-hand-pointer text-6xl text-blue-300 dark:text-blue-500 mb-4 animate-bounce"></i>
+        <h3 class="text-2xl font-bold text-blue-800 dark:text-blue-300 mb-2">¡Comienza aquí!</h3>
+        <p class="text-blue-600 dark:text-blue-400 text-center max-w-md">Selecciona un curso en el menú desplegable
+            superior para ver o crear sus capítulos.</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (chapter of filteredChapters; track chapter.id; let i = $index) {
+        <div
+            class="bg-white dark:bg-gray-800 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-gray-700 hover:border-blue-100 dark:hover:border-blue-800 transition-all duration-300 overflow-hidden flex flex-col group hover:-translate-y-1">
+
+            <div class="p-6 flex-1 flex flex-col relative">
+                <!-- Background gentle gradient -->
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 dark:from-blue-900/20 to-transparent rounded-bl-full -z-10 opacity-70">
+                </div>
+
+                <div class="flex justify-between items-start mb-4 gap-2">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold rounded-full w-10 h-10 flex items-center justify-center text-lg flex-shrink-0">
+                            {{ i + 1 }}
+                        </div>
+                        <p-tag [value]="chapter.difficulty"
+                            [severity]="chapter.difficulty === 'Fácil' ? 'success' : (chapter.difficulty === 'Medio' ? 'warning' : 'danger')"
+                            styleClass="font-bold"></p-tag>
+                    </div>
+                </div>
+
+                <h3
+                    class="text-xl font-extrabold text-gray-800 dark:text-white mb-3 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {{ chapter.title }}</h3>
+                <p class="text-gray-500 dark:text-gray-400 mb-6 flex-1 text-sm leading-relaxed">{{
+                    chapter.shortDescription || 'Sin descripción' }}</p>
+
+                <div class="flex items-center gap-3 text-xs font-semibold text-gray-400 dark:text-gray-500 mb-5">
+                    <div
+                        class="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-600">
+                        <i class="pi pi-calendar-plus text-gray-500 dark:text-gray-400"></i>
+                        <span class="dark:text-gray-300">{{ chapter.createdAt }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 dark:border-gray-700 w-full pt-4"></div>
+
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex gap-1 -ml-2">
+                        <p-button icon="pi pi-eye" [text]="true" [rounded]="true" severity="secondary"
+                            (click)="viewChapterDetails(chapter)" pTooltip="Ver detalles"></p-button>
+                        <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
+                            (click)="showEditDialog(chapter)" pTooltip="Editar"></p-button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                            (click)="confirmDelete(chapter)" pTooltip="Eliminar"></p-button>
+                        <p-button label="Temas" icon="pi pi-arrow-right" [outlined]="true" severity="success"
+                            size="small" (click)="navigateToThemes(chapter)" class="shadow-sm hover:shadow"></p-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    @if (filteredChapters.length === 0) {
+    <div
+        class="w-full py-16 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-3xl border border-dashed border-gray-300 dark:border-gray-600">
+        <img src="assets/elementos/cursos.png" alt="Capítulos" class="w-32 h-32 object-contain opacity-50 mb-6"
+            onerror="this.src=''; this.className='hidden'; this.nextElementSibling.className='pi pi-folder-open text-6xl text-gray-300 dark:text-gray-600 mb-6 block';" />
+        <i class="hidden"></i>
+        <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">No se encontraron capítulos</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-8 text-center max-w-md">Prueba ajustando los filtros de búsqueda o
+            comienza a estructurar este curso añadiendo el primer capítulo.</p>
+        <p-button label="Crear Nuevo Capítulo" icon="pi pi-plus" [raised]="true" severity="success" size="large"
+            (click)="showCreateDialog()"></p-button>
+    </div>
+    }
+    }
+    }
 </div>
 
 <p-dialog [header]="currentChapterId ? 'Editar Capítulo' : 'Nuevo Capítulo'"
-         [visible]="displayCreateDialog || displayEditDialog"
-         (onHide)="hideDialog()"
-         [style]="{width: '50vw'}"
-         [modal]="true"
-         [closable]="false"
-         class="rounded-lg shadow-xl">
+    [visible]="displayCreateDialog || displayEditDialog" (onHide)="hideDialog()" [style]="{width: '50vw'}"
+    [modal]="true" [closable]="false" class="rounded-lg shadow-xl">
     <ng-template pTemplate="header">
         <div class="flex justify-between items-center w-full">
             <h3 class="text-lg font-semibold text-gray-800 m-0">
                 {{ currentChapterId ? 'Editar Capítulo' : 'Nuevo Capítulo' }}
             </h3>
-            <p-button
-                icon="pi pi-times"
-                [rounded]="true"
-                severity="secondary"
-                size="small"
-                [text]="true"
-                (onClick)="hideDialog()"
-                class="hover:bg-gray-100 transition-colors duration-200"
-                pTooltip="Cerrar"
+            <p-button icon="pi pi-times" [rounded]="true" severity="secondary" size="small" [text]="true"
+                (onClick)="hideDialog()" class="hover:bg-gray-100 transition-colors duration-200" pTooltip="Cerrar"
                 tooltipPosition="bottom">
             </p-button>
         </div>
     </ng-template>
-    <form [formGroup]="chapterForm" 
-          (ngSubmit)="currentChapterId ? updateChapter() : createChapter()" 
-          class="p-fluid space-y-4">
-        
+    <form [formGroup]="chapterForm" (ngSubmit)="currentChapterId ? updateChapter() : createChapter()"
+        class="p-fluid space-y-4">
+
         <div class="field space-y-2">
             <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
-            <input id="title" pInputText formControlName="title" required 
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+            <input id="title" pInputText formControlName="title" required
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
             <small *ngIf="chapterForm.get('title')?.invalid && chapterForm.get('title')?.touched" class="text-red-500">
                 El título es requerido
             </small>
         </div>
-        
+
         <div class="field space-y-2">
             <div class="flex justify-between items-center">
                 <label for="shortDescription" class="block text-sm font-medium text-gray-700">Descripción Corta</label>
-                <p-button type="button"
-                         label="Generar con IA"
-                         icon="pi pi-bolt"
-                         severity="info"
-                         size="small"
-                         [outlined]="true"
-                         [loading]="loading"
-                         (onClick)="generateDescriptionWithAI()"
-                         class="transition-all duration-200 hover:shadow-md"
-                         pTooltip="Generar descripción automáticamente"
-                         tooltipPosition="top"></p-button>
+                <p-button type="button" label="Generar con IA" icon="pi pi-bolt" severity="info" size="small"
+                    [outlined]="true" [loading]="loading" (onClick)="generateDescriptionWithAI()"
+                    class="transition-all duration-200 hover:shadow-md" pTooltip="Generar descripción automáticamente"
+                    tooltipPosition="top"></p-button>
             </div>
             <textarea id="shortDescription" formControlName="shortDescription" rows="3"
-                      class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
-            <small *ngIf="chapterForm.get('shortDescription')?.invalid && chapterForm.get('shortDescription')?.touched" class="text-red-500">
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <small *ngIf="chapterForm.get('shortDescription')?.invalid && chapterForm.get('shortDescription')?.touched"
+                class="text-red-500">
                 La descripción es requerida
             </small>
         </div>
-        
+
         <div class="field space-y-2">
             <label for="difficulty" class="block text-sm font-medium text-gray-700">Dificultad</label>
-            <select id="difficulty" 
-                   formControlName="difficulty"
-                   class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <select id="difficulty" formControlName="difficulty"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option *ngFor="let option of difficultyOptions" [value]="option.value">{{option.label}}</option>
             </select>
-            <small *ngIf="chapterForm.get('difficulty')?.invalid && chapterForm.get('difficulty')?.touched" class="text-red-500">
+            <small *ngIf="chapterForm.get('difficulty')?.invalid && chapterForm.get('difficulty')?.touched"
+                class="text-red-500">
                 La dificultad es requerida
             </small>
         </div>
-        
+
         <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-            <p-button type="button"
-                    label="Cancelar"
-                    icon="pi pi-times"
-                    severity="secondary"
-                    [outlined]="true"
-                    (onClick)="hideDialog()"
-                    class="transition-all duration-200 hover:shadow-md"></p-button>
-            <p-button type="submit"
-                    [label]="currentChapterId ? 'Actualizar Capítulo' : 'Crear Capítulo'"
-                    icon="pi pi-check"
-                    severity="success"
-                    [raised]="true"
-                    [disabled]="chapterForm.invalid || loading"
-                    [loading]="loading"
-                    class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
+            <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true"
+                (onClick)="hideDialog()" class="transition-all duration-200 hover:shadow-md"></p-button>
+            <p-button type="submit" [label]="currentChapterId ? 'Actualizar Capítulo' : 'Crear Capítulo'"
+                icon="pi pi-check" severity="success" [raised]="true" [disabled]="chapterForm.invalid || loading"
+                [loading]="loading" class="shadow-lg hover:shadow-xl transition-all duration-200"></p-button>
         </div>
     </form>
 </p-dialog>
 
-<p-dialog [header]="selectedChapter ? 'Detalles del Capítulo' : 'Capítulo'"
-         [(visible)]="displayDetailsDialog"
-         [style]="{width: '60vw'}"
-         [modal]="true"
-         [closable]="false"
-         (visibleChange)="onDetailsDialogHide()"
-         class="rounded-lg shadow-xl">
+<p-dialog [header]="selectedChapter ? 'Detalles del Capítulo' : 'Capítulo'" [(visible)]="displayDetailsDialog"
+    [style]="{width: '60vw'}" [modal]="true" [closable]="false" (visibleChange)="onDetailsDialogHide()"
+    class="rounded-lg shadow-xl">
     <ng-template pTemplate="header">
         <div class="flex justify-between items-center w-full">
             <h3 class="text-lg font-semibold text-gray-800 m-0">
                 {{ selectedChapter ? 'Detalles del Capítulo' : 'Capítulo' }}
             </h3>
-            <p-button
-                icon="pi pi-times"
-                [rounded]="true"
-                severity="secondary"
-                size="small"
-                [text]="true"
-                (onClick)="onDetailsDialogHide()"
-                class="hover:bg-gray-100 transition-colors duration-200"
-                pTooltip="Cerrar"
-                tooltipPosition="bottom">
+            <p-button icon="pi pi-times" [rounded]="true" severity="secondary" size="small" [text]="true"
+                (onClick)="onDetailsDialogHide()" class="hover:bg-gray-100 transition-colors duration-200"
+                pTooltip="Cerrar" tooltipPosition="bottom">
             </p-button>
         </div>
     </ng-template>
@@ -236,8 +276,8 @@
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ selectedChapter.title }}</h2>
                 <p class="text-gray-600 mb-4">{{ selectedChapter.shortDescription }}</p>
                 <div class="flex items-center gap-4">
-                    <p-tag [value]="selectedChapter.difficulty" 
-                           [severity]="selectedChapter.difficulty === 'Fácil' ? 'success' : (selectedChapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
+                    <p-tag [value]="selectedChapter.difficulty"
+                        [severity]="selectedChapter.difficulty === 'Fácil' ? 'success' : (selectedChapter.difficulty === 'Medio' ? 'warning' : 'danger')"></p-tag>
                 </div>
             </div>
         </div>
@@ -262,47 +302,29 @@
 
     <ng-template pTemplate="footer">
         <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-            <p-button
-                label="Cerrar"
-                icon="pi pi-times"
-                severity="secondary"
-                [outlined]="true"
-                (onClick)="onDetailsDialogHide()"
-                class="transition-all duration-200 hover:shadow-md"></p-button>
-            <p-button
-                label="Editar Capítulo"
-                icon="pi pi-pencil"
-                severity="info"
-                [raised]="true"
+            <p-button label="Cerrar" icon="pi pi-times" severity="secondary" [outlined]="true"
+                (onClick)="onDetailsDialogHide()" class="transition-all duration-200 hover:shadow-md"></p-button>
+            <p-button label="Editar Capítulo" icon="pi pi-pencil" severity="info" [raised]="true"
                 (onClick)="selectedChapter && showEditDialog(selectedChapter); onDetailsDialogHide()"
                 class="shadow-lg hover:shadow-xl transition-all duration-200"
-                pTooltip="Modificar la información del capítulo"
-                tooltipPosition="top"></p-button>
+                pTooltip="Modificar la información del capítulo" tooltipPosition="top"></p-button>
         </div>
     </ng-template>
 </p-dialog>
 
 <!-- Modal para Generar Descripción con Prompt -->
-<p-dialog 
-    header="Generar Descripción con IA" 
-    [(visible)]="displayGenerateDescriptionDialog" 
-    [style]="{width: '90vw', 'max-width': '1000px'}"
-    [modal]="true"
-    [closable]="true"
-    (visibleChange)="closeGenerateDescriptionDialog()"
-    class="rounded-lg shadow-xl">
-    
+<p-dialog header="Generar Descripción con IA" [(visible)]="displayGenerateDescriptionDialog"
+    [style]="{width: '90vw', 'max-width': '1000px'}" [modal]="true" [closable]="true"
+    (visibleChange)="closeGenerateDescriptionDialog()" class="rounded-lg shadow-xl">
+
     <div class="space-y-4">
         <!-- Sección de Entrada del Prompt -->
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="pi pi-lightbulb mr-2"></i>Ingresa tu prompt personalizado
             </label>
-            <textarea 
-                [value]="descriptionPrompt"
-                (input)="descriptionPrompt = $any($event.target).value"
-                placeholder="Ej: Explica los conceptos clave de phishing y cómo protegerse..."
-                rows="4"
+            <textarea [value]="descriptionPrompt" (input)="descriptionPrompt = $any($event.target).value"
+                placeholder="Ej: Explica los conceptos clave de phishing y cómo protegerse..." rows="4"
                 class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 [disabled]="showDescriptionPreview"></textarea>
             <p class="text-xs text-gray-500 mt-2">
@@ -314,51 +336,22 @@
         <div class="flex gap-2 justify-end">
             <!-- Sin previsualización: mostrar botón Generar -->
             <div *ngIf="!showDescriptionPreview" class="w-full flex gap-2">
-                <p-button 
-                    type="button"
-                    label="Cancelar"
-                    icon="pi pi-times"
-                    severity="secondary"
-                    [raised]="true"
-                    (onClick)="closeGenerateDescriptionDialog()"
-                    class="flex-1"></p-button>
-                <p-button 
-                    type="button"
-                    label="Generar Descripción"
-                    icon="pi pi-bolt"
-                    severity="info"
-                    [raised]="true"
-                    [loading]="generatingDescription"
-                    [disabled]="!descriptionPrompt.trim() || generatingDescription"
-                    (onClick)="generateDescriptionFromPrompt()"
-                    class="flex-1"></p-button>
+                <p-button type="button" label="Cancelar" icon="pi pi-times" severity="secondary" [raised]="true"
+                    (onClick)="closeGenerateDescriptionDialog()" class="flex-1"></p-button>
+                <p-button type="button" label="Generar Descripción" icon="pi pi-bolt" severity="info" [raised]="true"
+                    [loading]="generatingDescription" [disabled]="!descriptionPrompt.trim() || generatingDescription"
+                    (onClick)="generateDescriptionFromPrompt()" class="flex-1"></p-button>
             </div>
 
             <!-- Con previsualización: mostrar botones Rechazar, Regenerar, Aprobar -->
             <div *ngIf="showDescriptionPreview" class="w-full flex gap-2">
-                <p-button 
-                    type="button"
-                    label="👎 Rechazar"
-                    severity="danger"
-                    [raised]="true"
-                    (onClick)="rejectGeneratedDescription()"
-                    class="flex-1"></p-button>
-                <p-button 
-                    type="button"
-                    label="🔄 Regenerar"
-                    severity="secondary"
-                    [raised]="true"
-                    [loading]="generatingDescription"
-                    [disabled]="generatingDescription"
-                    (onClick)="generateDescriptionFromPrompt()"
-                    class="flex-1"></p-button>
-                <p-button 
-                    type="button"
-                    label="👍 Aprobar"
-                    severity="success"
-                    [raised]="true"
-                    (onClick)="approveGeneratedDescription()"
-                    class="flex-1"></p-button>
+                <p-button type="button" label="👎 Rechazar" severity="danger" [raised]="true"
+                    (onClick)="rejectGeneratedDescription()" class="flex-1"></p-button>
+                <p-button type="button" label="🔄 Regenerar" severity="secondary" [raised]="true"
+                    [loading]="generatingDescription" [disabled]="generatingDescription"
+                    (onClick)="generateDescriptionFromPrompt()" class="flex-1"></p-button>
+                <p-button type="button" label="👍 Aprobar" severity="success" [raised]="true"
+                    (onClick)="approveGeneratedDescription()" class="flex-1"></p-button>
             </div>
         </div>
 

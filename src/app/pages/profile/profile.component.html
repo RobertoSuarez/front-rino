@@ -9,13 +9,11 @@
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="loading" class="card">
-            <div class="flex justify-content-center align-items-center min-h-[300px] md:min-h-[400px]">
-                <div class="text-center">
-                    <p-progressSpinner strokeWidth="3" animationDuration="1s"></p-progressSpinner>
-                    <p class="text-600 mt-3 text-sm md:text-base">Cargando información del perfil...</p>
-                </div>
-            </div>
+        <div *ngIf="loading"
+            style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 50vh; text-align: center;">
+            <p-progressSpinner strokeWidth="4" animationDuration="1s" styleClass="w-3rem h-3rem"></p-progressSpinner>
+            <p style="color: #64748b; margin-top: 1.5rem; font-size: 1rem; font-weight: 500;">Cargando información del
+                perfil...</p>
         </div>
 
         <!-- Error State -->

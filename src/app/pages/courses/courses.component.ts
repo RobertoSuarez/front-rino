@@ -21,7 +21,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { AiService } from '../../core/services/ai.service';
 import { TooltipModule } from 'primeng/tooltip';
@@ -42,11 +42,12 @@ import { TooltipModule } from 'primeng/tooltip';
     DialogModule,
     CheckboxModule,
     ReactiveFormsModule,
+    FormsModule,
     ConfirmDialogModule,
     BreadcrumbModule,
     RouterModule,
     TooltipModule
-],
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './courses.component.html'
 })
@@ -65,7 +66,8 @@ export class CoursesComponent implements OnInit {
   };
   currentCourseId: string | null = null;
   courseForm: FormGroup;
-  
+  viewMode: 'table' | 'grid' = 'table';
+
   // Propiedades para el modal de generación con prompt
   displayGenerateDescriptionDialog: boolean = false;
   descriptionPrompt: string = '';
@@ -110,6 +112,18 @@ export class CoursesComponent implements OnInit {
     });
   }
 
+  searchTerm: string = '';
+
+  get filteredCourses(): Course[] {
+    if (!this.searchTerm) return this.courses;
+    const term = this.searchTerm.toLowerCase();
+    return this.courses.filter(c =>
+      c.title.toLowerCase().includes(term) ||
+      (c.createdBy && c.createdBy.toLowerCase().includes(term)) ||
+      (c.code && c.code.toLowerCase().includes(term))
+    );
+  }
+
   get dialogVisible(): boolean {
     return this.displayCreateDialog || this.displayEditDialog;
   }
@@ -141,7 +155,7 @@ export class CoursesComponent implements OnInit {
   showEditDialog(course: any) {
     this.currentCourseId = course.id;
     this.loading = true;
-    
+
     this.http.get<GetCourseByIdResponse>(`${environment.apiUrl}/courses/${course.id}`)
       .subscribe({
         next: (response) => {
@@ -151,17 +165,17 @@ export class CoursesComponent implements OnInit {
             urlLogo: response.data.urlLogo,
             isPublic: response.data.isPublic
           });
-          
+
           // Si la imagen actual no está en las imágenes prediseñadas, agregarla como subida
           const currentImageUrl = response.data.urlLogo;
           if (currentImageUrl && !this.defaultImages.includes(currentImageUrl) && !this.uploadedImages.includes(currentImageUrl)) {
             this.uploadedImages.push(currentImageUrl);
           }
-          
+
           this.displayEditDialog = true;
         },
         error: (err) => {
-          this.messageService.add({severity:'error', summary:'Error', detail:'Error al cargar curso'});
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar curso' });
           console.error(err);
         },
         complete: () => this.loading = false
@@ -179,19 +193,19 @@ export class CoursesComponent implements OnInit {
       this.http.post(`${environment.apiUrl}/courses`, data)
         .subscribe({
           next: () => {
-            this.messageService.add({severity:'success', summary:'Éxito', detail:'Curso creado correctamente'});
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Curso creado correctamente' });
             this.displayCreateDialog = false;
             this.loadCourses(); // Recargar lista
           },
           error: (err) => {
-            this.messageService.add({severity:'error', summary:'Error', detail:'Error al crear curso'});
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al crear curso' });
             console.error(err);
           },
           complete: () => this.loading = false
         });
     }
   }
-  
+
   loadCourses() {
     this.courseService.getCoursesForAdmin().subscribe({
       next: (response) => {
@@ -210,12 +224,12 @@ export class CoursesComponent implements OnInit {
       this.http.patch(`${environment.apiUrl}/courses/${this.currentCourseId}`, data)
         .subscribe({
           next: () => {
-            this.messageService.add({severity:'success', summary:'Éxito', detail:'Curso actualizado correctamente'});
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Curso actualizado correctamente' });
             this.displayEditDialog = false;
             this.loadCourses();
           },
           error: (err) => {
-            this.messageService.add({severity:'error', summary:'Error', detail:'Error al actualizar curso'});
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al actualizar curso' });
             console.error(err);
           },
           complete: () => this.loading = false
@@ -231,7 +245,7 @@ export class CoursesComponent implements OnInit {
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: () => this.deleteCourse(course.id),
-      reject: () => {}
+      reject: () => { }
     });
   }
 
@@ -240,11 +254,11 @@ export class CoursesComponent implements OnInit {
     this.http.delete(`${environment.apiUrl}/courses/${courseId}`)
       .subscribe({
         next: () => {
-          this.messageService.add({severity:'success', summary:'Éxito', detail:'Curso eliminado correctamente'});
+          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Curso eliminado correctamente' });
           this.loadCourses();
         },
         error: (err) => {
-          this.messageService.add({severity:'error', summary:'Error', detail:'Error al eliminar curso'});
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar curso' });
           console.error(err);
         },
         complete: () => this.loading = false
@@ -261,7 +275,7 @@ export class CoursesComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       this.loading = true;
-      
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -272,12 +286,12 @@ export class CoursesComponent implements OnInit {
               // Agregar la imagen subida al array de imágenes disponibles
               this.uploadedImages.push(response.data.url);
               this.defaultImages = [...this.defaultImages, response.data.url];
-              
+
               // Seleccionar automáticamente la imagen subida
               this.courseForm.patchValue({
                 urlLogo: response.data.url
               });
-              
+
               this.messageService.add({
                 severity: 'success',
                 summary: 'Éxito',
@@ -336,7 +350,7 @@ export class CoursesComponent implements OnInit {
           this.selectedCourse = { ...this.selectedCourse, ...response.data };
         },
         error: (err) => {
-          this.messageService.add({severity:'error', summary:'Error', detail:'Error al cargar detalles del curso'});
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar detalles del curso' });
         },
         complete: () => this.loading = false
       });
@@ -354,7 +368,7 @@ export class CoursesComponent implements OnInit {
    */
   generateDescriptionWithAI() {
     const title = this.courseForm.get('title')?.value;
-    
+
     if (!title) {
       this.messageService.add({
         severity: 'warn',
@@ -376,7 +390,7 @@ export class CoursesComponent implements OnInit {
    */
   generateDescriptionFromPrompt() {
     const title = this.courseForm.get('title')?.value;
-    
+
     if (!this.descriptionPrompt.trim()) {
       this.messageService.add({
         severity: 'warn',
@@ -398,16 +412,16 @@ export class CoursesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al generar descripción', err);
-        
+
         // Extraer mensaje de error del backend
         let errorMessage = 'Error al generar descripción con IA';
         let errorSummary = 'Error';
         let severity = 'error';
-        
+
         // Verificar si es un error de contenido inapropiado
         if (err.error?.message) {
           errorMessage = err.error.message;
-          
+
           // Si contiene "No es posible" es contenido inapropiado
           if (errorMessage.includes('No es posible')) {
             errorSummary = '⚠️ Contenido No Permitido';
@@ -416,14 +430,14 @@ export class CoursesComponent implements OnInit {
         } else if (err.message) {
           errorMessage = err.message;
         }
-        
+
         this.messageService.add({
           severity: severity,
           summary: errorSummary,
           detail: errorMessage,
           life: 5000
         });
-        
+
         this.generatingDescription = false;
       }
     });

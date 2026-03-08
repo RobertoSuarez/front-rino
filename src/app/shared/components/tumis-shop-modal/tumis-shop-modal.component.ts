@@ -154,7 +154,7 @@ import { UserService } from '../../../core/services/user.service';
   `,
   styles: [
     `
-      :host {
+      ::ng-deep .tumis-shop-dialog {
         --shop-text: #1f2f46;
         --shop-muted: #6b7b93;
         --shop-border: #dde5f0;
@@ -163,6 +163,39 @@ import { UserService } from '../../../core/services/user.service';
         --shop-green: #19be84;
         --shop-green-dark: #11a873;
         --shop-gray-btn: #e8edf4;
+        
+        --shop-heart-bg: #f8fafc;
+        --shop-heart-count-bg: #ffffff;
+        --shop-balance-pill-bg: #edf2f8;
+        --shop-close-btn-bg: #e9eef5;
+        --shop-close-btn-hover: #dfe7f2;
+        --shop-offer-buy-bg: #f1f5f9;
+        --shop-offer-buy-hover: #e2e8f0;
+        --shop-offer-buy-text: #334155;
+        --shop-offer-special-border: #d6e1f0;
+        --shop-skeleton-bg: #e2e8f0;
+      }
+
+      ::ng-deep .app-dark .tumis-shop-dialog {
+        --shop-text: #f8fafc;
+        --shop-muted: #94a3b8;
+        --shop-border: #334155;
+        --shop-bg: #0f172a;
+        --shop-white: #1e293b;
+        --shop-green: #10b981;
+        --shop-green-dark: #059669;
+        --shop-gray-btn: #334155;
+        
+        --shop-heart-bg: #334155;
+        --shop-heart-count-bg: #0f172a;
+        --shop-balance-pill-bg: #334155;
+        --shop-close-btn-bg: #334155;
+        --shop-close-btn-hover: #475569;
+        --shop-offer-buy-bg: #334155;
+        --shop-offer-buy-hover: #475569;
+        --shop-offer-buy-text: #e2e8f0;
+        --shop-offer-special-border: #475569;
+        --shop-skeleton-bg: #334155;
       }
 
       :host ::ng-deep .p-dialog-mask {
@@ -214,7 +247,7 @@ import { UserService } from '../../../core/services/user.service';
         width: 34px;
         height: 34px;
         border-radius: 10px;
-        background: #e2f8ef;
+        background: rgba(25, 190, 132, 0.15);
         color: var(--shop-green);
         display: flex;
         align-items: center;
@@ -262,7 +295,7 @@ import { UserService } from '../../../core/services/user.service';
         gap: 7px;
         padding: 8px 12px;
         border-radius: 999px;
-        background: #edf2f8;
+        background: var(--shop-balance-pill-bg);
         color: var(--shop-text);
         animation: none;
       }
@@ -298,8 +331,8 @@ import { UserService } from '../../../core/services/user.service';
       }
 
       .shop-close-icon:hover {
-        background: #eef3fa;
-        color: #5f738f;
+        background: var(--shop-close-btn-hover);
+        color: var(--shop-text);
       }
 
       .shop-body {
@@ -378,13 +411,13 @@ import { UserService } from '../../../core/services/user.service';
       }
 
       .offer-card--special {
-        border-color: #d6e1f0;
+        border-color: var(--shop-offer-special-border);
       }
 
       .offer-card--skeleton {
         border: none;
         min-height: 345px;
-        background: #e2e8f0;
+        background: var(--shop-skeleton-bg);
       }
 
       .offer-badge {
@@ -427,7 +460,7 @@ import { UserService } from '../../../core/services/user.service';
         width: 74px;
         height: 74px;
         border-radius: 50%;
-        background: #f8fafc;
+        background: var(--shop-heart-bg);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -442,15 +475,15 @@ import { UserService } from '../../../core/services/user.service';
       }
 
       .offer-card--featured .heart-circle {
-        background: #eefdf8;
+        background: rgba(16, 185, 129, 0.1);
       }
 
       .heart-multiplier {
         position: absolute;
         right: -4px;
         bottom: 8px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: var(--shop-heart-count-bg);
+        border: 1px solid var(--shop-border);
         border-radius: 50%;
         width: 28px;
         height: 28px;
@@ -459,7 +492,7 @@ import { UserService } from '../../../core/services/user.service';
         justify-content: center;
         font-size: 11px;
         font-weight: 800;
-        color: #1f2f46;
+        color: var(--shop-text);
         box-shadow: 0 4px 8px rgba(0,0,0,0.06);
       }
 
@@ -468,7 +501,7 @@ import { UserService } from '../../../core/services/user.service';
         font-size: 32px;
         font-weight: 800;
         line-height: 1.2;
-        color: #1f2f46;
+        color: var(--shop-text);
       }
 
       .offer-description {
@@ -523,8 +556,8 @@ import { UserService } from '../../../core/services/user.service';
         margin-top: 20px;
         border: none;
         border-radius: 12px;
-        background: #f1f5f9;
-        color: #334155;
+        background: var(--shop-offer-buy-bg);
+        color: var(--shop-offer-buy-text);
         font-size: 15px;
         font-weight: 700;
         padding: 12px 18px;
@@ -533,7 +566,7 @@ import { UserService } from '../../../core/services/user.service';
       }
 
       .offer-buy-btn:hover:not(:disabled) {
-        background: #e2e8f0;
+        background: var(--shop-offer-buy-hover);
         transform: translateY(-2px);
       }
 
@@ -592,8 +625,8 @@ import { UserService } from '../../../core/services/user.service';
       .shop-close-btn {
         border: none;
         border-radius: 8px;
-        background: #e9eef5;
-        color: #3a4e69;
+        background: var(--shop-close-btn-bg);
+        color: var(--shop-text);
         font-size: 12px;
         font-weight: 700;
         padding: 10px 14px;
@@ -604,7 +637,7 @@ import { UserService } from '../../../core/services/user.service';
       }
 
       .shop-close-btn:hover {
-        background: #dfe7f2;
+        background: var(--shop-close-btn-hover);
       }
 
 

@@ -146,24 +146,24 @@ export class Register {
     userType: string = '';
     acceptTerms: boolean = false;
     isLoading: boolean = false;
-    
+
     get passwordsMatch(): boolean {
         return this.password === this.confirmPassword && this.confirmPassword !== '';
     }
-    
+
     userTypes = [
         { name: 'Administrador', value: 'admin' },
         { name: 'Estudiante', value: 'student' },
         { name: 'Profesor', value: 'teacher' },
         { name: 'Padre de familia', value: 'parent' }
     ];
-    
+
     constructor(
         private apiService: ApiService,
         private messageService: MessageService,
         private router: Router
-    ) {}
-    
+    ) { }
+
     /**
      * Registra un nuevo usuario
      */
@@ -171,9 +171,9 @@ export class Register {
         if (!this.validateForm()) {
             return;
         }
-        
+
         this.isLoading = true;
-        
+
         const userData = {
             firstName: this.name,
             lastName: this.lastname,
@@ -182,7 +182,7 @@ export class Register {
             password: this.password,
             typeUser: this.userType
         };
-        
+
         this.apiService.post('users', userData).subscribe({
             next: (response) => {
                 this.isLoading = false;
@@ -191,7 +191,7 @@ export class Register {
                     summary: 'Registro exitoso',
                     detail: 'Tu cuenta ha sido creada correctamente'
                 });
-                
+
                 // Redirigir al login después de 2 segundos
                 setTimeout(() => {
                     this.router.navigate(['/auth/login']);
@@ -207,7 +207,7 @@ export class Register {
             }
         });
     }
-    
+
     /**
      * Valida el formulario antes de enviarlo
      */
@@ -220,7 +220,7 @@ export class Register {
             });
             return false;
         }
-        
+
         if (this.password !== this.confirmPassword) {
             this.messageService.add({
                 severity: 'warn',
@@ -229,7 +229,7 @@ export class Register {
             });
             return false;
         }
-        
+
         if (!this.validateEmail(this.email)) {
             this.messageService.add({
                 severity: 'warn',
@@ -238,7 +238,7 @@ export class Register {
             });
             return false;
         }
-        
+
         if (!this.validatePassword(this.password)) {
             this.messageService.add({
                 severity: 'warn',
@@ -247,7 +247,7 @@ export class Register {
             });
             return false;
         }
-        
+
         if (!this.acceptTerms) {
             this.messageService.add({
                 severity: 'warn',
@@ -256,10 +256,10 @@ export class Register {
             });
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Valida el formato del email
      */
@@ -267,7 +267,7 @@ export class Register {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(email);
     }
-    
+
     /**
      * Valida que la contraseña cumpla con los requisitos
      */
@@ -276,21 +276,21 @@ export class Register {
         const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
         return passwordRegex.test(password);
     }
-    
+
     /**
      * Formatea la fecha para enviarla al servidor en formato DD/MM/YYYY HH:MM:SS
      */
     private formatDate(dateStr: string): string {
         if (!dateStr) return '';
-        
+
         // Convertir de YYYY-MM-DD a Date
         const date = new Date(dateStr);
-        
+
         // Formatear como DD/MM/YYYY HH:MM:SS
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear();
-        
+
         // Agregar hora fija 06:48:00 como en el ejemplo
         return `${day}/${month}/${year} 06:48:00`;
     }

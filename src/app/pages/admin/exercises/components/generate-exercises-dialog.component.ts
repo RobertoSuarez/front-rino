@@ -737,7 +737,6 @@ export class GenerateExercisesDialogComponent implements OnInit {
         activityId: this.activityId!,
         statement: ex.statement,
         difficulty: ex.difficulty,
-        code: ex.code || '',
         hind: ex.hint || '',
         typeExercise: ex.typeExercise as any,
         optionSelectOptions: ex.optionSelectOptions || [],

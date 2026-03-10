@@ -57,7 +57,6 @@ interface ExerciseGuide {
 interface Exercise {
   id: number;
   statement: string;
-  code: string;
   typeExercise: ExerciseType;
   approach: string;
   hind: string;
@@ -390,7 +389,6 @@ export class ActivitySolverComponent implements OnInit {
           exercises: data.exercises.map(ex => ({
             id: ex.id,
             statement: ex.statement,
-            code: ex.code || '',
             typeExercise: ex.typeExercise as any,
             approach: ex.approach || '',
             hind: ex.hind || '',
@@ -496,7 +494,6 @@ export class ActivitySolverComponent implements OnInit {
       return {
         id: 0,
         statement: '',
-        code: '',
         typeExercise: 'selection_single',
         approach: '',
         hind: '',
@@ -517,7 +514,6 @@ export class ActivitySolverComponent implements OnInit {
     return this.activity()!.exercises[this.currentExerciseIndex()] || {
       id: 0,
       statement: '',
-      code: '',
       typeExercise: 'selection_single',
       approach: '',
       hind: '',

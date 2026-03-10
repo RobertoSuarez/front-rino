@@ -71,10 +71,6 @@
                     <span><strong>Pista:</strong> {{ currentExercise.hind }}</span>
                 </div>
 
-                <!-- Código (si tiene) -->
-                <div *ngIf="currentExercise.code" class="code-block">
-                    <pre><code>{{ currentExercise.code }}</code></pre>
-                </div>
 
                 <!-- Componente de ejercicio -->
                 <div class="exercise-component-wrap" [ngSwitch]="currentExercise.typeExercise">

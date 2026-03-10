@@ -12,7 +12,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from "primeng/button";
@@ -28,6 +28,7 @@ import { PhishingSelectionMultipleComponent } from './components/phishing-select
 import { MatchPairsComponent } from './components/match-pairs.component';
 import { GenerateExercisesDialogComponent } from './components/generate-exercises-dialog.component';
 import { GeneratedExercise } from '../../../core/services/exercise-generation.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-exercises-list',
@@ -44,8 +45,10 @@ import { GeneratedExercise } from '../../../core/services/exercise-generation.se
     DialogModule,
     CheckboxModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     ConfirmDialogModule,
+    TooltipModule,
     SelectionSingleComponent,
     SelectionMultipleComponent,
     VerticalOrderingComponent,
@@ -62,12 +65,43 @@ import { GeneratedExercise } from '../../../core/services/exercise-generation.se
 export class ExercisesListComponent implements OnInit {
   exercises: ExerciseListItem[] = [];
   loading: boolean = true;
-  displayDialog: boolean = false; // Reemplaza a displayCreateDialog y displayEditDialog
+  displayDialog: boolean = false;
   currentExerciseId: number | null = null;
   exerciseForm: FormGroup;
   activityId: number | null = null;
   activityTitle: string = '';
   exerciseTypeData: any = {};
+  viewMode: 'table' | 'grid' = 'table';
+  searchTerm: string = '';
+
+  /** Exercise type metadata for labels, icons, and colors */
+  typeMap: Record<string, { label: string; icon: string; color: string; bg: string }> = {
+    'selection_single':           { label: 'Selección Simple',       icon: 'pi pi-check-circle',   color: '#2563eb', bg: '#eff6ff' },
+    'selection_multiple':         { label: 'Selección Múltiple',     icon: 'pi pi-check-square',   color: '#7c3aed', bg: '#f5f3ff' },
+    'vertical_ordering':          { label: 'Orden Vertical',         icon: 'pi pi-sort-amount-down',color: '#0891b2', bg: '#ecfeff' },
+    'horizontal_ordering':        { label: 'Orden Horizontal',       icon: 'pi pi-arrows-h',       color: '#0d9488', bg: '#f0fdfa' },
+    'phishing_selection_multiple': { label: 'Detección Phishing',    icon: 'pi pi-shield',         color: '#dc2626', bg: '#fef2f2' },
+    'match_pairs':                { label: 'Emparejar Conceptos',    icon: 'pi pi-link',           color: '#ea580c', bg: '#fff7ed' },
+  };
+
+  getTypeLabel(type: string): string { return this.typeMap[type]?.label || type; }
+  getTypeIcon(type: string): string  { return this.typeMap[type]?.icon || 'pi pi-question-circle'; }
+  getTypeColor(type: string): string { return this.typeMap[type]?.color || '#6b7280'; }
+  getTypeBg(type: string): string    { return this.typeMap[type]?.bg || '#f9fafb'; }
+
+  get filteredExercises(): ExerciseListItem[] {
+    if (!this.searchTerm) return this.exercises;
+    const term = this.searchTerm.toLowerCase();
+    return this.exercises.filter(e =>
+      (e.statement && e.statement.toLowerCase().includes(term)) ||
+      (e.typeExercise && e.typeExercise.toLowerCase().includes(term)) ||
+      String(e.id).includes(term)
+    );
+  }
+
+  countByType(type: string): number {
+    return this.filteredExercises.filter(e => e.typeExercise === type).length;
+  }
 
   // Parámetros para volver a la página de actividades
   returnCourseId: number | null = null;
@@ -140,7 +174,6 @@ export class ExercisesListComponent implements OnInit {
     return this.fb.group({
       activityId: ['', Validators.required],
       statement: ['', Validators.required],
-      code: [''],
       difficulty: ['Fácil', Validators.required],
       hind: ['', Validators.required],
       typeExercise: ['selection_single', Validators.required],
@@ -216,7 +249,6 @@ export class ExercisesListComponent implements OnInit {
     this.exerciseForm.reset({
       activityId: this.activityId,
       statement: '',
-      code: '',
       difficulty: 'Fácil',
       hind: '',
       typeExercise: 'selection_single',
@@ -261,7 +293,6 @@ export class ExercisesListComponent implements OnInit {
         this.exerciseForm.patchValue({
           activityId: response.activityId,
           statement: response.statement,
-          code: response.code,
           difficulty: response.difficulty,
           hind: response.hind,
           typeExercise: response.typeExercise,
@@ -411,7 +442,6 @@ export class ExercisesListComponent implements OnInit {
       answerOrderLineCode: data.answerOrderLineCode || [],
       answerFindError: data.answerFindError || '',
       answerWriteCode: data.answerWriteCode || '',
-      code: data.code || this.exerciseForm.get('code')?.value || '',
       // Nuevos campos para los 4 tipos adicionales
       optionsVerticalOrdering: data.optionsVerticalOrdering || [],
       answerVerticalOrdering: data.answerVerticalOrdering || [],

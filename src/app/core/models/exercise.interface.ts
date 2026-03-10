@@ -1,7 +1,6 @@
 export interface Exercise {
   id: number;
   statement: string;
-  code: string;
   typeExercise: 'selection_single' | 'selection_multiple' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';
   difficulty: string;
   hind: string;
@@ -39,6 +38,7 @@ export interface ExerciseListItem {
   statement: string;
   title: string;
   approach: string;
+  difficulty: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,7 +46,6 @@ export interface ExerciseListItem {
 export interface CreateExerciseRequest {
   activityId: number;
   statement: string;
-  code: string;
   difficulty: string;
   hind: string;
   typeExercise: 'selection_single' | 'selection_multiple' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';
@@ -76,7 +75,6 @@ export interface CreateExerciseRequest {
 export interface UpdateExerciseRequest {
   activityId?: number;
   statement?: string;
-  code?: string;
   difficulty?: string;
   hind?: string;
   typeExercise?: 'selection_single' | 'selection_multiple' | 'vertical_ordering' | 'horizontal_ordering' | 'phishing_selection_multiple' | 'match_pairs';

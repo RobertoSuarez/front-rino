@@ -2,10 +2,9 @@
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 
 <!-- Spinner de carga inicial -->
-<div *ngIf="loading()" class="flex justify-content-center align-items-center" style="height: 80vh;">
-  <div class="spinner-container">
-    <div class="spinner"></div>
-  </div>
+<div *ngIf="loading()" class="w-full flex flex-col items-center justify-center" style="height: 80vh;">
+  <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+  <p class="text-gray-500 font-medium">Cargando actividad...</p>
 </div>
 
 <!-- Contenido principal -->
@@ -119,10 +118,6 @@
               <h2 class="question-title">{{ currentExercise.statement }}</h2>
               <p class="exercise-objective">{{ currentExerciseGuide.objective }}</p>
 
-              <!-- Código del ejercicio (si existe) -->
-              <div *ngIf="currentExercise.code" class="question-code-block">
-                <pre class="whitespace-pre-wrap"><code>{{ currentExercise.code }}</code></pre>
-              </div>
             </div>
 
             <!-- Componente específico según el tipo de ejercicio -->

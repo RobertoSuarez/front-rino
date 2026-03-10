@@ -38,7 +38,6 @@ type ExerciseType =
 interface Exercise {
   id: number;
   statement: string;
-  code: string;
   typeExercise: ExerciseType;
   hind: string;
   optionSelectOptions: string[];
@@ -518,7 +517,6 @@ export class ExerciseSandboxComponent implements OnInit {
           exercises: data.exercises.map(ex => ({
             id: ex.id,
             statement: ex.statement,
-            code: ex.code || '',
             typeExercise: ex.typeExercise as ExerciseType,
             hind: ex.hind || '',
             optionSelectOptions: ex.optionSelectOptions || [],
@@ -568,7 +566,7 @@ export class ExerciseSandboxComponent implements OnInit {
 
   private get emptyExercise(): Exercise {
     return {
-      id: 0, statement: '', code: '', typeExercise: 'selection_single', hind: '',
+      id: 0, statement: '', typeExercise: 'selection_single', hind: '',
       optionSelectOptions: [], optionOrderFragmentCode: [], optionOrderLineCode: [],
       optionFindErrorCode: [], optionsVerticalOrdering: [], optionsHorizontalOrdering: [],
       optionsPhishingSelection: [], phishingContext: '', phishingImageUrl: '',

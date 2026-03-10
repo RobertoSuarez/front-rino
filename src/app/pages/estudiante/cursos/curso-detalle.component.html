@@ -1,10 +1,9 @@
 <p-toast></p-toast>
 
 <!-- Spinner de carga inicial -->
-<div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 80vh;">
-  <div class="spinner-container">
-    <div class="spinner"></div>
-  </div>
+<div *ngIf="loading" class="w-full flex flex-col items-center justify-center" style="height: 80vh;">
+  <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+  <p class="text-gray-500 font-medium">Cargando curso...</p>
 </div>
 
 <!-- Contenido principal -->

@@ -27,7 +27,6 @@ export interface GeneratedExercise {
   answerOrderFragmentCode?: string[];
   answerOrderLineCode?: string[];
   answerFindError?: string;
-  code?: string;
   hint?: string;
   
   // Match Pairs

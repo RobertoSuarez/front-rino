@@ -14,7 +14,6 @@ export interface ActivityWithExercises {
 export interface ExercisePreview {
   id: number;
   statement: string;
-  code: string;
   typeExercise: string;
   approach: string;
   hind: string;

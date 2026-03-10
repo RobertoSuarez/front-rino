@@ -1,87 +1,232 @@
 <p-toast></p-toast>
 <div class="card">
-    <div class="flex justify-between items-center mb-4">
-        <div class="font-semibold text-xl">Ejercicios de la Actividad: {{activityTitle}}</div>
-        <p-button icon="pi pi-arrow-left" label="Volver a Actividades" class="p-button-outlined"
+    <!-- ── Header ── -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+            <div class="font-bold text-2xl text-gray-800 dark:text-white mb-1">
+                Ejercicios de la Actividad
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+                <i class="pi pi-bookmark mr-1"></i>{{activityTitle}}
+            </div>
+        </div>
+        <p-button icon="pi pi-arrow-left" label="Volver a Actividades" [outlined]="true" severity="secondary"
             (click)="navigateBackToActivities()"></p-button>
     </div>
 
-    <p-table #dt [value]="exercises" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
-        [showGridlines]="true" [paginator]="true" [globalFilterFields]="['id', 'statement', 'typeExercise', 'approach']"
-        responsiveLayout="scroll">
-        <ng-template pTemplate="caption">
-            <div class="flex justify-between items-center flex-column sm:flex-row gap-2">
-                <div class="flex gap-2">
-                    <p-button label="Nuevo Ejercicio" icon="pi pi-plus" class="p-button-rounded"
-                        [disabled]="!activityId" (click)="showCreateDialog()"></p-button>
-                    <p-button label="Generar con IA" icon="pi pi-sparkles" severity="info" class="p-button-rounded"
-                        [disabled]="!activityId" (click)="openGenerateDialog()"></p-button>
-                    <p-button label="Probar Ejercicios" icon="pi pi-play" severity="warn" class="p-button-rounded"
-                        [disabled]="!activityId || exercises.length === 0"
-                        pTooltip="Abrir sandbox para previsualizar y probar los ejercicios como estudiante"
-                        tooltipPosition="bottom" (click)="openSandbox()"></p-button>
-                </div>
-                <p-iconField iconPosition="left" class="ml-auto">
-                    <p-inputIcon>
-                        <i class="pi pi-search"></i>
-                    </p-inputIcon>
-                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar ejercicio" />
-                </p-iconField>
+    <!-- ── Toolbar: Actions + Search + View Toggle ── -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <!-- Left: action buttons -->
+        <div class="flex flex-wrap gap-2">
+            <p-button label="Nuevo Ejercicio" icon="pi pi-plus" [raised]="true" severity="success"
+                [disabled]="!activityId" (click)="showCreateDialog()"></p-button>
+            <p-button label="Generar con IA" icon="pi pi-sparkles" [raised]="true" severity="info"
+                [disabled]="!activityId" (click)="openGenerateDialog()"></p-button>
+            <p-button label="Probar Ejercicios" icon="pi pi-play" [raised]="true" severity="warn"
+                [disabled]="!activityId || exercises.length === 0"
+                pTooltip="Abrir sandbox para previsualizar y probar los ejercicios como estudiante"
+                tooltipPosition="bottom" (click)="openSandbox()"></p-button>
+        </div>
+
+        <!-- Right: search + toggle -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <p-iconField iconPosition="left" class="w-full sm:w-64">
+                <p-inputIcon>
+                    <i class="pi pi-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" [(ngModel)]="searchTerm" placeholder="Buscar ejercicio..."
+                    class="w-full"
+                    (input)="viewMode === 'table' ? dt.filterGlobal($any($event.target).value, 'contains') : null" />
+            </p-iconField>
+
+            <div
+                class="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center gap-1 shrink-0 border border-transparent dark:border-gray-700">
+                <button (click)="viewMode = 'table'"
+                    [class]="viewMode === 'table' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                    class="px-3 py-2 rounded-md transition-all duration-200 flex items-center gap-2 font-medium"
+                    pTooltip="Vista de tabla" tooltipPosition="bottom">
+                    <i class="pi pi-list"></i>
+                    <span class="hidden sm:inline">Tabla</span>
+                </button>
+                <button (click)="viewMode = 'grid'"
+                    [class]="viewMode === 'grid' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'"
+                    class="px-3 py-2 rounded-md transition-all duration-200 flex items-center gap-2 font-medium"
+                    pTooltip="Vista de tarjetas" tooltipPosition="bottom">
+                    <i class="pi pi-th-large"></i>
+                    <span class="hidden sm:inline">Tarjetas</span>
+                </button>
             </div>
-        </ng-template>
+        </div>
+    </div>
+
+    <!-- ══════════════════ TABLE VIEW ══════════════════ -->
+    @if (viewMode === 'table') {
+    <p-table #dt [value]="exercises" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
+        [showGridlines]="false" [paginator]="true"
+        [globalFilterFields]="['id', 'statement', 'typeExercise', 'approach']" responsiveLayout="scroll"
+        styleClass="p-datatable-sm p-datatable-striped">
 
         <ng-template pTemplate="header">
             <tr>
-                <th>ID</th>
+                <th style="width:60px">ID</th>
                 <th>Enunciado</th>
-                <th>Tipo</th>
-                <th>Enfoque</th>
-                <th>Fecha Creación</th>
-                <th>Acciones</th>
+                <th style="width:190px">Tipo</th>
+                <th style="width:100px">Dificultad</th>
+                <th style="width:100px">Enfoque</th>
+                <th style="width:140px">Fecha Creación</th>
+                <th style="width:120px">Acciones</th>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-exercise>
             <tr>
-                <td>{{exercise.id}}</td>
-                <td>{{exercise.statement}}</td>
+                <td class="font-bold text-gray-500 dark:text-gray-400">#{{exercise.id}}</td>
                 <td>
-                    <span *ngIf="exercise.typeExercise === 'selection_single'">Selección Simple</span>
-                    <span *ngIf="exercise.typeExercise === 'selection_multiple'">Selección Múltiple</span>
-                    <span *ngIf="exercise.typeExercise === 'vertical_ordering'">Ordenamiento Vertical</span>
-                    <span *ngIf="exercise.typeExercise === 'horizontal_ordering'">Ordenamiento Horizontal</span>
-                    <span *ngIf="exercise.typeExercise === 'phishing_selection_multiple'">Detección de Phishing</span>
-                    <span *ngIf="exercise.typeExercise === 'match_pairs'">Emparejar Conceptos</span>
+                    <span class="line-clamp-2 text-gray-800 dark:text-gray-200">{{exercise.statement}}</span>
                 </td>
                 <td>
-                    <p-tag [value]="exercise.approach"
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold"
+                        [style.background]="getTypeBg(exercise.typeExercise)"
+                        [style.color]="getTypeColor(exercise.typeExercise)">
+                        <i [class]="getTypeIcon(exercise.typeExercise)" class="text-[0.7rem]"></i>
+                        {{getTypeLabel(exercise.typeExercise)}}
+                    </div>
+                </td>
+                <td>
+                    <p-tag
+                        [value]="exercise.difficulty || 'N/A'"
+                        [severity]="exercise.difficulty === 'Fácil' ? 'success' : exercise.difficulty === 'Medio' ? 'warn' : 'danger'"></p-tag>
+                </td>
+                <td>
+                    <p-tag [value]="exercise.approach || 'N/A'"
                         [severity]="exercise.approach === 'Teórica' ? 'info' : 'success'"></p-tag>
                 </td>
-                <td>{{exercise.createdAt }}</td>
-                <td class="flex gap-2">
-                    <p-button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text"
-                        (click)="showEditDialog(exercise)"></p-button>
-                    <p-button icon="pi pi-trash" severity="danger" class="p-button-rounded p-button-text"
-                        (click)="confirmDelete(exercise)"></p-button>
+                <td class="text-sm text-gray-500 dark:text-gray-400">{{exercise.createdAt}}</td>
+                <td>
+                    <div class="flex gap-1">
+                        <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
+                            (click)="showEditDialog(exercise)" pTooltip="Editar" tooltipPosition="top"></p-button>
+                        <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                            (click)="confirmDelete(exercise)" pTooltip="Eliminar" tooltipPosition="top"></p-button>
+                    </div>
                 </td>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="6" class="text-center p-4">
-                    <div *ngIf="activityId">
-                        No se encontraron ejercicios para esta actividad.
-                    </div>
-                    <div *ngIf="!activityId">
-                        Selecciona una actividad para ver sus ejercicios.
+                <td colspan="7" class="text-center p-6">
+                    <div class="flex flex-col items-center justify-center py-4">
+                        <i class="pi pi-inbox text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400 font-medium" *ngIf="activityId">
+                            No se encontraron ejercicios para esta actividad.
+                        </p>
+                        <p class="text-gray-500 dark:text-gray-400 font-medium" *ngIf="!activityId">
+                            Selecciona una actividad para ver sus ejercicios.
+                        </p>
                     </div>
                 </td>
             </tr>
         </ng-template>
     </p-table>
+    }
+
+    <!-- ══════════════════ CARD / GRID VIEW ══════════════════ -->
+    @if (viewMode === 'grid') {
+
+    <!-- Summary stat strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        @for (t of exerciseTypes; track t.value) {
+        <div class="rounded-xl p-3 border border-gray-100 dark:border-gray-700 flex items-center gap-3"
+            [style.background]="getTypeBg(t.value)">
+            <i [class]="getTypeIcon(t.value)" class="text-lg" [style.color]="getTypeColor(t.value)"></i>
+            <div>
+                <div class="text-xs font-medium text-gray-500 dark:text-gray-400 leading-tight">{{ t.label }}</div>
+                <div class="text-lg font-bold" [style.color]="getTypeColor(t.value)">
+                    {{ countByType(t.value) }}
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Cards grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        @for (exercise of filteredExercises; track exercise.id) {
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group hover:-translate-y-1">
+
+            <!-- Card header color stripe -->
+            <div class="h-1.5 w-full" [style.background]="getTypeColor(exercise.typeExercise)"></div>
+
+            <div class="p-5 flex-1 flex flex-col">
+                <!-- Top row: type badge + ID -->
+                <div class="flex items-center justify-between mb-3">
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold"
+                        [style.background]="getTypeBg(exercise.typeExercise)"
+                        [style.color]="getTypeColor(exercise.typeExercise)">
+                        <i [class]="getTypeIcon(exercise.typeExercise)" class="text-[0.65rem]"></i>
+                        {{getTypeLabel(exercise.typeExercise)}}
+                    </div>
+                    <span class="text-xs font-bold text-gray-400 dark:text-gray-500">#{{exercise.id}}</span>
+                </div>
+
+                <!-- Statement -->
+                <p class="text-sm text-gray-800 dark:text-gray-200 font-medium leading-relaxed line-clamp-3 flex-1 mb-4">
+                    {{exercise.statement}}
+                </p>
+
+                <!-- Meta tags -->
+                <div class="flex items-center gap-2 flex-wrap mb-4">
+                    <p-tag
+                        [value]="exercise.difficulty || 'N/A'"
+                        [severity]="exercise.difficulty === 'Fácil' ? 'success' : exercise.difficulty === 'Medio' ? 'warn' : 'danger'"
+                        [style]="{'font-size': '0.7rem'}"
+                        [rounded]="true">
+                    </p-tag>
+                    <p-tag [value]="exercise.approach || 'N/A'"
+                        [severity]="exercise.approach === 'Teórica' ? 'info' : 'success'"
+                        [style]="{'font-size': '0.7rem'}"
+                        [rounded]="true">
+                    </p-tag>
+                    <span class="text-xs text-gray-400 dark:text-gray-500 ml-auto flex items-center gap-1">
+                        <i class="pi pi-calendar text-[0.65rem]"></i>
+                        {{exercise.createdAt}}
+                    </span>
+                </div>
+
+                <!-- Divider -->
+                <div class="h-px bg-gray-100 dark:bg-gray-700 w-full mb-3"></div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-1">
+                    <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
+                        (click)="showEditDialog(exercise)" pTooltip="Editar" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                        (click)="confirmDelete(exercise)" pTooltip="Eliminar" tooltipPosition="top"></p-button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Empty state for grid -->
+    @if (filteredExercises.length === 0) {
+    <div
+        class="w-full py-12 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 mt-4">
+        <i class="pi pi-inbox text-5xl text-gray-400 dark:text-gray-500 mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">No se encontraron ejercicios</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6 text-center max-w-md">
+            Prueba ajustando los términos de búsqueda o crea un nuevo ejercicio para esta actividad.
+        </p>
+        <p-button label="Nuevo Ejercicio" icon="pi pi-plus" [raised]="true" severity="success"
+            (click)="showCreateDialog()"></p-button>
+    </div>
+    }
+    }
 </div>
 
+<!-- ══════════════════ CREATE / EDIT DIALOG ══════════════════ -->
 <p-dialog [header]="currentExerciseId ? 'Editar Ejercicio' : 'Nuevo Ejercicio'" [(visible)]="displayDialog"
     (onHide)="hideDialog()" [style]="{width: '70vw', height: '90vh'}" [modal]="true" [closable]="true"
     class="rounded-lg shadow-xl">
@@ -112,12 +257,6 @@
                 class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 <option *ngFor="let option of difficultyOptions" [value]="option.value">{{option.label}}</option>
             </select>
-        </div>
-
-        <div class="field space-y-2">
-            <label for="code" class="block text-sm font-medium text-gray-700">Código (si aplica)</label>
-            <textarea id="code" pInputTextarea formControlName="code" rows="5"
-                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
         </div>
 
         <div class="field space-y-2">

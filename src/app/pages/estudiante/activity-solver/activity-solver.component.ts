@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { marked } from 'marked';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -700,7 +701,10 @@ export class ActivitySolverComponent implements OnInit {
         }
 
         // Mostrar la retroalimentación en el drawer
-        this.currentFeedback.set(feedback);
+        this.currentFeedback.set({
+          ...feedback,
+          feedback: marked.parse(feedback.feedback || '') as string
+        });
         this.showFeedback.set(true);
         this.showFeedbackDrawer.set(true); // Abrir drawer
         this.answerVerified.set(true); // Marcar respuesta como verificada
@@ -911,13 +915,14 @@ export class ActivitySolverComponent implements OnInit {
   }
 
   updateFeedback(exerciseId: number, feedback: { qualification: number, feedback: string }): void {
+    const htmlFeedback = marked.parse(feedback.feedback || '') as string;
     this.answers.update(answers => {
       return answers.map(answer => {
         if (answer.exerciseId === exerciseId) {
           return { 
             ...answer, 
             qualification: feedback.qualification,
-            feedback: feedback.feedback,
+            feedback: htmlFeedback,
             // Asegurarse de que todos los campos requeridos existan
             answerSelect: answer.answerSelect || '',
             answerSelects: answer.answerSelects || [],

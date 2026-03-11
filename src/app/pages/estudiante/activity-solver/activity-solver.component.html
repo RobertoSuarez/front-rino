@@ -1,607 +1,359 @@
 <p-toast></p-toast>
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 
-<!-- Spinner de carga inicial -->
-<div *ngIf="loading()" class="w-full flex flex-col items-center justify-center" style="height: 80vh;">
-  <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-  <p class="text-gray-500 font-medium">Cargando actividad...</p>
+<!-- Loading State -->
+<div *ngIf="loading()" class="w-full h-screen flex flex-col items-center justify-center activity-page">
+  <div class="duo-spinner"></div>
+  <p class="font-bold text-lg text-gray-500">Cargando desafío...</p>
 </div>
 
-<!-- Contenido principal -->
-<div class="activity-page h-full inset-0 absolute flex flex-col z-10">
+<!-- Main Activity -->
+<div class="activity-page h-full inset-0 absolute flex flex-col z-10" *ngIf="!loading()">
+  
+  <!-- Topbar -->
+  <header class="duo-topbar px-4 sm:px-6 py-4">
+    <div class="max-w-5xl mx-auto w-full flex items-center gap-4">
+      <button class="duo-btn-close flex-shrink-0" (click)="navigateBack()" pTooltip="Abandonar" tooltipPosition="bottom">
+        <i class="pi pi-times"></i>
+      </button>
 
-  <!-- Barra superior -->
-  <div class="activity-topbar px-4 sm:px-6 py-2 sm:py-3">
-    <div class="max-w-6xl mx-auto">
-      <div class="summary-card">
-        <div class="summary-layout">
-          <div class="flex items-center justify-between gap-3 flex-wrap">
-            <p-button icon="pi pi-arrow-left"
-                     styleClass="p-button-rounded p-button-text p-button-secondary h-10 w-10 flex items-center justify-center"
-                     (click)="navigateBack()"
-                     pTooltip="Volver atrás"
-                     tooltipPosition="bottom">
-            </p-button>
+      <div class="flex-grow max-w-2xl mx-auto px-4">
+        <p-progressBar [value]="progress" [showValue]="false" styleClass="duo-progress-bar"></p-progressBar>
+      </div>
 
-            <div class="header-controls">
-              <span class="exercise-chip">
-                <i [class]="currentExerciseGuide.icon"></i>
-                {{ currentExerciseGuide.label }}
-              </span>
-              <p-button
-                [icon]="isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"
-                [label]="isDarkMode() ? 'Modo Claro' : 'Modo Oscuro'"
-                styleClass="theme-toggle-btn"
-                (onClick)="toggleLightDarkMode()"
-                [pTooltip]="isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-                tooltipPosition="bottom">
-              </p-button>
-            </div>
+      <div class="flex items-center gap-4 flex-shrink-0">
+        <div class="duo-lives">
+          <i class="pi pi-heart-fill"></i>
+          <span>{{ safeUserIndicators.tumis }}</span>
+        </div>
+        <button class="duo-theme-btn" (click)="toggleLightDarkMode()" [pTooltip]="isDarkMode() ? 'Modo claro' : 'Modo oscuro'">
+          <i [class]="isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 overflow-y-auto w-full">
+    <div class="max-w-5xl mx-auto w-full min-h-full flex flex-col md:flex-row gap-8 lg:gap-12 px-4 sm:px-6 pt-8 pb-40">
+      
+      <!-- Left Panel (Mission & Hint) -->
+      <aside class="md:w-[320px] flex-shrink-0 flex flex-col gap-5">
+        <div class="duo-mission-card">
+          <div class="mission-header">
+            <i [class]="currentExerciseGuide.icon"></i>
+            <h2>Misión Actual</h2>
           </div>
-
-          <div class="space-y-1">
-            <h1 class="activity-title">{{ safeActivity.title || 'Aventura de aprendizaje' }}</h1>
-            <p class="activity-step">{{ currentActionStep }}</p>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <div class="flex-grow">
-              <p-progressBar [value]="progress" [showValue]="false" styleClass="h-3 bg-gray-200"></p-progressBar>
-            </div>
-            <div class="lives-chip">
-              <i class="pi pi-heart-fill"></i>
-              <span class="font-bold">{{ safeUserIndicators.tumis }}</span>
-              <span>tumis</span>
-            </div>
-          </div>
-
-          <div class="meta-compact-row">
-            <span class="meta-stat">Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}</span>
-            <div class="steps-row">
-              <span class="step-pill" [class.step-pill-active]="!hasAnswer() && !answerVerified()">1. Lee</span>
-              <span class="step-pill" [class.step-pill-active]="hasAnswer() && !answerVerified()">2. Verifica</span>
-              <span class="step-pill" [class.step-pill-active]="answerVerified()">3. Continúa</span>
-            </div>
-            <span class="meta-stat">{{ progress.toFixed(0) }}% completado</span>
+          <p class="mission-action">{{ currentExerciseGuide.action }}</p>
+          <div class="mission-tooltip">
+            <i class="pi pi-bolt"></i>
+            <span>{{ currentExerciseGuide.tip }}</span>
           </div>
         </div>
+
+        <div *ngIf="currentExercise.hind" class="duo-hint-card">
+          <i class="pi pi-key text-xl mt-1"></i>
+          <p>{{ currentExercise.hind }}</p>
+        </div>
+      </aside>
+
+      <!-- Right Panel (Exercise Area) -->
+      <section class="flex-1 flex flex-col min-h-[450px]">
+        <h1 class="duo-question-title">{{ currentExercise.statement }}</h1>
+        <p class="duo-question-subtitle">{{ currentExerciseGuide.objective }}</p>
+
+        <div class="exercise-content-area flex-1 mt-2">
+          <div [ngSwitch]="currentExercise.typeExercise" class="w-full" *ngIf="currentExercise">
+            <app-single-selection-exercise
+              *ngSwitchCase="'selection_single'"
+              [options]="currentExercise.optionSelectOptions"
+              [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-single-selection-exercise>
+
+            <app-multiple-selection-exercise
+              *ngSwitchCase="'selection_multiple'"
+              [options]="currentExercise.optionSelectOptions"
+              [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-multiple-selection-exercise>
+
+            <app-order-fragment-code-exercise
+              *ngSwitchCase="'order_fragment_code'"
+              [fragments]="currentExercise.optionOrderFragmentCode"
+              [orderedFragments]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderFragmentCode : []"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-order-fragment-code-exercise>
+
+            <app-order-line-code-exercise
+              *ngSwitchCase="'order_line_code'"
+              [lines]="currentExercise.optionOrderLineCode"
+              [orderedLines]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderLineCode : []"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-order-line-code-exercise>
+
+            <app-write-code-exercise
+              *ngSwitchCase="'write_code'"
+              [code]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerWriteCode : ''"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-write-code-exercise>
+
+            <app-find-error-code-exercise
+              *ngSwitchCase="'find_error_code'"
+              [options]="currentExercise.optionFindErrorCode"
+              [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-find-error-code-exercise>
+
+            <app-vertical-ordering-exercise
+              *ngSwitchCase="'vertical_ordering'"
+              [fragments]="currentExercise.optionsVerticalOrdering"
+              [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-vertical-ordering-exercise>
+
+            <app-horizontal-ordering-exercise
+              *ngSwitchCase="'horizontal_ordering'"
+              [lines]="currentExercise.optionsHorizontalOrdering"
+              [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-horizontal-ordering-exercise>
+
+            <app-phishing-selection-multiple-exercise
+              *ngSwitchCase="'phishing_selection_multiple'"
+              [options]="currentExercise.optionsPhishingSelection"
+              [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
+              [phishingContext]="currentExercise.phishingContext"
+              [phishingImageUrl]="currentExercise.phishingImageUrl"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-phishing-selection-multiple-exercise>
+
+            <app-match-pairs-exercise
+              *ngSwitchCase="'match_pairs'"
+              [leftOptions]="currentExercise.optionsMatchPairsLeft"
+              [rightOptions]="currentExercise.optionsMatchPairsRight"
+              [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
+              (answerSubmitted)="onAnswerSubmitted($event)">
+            </app-match-pairs-exercise>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Normal Bottombar (visible when no feedback) -->
+  <footer class="duo-bottombar fixed bottom-0 w-full" *ngIf="!showFeedback() || !currentFeedback()">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-full flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="hidden sm:block">
+        <!-- Espacio reservado para indicador opcional -->
+      </div>
+      <div class="flex items-center gap-4 w-full sm:w-auto">
+        <button
+          class="duo-btn w-full sm:w-auto"
+          [class.duo-btn-primary]="hasAnswer()"
+          [class.duo-btn-disabled]="!hasAnswer()"
+          (click)="hasAnswer() && !submitting() ? verifyAnswer() : null">
+          <i class="pi pi-spin pi-spinner" *ngIf="submitting()"></i>
+          {{ submitting() ? 'COMPROBANDO...' : 'COMPROBAR' }}
+        </button>
       </div>
     </div>
-  </div>
-
-  <!-- Contenido del ejercicio -->
-  <div class="flex-1 px-4 sm:px-6 pb-6 overflow-y-auto">
-    <div class="max-w-6xl mx-auto w-full py-1">
-      <div *ngIf="currentExercise" class="solver-layout">
-        <aside class="mission-panel">
-          <div class="mission-card">
-            <div class="mission-title">
-              <i [class]="currentExerciseGuide.icon"></i>
-              <span>MISIÓN ACTUAL</span>
-            </div>
-            <p class="mission-text">{{ currentExerciseGuide.action }}</p>
-            <p class="mission-tip">Tip: {{ currentExerciseGuide.tip }}</p>
-          </div>
-
-          <div *ngIf="currentExercise.hind" class="hint-side-card">
-            <div class="hint-side-title">
-              <i class="pi pi-lightbulb"></i>
-              <span>Pista Desbloqueada</span>
-            </div>
-            <p>{{ currentExercise.hind }}</p>
-          </div>
-
-          <div class="sequence-card">
-            <div class="sequence-head">
-              <span>SEQUENCE</span>
-              <span>STEP {{ currentSequenceStep }} / 3</span>
-            </div>
-            <div class="sequence-track">
-              <span class="sequence-node" [class.sequence-node-active]="currentSequenceStep >= 1"></span>
-              <span class="sequence-node" [class.sequence-node-active]="currentSequenceStep >= 2"></span>
-              <span class="sequence-node" [class.sequence-node-active]="currentSequenceStep >= 3"></span>
-            </div>
-          </div>
-        </aside>
-
-        <section class="exercise-card question-stage">
-          <div class="p-5 sm:p-7">
-            <div class="question-head">
-              <span class="question-badge">
-                <i class="pi pi-circle-fill"></i>
-                {{ currentQuestionBadge }}
-              </span>
-              <i class="pi pi-shield question-ghost"></i>
-            </div>
-
-            <div class="mb-6">
-              <h2 class="question-title">{{ currentExercise.statement }}</h2>
-              <p class="exercise-objective">{{ currentExerciseGuide.objective }}</p>
-
-            </div>
-
-            <!-- Componente específico según el tipo de ejercicio -->
-            <div [ngSwitch]="currentExercise.typeExercise" class="mb-6">
-              <app-single-selection-exercise
-                *ngSwitchCase="'selection_single'"
-                [options]="currentExercise.optionSelectOptions"
-                [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-single-selection-exercise>
-
-              <app-multiple-selection-exercise
-                *ngSwitchCase="'selection_multiple'"
-                [options]="currentExercise.optionSelectOptions"
-                [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-multiple-selection-exercise>
-
-              <app-order-fragment-code-exercise
-                *ngSwitchCase="'order_fragment_code'"
-                [fragments]="currentExercise.optionOrderFragmentCode"
-                [orderedFragments]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderFragmentCode : []"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-order-fragment-code-exercise>
-
-              <app-order-line-code-exercise
-                *ngSwitchCase="'order_line_code'"
-                [lines]="currentExercise.optionOrderLineCode"
-                [orderedLines]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderLineCode : []"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-order-line-code-exercise>
-
-              <app-write-code-exercise
-                *ngSwitchCase="'write_code'"
-                [code]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerWriteCode : ''"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-write-code-exercise>
-
-              <app-find-error-code-exercise
-                *ngSwitchCase="'find_error_code'"
-                [options]="currentExercise.optionFindErrorCode"
-                [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-find-error-code-exercise>
-
-              <app-vertical-ordering-exercise
-                *ngSwitchCase="'vertical_ordering'"
-                [fragments]="currentExercise.optionsVerticalOrdering"
-                [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-vertical-ordering-exercise>
-
-              <app-horizontal-ordering-exercise
-                *ngSwitchCase="'horizontal_ordering'"
-                [lines]="currentExercise.optionsHorizontalOrdering"
-                [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-horizontal-ordering-exercise>
-
-              <app-phishing-selection-multiple-exercise
-                *ngSwitchCase="'phishing_selection_multiple'"
-                [options]="currentExercise.optionsPhishingSelection"
-                [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
-                [phishingContext]="currentExercise.phishingContext"
-                [phishingImageUrl]="currentExercise.phishingImageUrl"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-phishing-selection-multiple-exercise>
-
-              <app-match-pairs-exercise
-                *ngSwitchCase="'match_pairs'"
-                [leftOptions]="currentExercise.optionsMatchPairsLeft"
-                [rightOptions]="currentExercise.optionsMatchPairsRight"
-                [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
-                (answerSubmitted)="onAnswerSubmitted($event)">
-              </app-match-pairs-exercise>
-            </div>
-          </div>
-
-          <!-- Acciones -->
-          <div class="action-panel">
-            <div class="action-top-row">
-              <p class="action-selection">{{ currentSelectionSummary }}</p>
-              <div *ngIf="!answerVerified()" class="verify-inline">
-                <p-button
-                  label="Verificar análisis"
-                  icon="pi pi-arrow-right"
-                  iconPos="right"
-                  styleClass="primary-cta"
-                  (onClick)="verifyAnswer()"
-                  [loading]="submitting()"
-                  [disabled]="!hasAnswer()">
-                </p-button>
-              </div>
-            </div>
-
-            <p class="action-helper" *ngIf="!answerVerified() && !hasAnswer()">
-              Responde primero para activar.
-            </p>
-
-            <!-- Botones Siguiente/Anterior -->
-            <div *ngIf="answerVerified()" class="flex flex-col sm:flex-row justify-end gap-3">
-              <p-button
-                *ngIf="!isFirstExercise"
-                label="Anterior"
-                icon="pi pi-arrow-left"
-                styleClass="secondary-cta"
-                (onClick)="previousExercise()">
-              </p-button>
-
-              <p-button
-                [label]="isLastExercise ? 'Finalizar Actividad' : 'Siguiente'"
-                [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
-                [styleClass]="isLastExercise ? 'success-cta' : 'primary-cta'"
-                (onClick)="nextExercise()"
-                [loading]="submitting()">
-              </p-button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  </div>
+  </footer>
 </div>
 
-<!-- Drawer de Feedback -->
+<!-- Feedback Drawer (Duolingo style bottom banner overlay) -->
 <p-drawer
   [(visible)]="showFeedbackDrawer"
-  [modal]="true"
+  [modal]="false"
   position="bottom"
-  [style]="{'height': 'auto', 'border-radius': '16px 16px 0 0'}"
-  [contentStyle]="{'padding': '0', 'border-radius': '16px 16px 0 0'}"
+  [style]="{'height': 'auto', 'min-height': '200px', 'background': 'transparent', 'box-shadow': 'none', 'border': 'none', 'padding': '0'}"
+  [contentStyle]="{'padding': '0', 'overflow': 'hidden'}"
   [styleClass]="'feedback-drawer'"
   [showHeader]="false"
-  [dismissible]="true"
-  (onHide)="closeFeedbackDrawer()">
+  [showCloseIcon]="false"
+  [dismissible]="false">
 
-  <!-- Contenido del drawer de feedback -->
-  <div class="feedback-drawer-content" *ngIf="showFeedback() && currentFeedback()">
-    <!-- Handle para arrastrar -->
-    <div class="flex justify-center py-3">
-      <div class="w-12 h-1.5 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>
-    </div>
-
-    <!-- Contenedor principal con gradiente -->
-    <div class="bg-gradient-to-br from-white to-gray-50">
-      <div class="flex flex-col gap-6 px-6 py-8 max-w-6xl mx-auto">
+  <div class="feedback-banner" *ngIf="showFeedback() && currentFeedback()" 
+       [ngClass]="safeFeedback.qualification >= 7 ? 'feedback-success' : 'feedback-error'">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 w-full flex flex-col sm:flex-row items-center justify-between gap-6">
       
-
-        <!-- Contenido principal (Centro) -->
-        <div class="w-full flex flex-col justify-center">
-          <!-- Card de feedback -->
-          <div [ngClass]="{
-            'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-lg shadow-green-200/30': safeFeedback.qualification >= 7, 
-            'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200 shadow-lg shadow-amber-200/30': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-            'bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-lg shadow-red-200/30': safeFeedback.qualification < 5
-          }" class="rounded-2xl border-2 p-6 backdrop-blur-sm flex flex-auto flex-col">
-            
-            <!-- Header con ícono -->
-            <div class="flex items-start gap-4 mb-4">
-              <div [ngClass]="{
-                'bg-gradient-to-br from-green-400 to-emerald-500 text-white': safeFeedback.qualification >= 7, 
-                'bg-gradient-to-br from-amber-400 to-yellow-500 text-white': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                'bg-gradient-to-br from-red-400 to-rose-500 text-white': safeFeedback.qualification < 5
-              }" class="p-3 rounded-xl shadow-lg">
-                <i [ngClass]="{
-                  'pi-check-circle': safeFeedback.qualification >= 7, 
-                  'pi-exclamation-circle': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                  'pi-times-circle': safeFeedback.qualification < 5
-                }" class="pi text-2xl"></i>
-              </div>
-              
-              <div class="flex-1">
-                <h3 [ngClass]="{
-                  'text-green-800': safeFeedback.qualification >= 7, 
-                  'text-amber-800': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                  'text-red-800': safeFeedback.qualification < 5
-                }" class="text-3xl font-bold mb-1">
-                  {{ safeFeedback.qualification >= 7 ? '¡Excelente!' : safeFeedback.qualification >= 5 ? '¡Buen intento!' : '¡Sigue practicando!' }}
-                </h3>
-                <p class="text-gray-600 text-sm font-medium">
-                  {{ safeFeedback.qualification >= 7 ? '¡Dominas este concepto!' : safeFeedback.qualification >= 5 ? 'Estás muy cerca' : 'Necesitas más práctica' }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Puntuación destacada -->
-            <div class="flex items-center gap-3 mb-4 p-4 rounded-xl" [ngClass]="{
-              'bg-green-100/50': safeFeedback.qualification >= 7, 
-              'bg-amber-100/50': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-              'bg-red-100/50': safeFeedback.qualification < 5
-            }">
-              <span class="text-sm font-semibold text-gray-700">Puntuación:</span>
-              <span [ngClass]="{
-                'text-green-600': safeFeedback.qualification >= 7, 
-                'text-amber-600': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                'text-red-600': safeFeedback.qualification < 5
-              }" class="text-3xl font-bold">
-                {{ safeFeedback.qualification }}<span class="text-lg">/10</span>
-              </span>
-            </div>
-
-            <!-- Botón de retroalimentación detallada -->
-            <button 
-              (click)="showAIFeedbackModal.set(true)" 
-              class="w-full p-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer"
-              [ngClass]="{
-                'bg-green-100 text-green-700 hover:bg-green-200': safeFeedback.qualification >= 7, 
-                'bg-amber-100 text-amber-700 hover:bg-amber-200': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7, 
-                'bg-red-100 text-red-700 hover:bg-red-200': safeFeedback.qualification < 5
-              }">
-              <i class="pi pi-lightbulb"></i>
-              <span>Ver retroalimentación detallada</span>
-              <i class="pi pi-chevron-right"></i>
-            </button>
-          </div>
+      <!-- Mensaje Feedback -->
+      <div class="flex-1">
+        <div class="feedback-title" [ngClass]="safeFeedback.qualification >= 7 ? 'feedback-icon-success' : 'feedback-icon-error'">
+          <i [class]="safeFeedback.qualification >= 7 ? 'pi pi-check' : 'pi pi-times'"></i>
+          <span>{{ safeFeedback.qualification >= 7 ? '¡Excelente trabajo!' : 'Solución incorrecta' }}</span>
         </div>
-
-        <!-- Botones de acción (Derecha) -->
-        <div class="w-full flex flex-col gap-3 justify-center">
-          <button
-            pButton
-            label="Revisar"
-            icon="pi pi-eye"
-            class="p-button-outlined p-button-secondary w-full font-semibold"
-            (click)="closeFeedbackDrawer()">
-          </button>
-          
-          <button
-            pButton
-            [label]="isLastExercise ? 'Finalizar' : 'Siguiente'"
-            [icon]="isLastExercise ? 'pi pi-check' : 'pi pi-arrow-right'"
-            [iconPos]="'right'"
-            [class]="isLastExercise ? 'p-button-success w-full font-semibold' : 'p-button-primary w-full font-semibold'"
-            (click)="isLastExercise ? finishActivity() : continueFromFeedback()">
-          </button>
-
-          <!-- Indicador de progreso -->
-          <div class="text-center mt-2">
-            <span class="text-xs font-semibold text-gray-500">
-              Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
-            </span>
-          </div>
+        <div class="feedback-subtitle">
+          {{ safeFeedback.qualification >= 7 ? '¡Has respondido correctamente!' : 'No te preocupes, el aprendizaje viene de los errores.' }}
         </div>
+        
+        <div class="ai-feedback-btn" (click)="showAIFeedbackModal.set(true)">
+          <i class="pi pi-sparkles"></i>
+          Explicación de Amauta
+        </div>
+      </div>
+
+      <!-- Acciones feedback -->
+      <div class="flex items-center gap-4 w-full sm:w-auto">
+        <!-- 
+        <button
+          *ngIf="!isFirstExercise"
+          class="duo-btn duo-btn-secondary w-full sm:w-auto bg-transparent border-current"
+          (click)="previousExercise()">
+          ANTERIOR
+        </button>
+        -->
+
+        <button
+          class="duo-btn w-full sm:w-auto"
+          [ngClass]="safeFeedback.qualification >= 7 ? 'duo-btn-success' : 'duo-btn-danger'"
+          (click)="isLastExercise ? finishActivity() : continueFromFeedback()">
+          {{ isLastExercise ? 'FINALIZAR' : 'CONTINUAR' }}
+        </button>
       </div>
     </div>
   </div>
 </p-drawer>
 
-<!-- Modal de Feedback de IA -->
+<!-- AI Feedback Modal (same structure, refined styles) -->
 <p-dialog
   [(visible)]="showAIFeedbackModal"
   [modal]="true"
-  header="Retroalimentación de Amauta"
-  [style]="{ width: '100rem' }"
+  [header]="'Retroalimentación de Amauta'"
+  [style]="{ width: '70rem', 'max-width': '95vw', 'border-radius': '16px', 'overflow': 'hidden' }"
   [closeOnEscape]="true"
   [dismissableMask]="true"
-  [closable]="false">
+  [closable]="true"
+  styleClass="ai-feedback-dialog">
 
-  
-  <!-- Contenido del modal -->
-  <div class="bg-gradient-to-b ">
-    <!-- Layout responsivo: columnas en desktop, filas en móvil -->
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-0 min-h-[500px]">
+  <div class="ai-modal-bg p-6 md:p-10 pb-4">
+    <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
       
-      <!-- Lado izquierdo - Imagen y contexto (2 columnas en desktop) -->
-      <div class="lg:col-span-2 bg-gradient-to-br from-[#12BA82]/5 via-[#12BA82]/3 to-transparent p-8 lg:p-10 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
-        <div class="relative w-full max-w-sm">
-          <!-- Elementos decorativos de fondo -->
-          <div class="absolute -top-8 -left-8 w-40 h-40 bg-[#12BA82]/10 rounded-full blur-3xl opacity-60"></div>
-          <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-[#0FA573]/10 rounded-full blur-3xl opacity-60"></div>
-          
-          <!-- Imagen -->
-          <div class="relative z-10">
-            <img 
-              src="https://i.ibb.co/Zz3XV6xj/amauta.png" 
-              alt="Amauta - Retroalimentación de IA" 
-              class="w-full h-auto max-h-72 object-contain drop-shadow-lg hover:drop-shadow-xl transition-shadow duration-300"
-              onerror="this.src='assets/images/placeholder-feedback.svg'"
-            >
-          </div>
+      <!-- Icon/Avatar -->
+      <div class="w-full md:w-1/3 flex flex-col items-center text-center gap-4 shrink-0">
+        <div class="amauta-avatar-container">
+          <img src="https://i.ibb.co/Zz3XV6xj/amauta.png" alt="Amauta" class="w-32 md:w-40 h-auto drop-shadow-lg" onerror="this.src='assets/images/placeholder-feedback.svg'">
+        </div>
+        <div class="font-bold px-4 py-2 rounded-2xl border-2 flex items-center justify-center gap-2 w-full max-w-[200px]"
+          [ngClass]="{
+            'bg-green-50 text-green-700 border-green-200': safeFeedback.qualification >= 7,
+            'bg-yellow-50 text-yellow-700 border-yellow-200': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7,
+            'bg-red-50 text-red-700 border-red-200': safeFeedback.qualification < 5
+          }">
+          <i class="pi"
+            [ngClass]="{
+              'pi-check-circle': safeFeedback.qualification >= 7,
+              'pi-exclamation-triangle': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7,
+              'pi-times-circle': safeFeedback.qualification < 5
+            }"></i>
+          {{ safeFeedback.qualification >= 7 ? '¡Gran Trabajo!' : 'Sigue Intentando' }}
         </div>
         
-        <!-- Información contextual -->
-        <div class="mt-10 text-center space-y-3">
-          <div class="inline-flex items-center gap-2 bg-[#12BA82]/10 px-4 py-2 rounded-full border border-[#12BA82]/20 hover:border-[#12BA82]/40 transition-colors duration-200">
-            <i class="pi pi-check-circle text-[#12BA82] text-sm"></i>
-            <span class="text-sm font-medium text-[#0D9B6A]">Análisis completado</span>
-          </div>
-          <h3 class="text-lg font-bold text-gray-800">Retroalimentación Personalizada</h3>
-          <p class="text-sm text-gray-600 leading-relaxed">Amauta ha analizado tu desempeño y preparado recomendaciones específicas para tu mejora continua.</p>
+        <div class="score-pill shadow-sm" [ngClass]="{
+            'text-green-600': safeFeedback.qualification >= 7,
+            'text-yellow-600': safeFeedback.qualification >= 5 && safeFeedback.qualification < 7,
+            'text-red-500': safeFeedback.qualification < 5
+          }">
+           <i class="pi pi-star-fill text-yellow-500"></i> Puntuación: <span class="font-black text-xl ml-1">{{ safeFeedback.qualification }}/10</span>
         </div>
       </div>
       
-      <!-- Lado derecho - Feedback de IA (3 columnas en desktop) -->
-      <div class="lg:col-span-3 p-8 lg:p-10 flex flex-col">
-        <!-- Contenedor scrolleable -->
-        <div class="flex-1 overflow-y-auto pr-4 space-y-6 scrollbar-thin scrollbar-thumb-[#12BA82] scrollbar-track-slate-100 hover:scrollbar-thumb-[#0FA573]">
+      <!-- Feedback body -->
+      <div class="w-full md:w-2/3 flex flex-col pt-4 md:pt-0 pb-6 relative">
+        <!-- Rendered Feedback HTML as Speech Bubble -->
+        <div class="duo-speech-bubble px-6 py-6 md:px-8 md:py-8 text-[var(--text-primary)] relative z-10 w-full">
+          <div class="speech-arrow hidden md:block"></div>
+          <div class="speech-arrow-mobile block md:hidden"></div>
+          <div [innerHTML]="safeFeedback.feedback" class="prose max-w-none ai-prose-content"></div>
+        </div>
+
+        <!-- Rate AI response -->
+        <div class="bg-yellow-50 border-2 border-yellow-200 p-5 rounded-2xl mt-4">
+          <h4 class="font-bold text-yellow-800 flex items-center gap-2 mb-2">
+            <i class="pi pi-star-fill"></i> ¿Qué tan útil fue esto?
+          </h4>
+          <app-star-rating [(rating)]="feedbackRating" (ratingChange)="onFeedbackRatingChange($event)" [disabled]="submittingRating"></app-star-rating>
           
-          <!-- Tarjeta de consejo del sistema -->
-          <div class="bg-gradient-to-r from-[#12BA82]/10 to-[#0FA573]/10 border border-[#12BA82]/30 rounded-xl p-5 backdrop-blur-sm hover:border-[#12BA82]/50 hover:shadow-md transition-all duration-300">
-            <div class="flex items-start gap-4">
-              <div class="flex-shrink-0">
-                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-[#12BA82]/20 group-hover:bg-[#12BA82]/30 transition-colors duration-200">
-                  <i class="pi pi-lightbulb text-[#12BA82] text-lg"></i>
-                </div>
-              </div>
-              <div class="flex-1">
-                <h4 class="text-sm font-bold text-[#0D9B6A] mb-1">Consejo de Amauta</h4>
-                <p class="text-sm text-gray-700 leading-relaxed">Revisa cuidadosamente esta retroalimentación. Cada recomendación está diseñada para ayudarte a mejorar tu comprensión sobre ciberseguridad.</p>
-              </div>
+          <div *ngIf="feedbackRating > 0" class="mt-4 flex flex-col gap-2">
+            <textarea
+              [(ngModel)]="feedbackComment"
+              placeholder="(Opcional) Dinos qué opinas..."
+              class="w-full p-3 border-2 border-yellow-200 rounded-xl outline-none focus:border-yellow-400"
+              rows="2"></textarea>
+            <div class="flex gap-2 text-sm justify-end">
+              <button (click)="clearFeedbackRating()" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-lg font-bold uppercase transition">Cancelar</button>
+              <button (click)="submitFeedbackRating()" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded-lg font-bold uppercase hover:bg-yellow-500 transition disabled:opacity-50" [disabled]="submittingRating">
+                {{ submittingRating ? 'Enviando...' : 'Enviar' }}
+              </button>
             </div>
-          </div>
-          
-          <!-- Contenido del feedback con estilos mejorados -->
-          <div class="space-y-4">
-            <div class="text-gray-700 text-sm leading-relaxed">
-              <!-- Estilos dinámicos para el contenido HTML -->
-              <div 
-                [innerHTML]="safeFeedback.feedback"
-                class="prose prose-sm max-w-none
-                  prose-headings:text-[#0D9B6A] prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
-                  prose-p:text-gray-700 prose-p:mb-3 prose-p:leading-relaxed
-                  prose-li:text-gray-700 prose-li:mb-2
-                  prose-code:bg-slate-100 prose-code:text-[#0D9B6A] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs
-                  prose-blockquote:border-l-4 prose-blockquote:border-[#12BA82] prose-blockquote:pl-4 prose-blockquote:text-gray-600 prose-blockquote:italic
-                  prose-strong:text-[#0D9B6A] prose-strong:font-bold
-                  prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-4
-                  prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-4">
-              </div>
-            </div>
-          </div>
-          
-          <!-- Separador visual -->
-          <div class="flex items-center gap-3 py-4">
-            <div class="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
-            <span class="text-xs text-gray-500 font-medium whitespace-nowrap">Fin de la retroalimentación</span>
-            <div class="flex-1 h-px bg-gradient-to-l from-slate-200 to-transparent"></div>
-          </div>
-          
-          <!-- Sección de calificación con estrellas -->
-          <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-6 hover:border-yellow-300 transition-all duration-300">
-            <div class="space-y-4">
-              <div class="flex items-start gap-3">
-                <div class="flex-shrink-0">
-                  <div class="flex items-center justify-center h-10 w-10 rounded-full bg-yellow-100">
-                    <i class="pi pi-star-fill text-yellow-500 text-lg"></i>
-                  </div>
-                </div>
-                <div class="flex-1">
-                  <h4 class="text-sm font-bold text-gray-800 mb-1">Califica esta retroalimentación</h4>
-                  <p class="text-xs text-gray-600">Tu opinión nos ayuda a mejorar la calidad de las respuestas de Amauta</p>
-                </div>
-              </div>
-              
-              <!-- Componente de estrellas -->
-              <div class="flex justify-center py-3">
-                <app-star-rating 
-                  [(rating)]="feedbackRating"
-                  (ratingChange)="onFeedbackRatingChange($event)"
-                  [disabled]="submittingRating">
-                </app-star-rating>
-              </div>
-              
-              <!-- Campo de comentario opcional -->
-              <div *ngIf="feedbackRating > 0" class="space-y-2" style="animation: fadeIn 0.3s ease-out;">
-                <label class="text-xs font-medium text-gray-700">Comentario (opcional)</label>
-                <textarea
-                  [(ngModel)]="feedbackComment"
-                  placeholder="Cuéntanos qué te pareció esta retroalimentación..."
-                  class="w-full px-3 py-2 text-xs border border-yellow-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent resize-none"
-                  rows="2"
-                  [disabled]="submittingRating">
-                </textarea>
-              </div>
-              
-              <!-- Botón de envío -->
-              <div *ngIf="feedbackRating > 0" class="flex gap-2 pt-2">
-                <button
-                  (click)="submitFeedbackRating()"
-                  [disabled]="submittingRating"
-                  class="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white text-xs font-medium rounded-lg transition-colors duration-200 active:scale-95">
-                  <i class="pi pi-check mr-1" *ngIf="!submittingRating"></i>
-                  <i class="pi pi-spin pi-spinner mr-1" *ngIf="submittingRating"></i>
-                  {{ submittingRating ? 'Enviando...' : 'Enviar calificación' }}
-                </button>
-                <button
-                  (click)="clearFeedbackRating()"
-                  [disabled]="submittingRating"
-                  class="px-4 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 text-xs font-medium rounded-lg transition-colors duration-200 active:scale-95">
-                  <i class="pi pi-times"></i>
-                </button>
-              </div>
-              
-              <!-- Mensaje de éxito -->
-              <div *ngIf="feedbackSubmitted" class="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg" style="animation: fadeIn 0.3s ease-out;">
-                <i class="pi pi-check-circle text-green-600"></i>
-                <span class="text-xs text-green-700 font-medium">¡Gracias por tu calificación!</span>
-              </div>
+            <div *ngIf="feedbackSubmitted" class="text-green-600 font-bold mt-2 flex items-center gap-1">
+              <i class="pi pi-check-circle"></i> ¡Gracias por tu opinión!
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
-  
-  <!-- Footer del modal -->
-  <ng-template pTemplate="footer">
-      <p-button 
-        type="button" 
-        label="Cerrar" 
-        icon="pi pi-check"
-        class="p-button-rounded p-button-text text-gray-700 hover:bg-slate-100 hover:text-gray-900 transition-all duration-200 active:scale-95" 
-        (click)="showAIFeedbackModal.set(false)">
-      </p-button>
-  </ng-template>
 </p-dialog>
 
-<!-- Modal de resultados de actividad completada -->
+<!-- Activity Completed Fullscreen Modal -->
 <p-dialog
   [(visible)]="showResultsModal"
   [modal]="true"
   [closeOnEscape]="false"
   [closable]="false"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{width: '100vw', height: '100vh', 'max-width': '100vw', 'max-height': '100vh'}"
-  [contentStyle]="{'height': '100%', 'padding': '0'}"
-  [maskStyle]="{'background-color': 'rgba(0, 0, 0, 0.8)'}"
+  [style]="{width: '100vw', height: '100vh', 'max-width': '100vw', 'max-height': '100vh', margin: '0'}"
+  [contentStyle]="{'height': '100%', 'padding': '0', 'margin': '0'}"
   styleClass="fullscreen-results-modal">
 
-  <!-- Contenido del modal -->
-  <div class="results-modal-content">
-    <div class="text-center py-12 px-6">
-      <div class="mb-12">
-        <div class="flex justify-center mb-6">
-          <div class="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-2xl">
-            <i class="pi pi-check-circle text-white text-6xl"></i>
+  <div class="h-full w-full flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100" style="background: var(--bg-surface)">
+    <div class="max-w-4xl w-full flex flex-col items-center text-center gap-10">
+      
+      <!-- Header -->
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-32 h-32 rounded-full bg-green-500 shadow-[0_8px_0_#46a302] flex items-center justify-center -translate-y-4">
+          <i class="pi pi-check text-white font-extrabold" style="font-size: 5rem;"></i>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-black text-gray-800" style="color: var(--text-primary)">¡Lección completada!</h1>
+        <p class="text-xl md:text-2xl text-gray-500 font-bold" style="color: var(--text-secondary)">{{ safeActivityResult.activity }}</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div class="flex flex-col text-center p-6 bg-yellow-100 border-2 border-yellow-300 rounded-2xl shadow-[0_4px_0_#fcd34d]">
+          <span class="text-gray-500 font-bold text-sm uppercase mb-2">XP Ganados</span>
+          <span class="text-3xl font-black text-yellow-600">{{ safeActivityResult.score }}</span>
+        </div>
+        
+        <div class="flex flex-col text-center p-6 bg-green-100 border-2 border-green-300 rounded-2xl shadow-[0_4px_0_#86efac]">
+          <span class="text-gray-500 font-bold text-sm uppercase mb-2">Precisión</span>
+          <span class="text-3xl font-black text-green-600">{{ safeActivityResult.accuracy }}%</span>
+        </div>
+
+        <div class="flex flex-col text-center p-6 bg-blue-100 border-2 border-blue-300 rounded-2xl shadow-[0_4px_0_#93c5fd]">
+          <span class="text-gray-500 font-bold text-sm uppercase mb-2">Yachay</span>
+          <div class="flex items-center justify-center gap-2">
+            <i class="pi pi-star-fill text-blue-500 text-xl"></i>
+            <span class="text-3xl font-black text-blue-600">+{{ safeActivityResult.gems }}</span>
           </div>
         </div>
 
-        <h1 class="text-5xl font-bold text-slate-900 mb-4">¡Actividad completada!</h1>
-        <p class="text-2xl text-slate-600">Has completado la actividad "{{ safeActivityResult.activity }}"</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 max-w-6xl mx-auto">
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl shadow-xl border border-blue-200">
-          <div class="text-blue-600 text-5xl font-bold mb-3">{{ safeActivityResult.score }}</div>
-          <div class="text-blue-700 font-semibold text-lg">Puntuación total</div>
-        </div>
-
-        <div class="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-2xl shadow-xl border border-green-200">
-          <div class="text-green-600 text-5xl font-bold mb-3">{{ safeActivityResult.accuracy }}%</div>
-          <div class="text-green-700 font-semibold text-lg">Precisión</div>
-        </div>
-
-        <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-8 rounded-2xl shadow-xl border border-amber-200">
-          <div class="text-amber-600 text-5xl font-bold mb-3">+{{ safeActivityResult.gems }}</div>
-          <div class="text-amber-700 font-semibold text-lg">Yachay ganados</div>
-        </div>
-
-        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-2xl shadow-xl border border-purple-200">
-          <div class="flex items-center justify-center gap-2 mb-3">
-            <span class="text-5xl">💎</span>
-            <div class="text-purple-600 text-5xl font-bold">+{{ safeActivityResult.mulluEarned || 0 }}</div>
+        <div class="flex flex-col text-center p-6 bg-purple-100 border-2 border-purple-300 rounded-2xl shadow-[0_4px_0_#d8b4fe]">
+          <span class="text-gray-500 font-bold text-sm uppercase mb-2">Mullu</span>
+          <div class="flex items-center justify-center gap-2">
+            <span class="text-2xl">💎</span>
+            <span class="text-3xl font-black text-purple-600">+{{ safeActivityResult.mulluEarned || 0 }}</span>
           </div>
-          <div class="text-purple-700 font-semibold text-lg">Mullu ganados</div>
         </div>
       </div>
 
-      <div class="flex flex-col md:flex-row justify-center gap-6">
-        <p-button
-          label="Volver a los temas"
-          icon="pi pi-arrow-left"
-          styleClass="p-button-secondary p-button-lg px-8 py-4 text-lg"
-          (onClick)="navigateBack()">
-        </p-button>
-
-        <p-button
-          label="Reintentar actividad"
-          icon="pi pi-refresh"
-          styleClass="p-button-primary p-button-lg px-8 py-4 text-lg"
-          (onClick)="restartActivity()">
-        </p-button>
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-4 w-full justify-center mt-6">
+        <button class="duo-btn duo-btn-primary py-4 px-10 text-xl" (click)="restartActivity()">REINTENTAR</button>
+        <button class="duo-btn duo-btn-success py-4 px-10 text-xl" (click)="navigateBack()">CONTINUAR</button>
       </div>
+      
     </div>
   </div>
 </p-dialog>

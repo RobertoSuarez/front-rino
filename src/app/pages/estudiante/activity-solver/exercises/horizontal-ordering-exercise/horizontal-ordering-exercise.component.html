@@ -11,7 +11,7 @@
     <div *ngFor="let item of currentOrder; let i = index" cdkDrag class="ordering-card" role="listitem">
       <span class="ordering-index">{{ i + 1 }}</span>
       <span class="ordering-text">{{ item }}</span>
-      <i class="pi pi-arrows-h" aria-hidden="true"></i>
+      <i class="pi pi-arrows-h drag-handle" aria-hidden="true"></i>
     </div>
   </div>
 

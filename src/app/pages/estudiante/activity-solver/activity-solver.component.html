@@ -17,8 +17,13 @@
         <i class="pi pi-times"></i>
       </button>
 
-      <div class="flex-grow max-w-2xl mx-auto px-4">
-        <p-progressBar [value]="progress" [showValue]="false" styleClass="duo-progress-bar"></p-progressBar>
+      <div class="flex-grow max-w-2xl mx-auto flex items-center gap-4 px-4 w-full">
+        <div class="flex-1 w-full">
+          <p-progressBar [value]="progress" [showValue]="false" styleClass="duo-progress-bar"></p-progressBar>
+        </div>
+        <div class="font-extrabold text-[1.05rem] whitespace-nowrap" style="color: var(--text-secondary)">
+          {{ currentExerciseIndex() + 1 }} / {{ safeActivity.exercises.length || 0 }}
+        </div>
       </div>
 
       <div class="flex items-center gap-4 flex-shrink-0">

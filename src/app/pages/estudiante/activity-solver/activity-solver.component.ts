@@ -383,11 +383,20 @@ export class ActivitySolverComponent implements OnInit {
     this.activityService.initActivity(activityId).subscribe({
       next: (data: ApiActivityWithExercises) => {
         console.log('📚 Datos de actividad recibidos del backend:', data);
+        
+        // Seleccionar máximo 10 ejercicios al azar
+        let randomExercises = [...data.exercises];
+        for (let i = randomExercises.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [randomExercises[i], randomExercises[j]] = [randomExercises[j], randomExercises[i]];
+        }
+        randomExercises = randomExercises.slice(0, 10);
+
         // Convertir los datos de la API al formato interno
         const convertedData: ActivityWithExercises = {
           id: data.id,
           title: data.title,
-          exercises: data.exercises.map(ex => ({
+          exercises: randomExercises.map(ex => ({
             id: ex.id,
             statement: ex.statement,
             typeExercise: ex.typeExercise as any,

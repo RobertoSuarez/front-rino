@@ -8,11 +8,12 @@ import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../core/services/auth.service';
 import { MenuService } from '../../core/services/menu.service';
+import { StudentOnboardingComponent } from '../../shared/components/student-onboarding/student-onboarding.component';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, StudentOnboardingComponent],
     template: `<div class="layout-wrapper" [ngClass]="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
@@ -23,6 +24,7 @@ import { MenuService } from '../../core/services/menu.service';
             <app-footer></app-footer>
         </div>
         <div class="layout-mask animate-fadein"></div>
+        <app-student-onboarding #onboardingModal></app-student-onboarding>
     </div> `
 })
 export class AppLayout implements OnInit, OnDestroy {
@@ -33,6 +35,8 @@ export class AppLayout implements OnInit, OnDestroy {
     @ViewChild(AppSidebar) appSidebar!: AppSidebar;
 
     @ViewChild(AppTopbar) appTopBar!: AppTopbar;
+
+    @ViewChild('onboardingModal') onboardingModal!: StudentOnboardingComponent;
 
     constructor(
         public layoutService: LayoutService,
@@ -107,6 +111,15 @@ export class AppLayout implements OnInit, OnDestroy {
         // Verificar si hay un usuario autenticado y actualizar el menú
         if (this.authService.isAuthenticated()) {
             this.authService.getCurrentUser();
+            
+            // Mostrar onboarding si es el primer login
+            if (this.authService.isFirstLogin()) {
+                setTimeout(() => {
+                    if (this.onboardingModal) {
+                        this.onboardingModal.show();
+                    }
+                }, 500);
+            }
         }
     }
 

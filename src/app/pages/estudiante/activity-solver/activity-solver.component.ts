@@ -34,6 +34,7 @@ import { MatchPairsExerciseComponent } from './exercises/match-pairs-exercise/ma
 import { ThreeSceneComponent } from '@/shared/components/three-scene/three-scene.component';
 import { ThreeSceneService } from '@/core/services/three-scene.service';
 import { LayoutService } from '@/layout/service/layout.service';
+import { TumisShopModalComponent } from '@/shared/components/tumis-shop-modal/tumis-shop-modal.component';
 
 type ExerciseType =
   | 'selection_single'
@@ -131,7 +132,8 @@ interface ActivityResult {
     HorizontalOrderingExerciseComponent,
     PhishingSelectionMultipleExerciseComponent,
     MatchPairsExerciseComponent,
-    StarRatingComponent
+    StarRatingComponent,
+    TumisShopModalComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './activity-solver.component.html',
@@ -169,6 +171,10 @@ export class ActivitySolverComponent implements OnInit {
   showFeedbackDrawer = signal(false); // Drawer de feedback
   showAIFeedbackModal = signal(false); // Modal de feedback de IA
   userIndicators = signal<UserIndicators | null>(null); // Indicadores del usuario
+  outOfLivesModal = signal(false); // Modal cuando se queda sin tumis
+  showAbandonModal = signal(false); // Modal para abandonar actividad
+
+  @ViewChild('tumisShopModal') tumisShopModal!: TumisShopModalComponent;
   
   // Propiedades para la calificación de retroalimentación
   feedbackRating: number = 0;
@@ -479,6 +485,9 @@ export class ActivitySolverComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         this.userIndicators.set(response.data);
+        if (newTumis === 0) {
+          this.outOfLivesModal.set(true);
+        }
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -488,6 +497,9 @@ export class ActivitySolverComponent implements OnInit {
           ...currentIndicators,
           tumis: newTumis
         });
+        if (newTumis === 0) {
+          this.outOfLivesModal.set(true);
+        }
         this.cdr.detectChanges();
       }
     });
@@ -592,6 +604,9 @@ export class ActivitySolverComponent implements OnInit {
   }
 
   hasAnswer(): boolean {
+    if (this.safeUserIndicators.tumis === 0) {
+      return false;
+    }
     const currentAnswer = this.answers()[this.currentExerciseIndex()];
     if (!currentAnswer) return false;
 
@@ -623,6 +638,10 @@ export class ActivitySolverComponent implements OnInit {
 
   verifyAnswer(): void {
     if (!this.currentExercise) {
+      return;
+    }
+    if (this.safeUserIndicators.tumis === 0) {
+      this.outOfLivesModal.set(true);
       return;
     }
 
@@ -958,16 +977,14 @@ export class ActivitySolverComponent implements OnInit {
         this.router.navigate(['/estudiante/cursos']);
       }
     } else {
-      // Si no está completada, confirmar si desea abandonar
-      this.confirmationService.confirm({
-        header: 'Abandonar actividad',
-        message: '¿Estás seguro de que deseas abandonar la actividad? Tu progreso no se guardará.',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-          this.router.navigate(['/estudiante/cursos']);
-        }
-      });
+      // Si no está completada, mostrar el modal personalizado de Duolingo
+      this.showAbandonModal.set(true);
     }
+  }
+
+  confirmAbandon(): void {
+    this.showAbandonModal.set(false);
+    this.router.navigate(['/estudiante/cursos']);
   }
 
   restartActivity(): void {

@@ -91,6 +91,10 @@ export class AuthService {
         if (response && response.data && response.data.accessToken) {
           // Guardar token
           localStorage.setItem(this.tokenKey, response.data.accessToken);
+          // Guardar firstLogin en session storage
+          if (response.data.firstLogin) {
+            sessionStorage.setItem('is_first_login', 'true');
+          }
           // Guardar datos del usuario
           localStorage.setItem(this.userKey, JSON.stringify(response.data.user));
           // Actualizar el usuario actual
@@ -192,6 +196,17 @@ export class AuthService {
    */
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  /**
+   * Verifica si es el primer login del usuario
+   */
+  isFirstLogin(): boolean {
+    const isFirst = sessionStorage.getItem('is_first_login') === 'true';
+    if (isFirst) {
+      sessionStorage.removeItem('is_first_login'); // Para no volver a mostrar en recargas
+    }
+    return isFirst;
   }
 
   /**

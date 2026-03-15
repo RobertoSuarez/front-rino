@@ -142,6 +142,16 @@
                   [routerLink]="['/admin/users/edit', user.id]">
                 </button>
                 <button 
+                  *ngIf="currentUserType !== 'teacher' && !user.approved"
+                  pButton 
+                  pRipple 
+                  icon="pi pi-thumbs-up" 
+                  class="p-button-rounded p-button-help p-button-text p-button-sm"
+                  pTooltip="Aprobar usuario"
+                  tooltipPosition="top"
+                  (click)="approveUser(user)">
+                </button>
+                <button 
                   *ngIf="currentUserType !== 'teacher'"
                   pButton 
                   pRipple 

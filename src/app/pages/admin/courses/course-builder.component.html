@@ -1,432 +1,481 @@
 <div class="builder-container p-4">
     <!-- WIZARD MODE: CARD-BASED SELECTION -->
     <div class="wizard-container" *ngIf="wizardStep !== 'builder'">
-        <div class="wizard-card-wrapper fade-in">
+        <div class="wizard-card-wrapper fade-in glass-card">
+            
             <!-- STEP 1: TOPIC INPUT -->
-            <div *ngIf="wizardStep === 'topic'" class="step-content p-6 text-center">
-                <i class="pi pi-sparkles text-7xl text-primary mb-4"></i>
-                <h2 class="text-4xl font-bold mb-3">¿Qué vamos a crear hoy?</h2>
-                <p class="text-xl text-gray-500 mb-8">Escribe un tema y Amauta sugerirá una estructura académica de alto
-                    nivel.</p>
+            <div *ngIf="wizardStep === 'topic'" class="step-content p-8 text-center">
+                <div class="gamified-icon-box mx-auto mb-6">
+                    <i class="pi pi-sparkles text-5xl text-white"></i>
+                </div>
+                <h2 class="text-5xl font-black mb-4 text-gray-800 uppercase">¿Qué vamos a crear hoy?</h2>
+                <p class="text-2xl text-gray-500 mb-10 font-bold">Escribe un tema y Amauta sugerirá una estructura académica de alto nivel.</p>
 
                 <div class="field max-w-2xl mx-auto">
                     <span class="p-input-icon-left w-full">
-                        <i class="pi pi-search"></i>
-                        <input type="text" pInputText [(ngModel)]="wizardTopic" class="w-full p-inputtext-lg"
-                            placeholder="Ej: Fundamentos de Criptografía para niños...">
+                        <i class="pi pi-search text-2xl text-red-300"></i>
+                        <input type="text" pInputText [(ngModel)]="wizardTopic" 
+                            class="w-full gamified-title-input text-2xl font-black border-red-400 border-2"
+                            placeholder="Ej: Fundamentos de Criptografía...">
                     </span>
                 </div>
-                <div class="mt-8">
-                    <button pButton label="Comenzar con Amauta AI" icon="pi pi-bolt"
-                        class="p-button-lg p-button-rounded px-6 py-3 ai-gen-btn" [loading]="loadingSuggestions"
+                <div class="mt-10">
+                    <button pButton label="COMENZAR CON AMAUTA AI" icon="pi pi-bolt"
+                        class="gamified-publish-btn px-10 py-5 text-xl" [loading]="loadingSuggestions"
                         (click)="startWizard()"></button>
                 </div>
             </div>
 
             <!-- STEP 2: TITLE SUGGESTIONS -->
-            <div *ngIf="wizardStep === 'title-suggestions'" class="step-content p-6">
-                <h2 class="text-3xl font-bold mb-2 text-center">Títulos Sugeridos</h2>
-                <p class="text-center text-gray-500 mb-6">Elige el nombre que más te guste para tu curso.</p>
+            <div *ngIf="wizardStep === 'title-suggestions'" class="step-content p-8">
+                <div class="text-center mb-10">
+                    <div class="gamified-icon-box mx-auto mb-4">
+                        <i class="pi pi-pencil text-5xl text-white"></i>
+                    </div>
+                    <h2 class="text-5xl font-black text-gray-800 mb-3 uppercase">Títulos Sugeridos</h2>
+                    <p class="text-2xl text-gray-500 font-bold">Haz clic en uno para cargarlo y edítalo si prefieres otro nombre.</p>
+                </div>
 
-                <div class="suggestion-grid">
-                    <div *ngFor="let title of suggestedTitles" class="suggestion-card" (click)="selectTitle(title)">
-                        <span class="pr-2">{{title}}</span>
-                        <i class="pi pi-check-circle text-2xl"></i>
+                <div class="field max-w-2xl mx-auto mb-10">
+                    <label class="input-label-mini text-center block mb-2 font-black text-indigo-400">TÍTULO SELECCIONADO</label>
+                    <input type="text" pInputText [formControl]="$any(courseForm.get('courseTitle'))" 
+                        class="w-full gamified-title-input text-3xl font-black text-center border-red-400 border-3" 
+                        placeholder="Escribe el título definitivo aquí...">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div *ngFor="let title of suggestedTitles" 
+                        class="gamified-input-card cursor-pointer hover:border-blue-400 transition-all p-5" 
+                        (click)="selectTitle(title)">
+                        <span class="font-black text-xl leading-tight text-gray-700">{{title}}</span>
                     </div>
                 </div>
 
-                <div class="text-center mt-8">
-                    <button pButton label="Escribir mi propio título" class="p-button-text p-button-secondary"
-                        (click)="wizardStep = 'builder'"></button>
+                <div class="flex justify-content-center gap-6">
+                    <button pButton label="MOSTRAR MÁS IDEAS" icon="pi pi-refresh" 
+                        class="gamified-action-btn secondary px-8 py-4" (click)="getMoreTitles()"></button>
+                    <button pButton label="CONTINUAR" icon="pi pi-chevron-right" iconPos="right"
+                        class="gamified-publish-btn px-8 py-4 " (click)="confirmTitle()"></button>
                 </div>
             </div>
 
-            <!-- STEP 3: CHAPTER SUGGESTIONS (TINDER CARDS) -->
-            <div *ngIf="wizardStep === 'chapter-suggestions'" class="step-content p-6 text-center">
-                <h2 class="text-3xl font-bold mb-2">Creación de capítulos</h2>
-                <p class="text-gray-500 mb-6">Usa los botones para aceptar o descartar las sugerencias de capítulos.</p>
+            <!-- STEP 2.5: DESCRIPTION SUGGESTION -->
+            <div *ngIf="wizardStep === 'description-suggestion'" class="step-content p-8">
+                <div class="text-center mb-10">
+                    <div class="gamified-icon-box mx-auto mb-4" style="background: var(--duo-purple); border-color: var(--duo-purple-dark);">
+                        <i class="pi pi-align-left text-5xl text-white"></i>
+                    </div>
+                    <h2 class="text-5xl font-black text-gray-800 mb-3 uppercase">Asistente de Narrativa</h2>
+                    <p class="text-2xl text-gray-500 font-bold">Amauta ha redactado esto para tu curso. ¡Ajústalo a tu gusto!</p>
+                </div>
+
+                <div class="gamified-input-card mb-10" [style.min-height]="'400px'">
+                    <label class="input-label font-black text-indigo-400 mb-4 block">DESCRIPCIÓN DEL CURSO</label>
+                    <div *ngIf="loadingSuggestions" class="flex flex-column align-items-center justify-content-center p-12">
+                        <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="8"></p-progressSpinner>
+                        <span class="mt-5 font-black text-2xl text-indigo-400 uppercase">Amauta está redactando...</span>
+                    </div>
+                    <textarea *ngIf="!loadingSuggestions" pInputTextarea [formControl]="$any(courseForm.get('description'))" rows="12" autoResize="true"
+                        class="gamified-desc-preview w-full font-bold text-xl leading-relaxed outline-none"></textarea>
+                </div>
+
+                <div class="flex justify-content-center gap-6">
+                    <button pButton label="OTRA VERSIÓN" icon="pi pi-sparkles" 
+                        class="gamified-action-btn secondary px-8 py-4" (click)="getMoreDescription()"></button>
+                    <button pButton label="DEFINIR CAPÍTULOS" icon="pi pi-check" 
+                        class="gamified-publish-btn px-10 py-4" (click)="confirmDescription()"></button>
+                </div>
+            </div>
+
+            <!-- STEP 3: CHAPTER SUGGESTIONS -->
+            <div *ngIf="wizardStep === 'chapter-suggestions'" class="step-content p-8 text-center">
+                <div class="gamified-icon-box mx-auto mb-6" style="background: var(--duo-yellow); border-color: var(--duo-yellow-dark);">
+                    <i class="pi pi-bookmark-fill text-5xl text-white"></i>
+                </div>
+                <h2 class="text-5xl font-black mb-4 uppercase">Mapa de Capítulos</h2>
+                <p class="text-2xl text-gray-500 font-bold mb-10">Usa el sistema de aprobación para construir tu cuaderno.</p>
 
                 <div class="card-stack" *ngIf="!loadingSuggestions && suggestedChapters[currentChapterIndex]">
-                    <p-card class="curation-card slide-in">
-                        <ng-template pTemplate="header">
-                            <div class="card-header-art">
-                                <i class="pi pi-bookmark-fill text-5xl"></i>
-                            </div>
-                        </ng-template>
-                        <h3 class="text-2xl font-bold mt-4">{{suggestedChapters[currentChapterIndex].title}}</h3>
-                        <p class="text-gray-600 mt-3">{{suggestedChapters[currentChapterIndex].description}}</p>
-
-                        <ng-template pTemplate="footer">
-                            <div class="flex justify-content-center gap-6 mt-6">
-                                <button pButton icon="pi pi-thumbs-down"
-                                    class="p-button-rounded p-button-outlined p-button-danger tinder-btn"
+                    <div class="curation-card slide-in p-0 overflow-hidden">
+                        <div class="card-header-art">
+                            <i class="pi pi-map text-6xl"></i>
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-3xl font-black text-indigo-900 mb-4">{{suggestedChapters[currentChapterIndex].title}}</h3>
+                            <p class="text-xl text-gray-600 font-medium leading-relaxed">{{suggestedChapters[currentChapterIndex].description}}</p>
+                            
+                            <div class="flex justify-content-center gap-8 mt-10">
+                                <button pButton icon="pi pi-times"
+                                    class="gamified-action-btn secondary !rounded-full w-20 h-20 text-red-400 !border-red-200"
                                     (click)="dislikeChapter()"></button>
-                                <button pButton icon="pi pi-thumbs-up"
-                                    class="p-button-rounded p-button-primary tinder-btn"
+                                <button pButton icon="pi pi-check"
+                                    class="gamified-publish-btn !rounded-full w-20 h-20 text-3xl"
                                     (click)="likeChapter()"></button>
                             </div>
-                        </ng-template>
-                    </p-card>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Empty state or refreshing -->
-                <div *ngIf="loadingSuggestions" class="py-8">
-                    <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4"></p-progressSpinner>
-                    <p class="mt-4 text-primary font-bold">Amauta está preparando más ideas...</p>
+                <div *ngIf="loadingSuggestions" class="py-12">
+                    <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="8"></p-progressSpinner>
+                    <p class="mt-6 text-primary font-black text-2xl uppercase">Amauta está preparando más ideas...</p>
                 </div>
 
-                <div class="flex justify-content-center gap-3 mt-8">
-                    <button pButton label="Siguiente: Supervisión de Temas" icon="pi pi-arrow-right"
-                        class="p-button-rounded p-button-success p-button-lg px-6" (click)="finishWizard()"></button>
-                    <button pButton label="Más sugerencias" icon="pi pi-refresh"
-                        class="p-button-rounded p-button-outlined p-button-lg" *ngIf="!loadingSuggestions"
+                <div class="flex justify-content-center gap-6 mt-12 pt-6 border-t border-gray-100">
+                    <button pButton label="MÁS SUGERENCIAS" icon="pi pi-refresh"
+                        class="gamified-action-btn secondary px-8 py-4" *ngIf="!loadingSuggestions"
                         (click)="getNewChapterSuggestions()"></button>
+                    <button pButton label="TERMINAR Y SUPERVISAR" icon="pi pi-arrow-right"
+                        class="gamified-publish-btn px-10 py-4" (click)="finishWizard()"></button>
                 </div>
             </div>
 
-            <!-- STEP 4: SUPERVISED CURATION (Carousel of Chapters) -->
-            <div *ngIf="wizardStep === 'supervised-curation'" class="step-content p-6 max-w-5xl mx-auto">
-                <div class="carousel-navigation flex justify-content-between align-items-center mb-6">
-                    <button pButton label="Capítulo Anterior" icon="pi pi-chevron-left" class="p-button-text p-button-secondary" 
+            <!-- STEP 4: SUPERVISED CURATION -->
+            <div *ngIf="wizardStep === 'supervised-curation'" class="step-content p-8 max-w-7xl mx-auto">
+                <div class="carousel-navigation flex justify-content-between align-items-center mb-10 bg-white border-b-4 border-gray-100 p-6 rounded-3xl">
+                    <button pButton label="CAPÍTULO ANTERIOR" icon="pi pi-chevron-left" class="gamified-action-btn secondary px-6" 
                         [disabled]="currentChapterSupervIndex === 0" (click)="prevSupervStep()"></button>
                     <div class="text-center">
-                        <h2 class="text-3xl font-bold m-0">{{ chapters.at(currentChapterSupervIndex).value.title }}</h2>
-                        <span class="text-primary font-medium">Capítulo {{currentChapterSupervIndex + 1}} de {{chapters.length}}</span>
+                        <h2 class="text-4xl font-black m-0 text-gray-800 uppercase">{{ chapters.at(currentChapterSupervIndex).value.title }}</h2>
+                        <span class="text-blue-500 font-black text-xl">PASO {{currentChapterSupervIndex + 1}} DE {{chapters.length}}</span>
                     </div>
-                    <button pButton label="Siguiente Capítulo" icon="pi pi-chevron-right" iconPos="right" class="p-button-text p-button-secondary"
+                    <button pButton label="SIGUIENTE CAPÍTULO" icon="pi pi-chevron-right" iconPos="right" class="gamified-action-btn secondary px-6"
                         [disabled]="currentChapterSupervIndex === chapters.length - 1" (click)="nextSupervStep()"></button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                    <!-- Left: AI Suggestions (Tinder-style Supervision) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                    <!-- Left: AI Suggestions -->
                     <div class="col-span-1">
-                        <div class="flex justify-content-between align-items-center mb-4">
-                            <h3 class="text-xl font-bold m-0"><i class="pi pi-eye mr-2"></i>Supervisión de Temas</h3>
-                            <button pButton label="Sugerir Temas" icon="pi pi-sparkles" 
-                                class="p-button-sm p-button-rounded ai-gen-btn"
+                        <div class="flex justify-content-between align-items-center mb-6">
+                            <h3 class="text-2xl font-black m-0 text-indigo-900">LABORATORIO DE AMAUTA</h3>
+                            <button pButton label="SUGERIR TEMAS" icon="pi pi-sparkles" 
+                                class="gamified-publish-btn !bg-blue-400 !border-blue-600 text-sm py-2 px-4 shadow-none"
                                 [loading]="loadingSuggestions" (click)="generateTopicsAI(currentChapterSupervIndex)"></button>
                         </div>
                         
-                        <div class="suggestions-container p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex flex-column align-items-center min-h-[400px]">
-                            <!-- Loading and Empty States -->
-                            <div *ngIf="!loadingSuggestions && tempTopicSuggestions.length === 0 && !supervisingExercises" class="text-center py-8 text-indigo-400">
-                                <i class="pi pi-bolt text-5xl mb-3"></i>
-                                <p class="text-lg">Amauta está listo para sugerir temas para este capítulo.</p>
+                        <div class="suggestions-container p-8 gamified-input-card min-h-[550px] flex flex-column align-items-center">
+                            <div *ngIf="!loadingSuggestions && tempTopicSuggestions.length === 0 && !supervisingExercises" class="text-center py-16 text-gray-300">
+                                <i class="pi pi-bolt text-8xl mb-5 text-indigo-100"></i>
+                                <p class="text-2xl font-black uppercase tracking-tighter">Haz clic en Sugerir Temas para recibir ideas inteligentes.</p>
                             </div>
                             
-                            <div *ngIf="loadingSuggestions" class="text-center py-8">
-                                <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4"></p-progressSpinner>
-                                <p class="mt-3 text-indigo-600 font-bold">Amauta está trabajando...</p>
+                            <div *ngIf="loadingSuggestions" class="text-center py-16">
+                                <p-progressSpinner styleClass="w-5rem h-5rem" strokeWidth="8"></p-progressSpinner>
+                                <p class="mt-6 text-indigo-600 font-black text-2xl animate-pulse uppercase">Creando Magia...</p>
                             </div>
 
-                            <!-- CASE A: Topic Supervision -->
-                            <div *ngIf="!loadingSuggestions && tempTopicSuggestions.length > 0 && !supervisingExercises" class="topic-supervision-card w-full fade-in">
-                                <div class="supervision-card-wrapper mb-4">
-                                    <p-card class="topic-curation-card">
-                                        <ng-template pTemplate="header">
-                                            <div class="topic-card-header bg-primary text-white p-3 text-center">
-                                                <i class="pi pi-star-fill text-xl"></i>
-                                                <span class="ml-2 font-bold">SUGERENCIA DE AMAUTA</span>
-                                            </div>
-                                        </ng-template>
-                                        <div class="p-3">
-                                            <h4 class="text-2xl font-bold mb-3 text-indigo-900">{{tempTopicSuggestions[currentTopicSuggestionIndex]?.title}}</h4>
-                                            <p class="text-gray-600 leading-relaxed mb-4">{{tempTopicSuggestions[currentTopicSuggestionIndex]?.shortDescription || tempTopicSuggestions[currentTopicSuggestionIndex]?.theory}}</p>
-                                            
-                                            <div class="flex gap-2" *ngIf="tempTopicSuggestions[currentTopicSuggestionIndex]">
-                                                <p-chip [label]="tempTopicSuggestions[currentTopicSuggestionIndex]?.difficulty || 'Medio'" icon="pi pi-chart-bar" styleClass="bg-indigo-100 text-indigo-700"></p-chip>
-                                                <p-chip label="Tema Académico" icon="pi pi-book" styleClass="bg-blue-100 text-blue-700"></p-chip>
-                                            </div>
-                                        </div>
-                                    </p-card>
-                                </div>
-                                
-                                <div class="flex justify-content-center gap-4 mt-2">
-                                    <button pButton icon="pi pi-times" label="Rechazar"
-                                        class="p-button-rounded p-button-outlined p-button-danger p-button-lg px-6"
-                                        (click)="rejectTopic()"></button>
-                                    <button pButton icon="pi pi-check" label="Aprobar"
-                                        class="p-button-rounded p-button-primary p-button-lg px-6"
-                                        (click)="approveTopic(currentChapterSupervIndex, tempTopicSuggestions[currentTopicSuggestionIndex])"></button>
-                                </div>
-                                <div class="text-center mt-3 text-gray-400 text-sm">
-                                    {{currentTopicSuggestionIndex + 1}} de {{tempTopicSuggestions.length}} sugerencias pendientes
-                                </div>
-                            </div>
-
-                            <!-- CASE B: Exercise Supervision Wizard (Hidden as requested, but logic kept for potential re-use) -->
-                            <div *ngIf="!loadingSuggestions && supervisingExercises" class="exercise-supervision-wizard w-full slide-in">
-                                <div class="flex align-items-center mb-4 text-indigo-800">
-                                    <i class="pi pi-bolt mr-2 text-2xl"></i>
-                                    <h3 class="m-0 font-bold">Supervisión de Ejercicios</h3>
-                                </div>
-                                
-                                <div class="exercise-preview-list max-h-30rem overflow-y-auto pr-2 mb-4">
-                                    <div *ngFor="let ex of tempExerciseSuggestions; let idx = index" class="exercise-suggestion-card bg-white p-3 rounded-xl mb-3 shadow-sm border-l-4 border-indigo-400">
-                                        <div class="flex justify-content-between align-items-start">
-                                            <div class="flex-1">
-                                                <span class="text-xs font-bold text-indigo-400 uppercase">Ejercicio {{idx + 1}}</span>
-                                                <p class="font-bold my-2">{{ex.statement}}</p>
-                                                <div class="flex gap-2 mt-2">
-                                                    <p-chip [label]="ex.difficulty" icon="pi pi-info-circle" styleClass="text-[10px] py-1 h-auto"></p-chip>
-                                                    <p-chip [label]="ex.typeExercise" icon="pi pi-list" styleClass="text-[10px] py-1 h-auto"></p-chip>
-                                                </div>
-                                            </div>
-                                            <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" (click)="tempExerciseSuggestions.splice(idx, 1)"></button>
+                            <div *ngIf="!loadingSuggestions && tempTopicSuggestions.length > 0 && !supervisingExercises" class="w-full fade-in">
+                                <div class="curation-card slide-in overflow-hidden border-blue-400">
+                                    <div class="bg-blue-400 text-white p-4 text-center font-black text-sm tracking-widest">
+                                        IDEA DE AMAUTA
+                                    </div>
+                                    <div class="p-8">
+                                        <h4 class="text-3xl font-black mb-4 text-gray-800 leading-tight uppercase">{{tempTopicSuggestions[currentTopicSuggestionIndex]?.title}}</h4>
+                                        <p class="text-xl text-gray-600 font-medium leading-relaxed mb-6">{{tempTopicSuggestions[currentTopicSuggestionIndex]?.shortDescription || tempTopicSuggestions[currentTopicSuggestionIndex]?.theory}}</p>
+                                        
+                                        <div class="flex gap-4" *ngIf="tempTopicSuggestions[currentTopicSuggestionIndex]">
+                                            <span class="theme-pill bg-indigo-50 border-indigo-200 text-indigo-600 px-4 py-2 rounded-xl font-black">
+                                                <i class="pi pi-chart-bar mr-1"></i> {{tempTopicSuggestions[currentTopicSuggestionIndex]?.difficulty || 'Medio'}}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="flex justify-content-center gap-3">
-                                    <button pButton label="Cancelar" icon="pi pi-times" (click)="cancelExerciseSupervision()" class="p-button-text p-button-secondary"></button>
-                                    <button pButton label="Confirmar Ejercicios" icon="pi pi-check-circle" (click)="confirmExercises()" class="p-button-primary p-button-rounded px-4"></button>
+                                
+                                <div class="flex justify-content-center gap-10 mt-10">
+                                    <button pButton icon="pi pi-times" label="SALTAR"
+                                        class="gamified-action-btn secondary px-10 py-5 text-red-500"
+                                        (click)="rejectTopic()"></button>
+                                    <button pButton icon="pi pi-check" label="APROBAR"
+                                        class="gamified-publish-btn px-10 py-5 text-xl"
+                                        (click)="approveTopic(currentChapterSupervIndex, tempTopicSuggestions[currentTopicSuggestionIndex])"></button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right: Confirmed content in this chapter -->
+                    <!-- Right: Confirmed content -->
                     <div class="col-span-1">
-                        <div class="flex justify-content-between align-items-center mb-4">
-                            <h3 class="text-xl font-bold m-0"><i class="pi pi-list mr-2"></i>Contenido Confirmado</h3>
+                        <div class="flex justify-content-between align-items-center mb-6">
+                            <h3 class="text-2xl font-black m-0 text-gray-800">CONTENIDO APROBADO</h3>
                         </div>
                         
-                        <div class="confirmed-list p-4 bg-gray-50 rounded-2xl border border-gray-100 min-h-[400px]">
-                            <div *ngIf="getTemas(currentChapterSupervIndex).length === 0" class="text-center py-8 text-gray-400">
-                                <i class="pi pi-folder-open text-4xl mb-2"></i>
-                                <p>Aún no has aprobado temas para este capítulo.</p>
+                        <div class="confirmed-list p-8 gamified-input-card min-h-[550px] bg-slate-50/50">
+                            <div *ngIf="getTemas(currentChapterSupervIndex).length === 0" class="text-center py-24 text-gray-300">
+                                <i class="pi pi-check-circle text-7xl mb-5"></i>
+                                <p class="text-2xl font-black uppercase">Tu cuaderno está esperando tus aprobaciones.</p>
                             </div>
-                            <div *ngFor="let tema of getTemas(currentChapterSupervIndex).controls; let j = index" class="theme-pill-item mb-4 shadow-sm border-l-4 border-success slide-in">
-                                <div class="flex justify-content-between align-items-start">
-                                    <div class="flex-1">
-                                        <div class="font-bold text-lg text-gray-800">{{tema.value.title}}</div>
-                                        <div class="text-sm text-gray-500 mt-1">{{tema.value.shortDescription}}</div>
-                                    </div>
-                                    <button pButton icon="pi pi-trash" class="p-button-xs p-button-danger p-button-text" 
-                                        (click)="removeTema(currentChapterSupervIndex, j)"></button>
+                            <div *ngFor="let tema of $any(getTemas(currentChapterSupervIndex)).controls; let j = index" 
+                                class="bg-white border-gray-200 border-2 rounded-3xl p-6 mb-6 shadow-sm slide-in flex justify-content-between align-items-center border-l-8 border-l-green-400">
+                                <div class="flex-1">
+                                    <div class="font-black text-2xl text-gray-800 uppercase leading-none mb-2">{{tema.value.title}}</div>
+                                    <div class="text-lg text-gray-500 font-bold truncate">{{tema.value.shortDescription}}</div>
                                 </div>
+                                <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger text-2xl" 
+                                    (click)="removeTema(currentChapterSupervIndex, j)"></button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-content-between mt-8 pt-4 border-t border-gray-100">
-                    <div class="flex gap-3">
-                        <button pButton label="Volver al Wizard" icon="pi pi-arrow-left" 
-                            class="p-button-text p-button-secondary" (click)="wizardStep = 'chapter-suggestions'"></button>
-                        <button pButton label="Retroceder Capítulo" icon="pi pi-chevron-left" 
-                            class="p-button-outlined p-button-secondary" [disabled]="currentChapterSupervIndex === 0" (click)="prevSupervStep()"></button>
-                    </div>
+                <div class="flex justify-content-between mt-12 pt-8 border-t-4 border-gray-100">
+                    <button pButton label="VOLVER AL MAPA" icon="pi pi-map" 
+                        class="gamified-action-btn secondary px-8 py-4 font-black" (click)="wizardStep = 'chapter-suggestions'"></button>
                     
-                    <div class="flex gap-3">
-                        <button pButton label="Siguiente Capítulo" icon="pi pi-chevron-right" iconPos="right"
-                            class="p-button-outlined p-button-secondary" [disabled]="currentChapterSupervIndex === chapters.length - 1" (click)="nextSupervStep()"></button>
-                        <button pButton label="Ver Cuaderno Final" icon="pi pi-check-circle" 
-                            class="p-button-lg p-button-rounded px-6 p-button-primary" (click)="goToBuilder()"></button>
-                    </div>
+                    <button pButton label="FINALIZAR" icon="pi pi-check-circle" 
+                        class="gamified-publish-btn px-12 py-5 text-2xl" (click)="goToBuilder()"></button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MAIN BUILDER VIEW: SIDEBAR + EDITOR -->
-    <div class="builder-layout fade-in" *ngIf="wizardStep === 'builder'">
-        <!-- Sidebar Notebook -->
-        <div class="builder-sidebar">
-            <div class="sidebar-header">
-                <h3>📓 Cuaderno</h3>
-                <span class="badge" *ngIf="autosaving">Autoguardando...</span>
+    <div class="builder-layout fade-in" *ngIf="wizardStep === 'builder'" 
+        [style.grid-template-columns]="sidebarVisible ? '320px 1fr' : '0 1fr'">
+        
+        <!-- Sidebar Notebook (Retractable) -->
+        <div class="builder-sidebar overflow-hidden transition-all duration-300" 
+            [style.width]="sidebarVisible ? '320px' : '0'"
+            [style.padding]="sidebarVisible ? '1.5rem' : '0'"
+            [style.opacity]="sidebarVisible ? '1' : '0'">
+            
+            <div class="sidebar-header flex justify-content-between align-items-center">
+                <h3 class="truncate text-xl font-black m-0 tracking-tighter uppercase font-serif">📓 {{ (courseForm.get('courseTitle')?.value || 'Nuevo Curso') }}</h3>
             </div>
 
-            <div class="chapters-nav">
-                <div *ngFor="let chap of chapters.controls; let i = index" class="chapter-item">
-                    <i class="pi pi-bookmark-fill"></i>
-                    <span class="truncate">{{ chap.value.title || 'Capítulo ' + (i+1) }}</span>
+            <div class="chapters-nav mt-8">
+                <div *ngFor="let chap of chapters.controls; let i = index" 
+                    class="chapter-item cursor-pointer hover:bg-blue-50 border-3 border-gray-50 rounded-2xl p-4 mb-4 transition-all flex align-items-center gap-4 group"
+                    (click)="scrollToChapter(i)">
+                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex align-items-center justify-content-center group-hover:bg-blue-400 transition-colors">
+                        <i class="pi pi-bookmark-fill text-blue-500 group-hover:text-white"></i>
+                    </div>
+                    <span class="truncate font-black text-gray-700 tracking-tight uppercase text-sm">{{ chap.value.title || 'CAPÍTULO ' + (i+1) }}</span>
                 </div>
-                <button pButton icon="pi pi-plus" label="Nuevo Capítulo" class="p-button-text p-button-sm mt-3"
+                <button pButton icon="pi pi-plus" label="AÑADIR CAPÍTULO" 
+                    class="p-button-text font-black text-blue-500 mt-6 hover:bg-blue-50 p-4 border-2 border-dashed border-blue-200 rounded-2xl w-full"
                     (click)="addChapter()"></button>
             </div>
         </div>
 
         <!-- Editor Area -->
-        <div class="builder-content p-fluid" [formGroup]="courseForm">
+        <div class="builder-content p-fluid p-8 bg-slate-50 min-h-screen" [formGroup]="courseForm">
             <!-- Notebook Toolbar -->
-            <div class="notebook-status mb-4">
-                <div class="status-left">
-                    <i class="pi pi-pencil mr-2"></i>
-                    <span><strong>Editando:</strong> {{courseForm.get('courseTitle')?.value || 'Sin Título'}}</span>
+            <div class="notebook-status mb-12 p-6 bg-white border-b-8 border-gray-200 rounded-3xl flex justify-content-between align-items-center shadow-lg sticky top-0 z-50">
+                <div class="status-left flex align-items-center gap-6">
+                    <button pButton [icon]="sidebarVisible ? 'pi pi-angle-double-left' : 'pi pi-angle-double-right'" 
+                        class="p-button-rounded p-button-text p-button-lg text-blue-500 bg-blue-50" 
+                        (click)="toggleSidebar()" pTooltip="Alternar Panel"></button>
+                    <div class="h-10 w-1 bg-gray-100 rounded-full"></div>
+                    <div>
+                        <span class="text-xs font-black text-gray-400 tracking-widest uppercase block mb-1">Editor de Cátedra</span>
+                        <div class="flex align-items-center gap-3">
+                            <span class="text-2xl font-black text-gray-800 uppercase tracking-tighter">{{courseForm.get('courseTitle')?.value || 'SIN TÍTULO'}}</span>
+                            <span class="ai-badge" *ngIf="autosaving">SYNCING...</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="status-right flex align-items-center">
-                    <span *ngIf="lastSaved" class="text-xs text-gray-400 mr-3">Guardado: {{lastSaved |
-                        date:'HH:mm:ss'}}</span>
-                    <button pButton label="Publicar" icon="pi pi-cloud-upload"
-                        class="p-button-success p-button-sm p-button-rounded h-2rem" [loading]="saving"
+                <div class="status-right flex align-items-center gap-6">
+                    <div class="text-right mr-4 hidden md:block">
+                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest block">Último Guardado</span>
+                        <span *ngIf="lastSaved" class="text-sm font-bold text-gray-500">{{lastSaved | date:'HH:mm:ss'}}</span>
+                    </div>
+                    <button pButton label="GUARDAR Y PUBLICAR" icon="pi pi-cloud-upload"
+                        class="gamified-publish-btn px-10 text-lg" [loading]="saving"
                         (click)="saveCourse()"></button>
                 </div>
             </div>
 
             <!-- Course Header Info -->
-            <p-card styleClass="glass-card mb-4" header="Información del Curso">
-                <div class="grid p-fluid">
-                    <div class="field col-12 md:col-8">
-                        <label>Título del Curso</label>
-                        <input pInputText formControlName="courseTitle">
+            <div class="gamified-input-card mb-12 border-indigo-100 !p-10">
+                <div class="flex align-items-center gap-5 mb-10 border-b-4 border-slate-50 pb-6">
+                    <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex align-items-center justify-content-center border-b-4 border-indigo-200">
+                        <i class="pi pi-cog text-3xl text-indigo-500"></i>
                     </div>
-                    <div class="field col-2 flex align-items-end mb-1">
-                        <div class="flex flex-column align-items-center">
-                            <label class="mb-2">¿Borrador?</label>
-                            <p-toggleButton formControlName="isDraft" onLabel="Si" offLabel="No" onIcon="pi pi-check"
-                                offIcon="pi pi-times"></p-toggleButton>
-                        </div>
-                    </div>
-                    <div class="field col-12">
-                        <label>Descripción</label>
-                        <textarea pInputTextarea formControlName="description" rows="2" autoResize="true"></textarea>
-                    </div>
-                    <div class="field col-12 flex gap-3">
-                        <!-- <button pButton label="Generar Temas con AI" icon="pi pi-sparkles"
-                            class="p-button-rounded ai-gen-btn w-auto" [loading]="generating"
-                            (click)="generateStructure()"></button> -->
-                        <button pButton label="Limpiar Todo" icon="pi pi-trash"
-                            class="p-button-text p-button-danger w-auto" (click)="clearDraft()"></button>
+                    <div>
+                        <h2 class="text-4xl font-black m-0 text-gray-800 tracking-tighter uppercase">Identidad Académica</h2>
+                        <p class="text-gray-400 font-bold m-0 uppercase tracking-widest text-sm">Configura el ADN de tu curso</p>
                     </div>
                 </div>
-            </p-card>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="field">
+                        <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Título de la Obra</label>
+                        <input pInputText formControlName="courseTitle" 
+                            class="gamified-title-input w-full !text-2xl font-black !p-5 !border-gray-100 hover:border-indigo-200">
+                    </div>
+                    <div class="field">
+                        <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Estatus de Publicación</label>
+                        <div class="flex align-items-center bg-gray-50 p-3 rounded-2xl border-b-4 border-gray-200">
+                            <p-toggleButton formControlName="isPublic" [onLabel]="'VISIBLE PARA EL MUNDO'" [offLabel]="'BORRADOR PRIVADO'" 
+                                [onIcon]="'pi pi-globe'" [offIcon]="'pi pi-lock'" 
+                                styleClass="w-full !border-none !shadow-none !bg-transparent font-black !text-indigo-600 text-lg"></p-toggleButton>
+                        </div>
+                    </div>
+                    <div class="field col-span-2">
+                        <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Narrativa y Objetivos</label>
+                        <textarea pInputTextarea formControlName="description" rows="5" autoResize="true"
+                            class="gamified-desc-preview w-full !text-xl !leading-relaxed !font-bold !bg-slate-50 !border-none"
+                            placeholder="Escribe la misión de este curso..."></textarea>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Dynamic Chapters Accordion -->
+            <!-- CHAPTERS LIST -->
             <div formArrayName="chapters">
-                <div *ngFor="let chapter of chapters.controls; let i = index" [formGroupName]="i"
-                    class="chapter-card-wrapper mb-4">
-                    <p-card styleClass="chapter-card glass-card">
-                        <ng-template pTemplate="header">
-                            <div
-                                class="chapter-header p-3 flex justify-between items-center bg-gray-50 border-b border-gray-200">
-                                <span class="font-bold text-lg"><i class="pi pi-bookmark mr-2 text-primary"></i>
-                                    Capítulo {{i+1}}</span>
-                                <button pButton icon="pi pi-trash"
-                                    class="p-button-rounded p-button-danger p-button-text"
-                                    (click)="removeChapter(i)"></button>
+                <div *ngFor="let chapter of chapters.controls; let i = index" [formGroupName]="i" 
+                    [id]="'chapter-card-' + i" class="mb-16">
+                    
+                    <div class="gamified-chapter-card !p-10 border-b-8 border-purple-200 relative mb-12">
+                        <div class="chapter-label !text-lg !px-6 !py-2 !-top-6 shadow-md uppercase">MÓDULO #{{i + 1}}</div>
+                        
+                        <!-- Chapter Header -->
+                        <div class="flex justify-content-between align-items-center mb-10 bg-slate-50 p-8 rounded-3xl border-3 border-dashed border-slate-200">
+                            <div class="flex-1 mr-10">
+                                <span class="text-xs font-black text-purple-400 tracking-widest uppercase mb-1 block">Título del Módulo</span>
+                                <input pInputText formControlName="title" placeholder="Define el eje temático..."
+                                    class="w-full !bg-transparent !border-none !shadow-none !text-4xl font-black text-gray-800 focus:outline-none uppercase tracking-tighter">
+                                <input pInputText formControlName="description" placeholder="¿Qué descubrirán en este capítulo?"
+                                    class="w-full !bg-transparent !border-none !shadow-none !text-xl text-gray-400 font-bold focus:outline-none mt-2">
                             </div>
-                        </ng-template>
+                            <button pButton icon="pi pi-trash" class="gamified-action-btn secondary !rounded-full w-20 h-20 !text-red-400 !border-red-100" 
+                                (click)="removeChapter(i)" pTooltip="Eliminar Módulo"></button>
+                        </div>
 
-                        <div class="p-fluid">
-                            <div class="field">
-                                <input pInputText formControlName="title" placeholder="Título del Capítulo"
-                                    class="font-bold p-inputtext-lg">
-                            </div>
-                            <div class="field">
-                                <textarea pInputTextarea formControlName="description" rows="1"
-                                    placeholder="Descripción breve del capítulo..."></textarea>
-                            </div>
-
-                            <!-- Temas list -->
-                            <div class="field mb-3">
-                                <button pButton label="Sugerir Temas con IA" icon="pi pi-sparkles" 
-                                    class="p-button-sm p-button-outlined ai-gen-btn w-auto"
-                                    [loading]="loadingSuggestions" (click)="generateTopicsAI(i)"></button>
-                            </div>
-                            <div formArrayName="temas" class="temas-container border-l-4 border-primary pl-4 mt-4">
-                                <div *ngFor="let tema of getTemas(i).controls; let j = index" [formGroupName]="j"
-                                    class="tema-card-nested mb-4 p-3 bg-white shadow-sm rounded-xl">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <div class="flex-1 mr-3">
-                                            <input pInputText formControlName="title" placeholder="Título del Tema"
-                                                class="w-full font-semibold border-none bg-transparent focus:bg-white">
+                        <!-- Temas (Topics) inside Chapter -->
+                        <div formArrayName="temas" class="activity-timeline ml-8">
+                            <div *ngFor="let tema of getTemas(i).controls; let j = index" [formGroupName]="j"
+                                class="activity-node mb-12 fade-in">
+                                
+                                <div class="gamified-input-card hover:border-blue-400 group !p-8">
+                                    <div class="flex justify-content-between align-items-start mb-8 border-b-2 border-slate-50 pb-6">
+                                        <div class="flex-1">
+                                            <div class="flex align-items-center gap-4 mb-3">
+                                                <div class="w-12 h-12 bg-green-100 rounded-xl flex align-items-center justify-content-center border-b-4 border-green-200">
+                                                    <span class="font-black text-green-600 text-xl">{{j+1}}</span>
+                                                </div>
+                                                <input pInputText formControlName="title" 
+                                                    class="!p-0 !border-none !shadow-none !text-3xl font-black text-gray-800 placeholder:text-gray-200 w-full focus:outline-none uppercase tracking-tighter">
+                                            </div>
+                                            <div class="flex flex-column gap-3">
+                                                <div>
+                                                    <label class="font-black text-gray-400 text-[10px] tracking-widest uppercase mb-1 block">Descripción Corta</label>
+                                                    <textarea pInputTextarea formControlName="shortDescription" rows="2" autoResize="true"
+                                                        class="!p-3 !bg-slate-50 !border-none !shadow-none !text-lg text-gray-500 font-bold w-full focus:outline-none italic rounded-2xl"
+                                                        placeholder="Sintetiza el conocimiento de este tema..."></textarea>
+                                                </div>
+                                                <div>
+                                                    <label class="font-black text-gray-400 text-[10px] tracking-widest uppercase mb-1 block">Contenido / Teoría (Amauta)</label>
+                                                    <textarea pInputTextarea formControlName="theory" rows="4" autoResize="true"
+                                                        class="!p-4 !bg-indigo-50/30 !border-2 !border-indigo-50 !shadow-none !text-base text-gray-700 font-medium w-full focus:outline-none rounded-2xl"
+                                                        placeholder="Contenido teórico generado por Amauta..."></textarea>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button pButton icon="pi pi-times"
-                                            class="p-button-rounded p-button-text p-button-sm"
-                                            (click)="removeTema(i, j)"></button>
-                                    </div>
-                                    <div class="field mb-3">
-                                        <input pInputText formControlName="shortDescription"
-                                            placeholder="Descripción corta del tema..." class="text-sm p-inputtext-sm">
+                                        <button pButton icon="pi pi-minus-circle" class="p-button-text p-button-danger p-button-lg text-3xl opacity-30 hover:opacity-100 transition-opacity" 
+                                            (click)="removeTema(i, j)" pTooltip="Quitar Tema"></button>
                                     </div>
 
-                                    <div class="field mb-3 mt-2">
-                                        <button pButton label="Generar Ejercicios" icon="pi pi-bolt" 
-                                            class="p-button-xs p-button-secondary w-auto"
-                                            [loading]="loadingSuggestions" (click)="generateExerciseSetAI(i, j)"></button>
-                                    </div>
-
-                                    <!-- Activities -->
-                                    <div formArrayName="activities">
-                                        <div *ngFor="let act of getActivities(i, j).controls; let k = index"
-                                            [formGroupName]="k" class="activity-box mb-3 p-3 bg-indigo-50 rounded-xl">
-                                            <div class="flex items-center mb-2">
-                                                <i class="pi pi-bolt text-indigo-600 mr-2"></i>
-                                                <input pInputText formControlName="title" placeholder="Actividad"
-                                                    class="w-full border-none bg-transparent font-medium">
-                                                <button pButton icon="pi pi-trash"
-                                                    class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                                    <!-- Activities / Exercises list -->
+                                    <div formArrayName="activities" class="pl-10 border-l-4 border-indigo-50 flex flex-column gap-6">
+                                        <div *ngFor="let activity of getActivities(i, j).controls; let k = index" [formGroupName]="k"
+                                            class="p-6 bg-slate-50/50 rounded-3xl border-2 border-white shadow-sm hover:shadow-md transition-shadow">
+                                            
+                                            <div class="flex align-items-center gap-5 mb-6">
+                                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex align-items-center justify-content-center border-b-4 border-yellow-200">
+                                                    <i class="pi pi-bolt text-yellow-500"></i>
+                                                </div>
+                                                <input pInputText formControlName="title" placeholder="Misión de la actividad..."
+                                                    class="!bg-transparent !border-none !shadow-none font-black text-gray-700 text-lg uppercase tracking-tight focus:outline-none flex-1">
+                                                <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" 
                                                     (click)="removeActivity(i, j, k)"></button>
                                             </div>
 
                                             <!-- Exercises -->
-                                            <div formArrayName="exercises"
-                                                class="ml-4 pl-3 border-l-2 border-indigo-200">
-                                                <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index"
-                                                    [formGroupName]="l" class="flex items-center mb-2">
-                                                    <span class="text-xs text-indigo-400 font-bold mr-2">Q{{l+1}}</span>
-                                                    <input pInputText formControlName="statement"
-                                                        placeholder="Pregunta..."
-                                                        class="w-full p-inputtext-sm border-none bg-transparent">
-                                                    <button pButton icon="pi pi-times"
-                                                        class="p-button-rounded p-button-text p-button-sm"
-                                                        (click)="removeExercise(i, j, k, l)"></button>
+                                            <div formArrayName="exercises" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                                                <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index" [formGroupName]="l"
+                                                    class="bg-white p-5 rounded-2xl border-3 border-gray-50 flex align-items-center gap-4 hover:border-blue-100 transition-all group/ex">
+                                                    <div class="h-10 w-10 bg-blue-50 rounded-xl flex align-items-center justify-content-center font-black text-blue-400 text-lg border-b-3 border-blue-100">
+                                                        {{l+1}}
+                                                    </div>
+                                                    <input pInputText formControlName="statement" placeholder="Pregunta magistral..."
+                                                        class="flex-1 !border-none !shadow-none font-bold text-gray-600 text-lg focus:ring-0">
+                                                    <div class="flex opacity-0 group-hover/ex:opacity-100 transition-opacity">
+                                                        <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm"
+                                                            (click)="removeExercise(i, j, k, l)"></button>
+                                                    </div>
                                                 </div>
-                                                <button pButton icon="pi pi-plus" label="Añadir Ejercicio"
-                                                    class="p-button-text p-button-xs"
-                                                    (click)='addExercise(i, j, k)'></button>
+                                                <button pButton icon="pi pi-plus" label="AÑADIR PREGUNTA" 
+                                                    class="p-button-outlined p-button-secondary !border-dashed !rounded-2xl !p-4 font-black text-sm tracking-widest text-gray-400"
+                                                    (click)="addExercise(i, j, k)"></button>
                                             </div>
                                         </div>
-                                        <button pButton icon="pi pi-plus" label="Añadir Actividad"
-                                            class="p-button-text p-button-sm w-full"
+                                        <button pButton icon="pi pi-plus-circle" label="VINCULAR NUEVA ACTIVIDAD DINÁMICA" 
+                                            class="p-button-text text-indigo-500 font-black text-base uppercase tracking-tighter self-start hover:bg-white px-4 py-2 rounded-xl"
                                             (click)="addActivity(i, j)"></button>
                                     </div>
                                 </div>
-                                <button pButton icon="pi pi-plus-circle" label="Añadir Tema al Capítulo"
-                                    class="p-button-outlined p-button-sm w-full" (click)="addTema(i)"></button>
+                            </div>
+                            
+                            <div class="mt-8">
+                                <button pButton label="NUEVA CÁPSULA DE CONOCIMIENTO (TEMA)" icon="pi pi-plus"
+                                    class="gamified-action-btn secondary !text-indigo-400 !border-indigo-100 !py-4 !px-8 text-sm font-black"
+                                    (click)="addTema(i)"></button>
                             </div>
                         </div>
-                    </p-card>
+                    </div>
+                </div>
+
+                <div class="flex justify-content-center py-16 border-t-8 border-dashed border-gray-100 mt-10">
+                    <button pButton label="EXPANDIR CUADERNO CON UN NUEVO MÓDULO" icon="pi pi-plus-circle"
+                        class="p-button-lg p-button-rounded px-12 py-6 border-indigo-400 text-indigo-600 bg-white font-black border-4 shadow-xl hover:-translate-y-2 transition-transform"
+                        (click)="addChapter()"></button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- AI AGENT FLOATING BUTTON & CHAT -->
-    <button class="amauta-fab" (click)="toggleChat()" pTooltip="Hablar con Amauta">
-        <img src="https://i.ibb.co/932zmNVD/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg"
-            alt="Amauta">
-    </button>
-
-    <div class="amauta-chat" *ngIf="displayChat">
-        <div class="chat-header">
-            <div class="agent-info">
-                <img src="https://i.ibb.co/932zmNVD/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg"
-                    alt="Amauta">
-                <div>
-                    <strong>Amauta AI</strong>
-                    <span class="status">En línea</span>
-                </div>
-            </div>
-            <button pButton icon="pi pi-times" class="p-button-text p-button-plain" (click)="toggleChat()"></button>
-        </div>
-        <div class="chat-body" #scrollMe>
-            <div *ngFor="let msg of chatMessages" class="message" [ngClass]="msg.role">
-                <div class="bubble" [innerHTML]="msg.text"></div>
-            </div>
-            <div *ngIf="aiTyping" class="message ai typing">
-                <div class="bubble">Pensando...</div>
-            </div>
-        </div>
-        <div class="chat-footer">
-            <input type="text" pInputText [(ngModel)]="userMessage" (keyup.enter)="sendMessage()"
-                placeholder="Pregúntale algo al Amauta...">
-            <button pButton icon="pi pi-send" (click)="sendMessage()"></button>
         </div>
     </div>
 </div>
 
-<p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
+<!-- Floating Amauta Fab -->
+<button class="amauta-fab shadow-xl" (click)="toggleChat()" pTooltip="Consultar al Amauta" tooltipPosition="left">
+    <img src="https://i.ibb.co/Lz7Dq1x/robot-assistant.jpg" alt="Amauta AI">
+</button>
+
+<!-- Amauta Chat window -->
+<div class="amauta-chat shadow-2xl border-4 border-indigo-100" *ngIf="displayChat">
+    <div class="chat-header !bg-indigo-600 border-b-4 border-indigo-800 p-6">
+        <div class="agent-info">
+            <div class="relative">
+                <img src="https://i.ibb.co/Lz7Dq1x/robot-assistant.jpg" alt="Amauta" class="w-16 h-16 border-4 border-white">
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-4 border-indigo-600 rounded-full"></div>
+            </div>
+            <div>
+                <span class="font-black text-white text-2xl block tracking-tighter">AMAUTA AI</span>
+                <span class="status !bg-green-400/20 !px-3 !py-1 !rounded-full font-black text-green-300 text-xs tracking-widest uppercase">Eminencia Digital</span>
+            </div>
+        </div>
+        <button pButton icon="pi pi-times" class="p-button-rounded p-button-text text-white p-button-lg" (click)="toggleChat()"></button>
+    </div>
+    
+    <div class="chat-body p-8 bg-slate-50 flex flex-column gap-6">
+        <div *ngFor="let msg of chatMessages" class="message flex w-full" [ngClass]="msg.role === 'user' ? 'justify-content-end' : 'justify-content-start'">
+            <div class="bubble p-5 rounded-3xl font-bold leading-relaxed shadow-md max-w-[90%] text-lg" 
+                [ngClass]="msg.role === 'user' ? '!bg-indigo-500 text-white !rounded-br-none border-b-6 border-indigo-700' : 'bg-white text-gray-700 !rounded-bl-none border-b-6 border-gray-100'">
+                {{ msg.text }}
+            </div>
+        </div>
+        <div *ngIf="aiTyping" class="message justify-content-start">
+            <div class="bubble bg-white text-gray-400 italic p-5 rounded-3xl border-b-6 border-gray-100 font-bold text-lg animate-pulse">
+                Amauta está canalizando sabiduría...
+            </div>
+        </div>
+    </div>
+    
+    <div class="chat-footer p-6 border-t-4 border-gray-100 bg-white">
+        <div class="flex gap-4">
+            <input type="text" pInputText [(ngModel)]="userMessage" (keyup.enter)="sendMessage()" 
+                placeholder="Escribe tu duda pedagógica aquí..." class="!rounded-3xl border-4 border-slate-50 !p-5 font-bold text-lg flex-1 focus:border-indigo-100">
+            <button type="button" pButton icon="pi pi-send" (click)="sendMessage()" 
+                class="gamified-publish-btn !h-[70px] !w-[70px] !rounded-3xl flex-shrink-0 !p-0"></button>
+        </div>
+    </div>
+</div>

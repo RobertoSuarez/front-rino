@@ -15,6 +15,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ChipModule } from 'primeng/chip';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { AiService } from '../../../core/services/ai.service';
 import { CourseService } from '../../../core/services/course.service';
 
@@ -54,7 +55,8 @@ interface BuilderChapter {
     DialogModule,
     ChipModule,
     TextareaModule,
-    ToggleButtonModule
+    ToggleButtonModule,
+    SelectButtonModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './course-builder.component.html',
@@ -72,7 +74,7 @@ export class CourseBuilderComponent implements OnInit {
   aiTyping: boolean = false;
   
   // Wizard state
-  wizardStep: 'topic' | 'title-suggestions' | 'chapter-suggestions' | 'supervised-curation' | 'builder' = 'topic';
+  wizardStep: 'topic' | 'title-suggestions' | 'description-suggestion' | 'chapter-suggestions' | 'supervised-curation' | 'builder' = 'topic';
   wizardTopic: string = '';
   suggestedTitles: string[] = [];
   suggestedChapters: any[] = [];
@@ -87,6 +89,11 @@ export class CourseBuilderComponent implements OnInit {
   supervisingExercises: boolean = false;
   currentSupervisingTemaIndex: number = -1;
   loadingSuggestions: boolean = false;
+  
+  // Builder state
+  sidebarVisible: boolean = true;
+  autosaving: boolean = false;
+  lastSaved: Date | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -105,9 +112,6 @@ export class CourseBuilderComponent implements OnInit {
       chapters: this.fb.array([])
     });
   }
-
-  lastSaved: Date | null = null;
-  autosaving: boolean = false;
 
   ngOnInit(): void {
     this.loadFromLocalStorage();
@@ -201,6 +205,7 @@ export class CourseBuilderComponent implements OnInit {
     const temaGroup = this.fb.group({
       title: [data?.title || '', Validators.required],
       shortDescription: [data?.shortDescription || '', Validators.required],
+      theory: [data?.theory || ''],
       activities: this.fb.array([])
     });
 
@@ -286,11 +291,50 @@ export class CourseBuilderComponent implements OnInit {
 
   selectTitle(title: string) {
     this.courseForm.patchValue({ courseTitle: title });
-    this.wizardStep = 'chapter-suggestions';
-    this.getNewChapterSuggestions();
+  }
+
+  getMoreTitles() {
+    this.startWizard();
+  }
+
+  confirmTitle() {
+    const title = this.courseForm.get('courseTitle')?.value;
+    if (!title) {
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'El curso debe tener un título' });
+      return;
+    }
+    this.generateDescriptionAI();
+  }
+
+  async generateDescriptionAI() {
+    this.loadingSuggestions = true;
+    this.wizardStep = 'description-suggestion';
+    const title = this.courseForm.get('courseTitle')?.value;
+    
+    this.aiService.generateCourseDescription(title).subscribe({
+      next: (res: any) => {
+        if (res.data && res.data.description) {
+          this.courseForm.patchValue({ description: res.data.description });
+        }
+        this.loadingSuggestions = false;
+      },
+      error: () => {
+        this.loadingSuggestions = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo generar la descripción' });
+      }
+    });
+  }
+
+  getMoreDescription() {
+    this.generateDescriptionAI();
+  }
+
+  confirmDescription() {
+    this.getNewChapterSuggestions(); // Move to chapters
   }
 
   getNewChapterSuggestions() {
+    this.wizardStep = 'chapter-suggestions';
     this.loadingSuggestions = true;
     this.aiService.generateChaptersAI(this.courseForm.get('courseTitle')?.value).subscribe({
       next: (res: any) => {
@@ -454,22 +498,105 @@ export class CourseBuilderComponent implements OnInit {
     this.currentSupervisingTemaIndex = -1;
   }
 
+  toggleSidebar() {
+    this.sidebarVisible = !this.sidebarVisible;
+  }
+
+  scrollToChapter(index: number) {
+    const element = document.getElementById(`chapter-card-${index}`);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    }
+  }
+
+  logInvalidControls(form: FormGroup | FormArray, path: string = '') {
+    Object.keys(form.controls).forEach(key => {
+      const control = (form.controls as any)[key];
+      const currentPath = path ? `${path} -> ${key}` : key;
+      if (control.invalid) {
+        if (control instanceof FormGroup || control instanceof FormArray) {
+          this.logInvalidControls(control, currentPath);
+        } else {
+          console.log(`Control inválido: ${currentPath}`, control.errors);
+        }
+      }
+    });
+  }
+
   saveCourse() {
+    // Limpiar capítulos vacíos si hay más de uno
+    if (this.chapters.length > 1) {
+      for (let i = this.chapters.length - 1; i >= 0; i--) {
+        const chap = this.chapters.at(i);
+        if (!chap.value.title && !chap.value.description && this.getTemas(i).length === 0) {
+          this.chapters.removeAt(i);
+        }
+      }
+    }
+
     if (this.courseForm.invalid) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Completa todos los campos requeridos' });
+      console.log('--- Resumen de Errores de Formulario ---');
+      this.logInvalidControls(this.courseForm);
+      
+      const missingFields: string[] = [];
+      if (this.courseForm.get('courseTitle')?.invalid) missingFields.push('Título del Curso');
+      if (this.courseForm.get('description')?.invalid) missingFields.push('Descripción del Curso');
+      
+      // Check for errors in chapters
+      this.chapters.controls.forEach((chap, i) => {
+        if (chap.invalid) {
+          if (chap.get('title')?.invalid) missingFields.push(`Título del Capítulo ${i + 1}`);
+          if (chap.get('description')?.invalid) missingFields.push(`Descripción del Capítulo ${i + 1}`);
+          
+          const temas = this.getTemas(i);
+          temas.controls.forEach((tema, j) => {
+            if (tema.invalid) {
+              if (tema.get('title')?.invalid) missingFields.push(`Título del Tema ${j + 1} (Cap. ${i + 1})`);
+              if (tema.get('shortDescription')?.invalid) missingFields.push(`Descripción del Tema ${j + 1} (Cap. ${i + 1})`);
+            }
+          });
+        }
+      });
+
+      this.messageService.add({ 
+        severity: 'error', 
+        summary: 'Faltan Datos Obligatorios', 
+        detail: `Por favor completa: ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}` 
+      });
       return;
     }
 
     this.saving = true;
-    this.courseService.createBulkCourse(this.courseForm.value).subscribe({
+    const payload = {
+        ...this.courseForm.value,
+        isDraft: false
+    };
+
+    this.courseService.createBulkCourse(payload).subscribe({
       next: (res) => {
-        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Curso creado correctamente. ¡Buen trabajo en tu cuaderno!' });
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: '¡Curso Publicado!', 
+          detail: 'Tu obra maestra ha sido guardada con éxito.' 
+        });
+        
         localStorage.removeItem('course_builder_draft');
-        this.router.navigate(['/courses']);
         this.saving = false;
+
+        // Redirect to course details view (student view)
+        if (res && res.id) {
+          this.router.navigate(['/estudiante/cursos', res.id, 'capitulos']);
+        } else {
+          this.router.navigate(['/admin/courses']);
+        }
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar el curso' });
+        console.error('Error al guardar:', err);
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Error de Guardado', 
+          detail: 'No pudimos conectar con Amauta para guardar el curso. Inténtalo de nuevo.' 
+        });
         this.saving = false;
       }
     });

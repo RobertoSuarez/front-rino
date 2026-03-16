@@ -23,8 +23,18 @@ export const adminRoutes: Routes = [
   },
   {
     path: 'courses',
-    loadComponent: () => import('../../pages/courses/courses.component').then(m => m.CoursesComponent),
-    title: 'Gestión de Cursos'
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('../../pages/courses/courses.component').then(m => m.CoursesComponent),
+        title: 'Gestión de Cursos'
+      },
+      {
+        path: 'builder',
+        loadComponent: () => import('./courses/course-builder.component').then(m => m.CourseBuilderComponent),
+        title: 'Constructor de Cursos IA'
+      }
+    ]
   },
   {
     path: 'chapters',

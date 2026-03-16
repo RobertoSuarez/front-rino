@@ -30,4 +30,7 @@ export class CourseService {
     formData.append('file', file);
     return this.http.post<any>(`${this.apiUrl}/upload-image`, formData);
   }
+  createBulkCourse(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/bulk`, data);
+  }
 }

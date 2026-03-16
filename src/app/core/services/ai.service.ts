@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AiService {
   private apiUrl = `${environment.apiUrl}/ai`;
+  private assistantUrl = `${environment.apiUrl}/openai/course-assistant`;
 
   constructor(private http: HttpClient) { }
 
@@ -138,5 +139,52 @@ export class AiService {
       courseTitle,
       prompt
     });
+  }
+  /**
+   * Sugiere títulos para un curso
+   */
+  suggestTitles(topic: string): Observable<{ data: { titles: string[] } }> {
+    return this.http.post<{ data: { titles: string[] } }>(`${this.apiUrl}/suggest-titles`, { topic });
+  }
+
+  /**
+   * Sugiere capítulos para un curso curado
+   */
+  suggestChapters(courseTitle: string, existingChapters: string[]): Observable<{ data: { chapters: any[] } }> {
+    return this.http.post<{ data: { chapters: any[] } }>(`${this.apiUrl}/suggest-chapters`, { courseTitle, existingChapters });
+  }
+
+  /**
+   * Genera una estructura completa de curso (Capítulos, Temas, Actividades)
+   * @param title Título del curso
+   * @param context Contexto opcional
+   * @returns Observable con la estructura generada
+   */
+  /**
+   * Sugiere títulos para un curso (Nueva versión con CourseAssistant)
+   */
+  suggestTitlesAI(idea: string): Observable<{ data: string[] }> {
+    return this.http.post<{ data: string[] }>(`${this.assistantUrl}/suggest-titles`, { idea });
+  }
+
+  /**
+   * Genera capítulos con progresión lógica (Nueva versión)
+   */
+  generateChaptersAI(courseTitle: string): Observable<{ data: any }> {
+    return this.http.post<{ data: any }>(`${this.assistantUrl}/generate-chapters`, { courseTitle });
+  }
+
+  /**
+   * Genera temas para un capítulo (Nueva versión)
+   */
+  generateTopicsAI(courseTitle: string, chapterTitle: string): Observable<{ data: any }> {
+    return this.http.post<{ data: any }>(`${this.assistantUrl}/generate-topics`, { courseTitle, chapterTitle });
+  }
+
+  /**
+   * Genera un conjunto de ejercicios para un tema (Nueva versión)
+   */
+  generateExerciseSetAI(topicTitle: string, quantity: number = 3, difficulty: string = 'Medio'): Observable<{ data: any[] }> {
+    return this.http.post<{ data: any[] }>(`${this.assistantUrl}/generate-exercises`, { topicTitle, quantity, difficulty });
   }
 }

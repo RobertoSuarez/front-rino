@@ -33,4 +33,8 @@ export class CourseService {
   createBulkCourse(data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/bulk`, data);
   }
+
+  getCourseFullDetail(id: number | string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/full`);
+  }
 }

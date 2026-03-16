@@ -384,9 +384,17 @@
 
 /* Builder Layout (Sidebar + Content) */
 .builder-layout {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 1280px) {
+    .builder-layout {
+        display: grid;
+        grid-template-columns: var(--sidebar-width, 320px) 1fr;
+    }
 }
 
 .builder-sidebar {
@@ -554,10 +562,16 @@
 
 .gamified-input-card {
     background: white;
-    border: 3px solid #e5e5e5;
+    border: 3px solid #f1f5f9;
     border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 6px 0 #e5e5e5;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+}
+
+.gamified-input-card:focus-within {
+    border-color: var(--duo-blue);
+    box-shadow: 0 8px 25px rgba(28, 176, 246, 0.1);
 }
 
 .gamified-desc-preview {
@@ -577,4 +591,194 @@
     align-items: center;
     justify-content: center;
     border-bottom: 5px solid var(--duo-blue-dark);
+}
+.gamified-input-field {
+    background: #f8fafc !important;
+    border: 2px solid #f1f5f9 !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+    color: #475569 !important;
+}
+
+.gamified-input-field:focus {
+    background: white !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+.theory-container {
+    background: white;
+    border: 3px solid #f1f5f9;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 350px;
+}
+
+.theory-container.preview-active {
+    border-color: #e0e7ff;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.1);
+}
+
+.gamified-theory-editor {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+    padding: 1.5rem !important;
+    border: none !important;
+    resize: none !important;
+    outline: none !important;
+}
+
+/* refined vertical stacking and visual hierarchy */
+/* Refined Container and Spacing */
+.builder-page-wrapper {
+    width: 100%;
+    padding: 0 1rem 5rem 1rem;
+}
+
+/* Stacked Topic Layout Styles */
+.mission-callout-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.mission-callout-box::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 4rem;
+    color: #cbd5e1;
+    font-family: serif;
+    line-height: 1;
+}
+
+.theory-section-container {
+    background: white;
+    border: 2px solid #f1f5f9;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05);
+}
+
+.topic-vertical-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.amauta-theory-visor {
+    padding: 3rem;
+    color: #334155; /* Darker slate for better contrast */
+    line-height: 1.8;
+    font-size: 1.15rem;
+    font-weight: 500; /* Slightly bolder for clarity */
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(to bottom, #ffffff, #fafbff);
+    max-height: 700px;
+    overflow-y: auto;
+    border-top: 1px solid #f1f5f9;
+}
+
+.gamified-input-card textarea {
+    border-radius: 0 !important;
+}
+
+.amauta-theory-visor :host ::ng-deep h1, 
+.amauta-theory-visor :host ::ng-deep h2, 
+.amauta-theory-visor :host ::ng-deep h3 {
+    color: #4338ca;
+    font-weight: 800;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.amauta-theory-visor :host ::ng-deep section {
+    margin-bottom: 2rem;
+}
+
+.amauta-theory-visor :host ::ng-deep p {
+    margin-bottom: 1.25rem;
+}
+
+.amauta-theory-visor :host ::ng-deep ul, 
+.amauta-theory-visor :host ::ng-deep ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.amauta-theory-visor :host ::ng-deep li {
+    margin-bottom: 0.5rem;
+}
+
+.amauta-theory-visor :host ::ng-deep strong {
+    color: #4338ca;
+}
+
+/* Animations for visor */
+.amauta-theory-visor.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* --- ACTIVITY LIST STYLES --- */
+.activity-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-list-item {
+    background: #ffffff;
+    border: 2px solid #f1f5f9;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.activity-list-item:hover {
+    border-color: #e2e8f0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.activity-list-item.is-expanded {
+    border-color: #e0e7ff;
+    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.08);
+}
+
+.activity-item-header {
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    background: #fcfdff;
+    user-select: none;
+}
+
+.activity-expand-content {
+    padding: 2.5rem;
+    background: white;
+    border-top: 1px solid #f8fafc;
+    animation: slideDownFade 0.4s ease-out;
+}
+
+@keyframes slideDownFade {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sidebar Refinement */
+.builder-sidebar {
+    height: auto;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 }

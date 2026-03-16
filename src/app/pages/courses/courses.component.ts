@@ -339,21 +339,10 @@ export class CoursesComponent implements OnInit {
   }
 
   viewCourseDetails(course: any) {
-    this.selectedCourse = course;
-    this.displayDetailsDialog = true; // Mostrar modal inmediatamente
-    this.loading = true;
-
-    this.http.get<GetCourseByIdResponse>(`${environment.apiUrl}/courses/${course.id}`)
-      .subscribe({
-        next: (response) => {
-          // Combinar datos existentes con datos adicionales
-          this.selectedCourse = { ...this.selectedCourse, ...response.data };
-        },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar detalles del curso' });
-        },
-        complete: () => this.loading = false
-      });
+    // Redirigir al constructor con el ID del curso para visualización/edición completa
+    this.router.navigate(['/admin/courses/builder'], {
+      queryParams: { id: course.id }
+    });
   }
 
   navigateToChapters(course: any) {

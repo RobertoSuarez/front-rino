@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -18,6 +18,8 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { AiService } from '../../../core/services/ai.service';
 import { CourseService } from '../../../core/services/course.service';
+import { LayoutService } from '../../../layout/service/layout.service';
+import { QuillModule } from 'ngx-quill';
 
 interface BuilderActivity {
   title: string;
@@ -56,16 +58,18 @@ interface BuilderChapter {
     ChipModule,
     TextareaModule,
     ToggleButtonModule,
-    SelectButtonModule
+    SelectButtonModule,
+    QuillModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './course-builder.component.html',
   styleUrls: ['./course-builder.component.css']
 })
-export class CourseBuilderComponent implements OnInit {
+export class CourseBuilderComponent implements OnInit, OnDestroy {
   courseForm: FormGroup;
   generating: boolean = false;
   saving: boolean = false;
+  courseId: number | null = null;
   
   // Amauta Chatbot state
   displayChat: boolean = false;
@@ -95,13 +99,30 @@ export class CourseBuilderComponent implements OnInit {
   autosaving: boolean = false;
   lastSaved: Date | null = null;
 
+  // UI State: track preview mode per topic (key: "chapIndex-temaIndex")
+  previewModes: { [key: string]: boolean } = {};
+
+  // UI State: track expanded activities (key: "chapIndex-temaIndex-actIndex")
+  expandedActivities: { [key: string]: boolean } = {};
+
+  toggleActivityExpansion(chapI: number, temaJ: number, actK: number): void {
+    const key = `${chapI}-${temaJ}-${actK}`;
+    this.expandedActivities[key] = !this.expandedActivities[key];
+  }
+
+  isActivityExpanded(chapI: number, temaJ: number, actK: number): boolean {
+    return !!this.expandedActivities[`${chapI}-${temaJ}-${actK}`];
+  }
+
   constructor(
     private fb: FormBuilder,
     private aiService: AiService,
     private courseService: CourseService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    public layoutService: LayoutService
   ) {
     this.courseForm = this.fb.group({
       courseTitle: ['', Validators.required],
@@ -114,11 +135,27 @@ export class CourseBuilderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadFromLocalStorage();
-    
-    if (this.chapters.length === 0) {
-      this.addChapter(); // Start with one chapter if empty
-    }
+    // Verificar si estamos editando un curso existente
+    this.route.queryParams.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.courseId = +id;
+        this.loadCourseForEdit(this.courseId);
+        this.wizardStep = 'builder';
+        
+        // Hide platform sidebar for focus mode
+        this.layoutService.layoutState.update(prev => ({ 
+            ...prev, 
+            staticMenuDesktopInactive: true 
+        }));
+      } else {
+        // Flujo normal de creación
+        this.loadFromLocalStorage();
+        if (this.chapters.length === 0) {
+          this.addChapter(); // Start with one chapter if empty
+        }
+      }
+    });
 
     this.chatMessages.push({ 
       role: 'ai', 
@@ -128,6 +165,67 @@ export class CourseBuilderComponent implements OnInit {
     // Autosave listener
     this.courseForm.valueChanges.subscribe(() => {
       this.saveToLocalStorage();
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Restore platform sidebar
+    this.layoutService.layoutState.update(prev => ({ 
+        ...prev, 
+        staticMenuDesktopInactive: false 
+    }));
+  }
+
+  loadCourseForEdit(id: number) {
+    this.generating = true;
+    this.loadingSuggestions = true;
+    
+    this.courseService.getCourseFullDetail(id).subscribe({
+      next: (res) => {
+        // El backend responde con { statusCode, message, data: { message, data: { ... } } }
+        // O a veces viene ya unwrapped por un interceptor.
+        const responseData = res.data || res;
+        const data = responseData.data || responseData;
+
+        console.log('Cargando curso para edición:', data);
+
+        if (!data || !data.title) {
+          console.error('Estructura de datos inválida:', res);
+          return;
+        }
+
+        this.courseForm.patchValue({
+          courseTitle: data.title,
+          description: data.description,
+          urlLogo: data.urlLogo,
+          isPublic: data.isPublic,
+          isDraft: data.isDraft
+        });
+
+        // Reconstruir jerarquía completa
+        while (this.chapters.length) this.chapters.removeAt(0);
+        if (data.chapters) {
+          data.chapters.forEach((chap: any) => {
+            // Mapeamos shortDescription a description si es necesario
+            const formattedChap = {
+              ...chap,
+              description: chap.description || chap.shortDescription
+            };
+            this.addChapter(formattedChap);
+          });
+        }
+
+        this.wizardStep = 'builder'; // Ir directo al constructor
+        this.messageService.add({ severity: 'success', summary: 'Cargado', detail: 'Curso cargado para edición' });
+        this.generating = false;
+        this.loadingSuggestions = false;
+      },
+      error: (err) => {
+        console.error('Error al obtener detalle del curso:', err);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar el curso' });
+        this.generating = false;
+        this.loadingSuggestions = false;
+      }
     });
   }
 
@@ -180,6 +278,7 @@ export class CourseBuilderComponent implements OnInit {
 
   addChapter(data?: any) {
     const chapterGroup = this.fb.group({
+      id: [data?.id || null],
       title: [data?.title || '', Validators.required],
       description: [data?.description || '', Validators.required],
       temas: this.fb.array([])
@@ -203,6 +302,7 @@ export class CourseBuilderComponent implements OnInit {
 
   addTema(chapterIndex: number, data?: any) {
     const temaGroup = this.fb.group({
+      id: [data?.id || null],
       title: [data?.title || '', Validators.required],
       shortDescription: [data?.shortDescription || '', Validators.required],
       theory: [data?.theory || ''],
@@ -227,6 +327,7 @@ export class CourseBuilderComponent implements OnInit {
 
   addActivity(chapterIndex: number, temaIndex: number, data?: any) {
     const activityGroup = this.fb.group({
+      id: [data?.id || null],
       title: [data?.title || '', Validators.required],
       exercises: this.fb.array([])
     });
@@ -249,11 +350,15 @@ export class CourseBuilderComponent implements OnInit {
 
   addExercise(chapterIndex: number, temaIndex: number, activityIndex: number, data?: any) {
     const exGroup = this.fb.group({
+      id: [data?.id || null],
       statement: [data?.statement || '', Validators.required],
       typeExercise: [data?.typeExercise || 'selection_single'],
       difficulty: [data?.difficulty || 'Fácil'],
       optionSelectOptions: [data?.optionSelectOptions || []],
-      answerSelectCorrect: [data?.answerSelectCorrect || '']
+      answerSelectCorrect: [data?.answerSelectCorrect || ''],
+      hind: [data?.hind || ''],
+      optionsVerticalOrdering: [data?.optionsVerticalOrdering || []],
+      answerVerticalOrdering: [data?.answerVerticalOrdering || []]
     });
     this.getExercises(chapterIndex, temaIndex, activityIndex).push(exGroup);
   }
@@ -569,6 +674,7 @@ export class CourseBuilderComponent implements OnInit {
     this.saving = true;
     const payload = {
         ...this.courseForm.value,
+        id: this.courseId, // Incluir el ID si estamos en modo edición
         isDraft: false
     };
 
@@ -643,5 +749,16 @@ export class CourseBuilderComponent implements OnInit {
     if (!activities || activities.length === 0) return 0;
     const exercises = activities.at(0).get('exercises') as FormArray;
     return exercises ? exercises.length : 0;
+  }
+
+  togglePreview(chapterIndex: number, temaIndex: number) {
+    const key = `${chapterIndex}-${temaIndex}`;
+    this.previewModes[key] = !this.previewModes[key];
+  }
+
+  isPreviewMode(chapterIndex: number, temaIndex: number): boolean {
+    const key = `${chapterIndex}-${temaIndex}`;
+    // Por defecto es true (Vista Previa)
+    return this.previewModes[key] !== false;
   }
 }

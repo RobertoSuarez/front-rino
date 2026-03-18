@@ -153,33 +153,7 @@ export class CoursesComponent implements OnInit {
   }
 
   showEditDialog(course: any) {
-    this.currentCourseId = course.id;
-    this.loading = true;
-
-    this.http.get<GetCourseByIdResponse>(`${environment.apiUrl}/courses/${course.id}`)
-      .subscribe({
-        next: (response) => {
-          this.courseForm.patchValue({
-            title: response.data.title,
-            description: response.data.description,
-            urlLogo: response.data.urlLogo,
-            isPublic: response.data.isPublic
-          });
-
-          // Si la imagen actual no está en las imágenes prediseñadas, agregarla como subida
-          const currentImageUrl = response.data.urlLogo;
-          if (currentImageUrl && !this.defaultImages.includes(currentImageUrl) && !this.uploadedImages.includes(currentImageUrl)) {
-            this.uploadedImages.push(currentImageUrl);
-          }
-
-          this.displayEditDialog = true;
-        },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar curso' });
-          console.error(err);
-        },
-        complete: () => this.loading = false
-      });
+    this.router.navigate(['/admin/courses/builder', course.id]);
   }
 
   onGlobalFilter(table: Table, event: Event) {
@@ -340,9 +314,7 @@ export class CoursesComponent implements OnInit {
 
   viewCourseDetails(course: any) {
     // Redirigir al constructor con el ID del curso para visualización/edición completa
-    this.router.navigate(['/admin/courses/builder'], {
-      queryParams: { id: course.id }
-    });
+    this.router.navigate(['/admin/courses/builder', course.id]);
   }
 
   navigateToChapters(course: any) {

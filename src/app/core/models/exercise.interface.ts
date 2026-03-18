@@ -45,6 +45,7 @@ export interface ExerciseListItem {
 
 export interface CreateExerciseRequest {
   activityId: number;
+  index?: number;
   statement: string;
   difficulty: string;
   hind: string;
@@ -74,6 +75,7 @@ export interface CreateExerciseRequest {
 
 export interface UpdateExerciseRequest {
   activityId?: number;
+  index?: number;
   statement?: string;
   difficulty?: string;
   hind?: string;
@@ -109,6 +111,11 @@ export interface CheckExerciseRequest {
   answerOrderLineCode?: string[];
   answerWriteCode?: string;
   answerFindError?: string;
+  answerVerticalOrdering?: string[];
+  answerHorizontalOrdering?: string[];
+  answerPhishingSelection?: string[];
+  answerMatchPairs?: { left: string; right: string }[];
+  isPreview?: boolean;
 }
 
 export interface FeedbackExerciseResponse {

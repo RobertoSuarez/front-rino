@@ -79,9 +79,9 @@
                 <td class="dark:text-gray-400">{{course.createAt}}</td>
                 <td class="flex gap-2">
                     <p-button icon="pi pi-eye" [text]="true" [rounded]="true" severity="secondary"
-                        (click)="viewCourseDetails(course)" pTooltip="Ver detalle" tooltipPosition="top"></p-button>
+                        [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Ver detalle" tooltipPosition="top"></p-button>
                     <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
-                        (click)="showEditDialog(course)" pTooltip="Editar" tooltipPosition="top"></p-button>
+                        [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Editar" tooltipPosition="top"></p-button>
                     <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
                         (click)="confirmDelete(course)" pTooltip="Eliminar" tooltipPosition="top"></p-button>
                     <p-button icon="pi pi-list" [outlined]="true" severity="success" size="small" label="Capítulos"
@@ -134,9 +134,9 @@
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex gap-1">
                         <p-button icon="pi pi-eye" [text]="true" [rounded]="true" severity="secondary"
-                            (click)="viewCourseDetails(course)" pTooltip="Ver detalle"></p-button>
+                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Ver detalle"></p-button>
                         <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info"
-                            (click)="showEditDialog(course)" pTooltip="Editar"></p-button>
+                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Editar"></p-button>
                         <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
                             (click)="confirmDelete(course)" pTooltip="Eliminar"></p-button>
                     </div>

@@ -113,163 +113,167 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
   providers: [MessageService],
   templateUrl: './exercise-sandbox.component.html',
   styles: [`
-    :host { display: block; }
+    :host { 
+        display: block; 
+        --primary-color: #58cc02;
+        --duo-green: #58cc02;
+        --duo-green-dark: #46a302;
+        --duo-blue: #1cb0f6;
+        --duo-blue-dark: #1899d6;
+        --duo-purple: #ce82ff;
+        --duo-purple-dark: #af6cf0;
+        --duo-red: #ff4b4b;
+        --duo-red-dark: #d33131;
+        --duo-yellow: #ffc800;
+        --duo-yellow-dark: #e5a300;
+        --notebook-bg: #ffffff;
+    }
 
     .sandbox-page {
       min-height: 100vh;
-      background: var(--surface-ground);
-      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      font-family: 'Outfit', 'Inter', sans-serif;
     }
 
     /* ── Topbar ── */
     .sandbox-topbar {
-      background: var(--surface-card);
-      border-bottom: 1px solid var(--surface-border);
-      padding: 12px 24px;
+      background: #ffffff;
+      padding: 20px 40px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      justify-content: space-between;
+      gap: 24px;
       position: sticky;
       top: 0;
       z-index: 50;
+      border-bottom: 4px solid #f1f5f9;
     }
 
     .sandbox-badge {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      background: var(--duo-yellow);
+      color: #936300;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 20px;
-      white-space: nowrap;
+      padding: 6px 16px;
+      border-radius: 12px;
+      border-bottom: 3px solid var(--duo-yellow-dark);
     }
 
     .topbar-activity-title {
-      color: var(--text-color);
-      font-size: 0.95rem;
-      font-weight: 600;
+      color: #1e293b;
+      font-size: 1.2rem;
+      font-weight: 800;
       flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-align: center;
+      letter-spacing: -0.02em;
     }
 
     .topbar-progress {
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: var(--text-color-secondary);
-      font-size: 0.8rem;
-      white-space: nowrap;
+      gap: 15px;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 800;
     }
 
     .progress-bar-wrap {
-      width: 120px;
+      width: 200px;
+    }
+
+    ::ng-deep .p-progressbar {
+        height: 16px !important;
+        background: #e5e5e5 !important;
+        border-radius: 10px !important;
+        border: none !important;
+    }
+
+    ::ng-deep .p-progressbar-value {
+        background: var(--duo-green) !important;
+        border-radius: 10px !important;
+        border-bottom: 4px solid var(--duo-green-dark) !important;
     }
 
     /* ── Main layout ── */
     .sandbox-body {
-      max-width: 1000px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 32px 24px;
+      padding: 60px 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 30px;
     }
 
     /* ── Exercise card ── */
     .exercise-card {
-      background: var(--surface-card);
-      border-radius: 20px;
-      border: 1px solid var(--surface-border);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      background: #ffffff;
+      border-radius: 32px;
+      border: 3px solid #e5e5e5;
+      box-shadow: 0 10px 0 #e5e5e5;
       overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .exercise-card-head {
-      background: var(--surface-section, var(--surface-ground));
-      border-bottom: 1px solid var(--surface-border);
-      padding: 18px 28px;
+      padding: 30px 40px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
     }
 
     .exercise-type-chip {
       display: flex;
       align-items: center;
-      gap: 7px;
-      background: var(--primary-color);
-      color: var(--primary-color-text);
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 5px 14px;
-      border-radius: 20px;
+      gap: 8px;
+      color: #6366f1;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .exercise-number {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-color-secondary);
-      background: var(--surface-hover);
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--surface-border);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
     }
 
     .exercise-card-body {
-      padding: 28px;
+      padding: 20px 40px 40px;
     }
 
     .exercise-statement {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text-color);
-      margin-bottom: 6px;
-      line-height: 1.5;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 24px;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
     }
 
     .exercise-hint {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 12px;
       background: #fefce8;
-      border: 1px solid #fde68a;
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      font-size: 0.85rem;
+      border: 3px solid #fde68a;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 30px;
+      font-size: 1rem;
+      font-weight: 600;
       color: #92400e;
     }
 
     .exercise-hint i {
+      font-size: 1.25rem;
       color: #f59e0b;
-      margin-top: 1px;
-    }
-
-    .code-block {
-      background: #0f172a;
-      border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-    }
-
-    .code-block code {
-      color: #7dd3fc;
-      font-family: 'Fira Code', 'Cascadia Code', monospace;
-      font-size: 0.85rem;
-      white-space: pre-wrap;
-    }
-
-    .exercise-component-wrap {
-      margin-top: 12px;
     }
 
     /* ── Actions ── */
@@ -277,193 +281,120 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 20px 28px;
-      background: var(--surface-ground);
-      border-top: 1px solid var(--surface-border);
+      gap: 20px;
+      padding: 30px 40px;
+      background: #ffffff;
+      border-top: 3px solid #f1f5f9;
     }
 
-    .action-nav {
-      display: flex;
-      gap: 10px;
+    /* GAMIFIED BUTTONS */
+    .btn-3d {
+        border: none !important;
+        border-radius: 16px !important;
+        font-weight: 800 !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 16px 32px !important;
+        transition: all 0.1s ease !important;
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    /* ── Empty state ── */
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--text-color-secondary);
+    .btn-green {
+        background: var(--duo-green) !important;
+        color: white !important;
+        border-bottom: 5px solid var(--duo-green-dark) !important;
     }
 
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      display: block;
+    .btn-green:active:not(:disabled) {
+        border-bottom-width: 0 !important;
+        transform: translateY(5px);
     }
 
-    /* ── Feedback Dialog (fd-*) ── */
+    .btn-blue {
+        background: var(--duo-blue) !important;
+        color: white !important;
+        border-bottom: 5px solid var(--duo-blue-dark) !important;
+    }
+
+    .btn-blue:active:not(:disabled) {
+        border-bottom-width: 0 !important;
+        transform: translateY(5px);
+    }
+
+    .btn-secondary {
+        background: white !important;
+        color: #afafaf !important;
+        border: 3px solid #e5e5e5 !important;
+        border-bottom: 6px solid #e5e5e5 !important;
+    }
+
+    .btn-secondary:active:not(:disabled) {
+        border-bottom-width: 3px !important;
+        transform: translateY(3px);
+    }
+
+    .btn-3d:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+
+    /* ── Feedback Dialog ── */
+    ::ng-deep .p-dialog .p-dialog-content {
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
     .fd-wrap {
       display: flex;
       flex-direction: column;
-      max-height: 85vh;
-      border-radius: 20px;
-      overflow: hidden;
+      background: white;
     }
 
-    /* Colored header */
     .fd-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      flex-shrink: 0;
-      gap: 16px;
+      padding: 40px;
+      text-align: center;
     }
-    .fd-header--success { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-bottom: 2px solid #86efac; }
-    .fd-header--partial  { background: linear-gradient(135deg, #fef9c3, #fde68a); border-bottom: 2px solid #fcd34d; }
-    .fd-header--error    { background: linear-gradient(135deg, #fee2e2, #fecaca); border-bottom: 2px solid #fca5a5; }
-
-    .fd-header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex: 1;
-      min-width: 0;
-    }
+    .fd-header--success { background: #dcfce7; }
+    .fd-header--partial  { background: #fef9c3; }
+    .fd-header--error    { background: #fee2e2; }
 
     .fd-icon {
-      width: 48px;
-      height: 48px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      flex-shrink: 0;
+      font-size: 2.5rem;
+      margin: 0 auto 20px;
     }
-    .fd-icon--success { background: #16a34a; color: #fff; }
-    .fd-icon--partial  { background: #d97706; color: #fff; }
-    .fd-icon--error    { background: #dc2626; color: #fff; }
+    .fd-icon--success { background: var(--duo-green); color: white; border-bottom: 5px solid var(--duo-green-dark); }
+    .fd-icon--partial  { background: var(--duo-yellow); color: white; border-bottom: 5px solid var(--duo-yellow-dark); }
+    .fd-icon--error    { background: var(--duo-red); color: white; border-bottom: 5px solid var(--duo-red-dark); }
 
     .fd-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--text-color);
-    }
-    .fd-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-color-secondary);
-      margin-top: 2px;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #1e293b;
+      margin-bottom: 10px;
     }
 
-    /* Score bubble */
-    .fd-score {
-      min-width: 64px;
-      height: 64px;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .fd-score--success { background: #16a34a; color: #fff; }
-    .fd-score--partial  { background: #d97706; color: #fff; }
-    .fd-score--error    { background: #dc2626; color: #fff; }
-    .fd-score-num { font-size: 1.8rem; font-weight: 900; line-height: 1; }
-    .fd-score-den { font-size: 0.7rem; opacity: 0.8; }
-
-    /* Close button */
-    .fd-close-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(0,0,0,0.08);
-      color: var(--text-color);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      transition: background 0.15s;
-      flex-shrink: 0;
-    }
-    .fd-close-btn:hover { background: rgba(0,0,0,0.16); }
-
-    /* Scrollable body */
     .fd-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 24px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .fd-label {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--text-color-secondary);
+      padding: 40px;
+      text-align: center;
     }
 
     .fd-text {
-      font-size: 0.93rem;
-      color: var(--text-color);
-      line-height: 1.8;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #475569;
+      line-height: 1.6;
     }
 
-    .fd-notice {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      padding: 9px 14px;
-      background: var(--surface-ground);
-      border: 1px solid var(--surface-border);
-      border-radius: 10px;
-      margin-top: 4px;
-    }
-    .fd-notice-text {
-      font-size: 0.8rem;
-      color: var(--text-color-secondary);
-    }
-
-    /* Footer */
-    .fd-footer {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 24px;
-      background: var(--surface-card);
-      border-top: 1px solid var(--surface-border);
-      flex-shrink: 0;
-    }
-
-    /* ── Loader ── */
-    .loader-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 70vh;
-    }
-
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid var(--surface-border);
-      border-top-color: var(--primary-color);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
@@ -679,6 +610,7 @@ export class ExerciseSandboxComponent implements OnInit {
       answerHorizontalOrdering: a.answerHorizontalOrdering || [],
       answerPhishingSelection: a.answerPhishingSelection || [],
       answerMatchPairs: a.answerMatchPairs || [],
+      isPreview: true,
     };
 
     this.exerciseService.checkAnswer(this.currentExercise.id, dto).subscribe({

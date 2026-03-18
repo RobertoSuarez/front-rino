@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -20,10 +20,6 @@ import { AiService } from '../../../core/services/ai.service';
 import { CourseService } from '../../../core/services/course.service';
 import { LayoutService } from '../../../layout/service/layout.service';
 import { QuillModule } from 'ngx-quill';
-import { ExerciseGenerationService, GeneratedExercise } from '../../../core/services/exercise-generation.service';
-import { ExerciseService } from '../../../core/services/exercise.service';
-import { GenerateExercisesDialogComponent } from '../../admin/exercises/components/generate-exercises-dialog.component';
-import { ExerciseEditorDialogComponent } from '../../admin/exercises/components/exercise-editor-dialog/exercise-editor-dialog.component';
 
 interface BuilderActivity {
   title: string;
@@ -63,9 +59,7 @@ interface BuilderChapter {
     TextareaModule,
     ToggleButtonModule,
     SelectButtonModule,
-    QuillModule,
-    GenerateExercisesDialogComponent,
-    ExerciseEditorDialogComponent // Added to @Component imports
+    QuillModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './course-builder.component.html',
@@ -75,15 +69,14 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   courseForm: FormGroup;
   generating: boolean = false;
   saving: boolean = false;
-  loading: boolean = false;
   courseId: number | null = null;
-
+  
   // Amauta Chatbot state
   displayChat: boolean = false;
   chatMessages: { role: 'user' | 'ai', text: string }[] = [];
   userMessage: string = '';
   aiTyping: boolean = false;
-
+  
   // Wizard state
   wizardStep: 'topic' | 'title-suggestions' | 'description-suggestion' | 'chapter-suggestions' | 'supervised-curation' | 'builder' = 'topic';
   wizardTopic: string = '';
@@ -91,7 +84,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   suggestedChapters: any[] = [];
   currentTitleIndex: number = 0;
   currentChapterIndex: number = 0;
-
+  
   // Supervised curation state
   currentChapterSupervIndex: number = 0;
   tempTopicSuggestions: any[] = []; // Topics suggested by AI but not yet approved
@@ -100,7 +93,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   supervisingExercises: boolean = false;
   currentSupervisingTemaIndex: number = -1;
   loadingSuggestions: boolean = false;
-
+  
   // Builder state
   sidebarVisible: boolean = true;
   autosaving: boolean = false;
@@ -112,29 +105,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   // UI State: track expanded activities (key: "chapIndex-temaIndex-actIndex")
   expandedActivities: { [key: string]: boolean } = {};
 
-  // UI State: track view mode per activity (key: "chapIndex-temaIndex-actIndex", value: 'list' | 'sandbox')
-  exercisesViewMode: { [key: string]: 'list' | 'sandbox' } = {};
-
-  // Exercise Type Metadata
-  exerciseTypeMap: Record<string, { label: string; icon: string; color: string; bg: string }> = {
-    'selection_single':           { label: 'Selección Simple',       icon: 'pi pi-check-circle',   color: '#2563eb', bg: '#eff6ff' },
-    'selection_multiple':         { label: 'Selección Múltiple',     icon: 'pi pi-check-square',   color: '#7c3aed', bg: '#f5f3ff' },
-    'vertical_ordering':          { label: 'Orden Vertical',         icon: 'pi pi-sort-amount-down',color: '#0891b2', bg: '#ecfeff' },
-    'horizontal_ordering':        { label: 'Orden Horizontal',       icon: 'pi pi-arrows-h',       color: '#0d9488', bg: '#f0fdfa' },
-    'phishing_selection_multiple': { label: 'Detección Phishing',    icon: 'pi pi-shield',         color: '#dc2626', bg: '#fef2f2' },
-    'match_pairs':                { label: 'Emparejar Conceptos',    icon: 'pi pi-link',           color: '#ea580c', bg: '#fff7ed' },
-  };
-
-  // Preview State
-  displayExercisePreview: boolean = false;
-  selectedExerciseForPreview: any = null;
-
-  // AI Wizard State
-  @ViewChild('genWizard') genWizard!: GenerateExercisesDialogComponent;
-  @ViewChild('exerciseEditorDialog') exerciseEditorDialog!: ExerciseEditorDialogComponent; // Added ViewChild
-  displayGenWizard: boolean = false;
-  currentGenContext: { chapterI: number, temaJ: number } | null = null;
-
   toggleActivityExpansion(chapI: number, temaJ: number, actK: number): void {
     const key = `${chapI}-${temaJ}-${actK}`;
     this.expandedActivities[key] = !this.expandedActivities[key];
@@ -142,16 +112,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   isActivityExpanded(chapI: number, temaJ: number, actK: number): boolean {
     return !!this.expandedActivities[`${chapI}-${temaJ}-${actK}`];
-  }
-
-  toggleExercisesView(chapI: number, temaJ: number, actK: number): void {
-    const key = `${chapI}-${temaJ}-${actK}`;
-    const current = this.exercisesViewMode[key] || 'list';
-    this.exercisesViewMode[key] = current === 'list' ? 'sandbox' : 'list';
-  }
-
-  getExercisesViewMode(chapI: number, temaJ: number, actK: number): 'list' | 'sandbox' {
-    return this.exercisesViewMode[`${chapI}-${temaJ}-${actK}`] || 'list';
   }
 
   constructor(
@@ -162,16 +122,12 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute,
-    public layoutService: LayoutService,
-    private exerciseGenerationService: ExerciseGenerationService,
-    private exerciseService: ExerciseService
+    public layoutService: LayoutService
   ) {
     this.courseForm = this.fb.group({
-      title: ['', Validators.required],
+      courseTitle: ['', Validators.required],
       description: ['', Validators.required],
       urlLogo: ['https://i.ibb.co/chdPzT1f/Quiero-un-logo-para-mi-aplicaci-n-web-gamificada-para-ense-ar-cyberseguridad.jpg'],
-      code: [this.generateTempCode()],
-      index: [0],
       isPublic: [false],
       isDraft: [true],
       chapters: this.fb.array([])
@@ -179,31 +135,31 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // 1. Verificar si estamos editando (por URL params o query params)
-    const urlId = this.route.snapshot.params['id'];
-    const queryId = this.route.snapshot.queryParams['id'];
-    const id = urlId || queryId;
-
-    if (id) {
-      this.courseId = +id;
-      this.loadCourseForEdit(this.courseId);
-      this.wizardStep = 'builder';
-
-      // Focus mode (sidebar inactive)
-      this.layoutService.layoutState.update(prev => ({
-        ...prev, staticMenuDesktopInactive: true
-      }));
-    } else {
-      // 2. Flujo de creación normal
-      this.loadFromLocalStorage();
-      if (this.chapters.length === 0) {
-        this.addChapter();
+    // Verificar si estamos editando un curso existente
+    this.route.queryParams.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.courseId = +id;
+        this.loadCourseForEdit(this.courseId);
+        this.wizardStep = 'builder';
+        
+        // Hide platform sidebar for focus mode
+        this.layoutService.layoutState.update(prev => ({ 
+            ...prev, 
+            staticMenuDesktopInactive: true 
+        }));
+      } else {
+        // Flujo normal de creación
+        this.loadFromLocalStorage();
+        if (this.chapters.length === 0) {
+          this.addChapter(); // Start with one chapter if empty
+        }
       }
-    }
+    });
 
-    this.chatMessages.push({
-      role: 'ai',
-      text: '¡Hola! Soy Amauta, tu asistente pedagógico. Tu cuaderno de trabajo está listo. ¿En qué puedo ayudarte a diseñar hoy?'
+    this.chatMessages.push({ 
+      role: 'ai', 
+      text: '¡Hola! Soy Amauta, tu asistente pedagógico. Tu cuaderno de trabajo está listo. ¿En qué puedo ayudarte a diseñar hoy?' 
     });
 
     // Autosave listener
@@ -214,17 +170,16 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Restore platform sidebar
-    this.layoutService.layoutState.update(prev => ({
-      ...prev,
-      staticMenuDesktopInactive: false
+    this.layoutService.layoutState.update(prev => ({ 
+        ...prev, 
+        staticMenuDesktopInactive: false 
     }));
   }
 
   loadCourseForEdit(id: number) {
-    this.loading = true;
     this.generating = true;
     this.loadingSuggestions = true;
-
+    
     this.courseService.getCourseFullDetail(id).subscribe({
       next: (res) => {
         // El backend responde con { statusCode, message, data: { message, data: { ... } } }
@@ -240,11 +195,9 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         }
 
         this.courseForm.patchValue({
-          title: data.title,
+          courseTitle: data.title,
           description: data.description,
           urlLogo: data.urlLogo,
-          code: data.code,
-          index: data.index,
           isPublic: data.isPublic,
           isDraft: data.isDraft
         });
@@ -262,7 +215,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
           });
         }
 
-        this.loading = false;
         this.wizardStep = 'builder'; // Ir directo al constructor
         this.messageService.add({ severity: 'success', summary: 'Cargado', detail: 'Curso cargado para edición' });
         this.generating = false;
@@ -270,7 +222,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al obtener detalle del curso:', err);
-        this.loading = false;
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar el curso' });
         this.generating = false;
         this.loadingSuggestions = false;
@@ -291,11 +242,9 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       try {
         const data = JSON.parse(draft);
         this.courseForm.patchValue({
-          title: data.title,
+          courseTitle: data.courseTitle,
           description: data.description,
           urlLogo: data.urlLogo,
-          code: data.code,
-          index: data.index,
           isPublic: data.isPublic,
           isDraft: data.isDraft
         });
@@ -331,14 +280,12 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     const chapterGroup = this.fb.group({
       id: [data?.id || null],
       title: [data?.title || '', Validators.required],
-      shortDescription: [data?.shortDescription || data?.description || '', Validators.required],
-      index: [data?.index ?? this.chapters.length],
-      difficulty: [data?.difficulty || 'Fácil'],
+      description: [data?.description || '', Validators.required],
       temas: this.fb.array([])
     });
-
+    
     this.chapters.push(chapterGroup);
-
+    
     if (data?.temas) {
       data.temas.forEach((t: any) => this.addTema(this.chapters.length - 1, t));
     }
@@ -359,9 +306,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       title: [data?.title || '', Validators.required],
       shortDescription: [data?.shortDescription || '', Validators.required],
       theory: [data?.theory || ''],
-      urlBackground: [data?.urlBackground || null],
-      index: [data?.index ?? this.getTemas(chapterIndex).length],
-      difficulty: [data?.difficulty || 'Fácil'],
       activities: this.fb.array([])
     });
 
@@ -385,7 +329,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     const activityGroup = this.fb.group({
       id: [data?.id || null],
       title: [data?.title || '', Validators.required],
-      index: [data?.index ?? this.getActivities(chapterIndex, temaIndex).length],
       exercises: this.fb.array([])
     });
 
@@ -394,220 +337,38 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     if (data?.exercises) {
       data.exercises.forEach((ex: any) => this.addExercise(chapterIndex, temaIndex, this.getActivities(chapterIndex, temaIndex).length - 1, ex));
     }
+    // REMOVED autonomous empty exercise addition
   }
 
   removeActivity(chapterIndex: number, temaIndex: number, activityIndex: number) {
     this.getActivities(chapterIndex, temaIndex).removeAt(activityIndex);
   }
 
-  getActivity(chapterIndex: number, temaIndex: number, activityIndex: number) {
-    return this.getActivities(chapterIndex, temaIndex).at(activityIndex) as FormGroup;
-  }
-
   getExercises(chapterIndex: number, temaIndex: number, activityIndex: number) {
-    return this.getActivity(chapterIndex, temaIndex, activityIndex).get('exercises') as FormArray;
+    return this.getActivities(chapterIndex, temaIndex).at(activityIndex).get('exercises') as FormArray;
   }
 
   addExercise(chapterIndex: number, temaIndex: number, activityIndex: number, data?: any) {
     const exGroup = this.fb.group({
       id: [data?.id || null],
-      index: [data?.index ?? this.getExercises(chapterIndex, temaIndex, activityIndex).length],
-      difficulty: [data?.difficulty || 'Fácil'],
       statement: [data?.statement || '', Validators.required],
-      hind: [data?.hind || ''],
       typeExercise: [data?.typeExercise || 'selection_single'],
-      // Options
+      difficulty: [data?.difficulty || 'Fácil'],
       optionSelectOptions: [data?.optionSelectOptions || []],
-      optionOrderFragmentCode: [data?.optionOrderFragmentCode || []],
-      optionOrderLineCode: [data?.optionOrderLineCode || []],
-      optionsFindErrorCode: [data?.optionsFindErrorCode || []],
-      // Answers
       answerSelectCorrect: [data?.answerSelectCorrect || ''],
-      answerSelectsCorrect: [data?.answerSelectsCorrect || []],
-      answerOrderFragmentCode: [data?.answerOrderFragmentCode || []],
-      answerOrderLineCode: [data?.answerOrderLineCode || []],
-      answerFindError: [data?.answerFindError || ''],
-      answerWriteCode: [data?.answerWriteCode || ''],
-      // Extra types
+      hind: [data?.hind || ''],
       optionsVerticalOrdering: [data?.optionsVerticalOrdering || []],
-      answerVerticalOrdering: [data?.answerVerticalOrdering || []],
-      optionsHorizontalOrdering: [data?.optionsHorizontalOrdering || []],
-      answerHorizontalOrdering: [data?.answerHorizontalOrdering || []],
-      optionsPhishingSelection: [data?.optionsPhishingSelection || []],
-      answerPhishingSelection: [data?.answerPhishingSelection || []],
-      phishingContext: [data?.phishingContext || ''],
-      phishingImageUrl: [data?.phishingImageUrl || ''],
-      optionsMatchPairsLeft: [data?.optionsMatchPairsLeft || []],
-      optionsMatchPairsRight: [data?.optionsMatchPairsRight || []],
-      answerMatchPairs: [data?.answerMatchPairs || []]
+      answerVerticalOrdering: [data?.answerVerticalOrdering || []]
     });
     this.getExercises(chapterIndex, temaIndex, activityIndex).push(exGroup);
   }
 
-  addAndEditExercise(chapterIndex: number, temaIndex: number, activityIndex: number) {
-    this.addExercise(chapterIndex, temaIndex, activityIndex);
-    const newIndex = this.getExercises(chapterIndex, temaIndex, activityIndex).length - 1;
-    this.openEditExerciseDialog(chapterIndex, temaIndex, activityIndex, newIndex);
-  }
-
   removeExercise(chapterIndex: number, temaIndex: number, activityIndex: number, exerciseIndex: number) {
-    const exerciseGroup = this.getExercises(chapterIndex, temaIndex, activityIndex).at(exerciseIndex);
-    const exerciseId = exerciseGroup.value.id;
-
-    const removeLocal = () => {
-      this.getExercises(chapterIndex, temaIndex, activityIndex).removeAt(exerciseIndex);
-      this.messageService.add({ severity: 'info', summary: 'Removido', detail: 'Ejercicio quitado localmente' });
-    };
-
-    if (exerciseId) {
-      this.confirmationService.confirm({
-        message: '¿Estás seguro de que quieres eliminar completamente este ejercicio de la base de datos?',
-        header: 'Confirmación de Eliminación',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-          this.exerciseService.deleteExercise(exerciseId).subscribe({
-            next: () => {
-              this.getExercises(chapterIndex, temaIndex, activityIndex).removeAt(exerciseIndex);
-              this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Ejercicio eliminado de la base de datos' });
-            },
-            error: (err) => {
-              console.error('Error deleting exercise:', err);
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el ejercicio' });
-            }
-          });
-        }
-      });
-    } else {
-      removeLocal();
-    }
-  }
-
-  // --- EXERCISE EDITING METHODS ---
-
-  openEditExerciseDialog(chapterIndex: number, temaIndex: number, activityIndex: number, exerciseIndex: number) {
-    const exerciseGroup = this.getExercises(chapterIndex, temaIndex, activityIndex).at(exerciseIndex);
-    const exerciseData = exerciseGroup.value;
-    const metaData = { chapterIndex, temaIndex, activityIndex, exerciseIndex };
-    
-    if (this.exerciseEditorDialog) {
-      this.exerciseEditorDialog.openEdit(exerciseData, metaData);
-    }
-  }
-
-  onExerciseSave(event: any) {
-    const { data, meta } = event;
-    if (meta) {
-      const { chapterIndex, temaIndex, activityIndex, exerciseIndex } = meta;
-      const exerciseGroup = this.getExercises(chapterIndex, temaIndex, activityIndex).at(exerciseIndex);
-      const activityId = this.getActivity(chapterIndex, temaIndex, activityIndex).value.id;
-
-      // Asegurar que conectamos con el activityId verdadero si ya existe en la BD
-      const payload = { ...data, activityId };
-
-      if (activityId) {
-        if (data.id) {
-          // UPDATE
-          this.exerciseService.updateExercise(data.id, payload).subscribe({
-            next: (res: any) => {
-              exerciseGroup.patchValue({ ...data, ...res });
-              this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: 'El ejercicio ha sido sincronizado con la BD' });
-            },
-            error: (err) => {
-              console.error('Error updating exercise:', err);
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el ejercicio en la BD' });
-            }
-          });
-        } else {
-          // CREATE
-          this.exerciseService.createExercise(payload).subscribe({
-            next: (res: any) => {
-              exerciseGroup.patchValue({ ...data, id: res.id });
-              this.messageService.add({ severity: 'success', summary: 'Creado', detail: 'El nuevo ejercicio se ha guardado en la BD' });
-            },
-            error: (err) => {
-              console.error('Error creating exercise:', err);
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear el ejercicio en la BD' });
-            }
-          });
-        }
-      } else {
-        // LOCAL ONLY (El curso / actividad aún no se guarda en BD, es pura data de memoria)
-        exerciseGroup.patchValue(data);
-        this.messageService.add({ severity: 'success', summary: 'Guardado Local', detail: 'Se sincronizará cuando guardes el curso completo' });
-      }
-    }
-  }
-
-  // ENHANCEMENT METHODS
-
-  getExerciseIcon(type: string): string {
-    return this.exerciseTypeMap[type]?.icon || 'pi pi-question-circle';
-  }
-
-  getExerciseColor(type: string): string {
-    return this.exerciseTypeMap[type]?.color || '#94a3b8';
-  }
-
-  openExercisePreview(exercise: any) {
-    this.selectedExerciseForPreview = exercise;
-    this.displayExercisePreview = true;
-  }
-
-  openActivitySandbox(activity: any) {
-    if (!activity.id) {
-        this.messageService.add({ 
-            severity: 'warn', 
-            summary: 'Atención', 
-            detail: 'Guarda el curso primero para probar esta actividad en el Sandbox' 
-        });
-        return;
-    }
-    this.router.navigate(['/admin/exercises', activity.id, 'sandbox'], {
-        queryParams: {
-            returnCourseId: this.courseId
-        }
-    });
-  }
-
-  openGenWizard(chapterI: number, temaJ: number) {
-    this.currentGenContext = { chapterI, temaJ };
-    this.genWizard.open();
-  }
-
-  onExercisesGenerated(exercises: GeneratedExercise[]) {
-    if (!this.currentGenContext || exercises.length === 0) return;
-    
-    const { chapterI, temaJ } = this.currentGenContext;
-    
-    // Create a new activity for these exercises
-    const activityCount = this.getActivities(chapterI, temaJ).length;
-    const newActivityTitle = `Actividad Generada ${activityCount + 1}`;
-    
-    this.addActivity(chapterI, temaJ, {
-        title: newActivityTitle,
-        exercises: exercises.map(ex => ({
-            statement: ex.statement,
-            typeExercise: ex.typeExercise,
-            difficulty: ex.difficulty,
-            optionSelectOptions: ex.optionSelectOptions,
-            answerSelectCorrect: ex.answerSelectCorrect,
-            hind: ex.hint,
-            optionsVerticalOrdering: ex.optionsVerticalOrdering,
-            answerVerticalOrdering: ex.answerVerticalOrdering
-        }))
-    });
-
-    this.messageService.add({ 
-        severity: 'success', 
-        summary: '¡Bingo!', 
-        detail: `Se ha creado una nueva actividad con ${exercises.length} ejercicios.` 
-    });
-    
-    this.displayGenWizard = false;
+    this.getExercises(chapterIndex, temaIndex, activityIndex).removeAt(exerciseIndex);
   }
 
   // WIZARD METHODS
-
+  
   startWizard() {
     if (!this.wizardTopic.trim()) {
       this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Ingresa un tema para comenzar' });
@@ -634,7 +395,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   }
 
   selectTitle(title: string) {
-    this.courseForm.patchValue({ title: title });
+    this.courseForm.patchValue({ courseTitle: title });
   }
 
   getMoreTitles() {
@@ -642,7 +403,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   }
 
   confirmTitle() {
-    const title = this.courseForm.get('title')?.value;
+    const title = this.courseForm.get('courseTitle')?.value;
     if (!title) {
       this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'El curso debe tener un título' });
       return;
@@ -653,8 +414,8 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   async generateDescriptionAI() {
     this.loadingSuggestions = true;
     this.wizardStep = 'description-suggestion';
-    const title = this.courseForm.get('title')?.value;
-
+    const title = this.courseForm.get('courseTitle')?.value;
+    
     this.aiService.generateCourseDescription(title).subscribe({
       next: (res: any) => {
         if (res.data && res.data.description) {
@@ -680,7 +441,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   getNewChapterSuggestions() {
     this.wizardStep = 'chapter-suggestions';
     this.loadingSuggestions = true;
-    this.aiService.generateChaptersAI(this.courseForm.get('title')?.value).subscribe({
+    this.aiService.generateChaptersAI(this.courseForm.get('courseTitle')?.value).subscribe({
       next: (res: any) => {
         const data = res.data || res;
         this.suggestedChapters = data.chapters || data; // El back devuelve { chapters: [...] } o el array directo
@@ -735,47 +496,47 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   prevSupervStep() {
     if (this.currentChapterSupervIndex > 0) {
-      this.currentChapterSupervIndex--;
-      this.tempTopicSuggestions = [];
+        this.currentChapterSupervIndex--;
+        this.tempTopicSuggestions = [];
     }
   }
 
   nextSupervStep() {
     if (this.currentChapterSupervIndex < this.chapters.length - 1) {
-      this.currentChapterSupervIndex++;
-      this.tempTopicSuggestions = [];
+        this.currentChapterSupervIndex++;
+        this.tempTopicSuggestions = [];
     }
   }
 
   generateTopicsAI(chapterIndex: number) {
     const chapter = this.chapters.at(chapterIndex);
-    const courseTitle = this.courseForm.get('title')?.value;
-
+    const courseTitle = this.courseForm.get('courseTitle')?.value;
+    
     if (!chapter.value.title) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'El capítulo necesita un título' });
-      return;
+        this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'El capítulo necesita un título' });
+        return;
     }
 
     this.loadingSuggestions = true;
     this.aiService.generateTopicsAI(courseTitle, chapter.value.title).subscribe({
-      next: (res: any) => {
-        const data = res.data || res;
-        const suggestedTopics = data.temas || data;
-
-        if (this.wizardStep === 'supervised-curation') {
-          this.tempTopicSuggestions = suggestedTopics;
-          this.currentTopicSuggestionIndex = 0;
-        } else {
-          // Background flow (legacy/manual)
-          suggestedTopics.forEach((t: any) => this.addTema(chapterIndex, t));
+        next: (res: any) => {
+            const data = res.data || res;
+            const suggestedTopics = data.temas || data;
+            
+            if (this.wizardStep === 'supervised-curation') {
+                this.tempTopicSuggestions = suggestedTopics;
+                this.currentTopicSuggestionIndex = 0;
+            } else {
+                // Background flow (legacy/manual)
+                suggestedTopics.forEach((t: any) => this.addTema(chapterIndex, t));
+            }
+            
+            this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: 'Sugerencias de temas recibidas' });
+            this.loadingSuggestions = false;
+        },
+        error: () => {
+            this.loadingSuggestions = false;
         }
-
-        this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: 'Sugerencias de temas recibidas' });
-        this.loadingSuggestions = false;
-      },
-      error: () => {
-        this.loadingSuggestions = false;
-      }
     });
   }
 
@@ -783,17 +544,17 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     this.addTema(chapterIndex, topic);
     this.tempTopicSuggestions.splice(this.currentTopicSuggestionIndex, 1);
     this.messageService.add({ severity: 'success', summary: 'Aprobado', detail: `Tema "${topic.title}" añadido.` });
-
+    
     // Si llegamos al final, reset o cargar más si el usuario quiere
     if (this.currentTopicSuggestionIndex >= this.tempTopicSuggestions.length && this.tempTopicSuggestions.length > 0) {
-      this.currentTopicSuggestionIndex = 0;
+        this.currentTopicSuggestionIndex = 0;
     }
   }
 
   rejectTopic() {
     this.tempTopicSuggestions.splice(this.currentTopicSuggestionIndex, 1);
     if (this.currentTopicSuggestionIndex >= this.tempTopicSuggestions.length && this.tempTopicSuggestions.length > 0) {
-      this.currentTopicSuggestionIndex = 0;
+        this.currentTopicSuggestionIndex = 0;
     }
   }
 
@@ -805,29 +566,29 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     this.currentSupervisingTemaIndex = temaIndex;
 
     this.aiService.generateExerciseSetAI(tema.value.title).subscribe({
-      next: (res: any) => {
-        this.tempExerciseSuggestions = res.data || res;
-        this.supervisingExercises = true;
-        this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: `Se han sugerido ${this.tempExerciseSuggestions.length} ejercicios` });
-        this.loadingSuggestions = false;
-      },
-      error: () => {
-        this.loadingSuggestions = false;
-      }
+        next: (res: any) => {
+            this.tempExerciseSuggestions = res.data || res;
+            this.supervisingExercises = true;
+            this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: `Se han sugerido ${this.tempExerciseSuggestions.length} ejercicios` });
+            this.loadingSuggestions = false;
+        },
+        error: () => {
+            this.loadingSuggestions = false;
+        }
     });
   }
 
   confirmExercises() {
     if (this.currentSupervisingTemaIndex === -1) return;
-
+    
     const activities = this.getActivities(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex);
     if (activities.length === 0) {
-      this.addActivity(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, { title: 'Práctica con Amauta', exercises: [] });
+        this.addActivity(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, { title: 'Práctica con Amauta', exercises: [] });
     }
-
+    
     const activityIndex = 0;
     this.tempExerciseSuggestions.forEach((ex: any) => {
-      this.addExercise(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, activityIndex, ex);
+        this.addExercise(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, activityIndex, ex);
     });
 
     this.supervisingExercises = false;
@@ -849,7 +610,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   scrollToChapter(index: number) {
     const element = document.getElementById(`chapter-card-${index}`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
     }
   }
 
@@ -881,17 +642,17 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     if (this.courseForm.invalid) {
       console.log('--- Resumen de Errores de Formulario ---');
       this.logInvalidControls(this.courseForm);
-
+      
       const missingFields: string[] = [];
-      if (this.courseForm.get('title')?.invalid) missingFields.push('Título del Curso');
+      if (this.courseForm.get('courseTitle')?.invalid) missingFields.push('Título del Curso');
       if (this.courseForm.get('description')?.invalid) missingFields.push('Descripción del Curso');
-
+      
       // Check for errors in chapters
       this.chapters.controls.forEach((chap, i) => {
         if (chap.invalid) {
           if (chap.get('title')?.invalid) missingFields.push(`Título del Capítulo ${i + 1}`);
-          if (chap.get('shortDescription')?.invalid) missingFields.push(`Descripción del Capítulo ${i + 1}`);
-
+          if (chap.get('description')?.invalid) missingFields.push(`Descripción del Capítulo ${i + 1}`);
+          
           const temas = this.getTemas(i);
           temas.controls.forEach((tema, j) => {
             if (tema.invalid) {
@@ -902,29 +663,29 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Faltan datos obligatorios',
-        detail: `Por favor completa: ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}`
+      this.messageService.add({ 
+        severity: 'error', 
+        summary: 'Faltan Datos Obligatorios', 
+        detail: `Por favor completa: ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}` 
       });
       return;
     }
 
     this.saving = true;
     const payload = {
-      ...this.courseForm.value,
-      id: this.courseId, // Incluir el ID si estamos en modo edición
-      isDraft: false
+        ...this.courseForm.value,
+        id: this.courseId, // Incluir el ID si estamos en modo edición
+        isDraft: false
     };
 
     this.courseService.createBulkCourse(payload).subscribe({
       next: (res) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: '¡Curso Publicado!',
-          detail: 'Tu obra maestra ha sido guardada con éxito.'
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: '¡Curso Publicado!', 
+          detail: 'Tu obra maestra ha sido guardada con éxito.' 
         });
-
+        
         localStorage.removeItem('course_builder_draft');
         this.saving = false;
 
@@ -937,10 +698,10 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al guardar:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error de Guardado',
-          detail: 'No pudimos conectar con Amauta para guardar el curso. Inténtalo de nuevo.'
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Error de Guardado', 
+          detail: 'No pudimos conectar con Amauta para guardar el curso. Inténtalo de nuevo.' 
         });
         this.saving = false;
       }
@@ -963,7 +724,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     // Here we could call a specific "AMAUTA" agent endpoint 
     // For now, let's use a generic prompt to simulate the agent
     const context = JSON.stringify(this.courseForm.value);
-
+    
     // Simulating AI response for now to keep it responsive, 
     // or we can use AiService.generateContent with custom prompt
     this.aiService.generateTheoryWithPrompt(
@@ -999,9 +760,5 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     const key = `${chapterIndex}-${temaIndex}`;
     // Por defecto es true (Vista Previa)
     return this.previewModes[key] !== false;
-  }
-
-  private generateTempCode(): string {
-    return 'CRSE-' + Math.random().toString(36).substring(2, 8).toUpperCase();
   }
 }

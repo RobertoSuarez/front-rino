@@ -1,11 +1,33 @@
 <div class="builder-container p-4">
+    <!-- FULL LOADING OVERLAY -->
+    <div *ngIf="loading" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md transition-all duration-500">
+        <div class="loading-wizard-asset relative mb-8">
+            <div class="absolute inset-0 bg-blue-400/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
+            <div class="relative w-40 h-40 flex items-center justify-center bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-[40px] shadow-2xl rotate-12 animate-bounce-slow">
+                <i class="pi pi-sparkles text-7xl text-white"></i>
+            </div>
+            <div class="absolute -bottom-4 -right-4 w-16 h-16 bg-red-500 rounded-3xl flex items-center justify-center shadow-lg rotate-12 animate-pulse">
+                <i class="pi pi-bolt text-3xl text-white"></i>
+            </div>
+        </div>
+        
+        <h2 class="text-4xl font-black text-gray-800 uppercase tracking-tighter mb-2 scale-up-in">CONECTANDO CON AMAUTA AI</h2>
+        <div class="flex items-center gap-2 mb-8">
+            <div class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            <div class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+        </div>
+        
+        <p class="text-gray-400 font-bold uppercase tracking-widest text-sm animate-pulse">Recuperando estructura del curso...</p>
+    </div>
+
     <!-- WIZARD MODE: CARD-BASED SELECTION -->
     <div class="wizard-container" *ngIf="wizardStep !== 'builder'">
         <div class="wizard-card-wrapper fade-in glass-card">
 
             <!-- STEP 1: TOPIC INPUT -->
             <div *ngIf="wizardStep === 'topic'" class="step-content p-8 text-center">
-                <div class="gamified-icon-box mx-auto mb-6">
+                <div class="gamified-icon-box mx-auto mb-6 flex items-center justify-center">
                     <i class="pi pi-sparkles text-5xl text-white"></i>
                 </div>
                 <h2 class="text-5xl font-black mb-4 text-gray-800 uppercase">¿Qué vamos a crear hoy?</h2>
@@ -30,7 +52,7 @@
             <!-- STEP 2: TITLE SUGGESTIONS -->
             <div *ngIf="wizardStep === 'title-suggestions'" class="step-content p-8">
                 <div class="text-center mb-10">
-                    <div class="gamified-icon-box mx-auto mb-4">
+                    <div class="gamified-icon-box mx-auto mb-4 flex items-center justify-center">
                         <i class="pi pi-pencil text-5xl text-white"></i>
                     </div>
                     <h2 class="text-5xl font-black text-gray-800 mb-3 uppercase">Títulos Sugeridos</h2>
@@ -41,7 +63,7 @@
                 <div class="field max-w-2xl mx-auto mb-10">
                     <label class="input-label-mini text-center block mb-2 font-black text-indigo-400">TÍTULO
                         SELECCIONADO</label>
-                    <input type="text" pInputText [formControl]="$any(courseForm.get('courseTitle'))"
+                    <input type="text" pInputText [formControl]="$any(courseForm.get('title'))"
                         class="w-full gamified-title-input text-3xl font-black text-center border-red-400 border-3"
                         placeholder="Escribe el título definitivo aquí...">
                 </div>
@@ -277,7 +299,7 @@
 
                 <div class="sidebar-header flex justify-content-between align-items-center">
                     <h3 class="truncate text-xl font-black m-0 tracking-tighter uppercase font-serif">📓 {{
-                        (courseForm.get('courseTitle')?.value || 'Nuevo Curso') }}</h3>
+                        (courseForm.get('title')?.value || 'Nuevo Curso') }}</h3>
                 </div>
 
                 <div class="chapters-nav mt-8">
@@ -285,7 +307,7 @@
                         class="chapter-item cursor-pointer hover:bg-blue-50 border-3 border-gray-50 rounded-2xl p-4 mb-4 transition-all flex align-items-center gap-4 group"
                         (click)="scrollToChapter(i)">
                         <div
-                            class="w-10 h-10 bg-blue-100 rounded-xl flex align-items-center justify-content-center group-hover:bg-blue-400 transition-colors">
+                            class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-400 transition-colors">
                             <i class="pi pi-bookmark-fill text-blue-500 group-hover:text-white"></i>
                         </div>
                         <span class="truncate font-black text-gray-700 tracking-tight uppercase text-sm">{{
@@ -309,10 +331,10 @@
                         <div class="h-10 w-1 bg-gray-100 rounded-full"></div>
                         <div>
                             <span class="text-xs font-black text-gray-400 tracking-widest uppercase block mb-1">Editor
-                                de Cátedra</span>
+                                de Curso</span>
                             <div class="flex align-items-center gap-3">
                                 <span
-                                    class="text-2xl font-black text-gray-800 uppercase tracking-tighter">{{courseForm.get('courseTitle')?.value
+                                    class="text-2xl font-black text-gray-800 uppercase tracking-tighter">{{courseForm.get('title')?.value
                                     || 'SIN TÍTULO'}}</span>
                                 <span class="ai-badge" *ngIf="autosaving">SYNCING...</span>
                             </div>
@@ -335,13 +357,14 @@
                 <div class="gamified-input-card mb-12 border-indigo-100 !p-10">
                     <div class="flex align-items-center gap-5 mb-10 border-b-4 border-slate-50 pb-6">
                         <div
-                            class="w-16 h-16 bg-indigo-50 rounded-2xl flex align-items-center justify-content-center border-b-4 border-indigo-200">
+                            class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center border-b-4 border-indigo-200">
                             <i class="pi pi-cog text-3xl text-indigo-500"></i>
                         </div>
                         <div>
-                            <h2 class="text-4xl font-black m-0 text-gray-800 tracking-tighter uppercase">Identidad
-                                Académica</h2>
-                            <p class="text-gray-400 font-bold m-0 uppercase tracking-widest text-sm">Configura el ADN de
+                            <h2 class="text-4xl font-black m-0 text-gray-800 tracking-tighter uppercase">Información
+                                del Curso</h2>
+                            <p class="text-gray-400 font-bold m-0 uppercase tracking-widest text-sm">Configura la
+                                información básica de
                                 tu curso</p>
                         </div>
                     </div>
@@ -349,8 +372,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <div class="field">
                             <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Título
-                                de la Obra</label>
-                            <input pInputText formControlName="courseTitle"
+                                del Curso</label>
+                            <input pInputText formControlName="title"
                                 class="gamified-title-input w-full !text-2xl font-black !p-5 !border-gray-100 hover:border-indigo-200">
                         </div>
                         <div class="field">
@@ -364,11 +387,11 @@
                         </div>
                         <div class="field col-span-2">
                             <label
-                                class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Narrativa
-                                y Objetivos</label>
+                                class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Descripción
+                                del curso</label>
                             <textarea pInputTextarea formControlName="description" rows="5" autoResize="true"
                                 class="gamified-desc-preview w-full !text-xl !leading-relaxed !font-bold !bg-slate-50 !border-none"
-                                placeholder="Escribe la misión de este curso..."></textarea>
+                                placeholder="Escribe la descripción de este curso..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -379,7 +402,7 @@
                         [id]="'chapter-card-' + i" class="mb-16">
 
                         <div class="gamified-chapter-card !p-10 border-b-8 border-purple-200 relative mb-12">
-                            <div class="chapter-label !text-lg !px-6 !py-2 !-top-6 shadow-md uppercase">MÓDULO #{{i +
+                            <div class="chapter-label !text-lg !px-6 !py-2 !-top-6 shadow-md uppercase">CAPÍTULO #{{i +
                                 1}}</div>
 
                             <!-- Chapter Header -->
@@ -388,16 +411,17 @@
                                 <div class="flex-1 mr-10">
                                     <span
                                         class="text-xs font-black text-purple-400 tracking-widest uppercase mb-1 block">Título
-                                        del Módulo</span>
+                                        del Capítulo</span>
                                     <input pInputText formControlName="title" placeholder="Define el eje temático..."
                                         class="w-full !bg-transparent !border-none !shadow-none !text-4xl font-black text-gray-800 focus:outline-none uppercase tracking-tighter">
-                                    <input pInputText formControlName="description"
+                                    <textarea pInputTextarea formControlName="shortDescription"
+                                        [autoResize]="true" rows="1"
                                         placeholder="¿Qué descubrirán en este capítulo?"
-                                        class="w-full !bg-transparent !border-none !shadow-none !text-xl text-gray-400 font-bold focus:outline-none mt-2">
+                                        class="w-full !bg-transparent !border-none !shadow-none !text-xl text-gray-400 font-bold focus:outline-none mt-2 resize-none"></textarea>
                                 </div>
                                 <button pButton icon="pi pi-trash"
                                     class="gamified-action-btn secondary !rounded-full w-20 h-20 !text-red-400 !border-red-100"
-                                    (click)="removeChapter(i)" pTooltip="Eliminar Módulo"></button>
+                                    (click)="removeChapter(i)" pTooltip="Eliminar Capítulo"></button>
                             </div>
 
                             <!-- Temas (Topics) inside Chapter -->
@@ -411,7 +435,7 @@
                                             <div class="flex-1">
                                                 <div class="flex align-items-center gap-4 mb-3">
                                                     <div
-                                                        class="w-12 h-12 bg-green-100 rounded-xl flex align-items-center justify-content-center border-b-4 border-green-200">
+                                                        class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center border-b-4 border-green-200">
                                                         <span class="font-black text-green-600 text-xl">{{j+1}}</span>
                                                     </div>
                                                     <input pInputText formControlName="title"
@@ -421,7 +445,7 @@
                                                     <!-- Mission Callout Box (Short Description) -->
                                                     <div class="mission-callout-box">
                                                         <label
-                                                            class="font-black text-gray-400 text-[10px] tracking-widest uppercase mb-4 block">Misión
+                                                            class="font-black text-gray-400 text-[10px] tracking-widest uppercase mb-4 block">Propósito
                                                             del Tema (Descripción Corta)</label>
                                                         <textarea pInputTextarea formControlName="shortDescription"
                                                             rows="3" autoResize="true"
@@ -435,7 +459,7 @@
                                                             class="flex justify-content-between align-items-center mb-6">
                                                             <div class="flex align-items-center gap-3">
                                                                 <div
-                                                                    class="w-8 h-8 bg-indigo-50 rounded-lg flex align-items-center justify-content-center">
+                                                                    class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
                                                                     <i class="pi pi-book text-indigo-400"></i>
                                                                 </div>
                                                                 <label
@@ -445,16 +469,15 @@
                                                             <button pButton
                                                                 [icon]="isPreviewMode(i, j) ? 'pi pi-pencil' : 'pi pi-eye'"
                                                                 [label]="isPreviewMode(i, j) ? 'VOLVER AL EDITOR' : 'VISTA PREVIA'"
-                                                                class="p-button-text p-button-sm font-black text-[10px] tracking-widest"
+                                                                class="gamified-toggle-btn p-button-sm text-[10px]"
                                                                 (click)="togglePreview(i, j)"></button>
                                                         </div>
 
                                                         <!-- HTML Visor / Editor Area -->
                                                         <div class="theory-area"
                                                             [ngClass]="{'preview-active': isPreviewMode(i, j)}">
-                                                            <quill-editor *ngIf="!isPreviewMode(i, j)" 
-                                                                formControlName="theory" 
-                                                                theme="snow"
+                                                            <quill-editor *ngIf="!isPreviewMode(i, j)"
+                                                                formControlName="theory" theme="snow"
                                                                 placeholder="Contenido teórico generado por Amauta..."
                                                                 [styles]="{'height': '400px', 'background': 'white', 'border-radius': '0 0 1rem 1rem'}">
                                                             </quill-editor>
@@ -477,97 +500,297 @@
                                         <div formArrayName="activities" class="activity-list-container mt-10">
                                             <div *ngFor="let activity of getActivities(i, j).controls; let k = index"
                                                 [formGroupName]="k"
-                                                class="p-6 bg-slate-50/50 rounded-3xl border-2 border-white shadow-sm hover:shadow-md transition-shadow">
-
-                                                <!-- List Item Header -->
-                                                <div class="activity-item-header"
-                                                    (click)="toggleActivityExpansion(i, j, k)">
-                                                    <div class="flex align-items-center gap-4 flex-1">
-                                                        <div
-                                                            class="w-10 h-10 bg-indigo-50 rounded-xl flex align-items-center justify-content-center border-b-4 border-indigo-100">
+                                                class="p-6 bg-slate-50/50 rounded-3xl border-2 border-white mb-6">
+                                                <!-- List Item Header (Non-clickable container) -->
+                                                <div class="activity-item-header flex items-center justify-between p-4" style="cursor: default;">
+                                                    <!-- Clickable area for expansion -->
+                                                    <div class="flex align-items-center gap-4 flex-1 cursor-pointer" (click)="toggleActivityExpansion(i, j, k)">
+                                                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center border-b-4 border-indigo-100">
                                                             <i class="pi pi-bolt text-indigo-500 text-sm"></i>
                                                         </div>
                                                         <div class="flex-1">
                                                             <input pInputText formControlName="title"
-                                                                placeholder="Propósito de la misión..."
+                                                                placeholder="Propósito de la actividad..."
                                                                 class="!bg-transparent !border-none !shadow-none font-black text-gray-700 text-base uppercase tracking-tight focus:outline-none w-full"
                                                                 (click)="$event.stopPropagation()">
                                                         </div>
+                                                        <i class="pi" [ngClass]="isActivityExpanded(i, j, k) ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
                                                     </div>
 
-                                                    <div class="flex align-items-center gap-3">
-                                                        <span
-                                                            class="text-xs font-black text-gray-300 uppercase tracking-widest mr-2">
-                                                            {{ getExercises(i, j, k).length }} Desafíos
+                                                    <!-- Isolated Action Buttons -->
+                                                    <div class="flex align-items-center gap-3 ml-4" (click)="$event.stopPropagation()">
+                                                        <span class="text-xs font-black text-gray-300 uppercase tracking-widest mr-2">
+                                                            {{ getExercises(i, j, k).length }} Ejercicios
                                                         </span>
+                                                        <div class="flex gap-2">
+                                                            <button class="gamified-btn-3d"
+                                                                [pTooltip]="getExercisesViewMode(i, j, k) === 'list' ? 'Interactuar con vista de tarjetas' : 'Ver todo en lista compacta'"
+                                                                [ngClass]="getExercisesViewMode(i, j, k) === 'list' ? 'btn-3d-indigo' : 'btn-3d-amber'"
+                                                                (click)="toggleExercisesView(i, j, k)">
+                                                                <i class="pi" [ngClass]="getExercisesViewMode(i, j, k) === 'list' ? 'pi-th-large' : 'pi-list'"></i>
+                                                                {{ getExercisesViewMode(i, j, k) === 'list' ? 'VISTA TARJETAS' : 'VISTA LISTA' }}
+                                                            </button>
+                                                            <button class="gamified-btn-3d btn-3d-blue"
+                                                                (click)="openActivitySandbox(getActivity(i, j, k).value)"
+                                                                pTooltip="Abrir Sandbox Completo">
+                                                                <i class="pi pi-play"></i>
+                                                            </button>
+                                                        </div>
                                                         <button pButton icon="pi pi-trash"
                                                             class="p-button-text p-button-danger p-button-sm !w-10 !h-10 p-0"
-                                                            (click)="removeActivity(i, j, k); $event.stopPropagation()"
-                                                            pTooltip="Eliminar Misión"></button>
-                                                        <i class="pi"
-                                                            [ngClass]="isActivityExpanded(i, j, k) ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+                                                            (click)="removeActivity(i, j, k)"
+                                                            pTooltip="Eliminar"></button>
                                                     </div>
                                                 </div>
 
                                                 <!-- Expanded Content -->
                                                 <div *ngIf="isActivityExpanded(i, j, k)"
                                                     class="activity-expand-content">
-                                                    <div class="flex align-items-center gap-3 mb-6">
-                                                        <h4
-                                                            class="text-sm font-black text-gray-400 uppercase tracking-widest m-0">
-                                                            Laboratorio de Práctica</h4>
-                                                        <div class="flex-1 border-t-2 border-gray-50"></div>
-                                                    </div>
+                                                    
+                                                    <!-- LIST VIEW -->
+                                                    <div *ngIf="getExercisesViewMode(i, j, k) === 'list'">
+                                                        <div class="flex align-items-center gap-3 mb-6">
+                                                            <h4
+                                                                class="text-sm font-black text-gray-400 uppercase tracking-widest m-0">
+                                                                Laboratorio de Práctica (Lista)</h4>
+                                                            <div class="flex-1 border-t-2 border-gray-50"></div>
+                                                        </div>
 
                                                     <div formArrayName="exercises"
                                                         class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index"
-                                                            [formGroupName]="l" class="gamified-exercise-item group/ex">
-                                                            <div
-                                                                class="h-9 w-9 bg-blue-50 rounded-lg flex align-items-center justify-content-center font-black text-blue-400 text-sm border-b-2 border-blue-100">
-                                                                {{l+1}}
+                                                            [formGroupName]="l" class="bg-white border-2 border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all relative group/ex flex flex-col gap-3">
+                                                            
+                                                            <div class="flex justify-between items-center mb-1">
+                                                                <div class="flex items-center gap-3">
+                                                                    <div class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center font-black text-indigo-500 text-sm border-b-2 border-indigo-100">
+                                                                        <i [class]="getExerciseIcon(getExercises(i, j, k).at(l).get('typeExercise')?.value)"
+                                                                            [style.color]="getExerciseColor(getExercises(i, j, k).at(l).get('typeExercise')?.value)"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="block font-black text-[10px] text-slate-400 uppercase tracking-widest leading-tight">EJERCICIO {{l+1}}</span>
+                                                                        <span class="block font-bold text-xs text-slate-500">{{ exerciseTypeMap[getExercises(i, j, k).at(l).get('typeExercise')?.value]?.label || 'Selección Simple' }}</span>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="flex gap-1 md:opacity-0 md:group-hover/ex:opacity-100 transition-opacity">
+                                                                    <button pButton icon="pi pi-pencil"
+                                                                        class="p-button-rounded p-button-text p-button-sm !text-indigo-500 hover:!bg-indigo-50"
+                                                                        (click)="openEditExerciseDialog(i, j, k, l)"
+                                                                        pTooltip="Editar"></button>
+                                                                    <button pButton icon="pi pi-trash"
+                                                                        class="p-button-rounded p-button-text p-button-danger p-button-sm hover:!bg-red-50"
+                                                                        (click)="removeExercise(i, j, k, l)"
+                                                                        pTooltip="Quitar"></button>
+                                                                </div>
                                                             </div>
-                                                            <input pInputText formControlName="statement"
-                                                                placeholder="Escribe el reto..."
-                                                                class="flex-1 !bg-transparent !border-none !shadow-none font-bold text-gray-600 text-sm focus:ring-0">
-                                                            <button pButton icon="pi pi-times"
-                                                                class="p-button-text p-button-danger p-button-sm opacity-0 group-hover/ex:opacity-100 transition-opacity"
-                                                                (click)="removeExercise(i, j, k, l)"></button>
+                                                            
+                                                            <div class="mt-1">
+                                                                <input pInputText formControlName="statement"
+                                                                    placeholder="Enunciado del ejercicio..."
+                                                                    class="w-full !bg-slate-50 !border-slate-200 !rounded-xl font-bold text-slate-700 text-sm focus:!border-indigo-400 focus:!ring-2 focus:!ring-indigo-100 transition-colors px-4 py-3">
+                                                            </div>
                                                         </div>
 
-                                                        <button pButton icon="pi pi-plus" label="AÑADIR RETO"
-                                                            class="p-button-outlined p-button-secondary !border-dashed !rounded-xl !p-3 font-black text-[10px] tracking-widest text-gray-400 hover:text-indigo-400 hover:border-indigo-200 transition-colors"
-                                                            (click)="addExercise(i, j, k)"></button>
+                                                        <button class="gamified-btn-3d btn-3d-indigo !w-full !py-4"
+                                                            (click)="addExercise(i, j, k)">
+                                                            <i class="pi pi-plus"></i> AÑADIR EJERCICIO
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- SANDBOX VIEW (Embedded) -->
+                                                    <div *ngIf="getExercisesViewMode(i, j, k) === 'sandbox'" class="embedded-sandbox-container">
+                                                        <div class="flex align-items-center gap-3 mb-6">
+                                                            <h4
+                                                                class="text-sm font-black text-gray-400 uppercase tracking-widest m-0">
+                                                                Vista Previa Sandbox</h4>
+                                                            <div class="flex-1 border-t-2 border-gray-50"></div>
+                                                        </div>
+
+                                                        <div *ngIf="getExercises(i, j, k).length === 0" class="p-8 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                                                            <i class="pi pi-info-circle text-4xl text-gray-300 mb-4"></i>
+                                                            <p class="text-gray-400 font-bold m-0">No hay ejercicios para previsualizar. ¡Añade uno!</p>
+                                                        </div>
+
+                                                        <div *ngIf="getExercises(i, j, k).length > 0" class="embedded-sandbox-frame">
+                                                            <!-- Carousel of Exercises in 3D Card style -->
+                                                            <div class="flex flex-col gap-6">
+                                                                <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index" 
+                                                                     class="sandbox-preview-card">
+                                                                    <div class="preview-header">
+                                                                        <span class="preview-badge">EJERCICIO {{l+1}}</span>
+                                                                        <span class="preview-type">
+                                                                            <i [class]="getExerciseIcon(ex.get('typeExercise')?.value)"></i>
+                                                                            {{ exerciseTypeMap[ex.get('typeExercise')?.value]?.label }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="preview-body">
+                                                                        <p class="preview-statement">{{ ex.get('statement')?.value }}</p>
+                                                                        
+                                                                        <!-- Gamified visual representation of the exercise type -->
+                                                                        <div class="preview-visual-aid mt-4 p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                                                                            <div [ngSwitch]="ex.get('typeExercise')?.value">
+                                                                                <div *ngSwitchCase="'selection_single'" class="flex flex-col gap-3">
+                                                                                    <div *ngFor="let opt of (ex.get('optionSelectOptions')?.value?.length ? ex.get('optionSelectOptions')?.value : [{option: 'Opción de ejemplo 1'}, {option: 'Opción de ejemplo 2'}, {option: 'Opción de ejemplo 3'}])" 
+                                                                                         class="min-h-12 bg-white border-2 border-gray-200 rounded-2xl flex items-center px-4 hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm cursor-pointer">
+                                                                                        <div class="h-6 w-6 rounded-full border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center"><div class="hidden h-2.5 w-2.5 bg-blue-500 rounded-full"></div></div>
+                                                                                        <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'selection_multiple'" class="flex flex-col gap-3">
+                                                                                    <div *ngFor="let opt of (ex.get('optionSelectOptions')?.value?.length ? ex.get('optionSelectOptions')?.value : [{option: 'Primera opción correcta'}, {option: 'Segunda opción correcta'}])" 
+                                                                                         class="min-h-12 bg-white border-2 border-gray-200 rounded-2xl flex items-center px-4 hover:border-purple-400 hover:bg-purple-50 transition-colors shadow-sm cursor-pointer">
+                                                                                        <div class="h-6 w-6 rounded-lg border-2 border-gray-300 mr-4 flex-shrink-0"></div>
+                                                                                        <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'vertical_ordering'" class="flex flex-col gap-3 relative">
+                                                                                    <div class="absolute left-6 top-3 bottom-3 w-1 bg-slate-200 z-0 rounded-full"></div>
+                                                                                    <div *ngFor="let opt of (ex.get('optionsVerticalOrdering')?.value?.length ? ex.get('optionsVerticalOrdering')?.value : [{text: 'Paso 1'}, {text: 'Paso 2'}, {text: 'Paso 3'}])" 
+                                                                                         class="relative z-10 min-h-12 bg-white border-2 border-cyan-200 rounded-2xl flex items-center px-4 shadow-sm cursor-grab hover:shadow-md transition-shadow">
+                                                                                        <div class="h-8 w-8 bg-cyan-50 rounded-lg flex items-center justify-center text-cyan-500 font-black text-xs mr-4"><i class="pi pi-bars"></i></div>
+                                                                                        <div class="text-slate-600 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'horizontal_ordering'" class="flex flex-wrap gap-2">
+                                                                                    <div *ngFor="let opt of (ex.get('optionsHorizontalOrdering')?.value?.length ? ex.get('optionsHorizontalOrdering')?.value : [{text: 'Palabra 1'}, {text: 'Palabra 2'}, {text: 'Palabra 3'}])" 
+                                                                                         class="min-h-12 bg-white border-2 border-b-4 border-teal-200 rounded-2xl flex items-center px-5 shadow-sm cursor-grab hover:bg-teal-50 hover:border-teal-300 transition-colors active:border-b-2 active:translate-y-[2px]">
+                                                                                        <div class="text-teal-700 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'match_pairs'" class="flex justify-between gap-4">
+                                                                                    <div class="flex flex-col gap-3 flex-1">
+                                                                                        <div *ngFor="let opt of (ex.get('optionsMatchPairsLeft')?.value?.length ? ex.get('optionsMatchPairsLeft')?.value : [{text: 'Idea 1'}, {text: 'Idea 2'}])" 
+                                                                                             class="min-h-14 bg-white border-2 border-orange-200 rounded-2xl flex items-center justify-center px-4 text-center shadow-sm hover:border-orange-400 cursor-pointer transition-colors">
+                                                                                             <span class="text-slate-600 font-bold text-sm">{{ opt.text || opt }}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="flex flex-col flex-1 justify-center items-center pointer-events-none opacity-20 px-2 w-8">
+                                                                                        <div *ngFor="let ln of [1,2]" class="h-1 bg-slate-400 w-full mb-14 rotate-12"></div>
+                                                                                    </div>
+                                                                                    <div class="flex flex-col gap-3 flex-1">
+                                                                                        <div *ngFor="let opt of (ex.get('optionsMatchPairsRight')?.value?.length ? ex.get('optionsMatchPairsRight')?.value : [{text: 'Definición A'}, {text: 'Definición B'}])" 
+                                                                                             class="min-h-14 bg-white border-2 border-emerald-200 rounded-2xl flex items-center justify-center px-4 text-center shadow-sm hover:border-emerald-400 cursor-pointer transition-colors">
+                                                                                             <span class="text-slate-600 font-bold text-sm">{{ opt.text || opt }}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'phishing_selection_multiple'" class="flex flex-col gap-4">
+                                                                                    <div *ngIf="ex.get('phishingImageUrl')?.value" class="w-full h-40 rounded-2xl overflow-hidden border-2 border-red-200 shadow-sm relative group cursor-pointer hover:border-red-400">
+                                                                                        <img [src]="ex.get('phishingImageUrl')?.value" class="w-full h-full object-cover">
+                                                                                        <div class="absolute inset-0 bg-red-900/10 hidden group-hover:flex items-center justify-center">
+                                                                                            <i class="pi pi-search-plus text-3xl text-white drop-shadow-md"></i>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div *ngIf="ex.get('phishingContext')?.value" class="p-4 bg-white rounded-2xl border-l-4 border-l-red-400 border border-slate-200 text-sm text-slate-700 font-semibold shadow-sm">
+                                                                                        <i class="pi pi-comment text-red-400 mr-2 text-lg align-middle"></i> 
+                                                                                        <span class="align-middle">{{ ex.get('phishingContext')?.value }}</span>
+                                                                                    </div>
+                                                                                    <div class="flex flex-col gap-3 mt-2">
+                                                                                        <div *ngFor="let opt of (ex.get('optionsPhishingSelection')?.value?.length ? ex.get('optionsPhishingSelection')?.value : [{option: 'Indicador de Phishing 1'}, {option: 'Indicador 2'}])" 
+                                                                                             class="min-h-12 bg-white border-2 border-red-200 rounded-2xl flex items-center px-4 hover:border-red-400 hover:bg-red-50 transition-colors shadow-sm cursor-pointer">
+                                                                                            <div class="h-6 w-6 rounded-lg border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center"></div>
+                                                                                            <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchDefault class="h-28 bg-white border-2 border-slate-200 border-dashed rounded-2xl flex items-center justify-center text-slate-400 font-bold tracking-wide shadow-sm">
+                                                                                    <i class="pi pi-image text-2xl mr-3 text-slate-300"></i> Elemento interactivo
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="preview-footer">
+                                                                        <button pButton icon="pi pi-pencil" label="Editar" class="p-button-text p-button-sm" (click)="openEditExerciseDialog(i, j, k, l)"></button>
+                                                                        <button pButton icon="pi pi-external-link" label="Probar" class="p-button-sm p-button-outlined" (click)="openExercisePreview(ex.value)"></button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button pButton icon="pi pi-plus-circle"
-                                                label="VINCULAR NUEVA MISIÓN DINÁMICA"
-                                                class="p-button-text text-indigo-400 font-black text-xs uppercase tracking-widest self-start hover:bg-indigo-50/50 px-6 py-3 rounded-2xl mt-4 border-2 border-dashed border-indigo-50"
-                                                (click)="addActivity(i, j)"></button>
+                                            <div class="flex gap-4 items-center mt-6">
+                                                <button class="gamified-btn-3d btn-3d-indigo"
+                                                    (click)="addActivity(i, j)">
+                                                    <i class="pi pi-plus-circle"></i> VINCULAR NUEVA ACTIVIDAD
+                                                </button>
+                                                <button class="gamified-btn-3d btn-3d-amber"
+                                                    (click)="openGenWizard(i, j)">
+                                                    <i class="pi pi-sparkles"></i> GENERAR CON IA
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mt-8">
-                                    <button pButton label="NUEVA CÁPSULA DE CONOCIMIENTO (TEMA)" icon="pi pi-plus"
-                                        class="gamified-action-btn secondary !text-indigo-400 !border-indigo-100 !py-4 !px-8 text-sm font-black"
-                                        (click)="addTema(i)"></button>
+                                    <button class="gamified-btn-3d btn-3d-indigo !py-4 !px-8"
+                                        (click)="addTema(i)">
+                                        <i class="pi pi-plus"></i> NUEVO TEMA
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex justify-content-center py-16 border-t-8 border-dashed border-gray-100 mt-10">
-                        <button pButton label="EXPANDIR CUADERNO CON UN NUEVO MÓDULO" icon="pi pi-plus-circle"
-                            class="p-button-lg p-button-rounded px-12 py-6 border-indigo-400 text-indigo-600 bg-white font-black border-4 shadow-xl hover:-translate-y-2 transition-transform"
-                            (click)="addChapter()"></button>
+                        <button class="gamified-btn-3d btn-3d-indigo !px-12 !py-6 !text-xl"
+                            (click)="addChapter()">
+                            <i class="pi pi-plus-circle"></i> EXPANDIR CUADERNO CON UN NUEVO CAPÍTULO
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- EXERCISE PREVIEW DIALOG -->
+<p-dialog [(visible)]="displayExercisePreview" [modal]="true" [draggable]="false" [resizable]="false" 
+    [header]="'Previsualización de Ejercicio'" [style]="{ width: '600px' }">
+    <div *ngIf="selectedExerciseForPreview" class="p-4">
+        <div class="bg-gray-50 p-6 rounded-3xl border-b-6 border-gray-100">
+            <div class="flex items-center gap-3 mb-4">
+                <i [class]="getExerciseIcon(selectedExerciseForPreview.typeExercise)" 
+                   class="text-2xl text-indigo-500"></i>
+                <span class="font-black text-gray-400 uppercase tracking-widest text-xs">
+                    {{ exerciseTypeMap[selectedExerciseForPreview.typeExercise]?.label }}
+                </span>
+            </div>
+            <h3 class="text-2xl font-black text-gray-800 mb-6">{{ selectedExerciseForPreview.statement }}</h3>
+            
+            <div class="space-y-3">
+                <div *ngFor="let opt of selectedExerciseForPreview.optionSelectOptions" 
+                    class="p-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-600 flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-200"></div>
+                    {{ opt }}
+                </div>
+            </div>
+
+            <div *ngIf="selectedExerciseForPreview.hind" class="mt-6 p-4 bg-amber-50 border-2 border-amber-100 rounded-2xl flex gap-3">
+                <i class="pi pi-lightbulb text-amber-500"></i>
+                <p class="m-0 text-sm font-bold text-amber-700"><strong>Pista:</strong> {{ selectedExerciseForPreview.hind }}</p>
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="CERRAR" icon="pi pi-times" (click)="displayExercisePreview = false" 
+            class="gamified-toggle-btn"></p-button>
+    </ng-template>
+</p-dialog>
+
+<!-- AI EXERCISE GENERATION WIZARD -->
+<app-generate-exercises-dialog #genWizard
+    [activityId]="null"
+    (exercisesGenerated)="onExercisesGenerated($event)">
+</app-generate-exercises-dialog>
+
+<!-- NUEVO DIÁLOGO DE EDICIÓN DE EJERCICIO -->
+<app-exercise-editor-dialog #exerciseEditorDialog
+    (onSave)="onExerciseSave($event)">
+</app-exercise-editor-dialog>
 
 <!-- Floating Amauta Fab -->
 <button class="amauta-fab shadow-xl" (click)="toggleChat()" pTooltip="Consultar al Amauta" tooltipPosition="left">

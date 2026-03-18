@@ -771,7 +771,7 @@ export class GenerateExercisesDialogComponent implements OnInit {
           detail: `${this.previewExercises.length} ejercicio${this.previewExercises.length !== 1 ? 's guardados' : ' guardado'} correctamente.`,
           life: 3000,
         });
-        this.exercisesGenerated.emit([]);
+        this.exercisesGenerated.emit(this.previewExercises);
         this.onClose();
       },
       error: () => {

@@ -33,6 +33,11 @@ export const adminRoutes: Routes = [
         path: 'builder',
         loadComponent: () => import('./courses/course-builder.component').then(m => m.CourseBuilderComponent),
         title: 'Constructor de Cursos IA'
+      },
+      {
+        path: 'builder/:id',
+        loadComponent: () => import('./courses/course-builder.component').then(m => m.CourseBuilderComponent),
+        title: 'Editar Curso IA'
       }
     ]
   },

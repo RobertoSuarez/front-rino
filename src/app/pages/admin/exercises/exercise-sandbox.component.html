@@ -10,27 +10,17 @@
 
     <!-- ── Topbar ─────────────────────────────────────────────────────────── -->
     <div class="sandbox-topbar">
-        <!-- Botón salir -->
-        <p-button icon="pi pi-arrow-left" label="Salir del Sandbox" severity="secondary" [outlined]="true" size="small"
-            (onClick)="goBack()">
-        </p-button>
+        <button class="btn-3d btn-secondary" (click)="goBack()">
+            <i class="pi pi-arrow-left"></i> SALIR
+        </button>
 
-        <!-- Badge modo sandbox -->
-        <span class="sandbox-badge">
-            <i class="pi pi-eye"></i>
-            Modo Sandbox — Vista del Profesor
-        </span>
-
-        <!-- Título actividad -->
         <span class="topbar-activity-title">{{ safeActivity.title }}</span>
 
-        <!-- Progreso -->
         <div class="topbar-progress">
-            <span>{{ currentExerciseIndex() + 1 }}/{{ safeActivity.exercises.length }}</span>
             <div class="progress-bar-wrap">
                 <p-progressBar [value]="progress" [showValue]="false"></p-progressBar>
             </div>
-            <span>{{ progress }}%</span>
+            <span>{{ currentExerciseIndex() + 1 }} / {{ safeActivity.exercises.length }}</span>
         </div>
     </div>
 
@@ -40,41 +30,30 @@
         <!-- Estado vacío -->
         <div *ngIf="safeActivity.exercises.length === 0" class="empty-state">
             <i class="pi pi-inbox"></i>
-            <p style="font-size:1.1rem; font-weight:600; color:#e2e8f0;">Esta actividad no tiene ejercicios aún.</p>
-            <p style="font-size:0.85rem; margin-top:8px;">Crea el primer ejercicio desde la lista para poder
-                previsualizarlo aquí.</p>
+            <h2 style="font-weight:900; color:#1e293b;">¡Vaya! No hay ejercicios.</h2>
+            <p style="font-size:1.1rem; color:#64748b;">Parece que esta actividad aún está en blanco.</p>
         </div>
 
         <!-- Ejercicio actual -->
         <div *ngIf="safeActivity.exercises.length > 0" class="exercise-card">
 
-            <!-- Card header -->
             <div class="exercise-card-head">
                 <div class="exercise-type-chip">
                     <i [class]="typeInfo.icon"></i>
                     {{ typeInfo.label }}
                 </div>
-                <span class="exercise-number">
-                    Ejercicio {{ currentExerciseIndex() + 1 }} de {{ safeActivity.exercises.length }}
-                </span>
+                <span class="exercise-number">EJERCICIO {{ currentExerciseIndex() + 1 }}</span>
             </div>
 
-            <!-- Card body -->
             <div class="exercise-card-body">
-
-                <!-- Enunciado -->
                 <h2 class="exercise-statement">{{ currentExercise.statement }}</h2>
 
-                <!-- Pista -->
                 <div *ngIf="currentExercise.hind" class="exercise-hint">
                     <i class="pi pi-lightbulb"></i>
-                    <span><strong>Pista:</strong> {{ currentExercise.hind }}</span>
+                    <span>{{ currentExercise.hind }}</span>
                 </div>
 
-
-                <!-- Componente de ejercicio -->
                 <div class="exercise-component-wrap" [ngSwitch]="currentExercise.typeExercise">
-
                     <app-single-selection-exercise *ngSwitchCase="'selection_single'"
                         [options]="currentExercise.optionSelectOptions" [selectedOption]="currentAnswer?.answerSelect"
                         (answerSubmitted)="onAnswerSubmitted($event)">
@@ -136,110 +115,70 @@
                 </div>
             </div>
 
-            <!-- ── Action bar ── -->
             <div class="action-bar">
-                <!-- Navegación -->
-                <div class="action-nav">
-                    <p-button *ngIf="!isFirstExercise" icon="pi pi-arrow-left" label="Anterior" severity="secondary"
-                        [outlined]="true" (onClick)="previousExercise()">
-                    </p-button>
-
-                    <p-button *ngIf="!isLastExercise" icon="pi pi-arrow-right" iconPos="right" label="Siguiente"
-                        severity="secondary" [outlined]="true" (onClick)="nextExercise()">
-                    </p-button>
+                <div class="flex gap-4">
+                    <button *ngIf="!isFirstExercise" class="btn-3d btn-secondary" (click)="previousExercise()">
+                        <i class="pi pi-arrow-left"></i>
+                    </button>
+                    <button *ngIf="!isLastExercise" class="btn-3d btn-secondary" (click)="nextExercise()">
+                        <i class="pi pi-arrow-right"></i>
+                    </button>
                 </div>
 
-                <!-- Verificar / Reintentar -->
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <p-button *ngIf="answerSubmitted()" icon="pi pi-refresh" label="Reintentar" severity="secondary"
-                        [outlined]="true" size="small" (onClick)="restartCurrentExercise()">
-                    </p-button>
+                <div class="flex gap-4 items-center">
+                    <button *ngIf="answerSubmitted()" class="btn-3d btn-secondary" (click)="restartCurrentExercise()">
+                        <i class="pi pi-refresh"></i> REINTENTAR
+                    </button>
 
-                    <p-button *ngIf="!answerSubmitted()" icon="pi pi-check" iconPos="right" label="Verificar respuesta"
-                        [loading]="submitting()" [disabled]="!hasAnswer()" (onClick)="verifyAnswer()">
-                    </p-button>
+                    <button *ngIf="!answerSubmitted()" class="btn-3d btn-green" 
+                        [disabled]="!hasAnswer() || submitting()" (click)="verifyAnswer()">
+                        {{ submitting() ? 'VERIFICANDO...' : 'COMPROBAR' }}
+                    </button>
 
-                    <p-button *ngIf="answerSubmitted()" icon="pi pi-eye" iconPos="right" label="Ver feedback"
-                        severity="info" (onClick)="showFeedbackDrawer.set(true)">
-                    </p-button>
+                    <button *ngIf="answerSubmitted()" class="btn-3d btn-blue" (click)="showFeedbackDrawer.set(true)">
+                        <i class="pi pi-eye"></i> VER RESULTADO
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-<!-- ── Dialog de Feedback ─────────────────────────────────────────────────── -->
+<!-- ── Feedback Dialog ─────────────────────────────────────────────────── -->
 <p-dialog [(visible)]="showFeedbackDrawer" [modal]="true" [draggable]="false" [resizable]="false" [showHeader]="false"
     [closable]="false"
-    [style]="{'width': '680px', 'max-width': '95vw', 'border-radius': '20px', 'overflow': 'hidden', 'padding': '0'}"
-    [contentStyle]="{'padding': '0', 'border-radius': '20px'}">
+    [style]="{'width': '500px', 'max-width': '95vw', 'border-radius': '32px'}"
+    [contentStyle]="{'padding': '0', 'border-radius': '32px'}">
 
     <div class="fd-wrap" *ngIf="currentFeedback()">
-
-        <!-- Colored header banner -->
         <div class="fd-header" [class]="'fd-header--' + feedbackClass">
-            <div class="fd-header-left">
-                <div class="fd-icon" [class]="'fd-icon--' + feedbackClass">
-                    <i class="pi" [ngClass]="{
-                        'pi-check-circle':      feedbackClass === 'success',
-                        'pi-exclamation-circle': feedbackClass === 'partial',
-                        'pi-times-circle':       feedbackClass === 'error'
-                    }"></i>
-                </div>
-                <div>
-                    <div class="fd-title">{{ feedbackTitle }}</div>
-                    <div class="fd-subtitle">Ejercicio {{ currentExerciseIndex() + 1 }} de {{
-                        activity()?.exercises?.length }}</div>
-                </div>
+            <div class="fd-icon" [class]="'fd-icon--' + feedbackClass">
+                <i class="pi" [ngClass]="{
+                    'pi-check':      feedbackClass === 'success',
+                    'pi-exclamation-triangle': feedbackClass === 'partial',
+                    'pi-times':       feedbackClass === 'error'
+                }"></i>
             </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="fd-score" [class]="'fd-score--' + feedbackClass">
-                    <span class="fd-score-num">{{ safeFeedback.qualification }}</span>
-                    <span class="fd-score-den">/10</span>
-                </div>
-                <!-- Close X -->
-                <button class="fd-close-btn" (click)="closeFeedbackDrawer()" type="button" aria-label="Cerrar">
-                    <i class="pi pi-times"></i>
-                </button>
+            <div class="fd-title">{{ feedbackTitle }}</div>
+            <div class="bg-white/50 inline-block px-4 py-1 rounded-xl font-black text-xs uppercase tracking-widest text-gray-500">
+                Calificación: {{ safeFeedback.qualification }}/10
             </div>
         </div>
 
-        <!-- Scrollable body -->
         <div class="fd-body">
-            <!-- Label -->
-            <div class="fd-label">
-                <i class="pi pi-comment"></i>
-                Retroalimentación del sistema
-            </div>
-
-            <!-- Feedback text -->
             <div class="fd-text" [innerHTML]="safeFeedback.feedback"></div>
-
-            <!-- Sandbox notice -->
-            <div class="fd-notice">
-                <span class="sandbox-badge" style="font-size:0.65rem; white-space:nowrap;">
-                    <i class="pi pi-eye"></i> Sandbox — sin guardar
-                </span>
-                <span class="fd-notice-text">
-                    Las respuestas <strong>no se guardan</strong> ni afectan estadísticas de alumnos.
-                </span>
-            </div>
         </div>
 
-        <!-- Footer actions -->
-        <div class="fd-footer">
-            <p-button icon="pi pi-refresh" label="Reintentar" severity="secondary" [outlined]="true"
-                (onClick)="restartCurrentExercise()">
-            </p-button>
-            <div style="flex:1;"></div>
-            <p-button *ngIf="!isLastExercise" icon="pi pi-arrow-right" iconPos="right" label="Siguiente ejercicio"
-                (onClick)="nextExercise()">
-            </p-button>
-            <p-button *ngIf="isLastExercise" icon="pi pi-flag-fill" label="Finalizar sandbox" severity="success"
-                (onClick)="goBack()">
-            </p-button>
+        <div class="p-8 flex flex-column gap-4">
+            <button *ngIf="!isLastExercise && feedbackClass !== 'error'" class="btn-3d btn-green w-full justify-center" (click)="nextExercise()">
+                SIGUIENTE EJERCICIO
+            </button>
+            <button *ngIf="isLastExercise && feedbackClass !== 'error'" class="btn-3d btn-green w-full justify-center" (click)="goBack()">
+                FINALIZAR SANDBOX
+            </button>
+            <button class="btn-3d btn-secondary w-full justify-center" (click)="closeFeedbackDrawer()">
+                CERRAR
+            </button>
         </div>
     </div>
-
 </p-dialog>

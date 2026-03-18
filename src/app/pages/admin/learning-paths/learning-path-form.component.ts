@@ -11,6 +11,7 @@ import { ToastModule } from 'primeng/toast';
 import { CardModule } from 'primeng/card';
 import { RippleModule } from 'primeng/ripple';
 import { PickListModule } from 'primeng/picklist';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MessageService } from 'primeng/api';
 
 import { LearningPathService, CreateLearningPathDto, UpdateLearningPathDto } from '../../../core/services/learning-path.service';
@@ -36,12 +37,14 @@ interface Course {
     ToastModule,
     CardModule,
     RippleModule,
-    PickListModule
+    PickListModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   template: `
     <div class="grid grid-cols-12">
       <div class="col-span-12">
+        <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4 block"></p-breadcrumb>
         <div class="card px-6 py-6">
           <p-toast></p-toast>
           
@@ -223,6 +226,9 @@ export class LearningPathFormComponent implements OnInit, OnDestroy {
   selectedCourses: Course[] = [];
   allCourses: Course[] = [];
 
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
+
   constructor(
     private fb: FormBuilder,
     private learningPathService: LearningPathService,
@@ -250,6 +256,12 @@ export class LearningPathFormComponent implements OnInit, OnDestroy {
       this.isEditMode = true;
       this.learningPathId = parseInt(id, 10);
     }
+    
+    this.breadcrumbItems = [
+      { label: 'Administración' },
+      { label: 'Rutas de Aprendizaje', routerLink: '/admin/learning-paths' },
+      { label: this.isEditMode ? 'Editar Ruta' : 'Nueva Ruta' }
+    ];
     
     this.loadCourses();
   }

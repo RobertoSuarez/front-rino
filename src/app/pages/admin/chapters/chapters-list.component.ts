@@ -88,8 +88,8 @@ export class ChaptersListComponent implements OnInit {
   generatingDescription: boolean = false;
 
   breadcrumbItems = [
-    { label: 'Cursos', routerLink: '/courses' },
-    { label: 'Capítulos', routerLink: '/admin/chapters' }
+    { label: 'Cursos', routerLink: '/admin/courses' },
+    { label: 'Capítulos' }
   ];
 
   breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };

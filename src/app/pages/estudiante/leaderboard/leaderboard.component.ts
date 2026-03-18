@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { 
   LeaderboardService, 
@@ -15,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 @Component({
   selector: 'app-leaderboard',
@@ -26,7 +28,8 @@ import { CardModule } from 'primeng/card';
     SelectModule,
     FormsModule,
     ButtonModule,
-    CardModule
+    CardModule,
+    BreadcrumbModule
   ],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss']
@@ -42,6 +45,8 @@ export class LeaderboardComponent implements OnInit {
   selectedResourceType: string = 'yachay';
   selectedInstitutionId: number | null = null;
   dateRange: Date[] | null = null;
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
   
   periodOptions = [
     { label: 'Todos los tiempos', value: 'all' },
@@ -65,6 +70,10 @@ export class LeaderboardComponent implements OnInit {
   constructor(private leaderboardService: LeaderboardService) { }
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Leaderboard' }
+    ];
     this.loadLeaderboard();
     this.loadInstitutions();
   }

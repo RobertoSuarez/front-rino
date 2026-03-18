@@ -15,6 +15,7 @@ import { DialogModule } from 'primeng/dialog';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
 import { ChipModule } from 'primeng/chip';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { LearningPathService, LearningPath } from '../../../core/services/learning-path.service';
@@ -38,10 +39,12 @@ import { User } from '../../../core/models';
     DialogModule,
     RippleModule,
     TooltipModule,
-    ChipModule
+    ChipModule,
+    BreadcrumbModule
   ],
   providers: [ConfirmationService, MessageService],
   template: `
+    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4 block"></p-breadcrumb>
     <div class="card bg-white dark:bg-gray-900 border-none sm:rounded-3xl">
       <p-toast></p-toast>
       <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
@@ -350,6 +353,9 @@ export class LearningPathsListComponent implements OnInit {
   selectedPath: LearningPath | null = null;
   currentUser: User | null = null;
 
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
+
   get totalRecords(): number {
     return this.filteredPaths.length;
   }
@@ -380,6 +386,11 @@ export class LearningPathsListComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
+
+    this.breadcrumbItems = [
+      { label: 'Administración' },
+      { label: 'Rutas de Aprendizaje' }
+    ];
 
     this.loadLearningPaths();
   }

@@ -28,6 +28,7 @@ import { PhishingSelectionMultipleComponent } from './components/phishing-select
 import { MatchPairsComponent } from './components/match-pairs.component';
 import { GenerateExercisesDialogComponent } from './components/generate-exercises-dialog.component';
 import { GeneratedExercise } from '../../../core/services/exercise-generation.service';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
@@ -48,6 +49,7 @@ import { TooltipModule } from 'primeng/tooltip';
     FormsModule,
     ButtonModule,
     ConfirmDialogModule,
+    BreadcrumbModule,
     TooltipModule,
     SelectionSingleComponent,
     SelectionMultipleComponent,
@@ -73,6 +75,9 @@ export class ExercisesListComponent implements OnInit {
   exerciseTypeData: any = {};
   viewMode: 'table' | 'grid' = 'table';
   searchTerm: string = '';
+
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
 
   /** Exercise type metadata for labels, icons, and colors */
   typeMap: Record<string, { label: string; icon: string; color: string; bg: string }> = {
@@ -167,6 +172,7 @@ export class ExercisesListComponent implements OnInit {
       if (params['returnTemaId']) {
         this.returnTemaId = +params['returnTemaId'];
       }
+      this.updateBreadcrumbs();
     });
   }
 
@@ -199,6 +205,42 @@ export class ExercisesListComponent implements OnInit {
       optionsMatchPairsRight: [[]],
       answerMatchPairs: [[]]
     });
+  }
+
+  updateBreadcrumbs() {
+    this.breadcrumbItems = [
+      { label: 'Cursos', routerLink: '/admin/courses' }
+    ];
+
+    if (this.returnCourseId) {
+      this.breadcrumbItems.push({
+        label: 'Capítulos',
+        routerLink: '/admin/chapters',
+        queryParams: { courseId: this.returnCourseId }
+      });
+    }
+
+    if (this.returnCourseId && this.returnChapterId) {
+      this.breadcrumbItems.push({
+        label: 'Temas',
+        routerLink: '/admin/temas',
+        queryParams: { courseId: this.returnCourseId, chapterId: this.returnChapterId }
+      });
+    }
+
+    if (this.returnTemaId) {
+      this.breadcrumbItems.push({
+        label: 'Actividades',
+        routerLink: '/admin/activities',
+        queryParams: {
+          temaId: this.returnTemaId,
+          chapterId: this.returnChapterId,
+          courseId: this.returnCourseId
+        }
+      });
+    }
+
+    this.breadcrumbItems.push({ label: 'Ejercicios' });
   }
 
   loadActivityDetails() {

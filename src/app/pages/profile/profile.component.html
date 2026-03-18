@@ -1,5 +1,10 @@
 <p-toast></p-toast>
-<div class="grid grid-cols-12 gap-4 md:gap-8">
+<div class="w-full px-4 sm:px-8 py-4">
+    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome"></p-breadcrumb>
+</div>
+
+<div class="px-4 sm:px-8 pb-12">
+    <div class="grid grid-cols-12 gap-4 md:gap-8">
     <div class="col-span-12">
         <div class="profile-modern-header card mb-0">
             <div class="profile-modern-header__copy">
@@ -32,139 +37,94 @@
 
         <!-- Modo visualización -->
         @if (profileData && !loading && !editMode) {
-        <div class="profile-modern-grid">
-            <section class="profile-card-main card">
-                <div class="profile-card-main__head">
-                    <div class="profile-avatar-wrap">
-                        <img [src]="profileData.urlAvatar" alt="Avatar de usuario">
-                        <span class="profile-online-dot"></span>
+        <div class="profile-modern-container card">
+            <!-- Sección Superior: Info y Recursos -->
+            <div class="profile-top-row">
+                <div class="profile-info-column">
+                    <div class="profile-avatar-wrapper">
+                        <img [src]="profileData.urlAvatar" alt="Avatar">
+                        <span class="status-dot"></span>
                     </div>
-                    <div class="profile-main-identity">
-                        <span class="profile-progress-chip">{{ getProfileCompletion() }}%</span>
+                    <div class="profile-identity-info">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="profile-completion-tag">{{ getProfileCompletion() }}%</span>
+                        </div>
                         <h2>{{ profileData.firstName }} {{ profileData.lastName }}</h2>
-                        <p>{{ profileData.email }}</p>
-                        <p-tag [value]="getUserTypeLabel(profileData.typeUser)"
-                            [severity]="getUserTypeColor(profileData.typeUser)" icon="pi pi-user">
-                        </p-tag>
+                        <p class="email-text">{{ profileData.email }}</p>
+                        <div class="mt-2">
+                            <p-tag [value]="getUserTypeLabel(profileData.typeUser)"
+                                [severity]="getUserTypeColor(profileData.typeUser)" icon="pi pi-user">
+                            </p-tag>
+                        </div>
                     </div>
                 </div>
 
-                <div class="profile-meta-grid">
-                    <div class="profile-meta-item">
-                        <i class="pi pi-calendar text-primary"></i>
-                        <div>
-                            <span>Miembro desde</span>
-                            <strong>{{ formatDateShort(profileData.createdAt) }}</strong>
+                <div class="profile-resources-row">
+                    <div class="resource-container">
+                        <span class="resource-label-top">PUNTOS YACHAY</span>
+                        <div class="resource-pill-large xp-pill">
+                            <img src="assets/elementos/yachay.png" alt="XP">
+                            <div class="resource-text">
+                                <span class="res-value">{{ userIndicators?.yachay || 0 }}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="profile-meta-item" *ngIf="profileData.birthday">
+
+                    <div class="resource-container">
+                        <span class="resource-label-top">VIDAS TUMIS</span>
+                        <div class="resource-pill-large tumi-pill">
+                            <img src="assets/elementos/corazon_de_tumi.png" alt="Vidas">
+                            <div class="resource-text">
+                                <span class="res-value">{{ userIndicators?.tumis || 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resource-container">
+                        <span class="resource-label-top">MONEDAS MULLU</span>
+                        <div class="resource-pill-large mullu-pill">
+                            <img src="assets/elementos/mullu.png" alt="Mullu">
+                            <div class="resource-text">
+                                <span class="res-value">{{ userIndicators?.mullu || 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Media: Metadatos -->
+            <div class="profile-meta-row">
+                <div class="meta-item">
+                    <div class="meta-icon bg-blue-50 dark:bg-blue-900/20">
+                        <i class="pi pi-calendar text-blue-500"></i>
+                    </div>
+                    <div class="meta-content">
+                        <span class="meta-label">Miembro desde</span>
+                        <span class="meta-value">{{ formatDateShort(profileData.createdAt) }}</span>
+                    </div>
+                </div>
+                <div class="meta-item" *ngIf="profileData.birthday">
+                    <div class="meta-icon bg-pink-50 dark:bg-pink-900/20">
                         <i class="pi pi-gift text-pink-500"></i>
-                        <div>
-                            <span>Cumpleaños</span>
-                            <strong>{{ formatDateShort(profileData.birthday) }}</strong>
-                        </div>
+                    </div>
+                    <div class="meta-content">
+                        <span class="meta-label">Cumpleaños</span>
+                        <span class="meta-value">{{ formatDateShort(profileData.birthday) }}</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="profile-achievements">
-                    <h4>Logros Recientes</h4>
-                    <div class="profile-achievements__list">
-                        <span class="achievement-item achievement-item--gold"><i class="pi pi-trophy"></i></span>
-                        <span class="achievement-item achievement-item--blue"><i class="pi pi-star"></i></span>
-                        <span class="achievement-item achievement-item--violet"><i class="pi pi-send"></i></span>
-                        <span class="achievement-item achievement-item--empty"><i class="pi pi-plus"></i></span>
-                    </div>
-                </div>
-
-                <!-- Botones de acción contextuales -->
-                <div class="profile-card-actions">
-                    <button type="button" class="profile-action-btn profile-action-btn--primary"
-                        (click)="toggleEditMode()">
-                        <i class="pi pi-user-edit"></i>
-                        <span>Editar Perfil</span>
-                    </button>
-                    <button type="button" class="profile-action-btn profile-action-btn--secondary"
-                        routerLink="/teacher/change-password">
-                        <i class="pi pi-lock"></i>
-                        <span>Cambiar Contraseña</span>
-                    </button>
-                </div>
-            </section>
-
-            <aside class="profile-card-side">
-                <div class="profile-indicators card">
-                    <div class="profile-indicators__head">
-                        <h3>Indicadores</h3>
-                        <button type="button">Ver Historial</button>
-                    </div>
-                    <div class="indicator-row">
-                        <div class="indicator-left">
-                            <div class="indicator-icon indicator-icon--blue"><i class="pi pi-sparkles"></i></div>
-                            <div>
-                                <span>YACHAY</span>
-                                <strong>{{ userIndicators?.yachay || 0 }}</strong>
-                            </div>
-                        </div>
-                        <small class="indicator-up">+12% ↗</small>
-                    </div>
-                    <div class="indicator-row">
-                        <div class="indicator-left">
-                            <div class="indicator-icon indicator-icon--red"><i class="pi pi-heart-fill"></i></div>
-                            <div>
-                                <span>TUMIS</span>
-                                <strong>{{ userIndicators?.tumis || 0 }}</strong>
-                            </div>
-                        </div>
-                        <small class="indicator-up">+5% ↗</small>
-                    </div>
-                    <div class="indicator-row">
-                        <div class="indicator-left">
-                            <div class="indicator-icon indicator-icon--amber"><i class="pi pi-dollar"></i></div>
-                            <div>
-                                <span>MULLU</span>
-                                <strong>{{ userIndicators?.mullu || 0 }}</strong>
-                            </div>
-                        </div>
-                        <small class="indicator-muted">0% →</small>
-                    </div>
-                </div>
-
-                <div class="profile-mission card">
-                    <div class="profile-mission__head">
-                        <h4>Misión: Perfil Completo</h4>
-                        <span>{{ getProfileCompletion() }}%</span>
-                    </div>
-                    <p>Completa tu información para ganar 500 Mullu extra.</p>
-                    <div class="mission-progress">
-                        <span [style.width.%]="getProfileCompletion()"></span>
-                    </div>
-                    <div class="mission-footer">
-                        <small>{{ 3 - (getProfileCompletion() >= 100 ? 3 : 2) }} pasos restantes</small>
-                        <button type="button">Continuar Misión <i class="pi pi-arrow-right"></i></button>
-                    </div>
-                </div>
-            </aside>
-
-            <section class="profile-activity card">
-                <div class="profile-activity__head">
-                    <h3>Actividad Reciente</h3>
-                    <button type="button">Ver Todo</button>
-                </div>
-                <div class="profile-activity__list">
-                    <div class="activity-item" *ngFor="let activity of recentActivity">
-                        <div class="activity-left">
-                            <span class="activity-icon" [class.activity-icon--login]="activity.type === 'login'">
-                                <i class="pi" [ngClass]="activity.icon"></i>
-                            </span>
-                            <div>
-                                <strong>{{ activity.title }}</strong>
-                                <p>{{ activity.time }}</p>
-                            </div>
-                        </div>
-                        <small [class.activity-reward]="activity.reward">{{ activity.reward || '' }}</small>
-                    </div>
-                </div>
-            </section>
+            <!-- Sección Inferior: Botones -->
+            <div class="profile-actions-row">
+                <button type="button" class="action-btn btn-primary" (click)="toggleEditMode()">
+                    <i class="pi pi-user-edit"></i>
+                    <span>Editar Perfil</span>
+                </button>
+                <button type="button" class="action-btn btn-outline" routerLink="change-password">
+                    <i class="pi pi-lock"></i>
+                    <span>Cambiar Contraseña</span>
+                </button>
+            </div>
         </div>
         }
 
@@ -327,5 +287,6 @@
         </div>
         }
 
-    </div>
+            </div>
+</div>
 </div>

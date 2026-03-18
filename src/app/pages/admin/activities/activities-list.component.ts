@@ -20,6 +20,8 @@ import { environment } from 'src/environments/environment';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Router, ActivatedRoute } from '@angular/router';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-activities-list',
@@ -36,7 +38,9 @@ import { Router, ActivatedRoute } from '@angular/router';
     CheckboxModule,
     ReactiveFormsModule,
     ButtonModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    BreadcrumbModule,
+    TooltipModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './activities-list.component.html',
@@ -52,6 +56,11 @@ export class ActivitiesListComponent implements OnInit {
   activityForm: FormGroup;
   temaId: number | null = null;
   temaInfo: any = null;
+  courseId: number | null = null;
+  chapterId: number | null = null;
+
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
 
   @ViewChild('dt') dt!: Table;
 
@@ -75,8 +84,11 @@ export class ActivitiesListComponent implements OnInit {
       
       if (temaId) {
         this.temaId = parseInt(temaId, 10);
+        this.courseId = params['courseId'] ? parseInt(params['courseId'], 10) : null;
+        this.chapterId = params['chapterId'] ? parseInt(params['chapterId'], 10) : null;
         this.loadTemaInfo();
         this.loadActivities();
+        this.updateBreadcrumbs();
       } else {
         this.messageService.add({
           severity: 'warn',
@@ -113,6 +125,29 @@ export class ActivitiesListComponent implements OnInit {
     });
   }
 
+  updateBreadcrumbs() {
+    this.breadcrumbItems = [
+      { label: 'Cursos', routerLink: '/admin/courses' }
+    ];
+
+    if (this.courseId) {
+      this.breadcrumbItems.push({
+        label: 'Capítulos',
+        routerLink: '/admin/chapters',
+        queryParams: { courseId: this.courseId }
+      });
+    }
+
+    if (this.courseId && this.chapterId) {
+      this.breadcrumbItems.push({
+        label: 'Temas',
+        routerLink: '/admin/temas',
+        queryParams: { courseId: this.courseId, chapterId: this.chapterId }
+      });
+    }
+
+    this.breadcrumbItems.push({ label: 'Actividades' });
+  }
 
   createForm(): FormGroup {
     return this.fb.group({
@@ -290,7 +325,9 @@ export class ActivitiesListComponent implements OnInit {
     // Navegar a la página de ejercicios conservando el estado actual en la URL
     this.router.navigate(['/admin/exercises', activityId], {
       queryParams: {
-        returnTemaId: this.temaId
+        returnTemaId: this.temaId,
+        returnChapterId: this.chapterId,
+        returnCourseId: this.courseId
       }
     });
   }

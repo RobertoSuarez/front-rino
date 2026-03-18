@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MessageService } from 'primeng/api';
 
 import { TeacherDashboardService, DashboardStats } from '../../../core/services/teacher-dashboard.service';
@@ -27,10 +28,12 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
     TagModule,
     ButtonModule,
     SkeletonModule,
-    ToastModule
+    ToastModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   template: `
+    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-4 block"></p-breadcrumb>
     <div class="grid grid-cols-12 gap-4">
       <p-toast></p-toast>
 
@@ -357,6 +360,12 @@ export class TeacherDashboardComponent implements OnInit {
   chartOptions: any;
   pieData: any;
   pieOptions: any;
+
+  breadcrumbItems = [
+    { label: 'Dashboard' }
+  ];
+
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
 
   constructor(
     private dashboardService: TeacherDashboardService,

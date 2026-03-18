@@ -23,6 +23,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AiService } from '../../../core/services/ai.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TooltipModule } from 'primeng/tooltip';
 import { QuillModule } from 'ngx-quill';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -45,6 +46,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     FormsModule,
     ButtonModule,
     ConfirmDialogModule,
+    BreadcrumbModule,
     TooltipModule,
     QuillModule
   ],
@@ -96,6 +98,9 @@ export class TemasListComponent implements OnInit {
 
   viewMode: 'table' | 'grid' = 'table';
   searchTerm: string = '';
+
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
 
   get filteredTemas(): Tema[] {
     if (!this.searchTerm) return this.temas;
@@ -166,6 +171,7 @@ export class TemasListComponent implements OnInit {
           } else {
             this.loading = false;
           }
+          this.updateBreadcrumbs();
         } else {
           this.courses = [];
           this.chapters = [];
@@ -208,6 +214,7 @@ export class TemasListComponent implements OnInit {
   onChapterChange(event: any) {
     const value = parseInt(event.target.value, 10);
     this.selectedChapterId = isNaN(value) ? null : value;
+    this.updateBreadcrumbs();
     this.loadTemas();
   }
 
@@ -241,6 +248,7 @@ export class TemasListComponent implements OnInit {
           this.initialChapterId = null;
 
           if (this.selectedChapterId) {
+            this.updateBreadcrumbs();
             this.loadTemas();
             return;
           }
@@ -327,6 +335,22 @@ export class TemasListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  updateBreadcrumbs() {
+    this.breadcrumbItems = [
+      { label: 'Cursos', routerLink: '/admin/courses' }
+    ];
+
+    if (this.selectedCourseId) {
+      this.breadcrumbItems.push({
+        label: 'Capítulos',
+        routerLink: '/admin/chapters',
+        queryParams: { courseId: this.selectedCourseId }
+      });
+    }
+
+    this.breadcrumbItems.push({ label: 'Temas' });
   }
 
   showCreateDialog() {
@@ -490,8 +514,14 @@ export class TemasListComponent implements OnInit {
    * @param temaId ID del tema
    */
   navigateToActivities(temaId: number) {
-    // Redirigir a la página de actividades con el ID del tema como parámetro
-    this.router.navigate(['/admin/activities'], { queryParams: { temaId: temaId } });
+    // Redirigir a la página de actividades con los IDs necesarios para los breadcrumbs
+    this.router.navigate(['/admin/activities'], {
+      queryParams: {
+        temaId: temaId,
+        chapterId: this.selectedChapterId,
+        courseId: this.selectedCourseId
+      }
+    });
   }
 
   /**

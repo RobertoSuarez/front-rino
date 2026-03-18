@@ -15,6 +15,10 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { DialogModule } from 'primeng/dialog';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { AvatarModule } from 'primeng/avatar';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { UserService, UsersListResponse } from '../../../core/services/user.service';
@@ -37,7 +41,11 @@ import { User } from '../../../core/models';
     ToolbarModule,
     DialogModule,
     RippleModule,
-    TooltipModule
+    TooltipModule,
+    BreadcrumbModule,
+    AvatarModule,
+    IconFieldModule,
+    InputIconModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './users-list-simple.component.html'
@@ -50,6 +58,21 @@ export class UsersListComponent implements OnInit, OnDestroy {
   userDetailDialog = false;
   selectedUser: User | null = null;
   currentUserType: string = '';
+
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
+
+  avatarColors = [
+    { bg: '#fee2e2', text: '#ef4444' }, // red
+    { bg: '#fef3c7', text: '#f59e0b' }, // amber
+    { bg: '#dcfce7', text: '#22c55e' }, // green
+    { bg: '#d1fae5', text: '#10b981' }, // emerald
+    { bg: '#e0f2fe', text: '#0ea5e9' }, // sky
+    { bg: '#e0e7ff', text: '#6366f1' }, // indigo
+    { bg: '#f3e8ff', text: '#a855f7' }, // purple
+    { bg: '#fae8ff', text: '#d946ef' }, // fuchsia
+    { bg: '#ffedd5', text: '#f97316' }, // orange
+  ];
 
   private searchTimeout: any;
   private subscriptions: Subscription[] = [];
@@ -70,6 +93,13 @@ export class UsersListComponent implements OnInit, OnDestroy {
     });
     
     this.loadUsers();
+    this.updateBreadcrumbs();
+  }
+
+  updateBreadcrumbs() {
+    this.breadcrumbItems = [
+      { label: 'Gestión de Usuarios' }
+    ];
   }
 
   ngOnDestroy() {
@@ -237,6 +267,20 @@ export class UsersListComponent implements OnInit, OnDestroy {
   }
 
   getInitials(firstName: string, lastName: string): string {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    if (!firstName && !lastName) return 'U';
+    const firstInitial = firstName ? firstName.charAt(0) : '';
+    const lastInitial = lastName ? lastName.charAt(0) : '';
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  }
+
+  getAvatarStyle(user: User) {
+    const charCode = (user.firstName.charCodeAt(0) || 0) + (user.lastName.charCodeAt(0) || 0);
+    const color = this.avatarColors[charCode % this.avatarColors.length];
+    return {
+      'background-color': color.bg,
+      'color': color.text,
+      'font-weight': '600',
+      'border': `1px solid ${color.text}33`
+    };
   }
 }

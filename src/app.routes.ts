@@ -34,7 +34,7 @@ export const appRoutes: Routes = [
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
-            { path: 'profile', component: ProfileComponent },
+            { path: 'profile', loadChildren: () => import('./app/pages/profile/profile.routes').then(m => m.PROFILE_ROUTES) },
             { path: 'settings', component: SettingsComponent },
             { path: 'courses', loadComponent: () => import('./app/pages/courses/courses.component').then(m => m.CoursesComponent) },
             { path: 'admin', loadChildren: () => import('./app/pages/admin/admin.routes').then(m => m.adminRoutes) },

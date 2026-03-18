@@ -12,7 +12,8 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { PasswordModule } from 'primeng/password';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 import { ApiKeyService, ApiKey, ApiKeyHistory } from '../../../core/services/api-key.service';
 import { TooltipModule } from 'primeng/tooltip';
@@ -32,11 +33,15 @@ import { TooltipModule } from 'primeng/tooltip';
     ConfirmDialogModule,
     TagModule,
     TooltipModule,
-    PasswordModule
+    PasswordModule,
+    BreadcrumbModule
   ],
   providers: [MessageService, ConfirmationService],
   template: `
     <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 mb-2">
+        <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome"></p-breadcrumb>
+      </div>
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
 
@@ -330,6 +335,8 @@ export class ParametersComponent implements OnInit {
   historyDialogVisible = false;
   isEditMode = false;
   selectedKey: ApiKey | null = null;
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
 
   formData = {
     keyName: '',
@@ -344,6 +351,11 @@ export class ParametersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Administración' },
+      { label: 'Parámetros' }
+    ];
     this.loadApiKeys();
   }
 

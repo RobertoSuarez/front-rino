@@ -15,6 +15,8 @@ import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { MenuItem } from 'primeng/api';
 
 
 import { LearningPathService } from '../../../core/services/learning-path.service';
@@ -35,10 +37,14 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
     DividerModule,
     TooltipModule,
     ProgressSpinnerModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   template: `
     <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 mb-2">
+        <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome"></p-breadcrumb>
+      </div>
       <p-toast></p-toast>
 
       <!-- Botón de regreso -->
@@ -277,6 +283,8 @@ export class LearningPathDetailComponent implements OnInit {
   loading = false;
   pathId: number = 0;
   expandedCourses: { [key: number]: boolean } = {};
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
 
   constructor(
     private learningPathService: LearningPathService,
@@ -286,6 +294,11 @@ export class LearningPathDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Mis Rutas', routerLink: '/estudiante/my-learning-paths' },
+      { label: 'Detalle de la Ruta' }
+    ];
     this.pathId = parseInt(this.route.snapshot.paramMap.get('id') || '0', 10);
     if (this.pathId) {
       this.loadPathDetail();

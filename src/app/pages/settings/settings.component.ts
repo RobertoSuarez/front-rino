@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -8,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MessageService } from 'primeng/api';
 
 interface ThemeOption {
@@ -32,7 +34,8 @@ interface FontOption {
     RadioButtonModule,
     SelectModule,
     ReactiveFormsModule,
-    ToastModule
+    ToastModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   templateUrl: './settings.component.html',
@@ -45,6 +48,8 @@ export class SettingsComponent implements OnInit {
 
   settingsForm!: FormGroup;
   hasUnsavedChanges = false;
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
 
   themeOptions: ThemeOption[] = [
     { label: 'Modo Claro', value: 'light', icon: 'pi pi-sun' },
@@ -117,6 +122,10 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Configuración' }
+    ];
     console.log('SettingsComponent initialized');
     this.initializeForm();
     this.loadCurrentSettings();

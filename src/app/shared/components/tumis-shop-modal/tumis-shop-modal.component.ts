@@ -32,109 +32,118 @@ import { UserService } from '../../../core/services/user.service';
       (onHide)="onHide()"
     >
       <div class="shop-shell">
+        <!-- Botón Cerrar Absoluto -->
+        <button type="button" class="close-action-btn" (click)="visible.set(false)" aria-label="Cerrar">
+          <i class="pi pi-times"></i>
+        </button>
+
         <header class="shop-header">
           <div class="shop-brand">
             <div class="shop-brand-icon">
-              <i class="pi pi-shopping-cart"></i>
+              <img src="assets/elementos/corazon_de_tumi.png" alt="Tumis" class="w-8 h-8 object-contain">
             </div>
             <div>
-              <h2>Tienda de Tumis</h2>
-              <p>Adquiere vidas y mejoras para tu aprendizaje</p>
+              <h2 class="text-2xl font-black text-slate-800 dark:text-white">Tienda de Tumis</h2>
+              <p class="text-slate-500 dark:text-slate-400 font-medium font-outfit">Recupera tus vidas para seguir aprendiendo</p>
             </div>
           </div>
 
           <div class="shop-header-right">
             <div class="balance-block">
-              <span class="balance-label">SALDO DISPONIBLE</span>
-              <div class="balance-pill">
-                <img src="assets/elementos/mullu.png" alt="Mullu" />
-                <strong>{{ formatNumber(userMullu()) }}</strong>
-                <span>Mullu</span>
+              <span class="balance-label">MI SALDO</span>
+              <div class="balance-pill-premium">
+                <img src="assets/elementos/mullu.png" alt="Mullu" class="w-6 h-6 object-contain" />
+                <span class="value">{{ formatNumber(userMullu()) }}</span>
+                <span class="unit">Mullu</span>
               </div>
             </div>
-
-            <button type="button" class="shop-close-icon" (click)="visible.set(false)" aria-label="Cerrar modal">
-              <i class="pi pi-times"></i>
-            </button>
           </div>
         </header>
 
         <div class="shop-body">
-          <section class="shop-section">
-            <h3><i class="pi pi-heart-fill"></i> Paquetes de Vidas</h3>
+          <section class="shop-content">
+            <div class="section-title">
+                <i class="pi pi-bolt text-amber-500"></i>
+                <span>Paquetes de Vidas</span>
+            </div>
 
             @if (isLoadingOffers()) {
               <div class="offer-grid">
                 @for (item of [1, 2, 3]; track $index) {
-                  <div class="offer-card offer-card--skeleton"></div>
+                  <div class="offer-card-skeleton"></div>
                 }
               </div>
             } @else if (displayedOffers().length === 0) {
-              <div class="empty-state">
-                No hay ofertas disponibles en este momento.
+              <div class="empty-shop-state">
+                <i class="pi pi-search text-4xl mb-2 opacity-20"></i>
+                <p>No hay ofertas disponibles en este momento.</p>
               </div>
             } @else {
               <div class="offer-grid">
                 @for (offer of displayedOffers(); track offer.id; let i = $index) {
                   @let isFeatured = isFeaturedOffer(offer, i);
-                  @let isSpecial = isSpecialOffer(offer, i);
                   @let badge = getBadgeText(offer, i);
                   @let desc = getOfferDescription(offer, i);
                   @let oldPrice = getOriginalCost(offer);
 
                   <article
-                    class="offer-card"
+                    class="gamified-card"
+                    [class.featured]="isFeatured"
                     [style.--stagger]="i"
-                    [class.offer-card--featured]="isFeatured"
-                    [class.offer-card--special]="isSpecial"
                   >
                     @if (badge) {
-                      <span
-                        class="offer-badge"
-                        [class.offer-badge--special]="isSpecial"
-                      >
+                      <div class="card-badge" [class.badge-featured]="isFeatured">
                         {{ badge }}
-                      </span>
+                      </div>
                     }
 
-                    <div class="offer-heart">
-                      <div class="heart-circle">❤</div>
-                      @if (offer.tumisAmount > 1) {
-                        <span class="heart-multiplier">x{{ offer.tumisAmount }}</span>
-                      }
+                    <div class="card-visual">
+                        <div class="blob-bg"></div>
+                        <img src="assets/elementos/corazon_de_tumi.png" alt="Vidas" class="main-icon">
+                        @if (offer.tumisAmount > 1) {
+                            <div class="amount-badge">x{{ offer.tumisAmount }}</div>
+                        }
                     </div>
 
-                    <h4>{{ offer.tumisAmount }} {{ offer.tumisAmount === 1 ? 'Vida' : 'Vidas' }}</h4>
-                    <p class="offer-description">{{ desc }}</p>
-
-                    <div class="offer-pricing">
-                      @if (oldPrice) {
-                        <p class="offer-old-price">
-                          {{ formatNumber(oldPrice) }} Mullu
-                        </p>
-                      }
-                      <p class="offer-price"><span>{{ formatNumber(offer.mulluCost) }}</span> Mullu</p>
+                    <div class="card-info">
+                        <h4 class="card-title">{{ offer.tumisAmount }} {{ offer.tumisAmount === 1 ? 'Vida' : 'Vidas' }}</h4>
+                        <p class="card-desc">{{ desc }}</p>
                     </div>
 
-                    <button
-                      type="button"
-                      class="offer-buy-btn"
-                      [class.offer-buy-btn--featured]="isFeatured"
-                      [disabled]="userMullu() < offer.mulluCost || isLoading()"
-                      (click)="buyOffer(offer)"
-                    >
-                      @if (!isLoading()) {
-                        <span>{{ isFeatured ? 'Comprar Ahora' : 'Comprar' }}</span>
-                      } @else {
-                        <span><i class="pi pi-spin pi-spinner"></i> Comprando...</span>
-                      }
-                    </button>
+                    <div class="card-footer">
+                        <div class="price-tag">
+                            @if (oldPrice) {
+                                <span class="old-price">{{ formatNumber(oldPrice) }}</span>
+                            }
+                            <div class="current-price">
+                                <span class="num">{{ formatNumber(offer.mulluCost) }}</span>
+                                <img src="assets/elementos/mullu.png" alt="Mullu" class="w-4 h-4">
+                            </div>
+                        </div>
 
-                    @if (userMullu() < offer.mulluCost) {
-                      <p class="offer-warning">
-                        Necesitas {{ formatNumber(offer.mulluCost - userMullu()) }} Mullu más
-                      </p>
-                    }
+                        <button
+                          type="button"
+                          class="buy-button"
+                          [class.buy-button-featured]="isFeatured"
+                          [disabled]="userMullu() < offer.mulluCost || isLoading()"
+                          (click)="buyOffer(offer)"
+                        >
+                          @if (!isLoading()) {
+                            <span class="flex items-center justify-center gap-2">
+                                {{ isFeatured ? '¡LO QUIERO!' : 'COMPRAR' }}
+                            </span>
+                          } @else {
+                            <span><i class="pi pi-spin pi-spinner mr-2"></i> Procesando...</span>
+                          }
+                        </button>
+
+                        @if (userMullu() < offer.mulluCost) {
+                          <div class="insufficient-mullu">
+                            <i class="pi pi-exclamation-circle text-[10px]"></i>
+                            Te faltan {{ formatNumber(offer.mulluCost - userMullu()) }} Mullu
+                          </div>
+                        }
+                    </div>
                   </article>
                 }
               </div>
@@ -142,11 +151,13 @@ import { UserService } from '../../../core/services/user.service';
           </section>
         </div>
 
-        <footer class="shop-footer">
-          <p><i class="pi pi-info-circle"></i> Los Mullu se añaden de inmediato y cada compra queda registrada en tu historial.</p>
-          <button type="button" class="shop-close-btn" (click)="visible.set(false)">
-            <i class="pi pi-times"></i>
-            Cerrar
+        <footer class="shop-status-footer">
+          <div class="info-note">
+            <i class="pi pi-shield-check text-green-500"></i>
+            <span>Tus compras se sincronizan al instante en todos tus dispositivos.</span>
+          </div>
+          <button type="button" class="btn-secondary" (click)="visible.set(false)">
+            Entendido
           </button>
         </footer>
       </div>
@@ -155,606 +166,347 @@ import { UserService } from '../../../core/services/user.service';
   styles: [
     `
       ::ng-deep .tumis-shop-dialog {
-        --shop-text: #1f2f46;
-        --shop-muted: #6b7b93;
-        --shop-border: #dde5f0;
-        --shop-bg: #f3f7fc;
-        --shop-white: #ffffff;
-        --shop-green: #19be84;
-        --shop-green-dark: #11a873;
-        --shop-gray-btn: #e8edf4;
-        
-        --shop-heart-bg: #f8fafc;
-        --shop-heart-count-bg: #ffffff;
-        --shop-balance-pill-bg: #edf2f8;
-        --shop-close-btn-bg: #e9eef5;
-        --shop-close-btn-hover: #dfe7f2;
-        --shop-offer-buy-bg: #f1f5f9;
-        --shop-offer-buy-hover: #e2e8f0;
-        --shop-offer-buy-text: #334155;
-        --shop-offer-special-border: #d6e1f0;
-        --shop-skeleton-bg: #e2e8f0;
+        --shop-primary: #10b981;
+        --shop-primary-dark: #059669;
+        --shop-bg-canvas: #f0f4f8;
+        --shop-bg-card: #ffffff;
+        --shop-text-main: #1e293b;
+        --shop-text-muted: #64748b;
+        --shop-border-color: #e2e8f0;
+        --shop-accent-red: #ef4444;
+        --shop-accent-amber: #f59e0b;
       }
 
       ::ng-deep .app-dark .tumis-shop-dialog {
-        --shop-text: #f8fafc;
-        --shop-muted: #94a3b8;
-        --shop-border: #334155;
-        --shop-bg: #0f172a;
-        --shop-white: #1e293b;
-        --shop-green: #10b981;
-        --shop-green-dark: #059669;
-        --shop-gray-btn: #334155;
-        
-        --shop-heart-bg: #334155;
-        --shop-heart-count-bg: #0f172a;
-        --shop-balance-pill-bg: #334155;
-        --shop-close-btn-bg: #334155;
-        --shop-close-btn-hover: #475569;
-        --shop-offer-buy-bg: #334155;
-        --shop-offer-buy-hover: #475569;
-        --shop-offer-buy-text: #e2e8f0;
-        --shop-offer-special-border: #475569;
-        --shop-skeleton-bg: #334155;
+        --shop-bg-canvas: #0f172a;
+        --shop-bg-card: #1e293b;
+        --shop-text-main: #f1f5f9;
+        --shop-text-muted: #94a3b8;
+        --shop-border-color: #334155;
       }
 
       :host ::ng-deep .p-dialog-mask {
-        backdrop-filter: blur(2px);
-        background: rgba(15, 28, 48, 0.35);
-        animation: mask-fade 0.26s ease;
+        backdrop-filter: blur(8px);
+        background: rgba(15, 23, 42, 0.6);
       }
 
       :host ::ng-deep .tumis-shop-dialog.p-dialog {
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 28px 70px rgba(24, 39, 75, 0.28);
-        transform-origin: top center;
-        animation: modal-pop 0.46s cubic-bezier(0.2, 0.86, 0.32, 1);
-      }
-
-      :host ::ng-deep .tumis-shop-dialog .p-dialog-content {
-        padding: 0;
-        background: var(--shop-bg);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: none;
       }
 
       .shop-shell {
         display: flex;
         flex-direction: column;
-        max-height: min(88vh, 860px);
+        background: var(--shop-bg-canvas);
+        min-height: 500px;
         position: relative;
         isolation: isolate;
       }
 
+      .close-action-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: var(--shop-bg-canvas);
+        color: var(--shop-text-muted);
+        cursor: pointer;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+        &:hover {
+            background: #f1f5f9;
+            color: #ef4444;
+            transform: scale(1.1) rotate(90deg);
+        }
+        
+        &:active {
+            transform: scale(0.95);
+        }
+      }
 
       .shop-header {
-        background: var(--shop-white);
-        border-bottom: 1px solid var(--shop-border);
-        padding: 20px 24px;
+        background: var(--shop-bg-card);
+        padding: 2.5rem 6.5rem 2rem 2.5rem; /* Espacio extra a la derecha para el botón flotante */
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        animation: fade-rise 0.45s ease both;
+        border-bottom: 2px solid var(--shop-border-color);
       }
 
       .shop-brand {
         display: flex;
         align-items: center;
-        gap: 12px;
-      }
-
-      .shop-brand-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: rgba(25, 190, 132, 0.15);
-        color: var(--shop-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-      }
-
-      .shop-brand h2 {
-        margin: 0;
-        color: var(--shop-text);
-        font-size: 31px;
-        line-height: 1.1;
-        letter-spacing: -0.02em;
-      }
-
-      .shop-brand p {
-        margin: 3px 0 0;
-        color: var(--shop-muted);
-        font-size: 13px;
-      }
-
-      .shop-header-right {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-      }
-
-      .balance-block {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 4px;
-      }
-
-      .balance-label {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        color: #8a98ad;
-      }
-
-      .balance-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: var(--shop-balance-pill-bg);
-        color: var(--shop-text);
-        animation: none;
-      }
-
-      .balance-pill img {
-        width: 16px;
-        height: 16px;
-        object-fit: contain;
-      }
-
-      .balance-pill strong {
-        font-size: 29px;
-        line-height: 1;
-      }
-
-      .balance-pill span {
-        font-size: 13px;
-        color: var(--shop-muted);
-      }
-
-      .shop-close-icon {
-        border: 0;
-        background: transparent;
-        color: #8191a8;
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: 0.2s ease;
-      }
-
-      .shop-close-icon:hover {
-        background: var(--shop-close-btn-hover);
-        color: var(--shop-text);
-      }
-
-      .shop-body {
-        padding: 22px 24px;
-        overflow-y: auto;
-      }
-
-      .shop-section + .shop-section {
-        margin-top: 24px;
-      }
-
-      .shop-section {
-        opacity: 0;
-        transform: translateY(10px);
-        animation: fade-rise 0.5s ease forwards;
-      }
-
-
-      .shop-section h3 {
-        margin: 0 0 14px;
-        color: var(--shop-text);
-        font-size: 22px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .shop-section h3 i {
-        font-size: 16px;
-      }
-
-      .shop-section h3 .pi-heart-fill {
-        color: #ef4b54;
-      }
-
-
-      .offer-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-      }
-
-      .offer-card {
-        position: relative;
-        background: var(--shop-white);
-        border: 1px solid var(--shop-border);
-        border-radius: 18px;
-        padding: 18px 16px 14px;
-        min-height: 345px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        opacity: 0;
-        transform: translateY(15px) scale(0.985);
-        animation: card-rise 0.56s cubic-bezier(0.22, 0.88, 0.3, 1) forwards;
-        animation-delay: calc(90ms * var(--stagger, 0));
-        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
-      }
-
-      .offer-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 14px 28px rgba(31, 53, 94, 0.14);
-      }
-
-      .offer-card--featured {
-        border: 2px solid var(--shop-green);
-        box-shadow: 0 16px 28px rgba(25, 190, 132, 0.16);
-        transform: translateY(-6px);
-      }
-
-      .offer-card--featured:hover {
-        transform: translateY(-10px) scale(1.01);
-        box-shadow: 0 22px 34px rgba(21, 173, 121, 0.22);
-      }
-
-      .offer-card--special {
-        border-color: var(--shop-offer-special-border);
-      }
-
-      .offer-card--skeleton {
-        border: none;
-        min-height: 345px;
-        background: var(--shop-skeleton-bg);
-      }
-
-      .offer-badge {
-        position: absolute;
-        top: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #13b978;
-        color: #ffffff;
-        border-radius: 12px;
-        padding: 5px 14px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        white-space: nowrap;
-        box-shadow: 0 4px 10px rgba(19, 185, 120, 0.25);
-        z-index: 2;
-      }
-
-      .offer-badge--special {
-        background: #f5a313;
-        box-shadow: 0 4px 10px rgba(245, 163, 19, 0.25);
-        left: auto;
-        right: 18px;
-        transform: none;
-        top: -12px;
-      }
-
-      .offer-heart {
-        margin-top: 10px;
-        position: relative;
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .heart-circle {
-        width: 74px;
-        height: 74px;
-        border-radius: 50%;
-        background: var(--shop-heart-bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 42px;
-        line-height: 1;
-        color: #ef4b54;
-        transition: transform 0.3s ease;
-      }
-
-      .offer-card:hover .heart-circle {
-        transform: scale(1.08);
-      }
-
-      .offer-card--featured .heart-circle {
-        background: rgba(16, 185, 129, 0.1);
-      }
-
-      .heart-multiplier {
-        position: absolute;
-        right: -4px;
-        bottom: 8px;
-        background: var(--shop-heart-count-bg);
-        border: 1px solid var(--shop-border);
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 800;
-        color: var(--shop-text);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-      }
-
-      .offer-card h4 {
-        margin: 16px 0 6px;
-        font-size: 32px;
-        font-weight: 800;
-        line-height: 1.2;
-        color: var(--shop-text);
-      }
-
-      .offer-description {
-        margin: 0;
-        min-height: 48px;
-        color: #64748b;
-        font-size: 14px;
-        line-height: 1.4;
-        max-width: 220px;
-      }
-
-      .offer-pricing {
-        margin-top: auto;
-        padding-top: 16px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .offer-old-price {
-        margin: 0;
-        color: #94a3b8;
-        font-size: 14px;
-        text-decoration: line-through;
-        font-weight: 500;
-      }
-
-      .offer-price {
-        margin: 0;
-        color: #64748b;
-        font-size: 18px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .offer-price span {
-        color: #1f2f46;
-        font-size: 38px;
-        font-weight: 900;
-        line-height: 1;
-      }
-
-      .offer-card--featured .offer-price span {
-        color: #10b981;
-      }
-
-      .offer-buy-btn {
-        width: 100%;
-        margin-top: 20px;
-        border: none;
-        border-radius: 12px;
-        background: var(--shop-offer-buy-bg);
-        color: var(--shop-offer-buy-text);
-        font-size: 15px;
-        font-weight: 700;
-        padding: 12px 18px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .offer-buy-btn:hover:not(:disabled) {
-        background: var(--shop-offer-buy-hover);
-        transform: translateY(-2px);
-      }
-
-      .offer-buy-btn--featured {
-        background: #10b981;
-        color: #ffffff;
-        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
-      }
-
-      .offer-buy-btn--featured:hover:not(:disabled) {
-        background: #059669;
-        box-shadow: 0 12px 24px rgba(16, 185, 129, 0.25);
-      }
-
-
-      .offer-buy-btn:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-      }
-
-      .offer-warning {
-        margin: 8px 0 0;
-        font-size: 11px;
-        color: #d94747;
-      }
-
-
-      .empty-state {
-        text-align: center;
-        color: var(--shop-muted);
-        padding: 28px 14px;
-        background: var(--shop-white);
-        border: 1px solid var(--shop-border);
-        border-radius: 14px;
-      }
-
-      .shop-footer {
-        border-top: 1px solid var(--shop-border);
-        background: var(--shop-white);
-        padding: 14px 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
         gap: 16px;
       }
 
-      .shop-footer p {
-        margin: 0;
-        font-size: 11px;
-        color: var(--shop-muted);
+      .balance-pill-premium {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        background: var(--shop-bg-canvas);
+        padding: 8px 16px;
+        border-radius: 99px;
+        border: 2px solid var(--shop-border-color);
+
+        .value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--shop-text-main);
+        }
+        .unit {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--shop-text-muted);
+            text-transform: uppercase;
+        }
       }
 
-      .shop-close-btn {
-        border: none;
-        border-radius: 8px;
-        background: var(--shop-close-btn-bg);
-        color: var(--shop-text);
-        font-size: 12px;
-        font-weight: 700;
-        padding: 10px 14px;
-        display: inline-flex;
+      .shop-body {
+        padding: 32px;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .section-title {
+        display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 12px;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--shop-text-main);
+        margin-bottom: 24px;
+      }
+
+      .offer-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      .gamified-card {
+        background: var(--shop-bg-card);
+        border-radius: 24px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        border: 2px solid var(--shop-border-color);
+        box-shadow: 0 4px 0 0 var(--shop-border-color);
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        &:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 0 0 var(--shop-border-color);
+        }
+
+        &.featured {
+            border-color: var(--shop-primary);
+            box-shadow: 0 4px 0 0 var(--shop-primary);
+            &:hover {
+                box-shadow: 0 12px 0 0 var(--shop-primary);
+            }
+        }
+      }
+
+      .card-badge {
+        position: absolute;
+        top: -12px;
+        background: #3b82f6;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        z-index: 10;
+        &.badge-featured {
+            background: var(--shop-primary);
+        }
+      }
+
+      .card-visual {
+        position: relative;
+        margin-bottom: 20px;
+        .blob-bg {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+            z-index: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .main-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            position: relative;
+            z-index: 1;
+        }
+        .amount-badge {
+            position: absolute;
+            bottom: 0;
+            right: -5px;
+            background: white;
+            color: #1e293b;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.75rem;
+            border: 2px solid var(--shop-border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--shop-text-main);
+        margin: 0 0 8px;
+      }
+
+      .card-desc {
+        font-size: 0.875rem;
+        color: var(--shop-text-muted);
+        line-height: 1.4;
+        margin-bottom: 20px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .price-tag {
+        margin-bottom: 16px;
+        .old-price {
+            font-size: 0.9rem;
+            color: var(--shop-text-muted);
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .current-price {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            .num {
+                font-size: 2rem;
+                font-weight: 900;
+                color: var(--shop-text-main);
+            }
+        }
+      }
+
+      .buy-button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 16px;
+        border: none;
+        background: var(--shop-border-color);
+        color: var(--shop-text-main);
+        font-weight: 900;
+        font-size: 0.9rem;
         cursor: pointer;
-      }
+        box-shadow: 0 4px 0 0 rgba(0,0,0,0.1);
+        transition: all 0.1s;
 
-      .shop-close-btn:hover {
-        background: var(--shop-close-btn-hover);
-      }
-
-
-      @keyframes modal-pop {
-        from {
-          opacity: 0;
-          transform: translateY(-12px) scale(0.975);
+        &:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 rgba(0,0,0,0.1);
         }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
 
-      @keyframes mask-fade {
-        from {
-          opacity: 0;
+        &.buy-button-featured {
+            background: var(--shop-primary);
+            color: white;
+            box-shadow: 0 4px 0 0 var(--shop-primary-dark);
+            &:active:not(:disabled) {
+                box-shadow: 0 2px 0 0 var(--shop-primary-dark);
+            }
         }
-        to {
-          opacity: 1;
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(0.98);
         }
       }
 
-      @keyframes fade-rise {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+      .insufficient-mullu {
+        margin-top: 10px;
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--shop-accent-red);
+        text-transform: uppercase;
+      }
+
+      .shop-status-footer {
+        background: var(--shop-bg-card);
+        padding: 24px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 2px solid var(--shop-border-color);
+
+        .info-note {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--shop-text-muted);
         }
       }
 
-      @keyframes card-rise {
-        from {
-          opacity: 0;
-          transform: translateY(15px) scale(0.985);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      @keyframes badge-drop {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, -10px) scale(0.9);
-        }
-        65% {
-          opacity: 1;
-          transform: translate(-50%, 2px) scale(1.02);
-        }
-        100% {
-          opacity: 1;
-          transform: translate(-50%, 0) scale(1);
+      .btn-secondary {
+        padding: 10px 24px;
+        border-radius: 12px;
+        border: 2px solid var(--shop-border-color);
+        background: transparent;
+        color: var(--shop-text-main);
+        font-weight: 800;
+        cursor: pointer;
+        &:hover {
+            background: var(--shop-bg-canvas);
         }
       }
 
-
-
-
-
-      @media (max-width: 991px) {
-        .offer-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-
-        .offer-card--featured {
-          transform: none;
-        }
+      .offer-card-skeleton {
+        height: 350px;
+        background: var(--shop-border-color);
+        border-radius: 24px;
       }
 
-      @media (max-width: 760px) {
-        .shop-header,
-        .shop-body,
-        .shop-footer {
-          padding-left: 14px;
-          padding-right: 14px;
-        }
+      .empty-shop-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--shop-text-muted);
+      }
 
-        .shop-header {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .shop-header-right {
-          justify-content: space-between;
-        }
-
-        .balance-block {
-          align-items: flex-start;
-        }
-        .offer-grid {
-          grid-template-columns: 1fr;
-        }
-
-
-        .offer-card {
-          min-height: auto;
-        }
-
-        .offer-card h4 {
-          font-size: 33px;
-        }
-
-        .shop-footer {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .shop-close-btn {
-          width: 100%;
-          justify-content: center;
-        }
+      @media (max-width: 900px) {
+        .offer-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 600px) {
+        .offer-grid { grid-template-columns: 1fr; }
+        .shop-header { flex-direction: column; gap: 16px; align-items: flex-start; }
       }
     `
   ]

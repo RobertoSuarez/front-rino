@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -12,6 +13,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { DialogModule } from 'primeng/dialog';
 import { RippleModule } from 'primeng/ripple';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -34,7 +36,8 @@ import { environment } from '../../../../environments/environment';
     ToolbarModule,
     DialogModule,
     RippleModule,
-    TooltipModule
+    TooltipModule,
+    BreadcrumbModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './institutions-list.component.html'
@@ -49,6 +52,8 @@ export class InstitutionsListComponent implements OnInit {
   uploadingImage = false;
   selectedFile: File | null = null;
   previewUrl: string | null = null;
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
 
   constructor(
     private institutionService: InstitutionService,
@@ -59,6 +64,11 @@ export class InstitutionsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Administración' },
+      { label: 'Instituciones' }
+    ];
     console.log('InstitutionsListComponent inicializado');
     this.loadInstitutions();
   }

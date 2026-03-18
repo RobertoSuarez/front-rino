@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { MenuItem } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -14,6 +15,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MarkdownToHtmlPipe } from '@/shared/pipes/markdown-to-html.pipe';
 
 // Servicios
@@ -37,7 +39,8 @@ import { Chapter } from '@/core/models/chapter.interface';
     TagModule,
     DialogModule,
     DividerModule,
-    MarkdownToHtmlPipe
+    MarkdownToHtmlPipe,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   templateUrl: './cursos-list.component.html',
@@ -48,6 +51,8 @@ export class CursosListComponent implements OnInit {
   cursos: CourseSubscription[] = [];
   todosLosCursos: Course[] = [];
   loading: boolean = true;
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
   filtroOptions = [
     { label: 'En progreso', value: 'progreso' },
     { label: 'Todos los cursos', value: 'todos' },
@@ -67,6 +72,10 @@ export class CursosListComponent implements OnInit {
   private messageService = inject(MessageService);
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Mis Cursos' }
+    ];
     this.cargarCursos();
     this.cursosService.getAllCursos().subscribe(response => {
       this.todosLosCursos = response.data;

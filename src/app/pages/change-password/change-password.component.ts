@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 
@@ -21,7 +22,8 @@ import { ApiService } from '../../core/services/api.service';
     InputTextModule,
     ButtonModule,
     PasswordModule,
-    ToastModule
+    ToastModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   templateUrl: './change-password.component.html',
@@ -32,6 +34,9 @@ export class ChangePasswordComponent implements OnInit {
   loading: boolean = false;
   submitted: boolean = false;
 
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -41,6 +46,10 @@ export class ChangePasswordComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.breadcrumbItems = [
+      { label: 'Mi Cuenta', routerLink: '/profile' },
+      { label: 'Cambiar Contraseña' }
+    ];
     this.initForm();
   }
 
@@ -97,6 +106,12 @@ export class ChangePasswordComponent implements OnInit {
     if (count <= 1) return 'weak';
     if (count <= 3) return 'medium';
     return 'strong';
+  }
+
+  get passwordsMatch(): boolean {
+    const newPassword = this.changePasswordForm?.get('newPassword')?.value;
+    const confirmPassword = this.changePasswordForm?.get('confirmPassword')?.value;
+    return !!newPassword && !!confirmPassword && newPassword === confirmPassword;
   }
 
   passwordMatchValidator(form: FormGroup) {

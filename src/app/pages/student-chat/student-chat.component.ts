@@ -10,6 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToastModule } from 'primeng/toast';
 import { RippleModule } from 'primeng/ripple';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SharedModule } from '../../shared/shared.module';
 import { Subscription } from 'rxjs';
 
@@ -44,6 +45,7 @@ interface Message {
     RippleModule,
     SharedModule,
     DialogModule,
+    BreadcrumbModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -65,6 +67,9 @@ export class StudentChatComponent implements OnInit, OnDestroy {
   private hasLoadedChats = false;
   isSending = false;
   private userSubscription?: Subscription;
+
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
 
   @ViewChild('messageInput') messageInput?: ElementRef<HTMLInputElement>;
 
@@ -91,6 +96,10 @@ export class StudentChatComponent implements OnInit, OnDestroy {
         });
       }
     });
+
+    this.breadcrumbItems = [
+      { label: 'Chat con IA' }
+    ];
   }
 
   ngOnDestroy(): void {

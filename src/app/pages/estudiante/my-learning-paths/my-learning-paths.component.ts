@@ -14,7 +14,8 @@ import { ChipModule } from 'primeng/chip';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 import { LearningPathService } from '../../../core/services/learning-path.service';
 
@@ -33,11 +34,15 @@ import { LearningPathService } from '../../../core/services/learning-path.servic
     ChipModule,
     TagModule,
     SkeletonModule,
-    ProgressBarModule
+    ProgressBarModule,
+    BreadcrumbModule
   ],
   providers: [MessageService, ConfirmationService],
   template: `
     <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 mb-2">
+        <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome"></p-breadcrumb>
+      </div>
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
 
@@ -362,6 +367,8 @@ export class MyLearningPathsComponent implements OnInit {
   subscriptionCode = '';
   subscribing = false;
   codeError = '';
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
 
   constructor(
     private learningPathService: LearningPathService,
@@ -371,6 +378,10 @@ export class MyLearningPathsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Mis Rutas' }
+    ];
     this.loadSubscriptions();
   }
 

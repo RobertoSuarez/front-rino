@@ -18,6 +18,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 interface ProfileData {
   id: number;
@@ -54,13 +55,17 @@ interface ProfileData {
     ToastModule,
     TooltipModule,
     RouterModule,
-    SelectModule
+    SelectModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
+  breadcrumbItems: any[] = [];
+  breadcrumbHome = { label: 'Panel principal', icon: 'pi pi-home', routerLink: '/dashboard' };
+
   profileData: ProfileData | null = null;
   loading: boolean = true;
   error: string | null = null;
@@ -73,22 +78,6 @@ export class ProfileComponent implements OnInit {
   loadingInstitutions: boolean = false;
   availableAvatars: string[] = [];
   selectedAvatarPath: string = '';
-  recentActivity = [
-    {
-      type: 'module',
-      icon: 'pi-check-circle',
-      title: 'Completaste el módulo "Ciberseguridad Básica"',
-      time: 'Hace 2 horas',
-      reward: '+100 Yachay'
-    },
-    {
-      type: 'login',
-      icon: 'pi-sign-in',
-      title: 'Inicio de sesión exitoso',
-      time: 'Ayer a las 10:30',
-      reward: ''
-    }
-  ];
 
   get institutionsOptions(): Institution[] {
     return this.institutions || [];
@@ -114,6 +103,10 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.breadcrumbItems = [
+      { label: 'Mi Cuenta' },
+      { label: 'Perfil' }
+    ];
     this.loadProfileData();
     this.loadUserIndicators();
     this.loadInstitutions();

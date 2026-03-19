@@ -170,6 +170,7 @@ export class ActivitySolverComponent implements OnInit {
   showResultsModal = signal(false); // Modal de resultados
   showFeedbackDrawer = signal(false); // Drawer de feedback
   showAIFeedbackModal = signal(false); // Modal de feedback de IA
+  loadingAIFeedback = signal(false);
   userIndicators = signal<UserIndicators | null>(null); // Indicadores del usuario
   outOfLivesModal = signal(false); // Modal cuando se queda sin tumis
   showAbandonModal = signal(false); // Modal para abandonar actividad
@@ -266,6 +267,10 @@ export class ActivitySolverComponent implements OnInit {
   
   get safeFeedback(): { qualification: number, feedback: string } {
     return this.currentFeedback() || { qualification: 0, feedback: '' };
+  }
+
+  get hasAIFeedback(): boolean {
+    return !!this.safeFeedback.feedback?.trim();
   }
   
   get safeActivityResult(): ActivityResult {
@@ -646,21 +651,13 @@ export class ActivitySolverComponent implements OnInit {
     }
 
     const exerciseId = this.currentExercise.id;
-    const exerciseType = this.currentExercise.typeExercise;
 
-    // Obtener la respuesta almacenada del ejercicio actual
     const currentAnswer = this.answers()[this.currentExerciseIndex()];
     if (!currentAnswer) {
       return;
     }
 
-    // Obtener el userId del usuario actual
-    let userId = 0;
-    this.authService.currentUser$.subscribe(user => {
-      if (user) {
-        userId = user.id;
-      }
-    }).unsubscribe();
+    const userId = this.getCurrentUserId();
 
     if (!userId) {
       this.messageService.add({
@@ -671,77 +668,38 @@ export class ActivitySolverComponent implements OnInit {
       return;
     }
 
-    // Construir el objeto de respuesta con todos los campos requeridos
-    const checkExerciseDto: any = {
-      userId: userId, // Agregar userId
-      // Inicializar todos los campos con valores por defecto
-      answerSelect: '',
-      answerSelects: [],
-      answerOrderFragmentCode: [],
-      answerOrderLineCode: [],
-      answerWriteCode: '',
-      answerFindError: ''
-    };
+    const checkExerciseDto = this.buildCheckExerciseDto(currentAnswer, userId);
 
-    // Llenar con la respuesta almacenada
-    checkExerciseDto.answerSelect = currentAnswer.answerSelect || '';
-    checkExerciseDto.answerSelects = currentAnswer.answerSelects || [];
-    checkExerciseDto.answerOrderFragmentCode = currentAnswer.answerOrderFragmentCode || [];
-    checkExerciseDto.answerOrderLineCode = currentAnswer.answerOrderLineCode || [];
-    checkExerciseDto.answerWriteCode = currentAnswer.answerWriteCode || '';
-    checkExerciseDto.answerFindError = currentAnswer.answerFindError || '';
-    
-    // Nuevos tipos de ejercicios
-    checkExerciseDto.answerVerticalOrdering = currentAnswer.answerVerticalOrdering || [];
-    checkExerciseDto.answerHorizontalOrdering = currentAnswer.answerHorizontalOrdering || [];
-    checkExerciseDto.answerPhishingSelection = currentAnswer.answerPhishingSelection || [];
-    checkExerciseDto.answerMatchPairs = currentAnswer.answerMatchPairs || [];
-
-    // Enviar la respuesta al backend para validación
     this.submitting.set(true);
 
-    this.exerciseService.checkAnswer(exerciseId, checkExerciseDto).subscribe({
+    this.exerciseService.validateAnswer(exerciseId, checkExerciseDto).subscribe({
       next: (feedback) => {
-        // 🔊 Reproducir audio según el resultado
         if (feedback.qualification >= 7) {
           this.audioService.playSuccessSound();
-          // 🎉 Efecto 3D de éxito
           this.triggerSuccessEffect();
         } else {
           this.audioService.playErrorSound();
-          // ❌ Efecto 3D de error
           this.triggerErrorEffect();
         }
 
-        // Actualizar la retroalimentación en el estado local
         this.updateFeedback(exerciseId, feedback);
 
-        // Si la respuesta es incorrecta (calificación < 7), disminuir una vida (tumís)
         if (feedback.qualification < 7) {
           this.decreaseTumis();
         }
 
-        // Si ganó Yachay, mostrar alerta especial
         if (feedback.yachayEarned && feedback.yachayEarned > 0) {
           this.showYachayReward(feedback.yachayEarned, feedback.difficulty || 'Fácil');
-          // Recargar indicadores del usuario para actualizar el balance
           this.loadUserIndicators();
         }
 
-        // Mostrar la retroalimentación en el drawer
         this.currentFeedback.set({
           ...feedback,
-          feedback: marked.parse(feedback.feedback || '') as string
+          feedback: ''
         });
         this.showFeedback.set(true);
-        this.showFeedbackDrawer.set(true); // Abrir drawer
-        this.answerVerified.set(true); // Marcar respuesta como verificada
-        
-        // 🎆 Efecto 3D especial al abrir el modal de feedback
-        setTimeout(() => {
-          this.triggerFeedbackModalEffect(feedback.qualification);
-        }, 300);
-        
+        this.showFeedbackDrawer.set(true);
+        this.answerVerified.set(true);
         this.submitting.set(false);
         this.cdr.detectChanges();
       },
@@ -756,6 +714,77 @@ export class ActivitySolverComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  openAmautaFeedback(): void {
+    if (!this.currentExercise) {
+      return;
+    }
+
+    const currentAnswer = this.answers()[this.currentExerciseIndex()];
+    if (!currentAnswer) {
+      return;
+    }
+
+    this.showAIFeedbackModal.set(true);
+
+    if (currentAnswer.feedback?.trim()) {
+      this.currentFeedback.set({
+        qualification: currentAnswer.qualification || 0,
+        feedback: currentAnswer.feedback,
+      });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo obtener el ID del usuario'
+      });
+      this.showAIFeedbackModal.set(false);
+      return;
+    }
+
+    this.loadingAIFeedback.set(true);
+    this.cdr.detectChanges();
+
+    this.exerciseService
+      .getAmautaFeedback(this.currentExercise.id, this.buildCheckExerciseDto(currentAnswer, userId))
+      .subscribe({
+        next: (feedback) => {
+          const normalizedFeedback = {
+            qualification: currentAnswer.qualification ?? feedback.qualification ?? 0,
+            feedback: feedback.feedback || '',
+          };
+
+          this.updateFeedback(this.currentExercise!.id, normalizedFeedback);
+          this.currentFeedback.set({
+            qualification: normalizedFeedback.qualification,
+            feedback: marked.parse(normalizedFeedback.feedback) as string,
+          });
+
+          setTimeout(() => {
+            this.triggerFeedbackModalEffect(normalizedFeedback.qualification);
+          }, 300);
+
+          this.loadingAIFeedback.set(false);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al generar la explicación de Amauta:', error);
+          this.loadingAIFeedback.set(false);
+          this.showAIFeedbackModal.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo generar la explicación de Amauta'
+          });
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   nextExercise(): void {
@@ -1008,6 +1037,33 @@ export class ActivitySolverComponent implements OnInit {
   continueFromFeedback(): void {
     this.closeFeedbackDrawer();
     this.nextExercise();
+  }
+
+  private getCurrentUserId(): number {
+    let userId = 0;
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        userId = user.id;
+      }
+    }).unsubscribe();
+
+    return userId;
+  }
+
+  private buildCheckExerciseDto(currentAnswer: ExerciseAnswer, userId: number): any {
+    return {
+      userId,
+      answerSelect: currentAnswer.answerSelect || '',
+      answerSelects: currentAnswer.answerSelects || [],
+      answerOrderFragmentCode: currentAnswer.answerOrderFragmentCode || [],
+      answerOrderLineCode: currentAnswer.answerOrderLineCode || [],
+      answerWriteCode: currentAnswer.answerWriteCode || '',
+      answerFindError: currentAnswer.answerFindError || '',
+      answerVerticalOrdering: currentAnswer.answerVerticalOrdering || [],
+      answerHorizontalOrdering: currentAnswer.answerHorizontalOrdering || [],
+      answerPhishingSelection: currentAnswer.answerPhishingSelection || [],
+      answerMatchPairs: currentAnswer.answerMatchPairs || []
+    };
   }
 
   /**

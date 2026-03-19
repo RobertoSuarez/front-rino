@@ -347,7 +347,7 @@
                             <span *ngIf="lastSaved" class="text-sm font-bold text-gray-500">{{lastSaved |
                                 date:'HH:mm:ss'}}</span>
                         </div>
-                        <button pButton label="GUARDAR Y PUBLICAR" icon="pi pi-cloud-upload"
+                        <button pButton [label]="saveButtonLabel" icon="pi pi-cloud-upload"
                             class="gamified-publish-btn px-10 text-lg" [loading]="saving"
                             (click)="saveCourse()"></button>
                     </div>
@@ -593,7 +593,7 @@
                                                         </div>
 
                                                         <button class="gamified-btn-3d btn-3d-indigo !w-full !py-4"
-                                                            (click)="addExercise(i, j, k)">
+                                                            (click)="addAndEditExercise(i, j, k)">
                                                             <i class="pi pi-plus"></i> AÑADIR EJERCICIO
                                                         </button>
                                                     </div>
@@ -707,6 +707,13 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                        </div>
+
+                                                        <div class="mt-6 flex justify-end">
+                                                            <button class="gamified-btn-3d btn-3d-indigo"
+                                                                (click)="addAndEditExercise(i, j, k)">
+                                                                <i class="pi pi-plus"></i> AÑADIR EJERCICIO
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>

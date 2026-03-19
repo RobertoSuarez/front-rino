@@ -154,6 +154,24 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     return this.exercisesViewMode[`${chapI}-${temaJ}-${actK}`] || 'list';
   }
 
+  get isEditMode(): boolean {
+    return this.courseId !== null;
+  }
+
+  get saveButtonLabel(): string {
+    return this.isEditMode ? 'GUARDAR CAMBIOS' : 'GUARDAR Y PUBLICAR';
+  }
+
+  get saveSuccessSummary(): string {
+    return this.isEditMode ? '¡Cambios Guardados!' : '¡Curso Publicado!';
+  }
+
+  get saveSuccessDetail(): string {
+    return this.isEditMode
+      ? 'Los cambios del curso se sincronizaron correctamente.'
+      : 'Tu obra maestra ha sido guardada con éxito.';
+  }
+
   constructor(
     private fb: FormBuilder,
     private aiService: AiService,
@@ -198,6 +216,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       this.loadFromLocalStorage();
       if (this.chapters.length === 0) {
         this.addChapter();
+        this.sortCourseHierarchy();
       }
     }
 
@@ -260,6 +279,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
             };
             this.addChapter(formattedChap);
           });
+          this.sortCourseHierarchy();
         }
 
         this.loading = false;
@@ -304,6 +324,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         if (data.chapters) {
           while (this.chapters.length) this.chapters.removeAt(0);
           data.chapters.forEach((chap: any) => this.addChapter(chap));
+          this.sortCourseHierarchy();
         }
       } catch (e) {
         console.error('Error loading draft', e);
@@ -342,7 +363,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     if (data?.temas) {
       data.temas.forEach((t: any) => this.addTema(this.chapters.length - 1, t));
     }
-    // REMOVED autonomous empty tema addition
+    this.sortFormArrayByIndex(this.chapters);
   }
 
   removeChapter(index: number) {
@@ -370,7 +391,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     if (data?.activities) {
       data.activities.forEach((a: any) => this.addActivity(chapterIndex, this.getTemas(chapterIndex).length - 1, a));
     }
-    // REMOVED autonomous empty activity addition
+    this.sortFormArrayByIndex(this.getTemas(chapterIndex));
   }
 
   removeTema(chapterIndex: number, temaIndex: number) {
@@ -394,6 +415,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     if (data?.exercises) {
       data.exercises.forEach((ex: any) => this.addExercise(chapterIndex, temaIndex, this.getActivities(chapterIndex, temaIndex).length - 1, ex));
     }
+    this.sortFormArrayByIndex(this.getActivities(chapterIndex, temaIndex));
   }
 
   removeActivity(chapterIndex: number, temaIndex: number, activityIndex: number) {
@@ -412,6 +434,8 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     const exGroup = this.fb.group({
       id: [data?.id || null],
       index: [data?.index ?? this.getExercises(chapterIndex, temaIndex, activityIndex).length],
+      createdAt: [data?.createdAt || new Date().toISOString()],
+      updatedAt: [data?.updatedAt || null],
       difficulty: [data?.difficulty || 'Fácil'],
       statement: [data?.statement || '', Validators.required],
       hind: [data?.hind || ''],
@@ -442,6 +466,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       answerMatchPairs: [data?.answerMatchPairs || []]
     });
     this.getExercises(chapterIndex, temaIndex, activityIndex).push(exGroup);
+    this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
   }
 
   addAndEditExercise(chapterIndex: number, temaIndex: number, activityIndex: number) {
@@ -456,6 +481,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
     const removeLocal = () => {
       this.getExercises(chapterIndex, temaIndex, activityIndex).removeAt(exerciseIndex);
+      this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
       this.messageService.add({ severity: 'info', summary: 'Removido', detail: 'Ejercicio quitado localmente' });
     };
 
@@ -468,6 +494,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
           this.exerciseService.deleteExercise(exerciseId).subscribe({
             next: () => {
               this.getExercises(chapterIndex, temaIndex, activityIndex).removeAt(exerciseIndex);
+              this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
               this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Ejercicio eliminado de la base de datos' });
             },
             error: (err) => {
@@ -500,16 +527,14 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       const { chapterIndex, temaIndex, activityIndex, exerciseIndex } = meta;
       const exerciseGroup = this.getExercises(chapterIndex, temaIndex, activityIndex).at(exerciseIndex);
       const activityId = this.getActivity(chapterIndex, temaIndex, activityIndex).value.id;
-
-      // Asegurar que conectamos con el activityId verdadero si ya existe en la BD
-      const payload = { ...data, activityId };
+      const payload = this.buildExercisePayload(data, exerciseGroup.value, activityId);
 
       if (activityId) {
         if (data.id) {
-          // UPDATE
           this.exerciseService.updateExercise(data.id, payload).subscribe({
             next: (res: any) => {
-              exerciseGroup.patchValue({ ...data, ...res });
+              exerciseGroup.patchValue({ ...exerciseGroup.value, ...data, ...res, index: payload.index });
+              this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
               this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: 'El ejercicio ha sido sincronizado con la BD' });
             },
             error: (err) => {
@@ -518,10 +543,10 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
             }
           });
         } else {
-          // CREATE
           this.exerciseService.createExercise(payload).subscribe({
             next: (res: any) => {
-              exerciseGroup.patchValue({ ...data, id: res.id });
+              exerciseGroup.patchValue({ ...exerciseGroup.value, ...data, id: res.id, index: payload.index });
+              this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
               this.messageService.add({ severity: 'success', summary: 'Creado', detail: 'El nuevo ejercicio se ha guardado en la BD' });
             },
             error: (err) => {
@@ -531,11 +556,75 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
           });
         }
       } else {
-        // LOCAL ONLY (El curso / actividad aún no se guarda en BD, es pura data de memoria)
-        exerciseGroup.patchValue(data);
+        exerciseGroup.patchValue({ ...exerciseGroup.value, ...data, index: payload.index });
+        this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
         this.messageService.add({ severity: 'success', summary: 'Guardado Local', detail: 'Se sincronizará cuando guardes el curso completo' });
       }
     }
+  }
+
+  private buildExercisePayload(formData: any, currentExercise: any, activityId?: number | null) {
+    const payload: any = {
+      ...currentExercise,
+      ...formData,
+      index: formData.index ?? currentExercise?.index ?? 0,
+    };
+
+    if (activityId) {
+      payload.activityId = activityId;
+    }
+
+    return payload;
+  }
+
+  private sortCourseHierarchy(): void {
+    this.sortFormArrayByIndex(this.chapters);
+
+    this.chapters.controls.forEach((chapterControl, chapterIndex) => {
+      const temas = this.getTemas(chapterIndex);
+      this.sortFormArrayByIndex(temas);
+
+      temas.controls.forEach((_, temaIndex) => {
+        const activities = this.getActivities(chapterIndex, temaIndex);
+        this.sortFormArrayByIndex(activities);
+
+        activities.controls.forEach((__, activityIndex) => {
+          this.sortExercisesByCreationDate(this.getExercises(chapterIndex, temaIndex, activityIndex));
+        });
+      });
+    });
+  }
+
+  private sortExercisesByCreationDate(formArray: FormArray): void {
+    const sortedControls = [...formArray.controls].sort((a, b) => {
+      const leftCreatedAt = a.get('createdAt')?.value;
+      const rightCreatedAt = b.get('createdAt')?.value;
+
+      const leftTime = leftCreatedAt ? new Date(leftCreatedAt).getTime() : 0;
+      const rightTime = rightCreatedAt ? new Date(rightCreatedAt).getTime() : 0;
+
+      if (leftTime !== rightTime) {
+        return leftTime - rightTime;
+      }
+
+      const leftId = Number(a.get('id')?.value ?? 0);
+      const rightId = Number(b.get('id')?.value ?? 0);
+      return leftId - rightId;
+    });
+
+    formArray.clear({ emitEvent: false });
+    sortedControls.forEach((control) => formArray.push(control, { emitEvent: false }));
+  }
+
+  private sortFormArrayByIndex(formArray: FormArray): void {
+    const sortedControls = [...formArray.controls].sort((a, b) => {
+      const left = Number(a.get('index')?.value ?? 0);
+      const right = Number(b.get('index')?.value ?? 0);
+      return left - right;
+    });
+
+    formArray.clear({ emitEvent: false });
+    sortedControls.forEach((control) => formArray.push(control, { emitEvent: false }));
   }
 
   // ENHANCEMENT METHODS
@@ -911,28 +1000,30 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     }
 
     this.saving = true;
-    const payload = {
-      ...this.courseForm.value,
-      id: this.courseId, // Incluir el ID si estamos en modo edición
-      isDraft: false
-    };
+    const payload = this.buildBulkCoursePayload();
 
     this.courseService.createBulkCourse(payload).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.messageService.add({
           severity: 'success',
-          summary: '¡Curso Publicado!',
-          detail: 'Tu obra maestra ha sido guardada con éxito.'
+          summary: this.saveSuccessSummary,
+          detail: this.saveSuccessDetail
         });
 
         localStorage.removeItem('course_builder_draft');
         this.saving = false;
+        const savedCourseId = res?.id || this.courseId;
 
-        // Redirect to course details view (student view)
-        if (res && res.id) {
-          this.router.navigate(['/estudiante/cursos', res.id, 'capitulos']);
-        } else {
-          this.router.navigate(['/admin/courses']);
+        if (!this.isEditMode && savedCourseId) {
+          this.courseId = savedCourseId;
+          this.router.navigate(['/admin/courses/builder', savedCourseId], {
+            replaceUrl: true
+          });
+          return;
+        }
+
+        if (this.isEditMode && savedCourseId) {
+          this.courseId = savedCourseId;
         }
       },
       error: (err) => {
@@ -945,6 +1036,46 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         this.saving = false;
       }
     });
+  }
+
+  private buildBulkCoursePayload() {
+    const raw = this.courseForm.getRawValue();
+
+    return {
+      id: this.courseId,
+      courseTitle: raw.title,
+      description: raw.description,
+      urlLogo: raw.urlLogo,
+      code: raw.code,
+      index: raw.index,
+      isPublic: raw.isPublic,
+      isDraft: false,
+      chapters: (raw.chapters || []).map((chapter: any, chapterIndex: number) => ({
+        id: chapter.id || null,
+        title: chapter.title,
+        description: chapter.shortDescription,
+        shortDescription: chapter.shortDescription,
+        index: chapter.index ?? chapterIndex,
+        temas: (chapter.temas || []).map((tema: any, temaIndex: number) => ({
+          id: tema.id || null,
+          title: tema.title,
+          shortDescription: tema.shortDescription,
+          theory: tema.theory,
+          urlBackground: tema.urlBackground,
+          index: tema.index ?? temaIndex,
+          activities: (tema.activities || []).map((activity: any, activityIndex: number) => ({
+            id: activity.id || null,
+            title: activity.title,
+            index: activity.index ?? activityIndex,
+            exercises: (activity.exercises || []).map((exercise: any, exerciseIndex: number) => ({
+              ...exercise,
+              id: exercise.id || null,
+              index: exercise.index ?? exerciseIndex,
+            })),
+          })),
+        })),
+      })),
+    };
   }
 
   // Amauta Agent logic

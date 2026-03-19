@@ -96,13 +96,39 @@ export class ExerciseService {
   }
 
   /**
-   * Verifica la respuesta de un ejercicio
+   * Verifica la respuesta de un ejercicio y devuelve validación más feedback
    * @param id ID del ejercicio
    * @param answer Respuesta del usuario
    * @returns Observable con el feedback y calificación
    */
   checkAnswer(id: number, answer: CheckExerciseRequest): Observable<FeedbackExerciseResponse> {
     return this.http.post<{data: FeedbackExerciseResponse}>(`${this.apiUrl}/${id}/feedback`, answer)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Valida la respuesta sin generar feedback de IA
+   * @param id ID del ejercicio
+   * @param answer Respuesta del usuario
+   * @returns Observable con la calificación y recompensas
+   */
+  validateAnswer(id: number, answer: CheckExerciseRequest): Observable<FeedbackExerciseResponse> {
+    return this.http.post<{data: FeedbackExerciseResponse}>(`${this.apiUrl}/${id}/validate`, answer)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
+   * Genera el feedback de Amauta para una respuesta ya enviada
+   * @param id ID del ejercicio
+   * @param answer Respuesta del usuario
+   * @returns Observable con el feedback generado por IA
+   */
+  getAmautaFeedback(id: number, answer: CheckExerciseRequest): Observable<FeedbackExerciseResponse> {
+    return this.http.post<{data: FeedbackExerciseResponse}>(`${this.apiUrl}/${id}/amauta-feedback`, answer)
       .pipe(
         map(response => response.data)
       );

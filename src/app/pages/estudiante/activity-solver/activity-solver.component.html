@@ -191,9 +191,10 @@
           {{ safeFeedback.qualification >= 7 ? '¡Has respondido correctamente!' : 'No te preocupes, el aprendizaje viene de los errores.' }}
         </div>
         
-        <div class="ai-feedback-btn" (click)="showAIFeedbackModal.set(true)">
+        <div class="ai-feedback-btn" (click)="!loadingAIFeedback() ? openAmautaFeedback() : null">
+          <i class="pi pi-spin pi-spinner" *ngIf="loadingAIFeedback()"></i>
           <i class="pi pi-sparkles"></i>
-          Explicación de Amauta
+          {{ loadingAIFeedback() ? 'Generando explicación...' : 'Explicación de Amauta' }}
         </div>
       </div>
 
@@ -264,15 +265,22 @@
       
       <!-- Feedback body -->
       <div class="w-full md:w-2/3 flex flex-col pt-4 md:pt-0 pb-6 relative">
-        <!-- Rendered Feedback HTML as Speech Bubble -->
-        <div class="duo-speech-bubble px-6 py-6 md:px-8 md:py-8 text-[var(--text-primary)] relative z-10 w-full">
+        <div *ngIf="loadingAIFeedback()" class="duo-speech-bubble px-6 py-6 md:px-8 md:py-8 text-[var(--text-primary)] relative z-10 w-full flex items-center gap-3">
+          <i class="pi pi-spin pi-spinner text-2xl text-blue-500"></i>
+          <div>
+            <div class="font-bold">Amauta está preparando tu explicación</div>
+            <div class="text-sm opacity-80">Estamos generando retroalimentación personalizada para tu respuesta.</div>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingAIFeedback()" class="duo-speech-bubble px-6 py-6 md:px-8 md:py-8 text-[var(--text-primary)] relative z-10 w-full">
           <div class="speech-arrow hidden md:block"></div>
           <div class="speech-arrow-mobile block md:hidden"></div>
           <div [innerHTML]="safeFeedback.feedback" class="prose max-w-none ai-prose-content"></div>
         </div>
 
         <!-- Rate AI response -->
-        <div class="bg-yellow-50 border-2 border-yellow-200 p-5 rounded-2xl mt-4">
+        <div *ngIf="!loadingAIFeedback() && hasAIFeedback" class="bg-yellow-50 border-2 border-yellow-200 p-5 rounded-2xl mt-4">
           <h4 class="font-bold text-yellow-800 flex items-center gap-2 mb-2">
             <i class="pi pi-star-fill"></i> ¿Qué tan útil fue esto?
           </h4>
@@ -431,4 +439,3 @@
 </p-dialog>
 
 <app-tumis-shop-modal #tumisShopModal (onBuySuccess)="loadUserIndicators(); tumisShopModal.visible.set(false)"></app-tumis-shop-modal>
-

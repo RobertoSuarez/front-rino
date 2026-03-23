@@ -10,6 +10,7 @@ import { DialogModule } from 'primeng/dialog';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivityService } from '@/core/services/activity.service';
 import { ExerciseService } from '@/core/services/exercise.service';
+import { AuthService } from '@/core/services/auth.service';
 import { ActivityWithExercises as ApiActivityWithExercises } from '@/core/models/activity.interface';
 import { SingleSelectionExerciseComponent } from '../../estudiante/activity-solver/exercises/single-selection-exercise/single-selection-exercise.component';
 import { MultipleSelectionExerciseComponent } from '../../estudiante/activity-solver/exercises/multiple-selection-exercise/multiple-selection-exercise.component';
@@ -404,15 +405,18 @@ export class ExerciseSandboxComponent implements OnInit {
   private router = inject(Router);
   private activityService = inject(ActivityService);
   private exerciseService = inject(ExerciseService);
+  private authService = inject(AuthService);
   private messageService = inject(MessageService);
   private cdr = inject(ChangeDetectorRef);
 
   loading = signal(true);
   submitting = signal(false);
+  loadingAIFeedback = signal(false);
   activity = signal<ActivityWithExercises | null>(null);
   currentExerciseIndex = signal(0);
   answers = signal<ExerciseAnswer[]>([]);
   showFeedbackDrawer = signal(false);
+  showAIFeedbackModal = signal(false);
   currentFeedback = signal<{ qualification: number; feedback: string } | null>(null);
   answerSubmitted = signal(false);
 
@@ -545,6 +549,10 @@ export class ExerciseSandboxComponent implements OnInit {
     return 'error';
   }
 
+  get hasAIFeedback(): boolean {
+    return !!(this.currentAnswer?.feedback?.trim() || (this.currentFeedback()?.feedback?.trim()));
+  }
+
   get feedbackTitle(): string {
     const q = this.safeFeedback.qualification;
     if (q >= 7) return '¡Correcto!';
@@ -599,7 +607,57 @@ export class ExerciseSandboxComponent implements OnInit {
     this.submitting.set(true);
 
     const dto: any = {
-      userId: 0,
+      userId: this.getCurrentUserId(),
+      answerSelect: a.answerSelect || '',
+      answerSelects: a.answerSelects || [],
+      answerOrderFragmentCode: a.answerOrderFragmentCode || [],
+      answerOrderLineCode: a.answerOrderLineCode || [],
+      answerWriteCode: a.answerWriteCode || '',
+      answerFindError: a.answerFindError || '',
+      answerVerticalOrdering: a.answerVerticalOrdering || [],
+      answerHorizontalOrdering: a.answerHorizontalOrdering || [],
+      answerPhishingSelection: a.answerPhishingSelection || [],
+      answerMatchPairs: a.answerMatchPairs || [],
+      isPreview: true,
+    };
+
+    this.exerciseService.validateAnswer(this.currentExercise.id, dto).subscribe({
+      next: (feedback) => {
+        this.currentFeedback.set({
+          qualification: feedback.qualification,
+          feedback: ''
+        });
+        this.answerSubmitted.set(true);
+        this.showFeedbackDrawer.set(true);
+        this.submitting.set(false);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo verificar la respuesta' });
+        this.submitting.set(false);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private getCurrentUserId(): number {
+    let userId = 0;
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        userId = user.id;
+      }
+    }).unsubscribe();
+
+    return userId;
+  }
+
+  openAmautaFeedback(): void {
+    const a = this.currentAnswer;
+    if (!a || this.loadingAIFeedback()) return;
+
+    this.loadingAIFeedback.set(true);
+    const dto: any = {
+      userId: this.getCurrentUserId(),
       answerSelect: a.answerSelect || '',
       answerSelects: a.answerSelects || [],
       answerOrderFragmentCode: a.answerOrderFragmentCode || [],
@@ -615,15 +673,22 @@ export class ExerciseSandboxComponent implements OnInit {
 
     this.exerciseService.checkAnswer(this.currentExercise.id, dto).subscribe({
       next: (feedback) => {
-        this.currentFeedback.set(feedback);
-        this.answerSubmitted.set(true);
-        this.showFeedbackDrawer.set(true);
-        this.submitting.set(false);
+        const htmlFeedback = marked.parse(feedback.feedback || '') as string;
+        this.currentFeedback.update(curr => curr ? { ...curr, feedback: htmlFeedback } : null);
+        
+        // También actualizar en el array de respuestas para persistencia local
+        this.answers.update(ans => ans.map(it => 
+          it.exerciseId === this.currentExercise.id 
+            ? { ...it, feedback: htmlFeedback, qualification: feedback.qualification } 
+            : it
+        ));
+
+        this.loadingAIFeedback.set(false);
         this.cdr.detectChanges();
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo verificar la respuesta' });
-        this.submitting.set(false);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo obtener la explicación de Amauta' });
+        this.loadingAIFeedback.set(false);
         this.cdr.detectChanges();
       }
     });

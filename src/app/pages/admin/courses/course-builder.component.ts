@@ -172,6 +172,10 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       : 'Tu obra maestra ha sido guardada con éxito.';
   }
 
+  get storageKey(): string {
+    return this.courseId ? `course_edit_draft_${this.courseId}` : 'course_builder_draft';
+  }
+
   constructor(
     private fb: FormBuilder,
     private aiService: AiService,
@@ -213,10 +217,24 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       }));
     } else {
       // 2. Flujo de creación normal
-      this.loadFromLocalStorage();
-      if (this.chapters.length === 0) {
-        this.addChapter();
-        this.sortCourseHierarchy();
+      const draft = localStorage.getItem(this.storageKey);
+      if (draft && !this.isEditMode) {
+        this.confirmationService.confirm({
+          message: '¡Existe un borrador de curso! ¿Deseas volver a trabajar sobre él? De lo contrario, comenzaremos uno nuevo desde cero.',
+          header: 'Borrador Detectado',
+          icon: 'pi pi-info-circle',
+          acceptLabel: 'Continuar Borrador',
+          rejectLabel: 'Comenzar Nuevo',
+          accept: () => {
+            this.loadFromLocalStorage();
+          },
+          reject: () => {
+            localStorage.removeItem(this.storageKey);
+            this.initNewCourseState();
+          }
+        });
+      } else {
+        this.initNewCourseState();
       }
     }
 
@@ -300,16 +318,28 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   saveToLocalStorage() {
     this.autosaving = true;
-    localStorage.setItem('course_builder_draft', JSON.stringify(this.courseForm.value));
+    localStorage.setItem(this.storageKey, JSON.stringify(this.courseForm.value));
     this.lastSaved = new Date();
     setTimeout(() => this.autosaving = false, 1000);
   }
 
   loadFromLocalStorage() {
-    const draft = localStorage.getItem('course_builder_draft');
+    const draft = localStorage.getItem(this.storageKey);
     if (draft) {
       try {
         const data = JSON.parse(draft);
+
+        // --- FIX: Polluted Draft Cleanup ---
+        if (!this.isEditMode) {
+          const hasStaleIds = (data.chapters || []).some((c: any) => c.id != null) || data.id != null;
+          if (hasStaleIds) {
+            console.warn('Polluted draft detected for a new course. Clearing to prevent data leakage.');
+            this.clearDraft();
+            return; // Skip loading
+          }
+        }
+        // -----------------------------------
+
         this.courseForm.patchValue({
           title: data.title,
           description: data.description,
@@ -338,7 +368,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       header: 'Confirmación',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        localStorage.removeItem('course_builder_draft');
+        localStorage.removeItem(this.storageKey);
         window.location.reload();
       }
     });
@@ -346,6 +376,13 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   get chapters() {
     return this.courseForm.get('chapters') as FormArray;
+  }
+
+  private initNewCourseState() {
+    if (this.chapters.length === 0) {
+      this.addChapter();
+      this.sortCourseHierarchy();
+    }
   }
 
   addChapter(data?: any) {
@@ -789,12 +826,12 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       if (this.chapters.length === 1 && !this.chapters.at(0).value.title) {
         this.chapters.at(0).patchValue({
           title: chapter.title,
-          description: chapter.description
+          shortDescription: chapter.description
         });
       } else {
         this.addChapter({
           title: chapter.title,
-          description: chapter.description
+          shortDescription: chapter.description
         });
       }
       this.messageService.add({ severity: 'success', summary: 'Añadido', detail: `"${chapter.title}" al cuaderno` });
@@ -1010,21 +1047,27 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
           detail: this.saveSuccessDetail
         });
 
-        localStorage.removeItem('course_builder_draft');
+        localStorage.removeItem(this.storageKey);
         this.saving = false;
-        const savedCourseId = res?.id || this.courseId;
+        
+        const responseData = res.data || res;
+        const data = responseData.data || responseData;
+        const savedCourseId = data?.id || this.courseId;
 
         if (!this.isEditMode && savedCourseId) {
           this.courseId = savedCourseId;
           this.router.navigate(['/admin/courses/builder', savedCourseId], {
             replaceUrl: true
           });
-          return;
-        }
-
-        if (this.isEditMode && savedCourseId) {
+        } else if (this.isEditMode && savedCourseId) {
           this.courseId = savedCourseId;
         }
+
+        // --- FIX: Force reload component state with DB IDs after save to prevent duplicates ---
+        if (this.courseId) {
+            this.loadCourseForEdit(this.courseId);
+        }
+        // -----------------------------------------------------------------------------------
       },
       error: (err) => {
         console.error('Error al guardar:', err);
@@ -1040,6 +1083,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   private buildBulkCoursePayload() {
     const raw = this.courseForm.getRawValue();
+    const isEdit = this.isEditMode;
 
     return {
       id: this.courseId,
@@ -1051,25 +1095,25 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       isPublic: raw.isPublic,
       isDraft: false,
       chapters: (raw.chapters || []).map((chapter: any, chapterIndex: number) => ({
-        id: chapter.id || null,
+        id: isEdit ? (chapter.id || null) : null,
         title: chapter.title,
         description: chapter.shortDescription,
         shortDescription: chapter.shortDescription,
         index: chapter.index ?? chapterIndex,
         temas: (chapter.temas || []).map((tema: any, temaIndex: number) => ({
-          id: tema.id || null,
+          id: isEdit ? (tema.id || null) : null,
           title: tema.title,
           shortDescription: tema.shortDescription,
           theory: tema.theory,
           urlBackground: tema.urlBackground,
           index: tema.index ?? temaIndex,
           activities: (tema.activities || []).map((activity: any, activityIndex: number) => ({
-            id: activity.id || null,
+            id: isEdit ? (activity.id || null) : null,
             title: activity.title,
             index: activity.index ?? activityIndex,
             exercises: (activity.exercises || []).map((exercise: any, exerciseIndex: number) => ({
               ...exercise,
-              id: exercise.id || null,
+              id: isEdit ? (exercise.id || null) : null,
               index: exercise.index ?? exerciseIndex,
             })),
           })),

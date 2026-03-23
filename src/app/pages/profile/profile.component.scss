@@ -7,12 +7,12 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem 1.25rem;
+  padding: 0.8rem 1rem;
 }
 
 .profile-modern-header__copy h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-color);
   line-height: 1.05;
@@ -21,7 +21,7 @@
 .profile-modern-header__copy p {
   margin: 0.45rem 0 0;
   color: var(--text-color-secondary);
-  font-size: 0.92rem;
+  font-size: 0.85rem;
 }
 
 .profile-modern-header__actions {
@@ -31,10 +31,10 @@
 }
 
 .profile-modern-container {
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .profile-top-row {
@@ -42,7 +42,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 1.5rem;
   border-bottom: 2px dashed var(--surface-border);
 
   @media (max-width: 1100px) {
@@ -64,8 +64,8 @@
 
 .profile-avatar-wrapper {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 110px;
+  height: 110px;
   flex-shrink: 0;
 
   img {
@@ -93,7 +93,7 @@
 
 .profile-identity-info {
   h2 {
-    font-size: 2.25rem;
+    font-size: 1.75rem;
     font-weight: 850;
     margin: 0;
     line-height: 1.1;
@@ -102,7 +102,7 @@
   }
 
   .email-text {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     color: var(--text-color-secondary);
     margin: 0.25rem 0 0.75rem;
   }
@@ -139,13 +139,13 @@
 }
 
 .resource-label-top {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 850;
   color: var(--text-color-secondary);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   background: var(--surface-300, #f1f5f9);
-  padding: 0.2rem 0.6rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 0.5rem;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
@@ -159,20 +159,20 @@
 .resource-pill-large {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  padding: 1rem 1.5rem;
-  border-radius: 2rem;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 1.5rem;
   border-width: 4px;
   border-style: solid;
   background: var(--surface-card);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  min-width: 200px;
-  height: 120px;
+  min-width: 170px;
+  height: 90px;
   cursor: default;
 
   img {
-    height: 80px;
-    width: 80px;
+    height: 55px;
+    width: 55px;
     object-fit: contain;
     filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.1));
   }
@@ -183,7 +183,7 @@
     justify-content: center;
 
     .res-value {
-      font-size: 2.25rem;
+      font-size: 1.75rem;
       font-weight: 900;
       line-height: 1;
       font-family: 'Outfit', sans-serif;
@@ -219,7 +219,7 @@
 .profile-meta-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
@@ -230,10 +230,10 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.25rem;
+  padding: 1rem;
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   transition: all 0.2s;
 
   &:hover {
@@ -242,13 +242,13 @@
   }
 
   .meta-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
   .meta-content {
@@ -256,13 +256,13 @@
     flex-direction: column;
 
     .meta-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 700;
       color: var(--text-color-secondary);
     }
 
     .meta-value {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--text-color);
     }
@@ -285,10 +285,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 1.25rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
   border: none;
@@ -349,8 +349,8 @@
     align-items: flex-start;
   }
 
-  .profile-main-identity h2 {
-    font-size: 1.6rem;
+  .profile-identity-info h2 {
+    font-size: 1.5rem;
   }
 }
 
@@ -378,13 +378,13 @@
     text-align: center;
   }
 
-  .profile-avatar-wrap {
-    width: 112px;
-    height: 112px;
+  .profile-avatar-wrapper {
+    width: 90px;
+    height: 90px;
   }
-
-  .profile-main-identity h2 {
-    font-size: 1.35rem;
+  
+  .profile-identity-info h2 {
+    font-size: 1.25rem;
   }
 
   .profile-meta-grid {

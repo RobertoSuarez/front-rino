@@ -166,6 +166,16 @@
         </div>
 
         <div class="fd-body">
+            <!-- Botón para solicitar explicación de Amauta -->
+            <div *ngIf="!hasAIFeedback" class="p-4">
+                <button class="btn-3d btn-blue w-full justify-center" 
+                    [disabled]="loadingAIFeedback()" (click)="openAmautaFeedback()">
+                    <i class="pi" [ngClass]="loadingAIFeedback() ? 'pi-spin pi-spinner' : 'pi-sparkles'"></i>
+                    {{ loadingAIFeedback() ? 'GENERANDO EXPLICACIÓN...' : 'EXPLICACIÓN DE AMAUTA' }}
+                </button>
+            </div>
+
+            <!-- Contenido del feedback (IA o vacío) -->
             <div class="fd-text" [innerHTML]="safeFeedback.feedback"></div>
         </div>
 

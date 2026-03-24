@@ -593,10 +593,16 @@
                                                             </div>
                                                         </div>
 
-                                                        <button class="gamified-btn-3d btn-3d-indigo !w-full !py-4"
-                                                            (click)="addAndEditExercise(i, j, k)">
-                                                            <i class="pi pi-plus"></i> AÑADIR EJERCICIO
-                                                        </button>
+                                                        <div class="flex gap-4">
+                                                            <button class="gamified-btn-3d btn-3d-indigo flex-1 !py-4"
+                                                                (click)="addAndEditExercise(i, j, k)">
+                                                                <i class="pi pi-plus"></i> AÑADIR EJERCICIO
+                                                            </button>
+                                                            <button class="gamified-btn-3d btn-3d-amber flex-1 !py-4"
+                                                                (click)="openGenWizard(i, j, k)">
+                                                                <i class="pi pi-sparkles"></i> GENERAR CON IA
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -710,10 +716,14 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="mt-6 flex justify-end">
-                                                            <button class="gamified-btn-3d btn-3d-indigo"
+                                                        <div class="mt-6 flex justify-end gap-4">
+                                                            <button class="gamified-btn-3d btn-3d-indigo flex-1"
                                                                 (click)="addAndEditExercise(i, j, k)">
                                                                 <i class="pi pi-plus"></i> AÑADIR EJERCICIO
+                                                            </button>
+                                                            <button class="gamified-btn-3d btn-3d-amber flex-1"
+                                                                (click)="openGenWizard(i, j, k)">
+                                                                <i class="pi pi-sparkles"></i> GENERAR CON IA
                                                             </button>
                                                         </div>
                                                     </div>
@@ -723,10 +733,6 @@
                                                 <button class="gamified-btn-3d btn-3d-indigo"
                                                     (click)="addActivity(i, j)">
                                                     <i class="pi pi-plus-circle"></i> VINCULAR NUEVA ACTIVIDAD
-                                                </button>
-                                                <button class="gamified-btn-3d btn-3d-amber"
-                                                    (click)="openGenWizard(i, j)">
-                                                    <i class="pi pi-sparkles"></i> GENERAR CON IA
                                                 </button>
                                             </div>
                                         </div>
@@ -792,6 +798,7 @@
 <!-- AI EXERCISE GENERATION WIZARD -->
 <app-generate-exercises-dialog #genWizard
     [activityId]="null"
+    [saveToDatabase]="false"
     (exercisesGenerated)="onExercisesGenerated($event)">
 </app-generate-exercises-dialog>
 

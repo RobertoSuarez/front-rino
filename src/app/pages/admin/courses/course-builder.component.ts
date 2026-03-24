@@ -133,7 +133,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   @ViewChild('genWizard') genWizard!: GenerateExercisesDialogComponent;
   @ViewChild('exerciseEditorDialog') exerciseEditorDialog!: ExerciseEditorDialogComponent; // Added ViewChild
   displayGenWizard: boolean = false;
-  currentGenContext: { chapterI: number, temaJ: number } | null = null;
+  currentGenContext: { chapterI: number, temaJ: number, activityK?: number } | null = null;
 
   toggleActivityExpansion(chapI: number, temaJ: number, actK: number): void {
     const key = `${chapI}-${temaJ}-${actK}`;
@@ -695,38 +695,51 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     });
   }
 
-  openGenWizard(chapterI: number, temaJ: number) {
-    this.currentGenContext = { chapterI, temaJ };
+  openGenWizard(chapterI: number, temaJ: number, activityK: number) {
+    this.currentGenContext = { chapterI, temaJ, activityK };
     this.genWizard.open();
   }
 
   onExercisesGenerated(exercises: GeneratedExercise[]) {
     if (!this.currentGenContext || exercises.length === 0) return;
     
-    const { chapterI, temaJ } = this.currentGenContext;
+    const { chapterI, temaJ, activityK } = this.currentGenContext;
     
-    // Create a new activity for these exercises
-    const activityCount = this.getActivities(chapterI, temaJ).length;
-    const newActivityTitle = `Actividad Generada ${activityCount + 1}`;
-    
-    this.addActivity(chapterI, temaJ, {
-        title: newActivityTitle,
-        exercises: exercises.map(ex => ({
-            statement: ex.statement,
-            typeExercise: ex.typeExercise,
-            difficulty: ex.difficulty,
-            optionSelectOptions: ex.optionSelectOptions,
-            answerSelectCorrect: ex.answerSelectCorrect,
-            hind: ex.hint,
-            optionsVerticalOrdering: ex.optionsVerticalOrdering,
-            answerVerticalOrdering: ex.answerVerticalOrdering
-        }))
+    if (activityK === undefined) return;
+
+    exercises.forEach(ex => {
+      this.addExercise(chapterI, temaJ, activityK, {
+        statement: ex.statement,
+        typeExercise: ex.typeExercise,
+        difficulty: ex.difficulty,
+        optionSelectOptions: ex.optionSelectOptions || [],
+        optionOrderFragmentCode: ex.optionOrderFragmentCode || [],
+        optionOrderLineCode: ex.optionOrderLineCode || [],
+        optionsFindErrorCode: ex.optionsFindErrorCode || [],
+        answerSelectCorrect: ex.answerSelectCorrect || '',
+        answerSelectsCorrect: ex.answerSelectsCorrect || [],
+        answerOrderFragmentCode: ex.answerOrderFragmentCode || [],
+        answerOrderLineCode: ex.answerOrderLineCode || [],
+        answerFindError: ex.answerFindError || '',
+        optionsVerticalOrdering: ex.optionsVerticalOrdering || [],
+        answerVerticalOrdering: ex.answerVerticalOrdering || [],
+        optionsHorizontalOrdering: ex.optionsHorizontalOrdering || [],
+        answerHorizontalOrdering: ex.answerHorizontalOrdering || [],
+        optionsPhishingSelection: ex.optionsPhishingSelection || [],
+        answerPhishingSelection: ex.answerPhishingSelection || [],
+        phishingContext: ex.phishingContext || '',
+        phishingImageUrl: ex.phishingImageUrl || '',
+        optionsMatchPairsLeft: ex.leftItems || [],
+        optionsMatchPairsRight: ex.rightItems || [],
+        answerMatchPairs: ex.pairs || [],
+        hind: ex.hint || ''
+      });
     });
 
     this.messageService.add({ 
         severity: 'success', 
         summary: '¡Bingo!', 
-        detail: `Se ha creado una nueva actividad con ${exercises.length} ejercicios.` 
+        detail: `Se han añadido ${exercises.length} ejercicios a la actividad.` 
     });
     
     this.displayGenWizard = false;

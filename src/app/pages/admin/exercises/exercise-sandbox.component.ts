@@ -139,11 +139,11 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
     /* ── Topbar ── */
     .sandbox-topbar {
       background: #ffffff;
-      padding: 20px 40px;
+      padding: 16px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      gap: 20px;
       position: sticky;
       top: 0;
       z-index: 50;
@@ -202,12 +202,12 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
 
     /* ── Main layout ── */
     .sandbox-body {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
-      padding: 60px 24px;
+      padding: 32px 24px;
       display: flex;
       flex-direction: column;
-      gap: 30px;
+      gap: 24px;
     }
 
     /* ── Exercise card ── */
@@ -221,7 +221,7 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
     }
 
     .exercise-card-head {
-      padding: 30px 40px 10px;
+      padding: 24px 32px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -232,29 +232,29 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
       align-items: center;
       gap: 8px;
       color: #6366f1;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
     .exercise-number {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 800;
       color: #94a3b8;
       text-transform: uppercase;
     }
 
     .exercise-card-body {
-      padding: 20px 40px 40px;
+      padding: 16px 32px 32px;
     }
 
     .exercise-statement {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: #1e293b;
-      margin-bottom: 24px;
-      line-height: 1.3;
+      margin-bottom: 20px;
+      line-height: 1.4;
       letter-spacing: -0.01em;
     }
 
@@ -282,119 +282,153 @@ const EXERCISE_TYPE_LABELS: Record<ExerciseType, { label: string; icon: string }
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      padding: 30px 40px;
+      gap: 16px;
+      padding: 24px 32px;
       background: #ffffff;
       border-top: 3px solid #f1f5f9;
     }
 
-    /* GAMIFIED BUTTONS */
+    /* GAMIFIED BUTTONS - Enhanced Visibility */
     .btn-3d {
         border: none !important;
-        border-radius: 16px !important;
-        font-weight: 800 !important;
+        border-radius: 14px !important;
+        font-weight: 900 !important;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 16px 32px !important;
+        padding: 14px 28px !important;
         transition: all 0.1s ease !important;
         position: relative;
         cursor: pointer;
-        display: flex;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 10px;
+        font-size: 0.9rem !important;
+        min-height: 48px;
+        width: auto;
     }
 
     .btn-green {
-        background: var(--duo-green) !important;
+        background: #58cc02 !important;
         color: white !important;
-        border-bottom: 5px solid var(--duo-green-dark) !important;
+        border-bottom: 5px solid #46a302 !important;
+        box-shadow: 0 4px 0 #46a302;
     }
-
+    .btn-green:hover:not(:disabled) { background: #61e002 !important; }
     .btn-green:active:not(:disabled) {
         border-bottom-width: 0 !important;
+        box-shadow: none !important;
         transform: translateY(5px);
     }
 
     .btn-blue {
-        background: var(--duo-blue) !important;
+        background: #1cb0f6 !important;
         color: white !important;
-        border-bottom: 5px solid var(--duo-blue-dark) !important;
+        border-bottom: 5px solid #1899d6 !important;
+        box-shadow: 0 4px 0 #1899d6;
     }
-
+    .btn-blue:hover:not(:disabled) { background: #2bd0ff !important; }
     .btn-blue:active:not(:disabled) {
         border-bottom-width: 0 !important;
+        box-shadow: none !important;
         transform: translateY(5px);
     }
 
     .btn-secondary {
-        background: white !important;
-        color: #afafaf !important;
-        border: 3px solid #e5e5e5 !important;
-        border-bottom: 6px solid #e5e5e5 !important;
+        background: #ffffff !important;
+        color: #4b5563 !important;
+        border: 2px solid #e5e7eb !important;
+        border-bottom: 5px solid #e5e7eb !important;
+        box-shadow: 0 2px 0 #e5e7eb;
     }
-
+    .btn-secondary:hover:not(:disabled) { background: #f9fafb !important; }
     .btn-secondary:active:not(:disabled) {
-        border-bottom-width: 3px !important;
+        border-bottom-width: 2px !important;
+        box-shadow: none !important;
         transform: translateY(3px);
     }
 
     .btn-3d:disabled {
         opacity: 0.5;
-        cursor: default;
+        cursor: not-allowed;
+        filter: grayscale(0.5);
     }
 
-    /* ── Feedback Dialog ── */
-    ::ng-deep .p-dialog .p-dialog-content {
-        padding: 0 !important;
-        overflow: visible !important;
+    /* ── Amauta Premium Modal ── */
+    ::ng-deep .amauta-dialog .p-dialog-content {
+      padding: 0 !important; border-radius: 28px !important; overflow: hidden !important;
+    }
+    ::ng-deep .amauta-dialog .p-dialog-header {
+      padding: 24px 32px !important; border-bottom: 2px solid #f1f5f9 !important;
+    }
+    ::ng-deep .amauta-dialog .p-dialog-header-title {
+      font-weight: 900 !important; color: #1e293b !important; font-size: 1.25rem !important;
     }
 
-    .fd-wrap {
-      display: flex;
-      flex-direction: column;
-      background: white;
+    .am-modal-wrap { background: white; display: flex; flex-direction: column; height: 100%; max-height: 85vh; }
+    
+    .am-modal-main { display: flex; gap: 32px; align-items: flex-start; padding: 40px; overflow-y: auto; flex-grow: 1; }
+    
+    .am-character-col { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 140px; flex-shrink: 0; }
+    .am-img { width: 120px; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+    
+    .am-badge {
+      width: 100%; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 0.8rem;
+      text-transform: uppercase; text-align: center; border: 2px solid;
+    }
+    .am-badge--error { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
+    .am-badge--success { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    .am-badge--score { background: white; color: #f59e0b; border-color: #fef3c7; }
+
+    .am-bubble-col { flex: 1; position: relative; min-width: 0; }
+    .am-bubble {
+      background: #ffffff; border: 3px solid #e5e7eb; border-radius: 24px;
+      padding: 24px; font-size: 1.1rem; font-weight: 600; color: #4b5563;
+      line-height: 1.6; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    /* El triangulito de la burbuja */
+    .am-bubble::before {
+      content: ''; position: absolute; left: -14px; top: 40px;
+      border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+      border-right: 14px solid #e5e7eb;
+    }
+    .am-bubble::after {
+      content: ''; position: absolute; left: -10px; top: 40px;
+      border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+      border-right: 14px solid #ffffff;
     }
 
-    .fd-header {
-      padding: 40px;
-      text-align: center;
+    .am-explanation-content {
+      margin-top: 0;
     }
-    .fd-header--success { background: #dcfce7; }
-    .fd-header--partial  { background: #fef9c3; }
-    .fd-header--error    { background: #fee2e2; }
+    
+    .am-initial-state {
+      display: flex; flex-direction: column; gap: 20px; align-items: flex-start;
+    }
+    .am-result-title { font-size: 2rem; font-weight: 900; line-height: 1; }
+    .am-result-title--success { color: var(--duo-green); }
+    .am-result-title--error { color: var(--duo-red); }
 
-    .fd-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      margin: 0 auto 20px;
+    .am-footer { 
+      padding: 24px 40px; border-top: 3px solid #f1f5f9; background: #ffffff; 
+      flex-shrink: 0; display: flex; gap: 16px; align-items: center; 
+      box-shadow: 0 -10px 20px rgba(0,0,0,0.02);
     }
-    .fd-icon--success { background: var(--duo-green); color: white; border-bottom: 5px solid var(--duo-green-dark); }
-    .fd-icon--partial  { background: var(--duo-yellow); color: white; border-bottom: 5px solid var(--duo-yellow-dark); }
-    .fd-icon--error    { background: var(--duo-red); color: white; border-bottom: 5px solid var(--duo-red-dark); }
+    
+    .am-utility-box {
+      background: #fffcf0; border: 2px solid #fef3c7; border-radius: 16px; padding: 16px;
+      display: flex; align-items: center; justify-content: space-between; margin-top: 24px; width: 100%;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .am-utility-title { font-weight: 800; color: #92400e; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+    .am-stars { display: flex; gap: 4px; color: #fbbf24; font-size: 1.1rem; }
 
-    .fd-title {
-      font-size: 2rem;
-      font-weight: 900;
-      color: #1e293b;
-      margin-bottom: 10px;
+    .loader-wrap {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center;
     }
-
-    .fd-body {
-      padding: 40px;
-      text-align: center;
-    }
-
-    .fd-text {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #475569;
-      line-height: 1.6;
-    }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--duo-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -419,6 +453,7 @@ export class ExerciseSandboxComponent implements OnInit {
   showAIFeedbackModal = signal(false);
   currentFeedback = signal<{ qualification: number; feedback: string } | null>(null);
   answerSubmitted = signal(false);
+  userRating = signal(0);
 
   // return query params
   private returnTemaId: number | null = null;
@@ -628,7 +663,7 @@ export class ExerciseSandboxComponent implements OnInit {
           feedback: ''
         });
         this.answerSubmitted.set(true);
-        this.showFeedbackDrawer.set(true);
+        this.showAIFeedbackModal.set(true); // Open the modal directly
         this.submitting.set(false);
         this.cdr.detectChanges();
       },
@@ -684,6 +719,7 @@ export class ExerciseSandboxComponent implements OnInit {
         ));
 
         this.loadingAIFeedback.set(false);
+        this.showAIFeedbackModal.set(true); // Open the premium modal
         this.cdr.detectChanges();
       },
       error: () => {
@@ -710,8 +746,10 @@ export class ExerciseSandboxComponent implements OnInit {
 
   private resetExerciseState(): void {
     this.showFeedbackDrawer.set(false);
+    this.showAIFeedbackModal.set(false);
     this.currentFeedback.set(null);
     this.answerSubmitted.set(false);
+    this.userRating.set(0);
     this.cdr.detectChanges();
   }
 
@@ -724,18 +762,23 @@ export class ExerciseSandboxComponent implements OnInit {
           answerSelect: '', answerSelects: [], answerOrderFragmentCode: [],
           answerOrderLineCode: [], answerWriteCode: '', answerFindError: '',
           answerVerticalOrdering: [], answerHorizontalOrdering: [],
-          answerPhishingSelection: [], answerMatchPairs: []
+          answerPhishingSelection: [], answerMatchPairs: [],
+          feedback: ''
         }
         : a
     ));
-    this.showFeedbackDrawer.set(false);
-    this.currentFeedback.set(null);
-    this.answerSubmitted.set(false);
-    this.cdr.detectChanges();
+    this.resetExerciseState();
   }
 
   closeFeedbackDrawer(): void {
     this.showFeedbackDrawer.set(false);
+    this.showAIFeedbackModal.set(false);
+    this.cdr.detectChanges();
+  }
+
+  rateFeedback(stars: number): void {
+    this.userRating.set(stars);
+    this.cdr.detectChanges();
   }
 
   goBack(): void {

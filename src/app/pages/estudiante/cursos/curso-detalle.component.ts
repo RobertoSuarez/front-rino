@@ -133,7 +133,7 @@ export class CursoDetalleComponent implements OnInit {
 
   prepararTimelineEvents() {
     this.timelineEvents = this.chapters.map((chapter, index) => {
-      const completed = chapter.progress === 100;
+      const completed = chapter.progress >= 100;
       const inProgress = chapter.started && chapter.progress > 0 && chapter.progress < 100;
       const canStart = chapter.nextToStart && !chapter.started;
       const pending = !chapter.started && !chapter.nextToStart;

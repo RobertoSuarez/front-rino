@@ -142,52 +142,104 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- ── Feedback Dialog ─────────────────────────────────────────────────── -->
-<p-dialog [(visible)]="showFeedbackDrawer" [modal]="true" [draggable]="false" [resizable]="false" [showHeader]="false"
-    [closable]="false"
-    [style]="{'width': '500px', 'max-width': '95vw', 'border-radius': '32px'}"
-    [contentStyle]="{'padding': '0', 'border-radius': '32px'}">
+<!-- ── Amauta Premium Modal ── -->
+<p-dialog [(visible)]="showAIFeedbackModal" 
+          [modal]="true" 
+          [draggable]="false" 
+          [resizable]="false" 
+          [header]="'Retroalimentación de Amauta'"
+          [closable]="true"
+          appendTo="body"
+          styleClass="amauta-dialog"
+          [style]="{'width': '850px', 'max-width': '95vw'}">
 
-    <div class="fd-wrap" *ngIf="currentFeedback()">
-        <div class="fd-header" [class]="'fd-header--' + feedbackClass">
-            <div class="fd-icon" [class]="'fd-icon--' + feedbackClass">
-                <i class="pi" [ngClass]="{
-                    'pi-check':      feedbackClass === 'success',
-                    'pi-exclamation-triangle': feedbackClass === 'partial',
-                    'pi-times':       feedbackClass === 'error'
-                }"></i>
+    <div class="am-modal-wrap" *ngIf="currentFeedback()">
+        <!-- Scrollable Main Content -->
+        <div class="am-modal-main">
+            <!-- Left column: Amauta Character & Badges -->
+            <div class="am-character-col">
+                <img src="assets/elementos/amauta.png" alt="Amauta" class="am-img">
+                
+                <div class="am-badge" 
+                     [class.am-badge--success]="feedbackClass === 'success'"
+                     [class.am-badge--error]="feedbackClass === 'error'">
+                    <i class="pi" [ngClass]="feedbackClass === 'success' ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                    {{ feedbackClass === 'success' ? '¡Excelente!' : 'Sigue así' }}
+                </div>
+                
+                <div class="am-badge am-badge--score">
+                    <i class="pi pi-star-fill"></i>
+                    Puntos: {{ safeFeedback.qualification }}/10
+                </div>
             </div>
-            <div class="fd-title">{{ feedbackTitle }}</div>
-            <div class="bg-white/50 inline-block px-4 py-1 rounded-xl font-black text-xs uppercase tracking-widest text-gray-500">
-                Calificación: {{ safeFeedback.qualification }}/10
+
+            <!-- Right column: Dynamic Content (Result or Explanation) -->
+            <div class="am-bubble-col">
+                <div class="am-bubble">
+                    <!-- State 1: Initial Result (No AI Feedback yet) -->
+                    <div *ngIf="!hasAIFeedback" class="am-initial-state">
+                        <h2 class="am-result-title" [class.am-result-title--success]="feedbackClass === 'success'" [class.am-result-title--error]="feedbackClass === 'error'">
+                            {{ feedbackTitle }}
+                        </h2>
+                        <p class="text-xl font-bold text-gray-600 leading-relaxed">
+                            {{ feedbackClass === 'success' ? '¡Increíble! Has dominado este ejercicio. Tu respuesta es totalmente correcta.' : '¡Buen intento! Aunque esta vez no fue la correcta, cada error es un paso más hacia el éxito.' }}
+                        </p>
+                        
+                        <div class="w-full pt-4">
+                            <button class="btn-3d btn-blue w-full" 
+                                    [disabled]="loadingAIFeedback()"
+                                    (click)="openAmautaFeedback()">
+                                <i class="pi" [ngClass]="loadingAIFeedback() ? 'pi-spin pi-spinner' : 'pi-sparkles'"></i>
+                                <span class="font-black text-lg">{{ loadingAIFeedback() ? 'GENERANDO...' : 'REVELAR EXPLICACIÓN DE AMAUTA' }}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- State 2: AI Explanation -->
+                    <div *ngIf="hasAIFeedback" class="am-explanation-content">
+                        <div class="fd-text" [innerHTML]="safeFeedback.feedback"></div>
+
+                        <!-- Utility / Rating box inside bubble -->
+                        <div class="am-utility-box">
+                            <div class="am-utility-title">
+                                <i class="pi pi-star-fill"></i>
+                                <span>¿Te ayudó esta explicación?</span>
+                            </div>
+                            <div class="am-stars">
+                                <i class="pi cursor-pointer transition-all duration-200 hover:scale-125" 
+                                   *ngFor="let s of [1,2,3,4,5]"
+                                   [ngClass]="userRating() >= s ? 'pi-star-fill text-yellow-400' : 'pi-star text-gray-300'"
+                                   (click)="rateFeedback(s)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="fd-body">
-            <!-- Botón para solicitar explicación de Amauta -->
-            <div *ngIf="!hasAIFeedback" class="p-4">
-                <button class="btn-3d btn-blue w-full justify-center" 
-                    [disabled]="loadingAIFeedback()" (click)="openAmautaFeedback()">
-                    <i class="pi" [ngClass]="loadingAIFeedback() ? 'pi-spin pi-spinner' : 'pi-sparkles'"></i>
-                    {{ loadingAIFeedback() ? 'GENERANDO EXPLICACIÓN...' : 'EXPLICACIÓN DE AMAUTA' }}
-                </button>
-            </div>
-
-            <!-- Contenido del feedback (IA o vacío) -->
-            <div class="fd-text" [innerHTML]="safeFeedback.feedback"></div>
-        </div>
-
-        <div class="p-8 flex flex-column gap-4">
-            <button *ngIf="!isLastExercise && feedbackClass !== 'error'" class="btn-3d btn-green w-full justify-center" (click)="nextExercise()">
-                SIGUIENTE EJERCICIO
+        <!-- Sticky Footer: Final Actions -->
+        <div class="am-footer">
+            <!-- Continue/Next Button: Always visible if success, or if explanation was obtained -->
+            <button *ngIf="!isLastExercise && (feedbackClass === 'success' || hasAIFeedback)" 
+                    class="btn-3d btn-green flex-1" (click)="nextExercise()">
+                <span class="font-black">SIGUIENTE EJERCICIO</span>
+                <i class="pi pi-arrow-right font-black"></i>
             </button>
-            <button *ngIf="isLastExercise && feedbackClass !== 'error'" class="btn-3d btn-green w-full justify-center" (click)="goBack()">
-                FINALIZAR SANDBOX
+            
+            <button *ngIf="isLastExercise && (feedbackClass === 'success' || hasAIFeedback)" 
+                    class="btn-3d btn-green flex-1" (click)="goBack()">
+                <span class="font-black text-lg">FINALIZAR SANDBOX</span>
             </button>
-            <button class="btn-3d btn-secondary w-full justify-center" (click)="closeFeedbackDrawer()">
-                CERRAR
+
+            <!-- Retry Button: Only if error and NO explanation opened yet -->
+            <button *ngIf="feedbackClass === 'error' && !hasAIFeedback" 
+                    class="btn-3d btn-blue flex-1" (click)="restartCurrentExercise()">
+                <span class="font-black">REINTENTAR AHORA</span>
+            </button>
+
+            <button class="btn-3d btn-secondary px-10" (click)="closeFeedbackDrawer()">
+                <span class="font-black">CERRAR</span>
             </button>
         </div>
     </div>

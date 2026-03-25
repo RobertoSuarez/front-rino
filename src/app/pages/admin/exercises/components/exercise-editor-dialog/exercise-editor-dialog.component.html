@@ -1,40 +1,68 @@
-<p-dialog [header]="currentEditMeta ? 'Editar Ejercicio' : 'Nuevo Ejercicio'" [(visible)]="displayDialog"
-    (onHide)="hideDialog()" [style]="{width: '70vw', height: '90vh'}" [modal]="true" [closable]="true"
-    class="rounded-lg shadow-xl">
-    <form [formGroup]="exerciseForm" (ngSubmit)="saveExercise()"
-        class="p-fluid space-y-4 pt-4">
+<p-dialog [(visible)]="displayDialog"
+    (onHide)="hideDialog()" [style]="{width: '70vw', maxWidth: '850px', height: '90vh'}" [modal]="true" [closable]="false"
+    styleClass="shadow-2xl !rounded-3xl border-4 border-indigo-100">
+    <ng-template pTemplate="header">
+        <div class="flex w-full justify-between items-center border-b-8 border-indigo-100 pb-4 mb-2">
+            <h2 class="text-2xl font-black text-indigo-800 uppercase tracking-tighter m-0">
+                <i class="pi pi-star-fill text-amber-400 mr-2 text-2xl"></i>
+                {{ currentEditMeta ? 'EDITAR EJERCICIO' : 'NUEVO EJERCICIO' }}
+            </h2>
+            <button type="button" class="h-14 w-14 rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center border-b-4 border-slate-200 hover:border-red-600 active:border-b-0 active:translate-y-1" (click)="hideDialog()">
+                <i class="pi pi-times font-black text-xl"></i>
+            </button>
+        </div>
+    </ng-template>
 
-        <div class="field space-y-2">
-            <label for="typeExercise" class="block text-sm font-medium text-gray-700">Tipo de Ejercicio</label>
-            <select id="typeExercise" formControlName="typeExercise" (change)="onExerciseTypeChange()"
-                class="w-full xl:w-1/2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <option *ngFor="let option of exerciseTypes" [value]="option.value">{{option.label}}</option>
-            </select>
+    <form [formGroup]="exerciseForm" (ngSubmit)="saveExercise()"
+        class="p-fluid space-y-6 pt-2">
+
+        <div class="field space-y-3">
+            <label class="block text-sm font-black text-gray-400 uppercase tracking-widest">Tipo de Ejercicio</label>
+            <div class="relative">
+                <select id="typeExercise" formControlName="typeExercise" (change)="onExerciseTypeChange()"
+                    class="appearance-none w-full p-5 bg-white border-4 border-slate-200 rounded-2xl font-black text-gray-700 hover:border-indigo-300 focus:border-indigo-500 focus:ring-0 outline-none transition-all shadow-sm cursor-pointer pr-14 text-lg">
+                    <option *ngFor="let option of exerciseTypes" [value]="option.value" class="font-bold text-base py-2">
+                        {{option.label}}
+                    </option>
+                </select>
+                <!-- Flecha personalizada para select -->
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-5 text-gray-400">
+                    <i class="pi pi-chevron-down font-black text-xl"></i>
+                </div>
+            </div>
         </div>
 
-        <div class="field space-y-2">
-            <label for="statement" class="block text-sm font-medium text-gray-700">Enunciado</label>
-            <textarea id="statement" pInputTextarea formControlName="statement" rows="3" required
-                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+        <div class="field space-y-3">
+            <label for="statement" class="block text-sm font-black text-gray-400 uppercase tracking-widest">Enunciado</label>
+            <textarea id="statement" formControlName="statement" rows="3" required
+                class="w-full p-4 bg-slate-50 border-4 border-slate-200 rounded-2xl font-bold text-gray-700 focus:border-indigo-400 focus:ring-0 outline-none transition-colors resize-none"></textarea>
             <small *ngIf="exerciseForm.get('statement')?.invalid && exerciseForm.get('statement')?.touched"
-                class="text-red-500">
+                class="text-red-500 font-bold">
                 El enunciado es requerido
             </small>
         </div>
 
-        <div class="field space-y-2">
-            <label for="difficulty" class="block text-sm font-medium text-gray-700">Dificultad</label>
-            <select id="difficulty" formControlName="difficulty"
-                class="w-full xl:w-1/2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <option *ngFor="let option of difficultyOptions" [value]="option.value">{{option.label}}</option>
-            </select>
+        <div class="field space-y-3">
+            <label class="block text-sm font-black text-gray-400 uppercase tracking-widest">Dificultad</label>
+            <div class="flex gap-4">
+                <button *ngFor="let option of difficultyOptions" type="button"
+                    (click)="exerciseForm.get('difficulty')?.setValue(option.value)"
+                    class="flex-1 py-4 rounded-2xl font-black text-lg border-b-8 transition-all active:border-b-4 active:translate-y-1"
+                    [ngClass]="exerciseForm.get('difficulty')?.value === option.value ? 
+                        (option.value === 'Fácil' ? 'bg-green-500 text-white border-green-700' : 
+                         option.value === 'Medio' ? 'bg-amber-500 text-white border-amber-700' : 
+                         'bg-red-500 text-white border-red-700') : 
+                        'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'">
+                    {{option.label}}
+                </button>
+            </div>
         </div>
 
-        <div class="field space-y-2">
-            <label for="hind" class="block text-sm font-medium text-gray-700">Pista</label>
-            <textarea id="hind" pInputTextarea formControlName="hind" rows="2" required
-                class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
-            <small *ngIf="exerciseForm.get('hind')?.invalid && exerciseForm.get('hind')?.touched" class="text-red-500">
+        <div class="field space-y-3">
+            <label for="hind" class="block text-sm font-black text-gray-400 uppercase tracking-widest">Pista (Hint)</label>
+            <textarea id="hind" formControlName="hind" rows="2" required
+                class="w-full p-4 bg-amber-50 border-4 border-amber-200 rounded-2xl font-bold text-amber-800 focus:border-amber-400 focus:ring-0 outline-none transition-colors resize-none"></textarea>
+            <small *ngIf="exerciseForm.get('hind')?.invalid && exerciseForm.get('hind')?.touched" class="text-red-500 font-bold">
                 La pista es requerida
             </small>
         </div>
@@ -69,10 +97,12 @@
             </app-match-pairs>
         </div>
 
-        <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
-            <button type="button" class="gamified-action-btn secondary" (click)="hideDialog()">CANCELAR</button>
-            <button type="submit" class="gamified-publish-btn" [disabled]="exerciseForm.invalid">
-                <i class="pi pi-check mr-2"></i> {{ currentEditMeta ? 'ACTUALIZAR EJERCICIO' : 'GUARDAR EJERCICIO' }}
+        <div class="flex flex-col-reverse md:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t-4 border-gray-100">
+            <button type="button" class="px-6 py-4 rounded-2xl font-black text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors uppercase tracking-widest text-sm w-full md:w-auto" (click)="hideDialog()">
+                CANCELAR
+            </button>
+            <button type="submit" class="gamified-btn-3d btn-3d-green w-full md:w-auto !px-12 !py-4 text-lg" [disabled]="exerciseForm.invalid" [class.opacity-50]="exerciseForm.invalid">
+                <i class="pi pi-check mr-2 font-bold"></i> {{ currentEditMeta ? 'ACTUALIZAR EJERCICIO' : 'GUARDAR EJERCICIO' }}
             </button>
         </div>
     </form>

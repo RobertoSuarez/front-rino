@@ -18,6 +18,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TimelineModule } from 'primeng/timeline';
 import { KnobModule } from 'primeng/knob';
 import { TagModule } from 'primeng/tag';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { MenuItem } from 'primeng/api';
 import { catchError, of } from 'rxjs';
 import { MarkdownToHtmlPipe } from '@/shared/pipes/markdown-to-html.pipe';
 
@@ -66,7 +68,8 @@ interface TimelineEvent {
     KnobModule,
     TagModule,
     TooltipModule,
-    MarkdownToHtmlPipe
+    MarkdownToHtmlPipe,
+    BreadcrumbModule
 ],
   providers: [MessageService],
   templateUrl: './curso-detalle.component.html',
@@ -80,6 +83,8 @@ export class CursoDetalleComponent implements OnInit {
   loadingContenido: boolean = false;
   chapters: ChapterWithProgress[] = [];
   timelineEvents: TimelineEvent[] = [];
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
 
   private route = inject(ActivatedRoute);
   private cursosService = inject(CursosService);
@@ -88,6 +93,10 @@ export class CursoDetalleComponent implements OnInit {
   private router = inject(Router);
 
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+    ];
     this.route.params.subscribe(params => {
       this.cursoId = +params['id'];
       this.cargarCapitulos();
@@ -99,6 +108,7 @@ export class CursoDetalleComponent implements OnInit {
     this.cursosService.getCourseById(this.cursoId).subscribe({
       next: (response) => {
         this.curso = response.data;
+        this.actualizarBreadcrumbs();
         this.loading = false;
       },
       error: (error) => {
@@ -234,5 +244,14 @@ export class CursoDetalleComponent implements OnInit {
   irATemas(chapterId: string | number | undefined) {
     if (!chapterId) return;
     this.router.navigate(['/estudiante/cursos', this.cursoId, 'chapters', chapterId, 'temas']);
+  }
+
+  private actualizarBreadcrumbs(): void {
+    this.breadcrumbItems = [
+      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+    ];
+    if (this.curso) {
+      this.breadcrumbItems.push({ label: this.curso.title });
+    }
   }
 }

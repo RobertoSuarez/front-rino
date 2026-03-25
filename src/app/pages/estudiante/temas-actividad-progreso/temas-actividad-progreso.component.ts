@@ -13,7 +13,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { KnobModule } from 'primeng/knob';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
-import { MessageService } from 'primeng/api';
+import { MessageService, MenuItem } from 'primeng/api';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TemaConProgreso, ActividadConProgreso } from '@/core/models/tema.interface';
 
 @Component({
@@ -29,7 +30,10 @@ import { TemaConProgreso, ActividadConProgreso } from '@/core/models/tema.interf
     ProgressBarModule,
     KnobModule,
     ToastModule,
-    DialogModule
+    KnobModule,
+    ToastModule,
+    DialogModule,
+    BreadcrumbModule
   ],
   providers: [MessageService],
   templateUrl: './temas-actividad-progreso.component.html',
@@ -58,7 +62,16 @@ export class TemasActividadProgresoComponent implements OnInit {
   showTeoriaModal = signal(false);
   temaSeleccionado = signal<TemaConProgreso | null>(null);
 
+  // Breadcrumbs
+  breadcrumbItems: MenuItem[] = [];
+  breadcrumbHome: MenuItem | undefined;
+
   ngOnInit(): void {
+    this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
+    this.breadcrumbItems = [
+      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+    ];
+    
     const capituloId = this.activatedRoute.snapshot.paramMap.get('capituloId');
     const cursoId = this.activatedRoute.snapshot.paramMap.get('cursoId');
 
@@ -78,6 +91,7 @@ export class TemasActividadProgresoComponent implements OnInit {
       next: (response) => {
         if (response?.data) {
           this.cursoTitulo.set(response.data.title);
+          this.actualizarBreadcrumbs();
         }
       },
       error: (error) => {
@@ -95,6 +109,7 @@ export class TemasActividadProgresoComponent implements OnInit {
       next: (response) => {
         if (response?.data) {
           this.capituloTitulo.set(response.data.title);
+          this.actualizarBreadcrumbs();
         }
       },
       error: (error) => {
@@ -109,13 +124,37 @@ export class TemasActividadProgresoComponent implements OnInit {
 
     // Cargar temas con progreso
     this.cargarTemaConProgreso(capituloId);
+
+    // Actualizar breadcrumbs cuando ambos títulos estén cargados
+    this.actualizarBreadcrumbs();
+  }
+
+  private actualizarBreadcrumbs(): void {
+    const items: MenuItem[] = [
+      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+    ];
+
+    if (this.cursoTitulo()) {
+      items.push({ 
+        label: this.cursoTitulo(), 
+        routerLink: `/estudiante/cursos/${this.cursoId()}/capitulos` 
+      });
+    }
+
+    if (this.capituloTitulo()) {
+      items.push({ label: this.capituloTitulo() });
+    }
+
+    this.breadcrumbItems = items;
   }
 
   cargarTemaConProgreso(capituloId: string): void {
     this.temaService.getTemaConProgreso(capituloId).subscribe({
       next: (response) => {
         if (response?.data) {
-          this.temas.set(response.data);
+          // Filtrar temas que tienen al menos una actividad
+          const temasValidos = response.data.filter(tema => tema.activitiesToComplete > 0);
+          this.temas.set(temasValidos);
         }
         this.loading.set(false);
         this.cdr.detectChanges();

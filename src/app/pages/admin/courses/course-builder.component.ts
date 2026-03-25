@@ -117,12 +117,12 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   // Exercise Type Metadata
   exerciseTypeMap: Record<string, { label: string; icon: string; color: string; bg: string }> = {
-    'selection_single':           { label: 'Selección Simple',       icon: 'pi pi-check-circle',   color: '#2563eb', bg: '#eff6ff' },
-    'selection_multiple':         { label: 'Selección Múltiple',     icon: 'pi pi-check-square',   color: '#7c3aed', bg: '#f5f3ff' },
-    'vertical_ordering':          { label: 'Orden Vertical',         icon: 'pi pi-sort-amount-down',color: '#0891b2', bg: '#ecfeff' },
-    'horizontal_ordering':        { label: 'Orden Horizontal',       icon: 'pi pi-arrows-h',       color: '#0d9488', bg: '#f0fdfa' },
-    'phishing_selection_multiple': { label: 'Detección Phishing',    icon: 'pi pi-shield',         color: '#dc2626', bg: '#fef2f2' },
-    'match_pairs':                { label: 'Emparejar Conceptos',    icon: 'pi pi-link',           color: '#ea580c', bg: '#fff7ed' },
+    'selection_single': { label: 'Selección Simple', icon: 'pi pi-check-circle', color: '#2563eb', bg: '#eff6ff' },
+    'selection_multiple': { label: 'Selección Múltiple', icon: 'pi pi-check-square', color: '#7c3aed', bg: '#f5f3ff' },
+    'vertical_ordering': { label: 'Orden Vertical', icon: 'pi pi-sort-amount-down', color: '#0891b2', bg: '#ecfeff' },
+    'horizontal_ordering': { label: 'Orden Horizontal', icon: 'pi pi-arrows-h', color: '#0d9488', bg: '#f0fdfa' },
+    'phishing_selection_multiple': { label: 'Detección Phishing', icon: 'pi pi-shield', color: '#dc2626', bg: '#fef2f2' },
+    'match_pairs': { label: 'Emparejar Conceptos', icon: 'pi pi-link', color: '#ea580c', bg: '#fff7ed' },
   };
 
   // Preview State
@@ -552,7 +552,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     const exerciseGroup = this.getExercises(chapterIndex, temaIndex, activityIndex).at(exerciseIndex);
     const exerciseData = exerciseGroup.value;
     const metaData = { chapterIndex, temaIndex, activityIndex, exerciseIndex };
-    
+
     if (this.exerciseEditorDialog) {
       this.exerciseEditorDialog.openEdit(exerciseData, metaData);
     }
@@ -681,17 +681,17 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   openActivitySandbox(activity: any) {
     if (!activity.id) {
-        this.messageService.add({ 
-            severity: 'warn', 
-            summary: 'Atención', 
-            detail: 'Guarda el curso primero para probar esta actividad en el Sandbox' 
-        });
-        return;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atención',
+        detail: 'Guarda el curso primero para probar esta actividad en el Sandbox'
+      });
+      return;
     }
     this.router.navigate(['/admin/exercises', activity.id, 'sandbox'], {
-        queryParams: {
-            returnCourseId: this.courseId
-        }
+      queryParams: {
+        returnCourseId: this.courseId
+      }
     });
   }
 
@@ -702,9 +702,9 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   onExercisesGenerated(exercises: GeneratedExercise[]) {
     if (!this.currentGenContext || exercises.length === 0) return;
-    
+
     const { chapterI, temaJ, activityK } = this.currentGenContext;
-    
+
     if (activityK === undefined) return;
 
     exercises.forEach(ex => {
@@ -736,12 +736,12 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.messageService.add({ 
-        severity: 'success', 
-        summary: '¡Bingo!', 
-        detail: `Se han añadido ${exercises.length} ejercicios a la actividad.` 
+    this.messageService.add({
+      severity: 'success',
+      summary: '¡Bingo!',
+      detail: `Se han añadido ${exercises.length} ejercicios a la actividad.`
     });
-    
+
     this.displayGenWizard = false;
   }
 
@@ -895,8 +895,11 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const safeTitle = chapter.value.title || 'Capítulo Inicial';
+    const safeCourseTitle = courseTitle || 'Nuevo Curso';
+
     this.loadingSuggestions = true;
-    this.aiService.generateTopicsAI(courseTitle, chapter.value.title).subscribe({
+    this.aiService.generateTopicsAI(safeCourseTitle, safeTitle).subscribe({
       next: (res: any) => {
         const data = res.data || res;
         const suggestedTopics = data.temas || data;
@@ -1062,7 +1065,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
         localStorage.removeItem(this.storageKey);
         this.saving = false;
-        
+
         const responseData = res.data || res;
         const data = responseData.data || responseData;
         const savedCourseId = data?.id || this.courseId;
@@ -1078,7 +1081,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
         // --- FIX: Force reload component state with DB IDs after save to prevent duplicates ---
         if (this.courseId) {
-            this.loadCourseForEdit(this.courseId);
+          this.loadCourseForEdit(this.courseId);
         }
         // -----------------------------------------------------------------------------------
       },

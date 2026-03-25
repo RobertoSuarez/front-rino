@@ -1,25 +1,30 @@
 <p-toast position="top-right"></p-toast>
 <div class="builder-container p-4">
     <!-- FULL LOADING OVERLAY -->
-    <div *ngIf="loading" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md transition-all duration-500">
+    <div *ngIf="loading"
+        class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md transition-all duration-500">
         <div class="loading-wizard-asset relative mb-8">
             <div class="absolute inset-0 bg-blue-400/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
-            <div class="relative w-40 h-40 flex items-center justify-center bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-[40px] shadow-2xl rotate-12 animate-bounce-slow">
+            <div
+                class="relative w-40 h-40 flex items-center justify-center bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-[40px] shadow-2xl rotate-12 animate-bounce-slow">
                 <i class="pi pi-sparkles text-7xl text-white"></i>
             </div>
-            <div class="absolute -bottom-4 -right-4 w-16 h-16 bg-red-500 rounded-3xl flex items-center justify-center shadow-lg rotate-12 animate-pulse">
+            <div
+                class="absolute -bottom-4 -right-4 w-16 h-16 bg-red-500 rounded-3xl flex items-center justify-center shadow-lg rotate-12 animate-pulse">
                 <i class="pi pi-bolt text-3xl text-white"></i>
             </div>
         </div>
-        
-        <h2 class="text-4xl font-black text-gray-800 uppercase tracking-tighter mb-2 scale-up-in">CONECTANDO CON AMAUTA AI</h2>
+
+        <h2 class="text-4xl font-black text-gray-800 uppercase tracking-tighter mb-2 scale-up-in">CONECTANDO CON AMAUTA
+            AI</h2>
         <div class="flex items-center gap-2 mb-8">
             <div class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
             <div class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
             <div class="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
         </div>
-        
-        <p class="text-gray-400 font-bold uppercase tracking-widest text-sm animate-pulse">Recuperando estructura del curso...</p>
+
+        <p class="text-gray-400 font-bold uppercase tracking-widest text-sm animate-pulse">Recuperando estructura del
+            curso...</p>
     </div>
 
     <!-- WIZARD MODE: CARD-BASED SELECTION -->
@@ -31,8 +36,8 @@
                 <div class="gamified-icon-box mx-auto mb-6 flex items-center justify-center">
                     <i class="pi pi-sparkles text-5xl text-white"></i>
                 </div>
-                <h2 class="text-5xl font-black mb-4 text-gray-800 uppercase">¿Qué vamos a crear hoy?</h2>
-                <p class="text-2xl text-gray-500 mb-10 font-bold">Escribe un tema y Amauta sugerirá una estructura
+                <h2 class="text-3xl font-black mb-4 text-gray-800 uppercase">¿Qué vamos a crear hoy?</h2>
+                <p class="text-xl text-gray-500 mb-8 font-bold">Escribe un tema y Amauta sugerirá una estructura
                     académica de alto nivel.</p>
 
                 <div class="field max-w-2xl mx-auto">
@@ -56,8 +61,8 @@
                     <div class="gamified-icon-box mx-auto mb-4 flex items-center justify-center">
                         <i class="pi pi-pencil text-5xl text-white"></i>
                     </div>
-                    <h2 class="text-5xl font-black text-gray-800 mb-3 uppercase">Títulos Sugeridos</h2>
-                    <p class="text-2xl text-gray-500 font-bold">Haz clic en uno para cargarlo y edítalo si prefieres
+                    <h2 class="text-3xl font-black text-gray-800 mb-2 uppercase">Títulos Sugeridos</h2>
+                    <p class="text-xl text-gray-500 font-bold">Haz clic en uno para cargarlo y edítalo si prefieres
                         otro nombre.</p>
                 </div>
 
@@ -92,8 +97,8 @@
                         style="background: var(--duo-purple); border-color: var(--duo-purple-dark);">
                         <i class="pi pi-align-left text-5xl text-white"></i>
                     </div>
-                    <h2 class="text-5xl font-black text-gray-800 mb-3 uppercase">Asistente de Narrativa</h2>
-                    <p class="text-2xl text-gray-500 font-bold">Amauta ha redactado esto para tu curso. ¡Ajústalo a tu
+                    <h2 class="text-3xl font-black text-gray-800 mb-2 uppercase">Asistente de Narrativa</h2>
+                    <p class="text-xl text-gray-500 font-bold">Amauta ha redactado esto para tu curso. ¡Ajústalo a tu
                         gusto!</p>
                 </div>
 
@@ -106,8 +111,8 @@
                             redactando...</span>
                     </div>
                     <textarea *ngIf="!loadingSuggestions" pInputTextarea
-                        [formControl]="$any(courseForm.get('description'))" rows="12" autoResize="true"
-                        class="gamified-desc-preview w-full font-bold text-xl leading-relaxed outline-none"></textarea>
+                        [formControl]="$any(courseForm.get('description'))" rows="8" autoResize="true"
+                        class="gamified-desc-preview w-full font-bold text-lg leading-relaxed outline-none"></textarea>
                 </div>
 
                 <div class="flex justify-content-center gap-6">
@@ -124,8 +129,8 @@
                     style="background: var(--duo-yellow); border-color: var(--duo-yellow-dark);">
                     <i class="pi pi-bookmark-fill text-5xl text-white"></i>
                 </div>
-                <h2 class="text-5xl font-black mb-4 uppercase">Mapa de Capítulos</h2>
-                <p class="text-2xl text-gray-500 font-bold mb-10">Usa el sistema de aprobación para construir tu
+                <h2 class="text-3xl font-black mb-4 uppercase">Mapa de Capítulos</h2>
+                <p class="text-xl text-gray-500 font-bold mb-8">Usa el sistema de aprobación para construir tu
                     cuaderno.</p>
 
                 <div class="card-stack" *ngIf="!loadingSuggestions && suggestedChapters[currentChapterIndex]">
@@ -173,9 +178,9 @@
                         class="gamified-action-btn secondary px-6" [disabled]="currentChapterSupervIndex === 0"
                         (click)="prevSupervStep()"></button>
                     <div class="text-center">
-                        <h2 class="text-4xl font-black m-0 text-gray-800 uppercase">{{
+                        <h2 class="text-2xl font-black m-0 text-gray-800 uppercase">{{
                             chapters.at(currentChapterSupervIndex).value.title }}</h2>
-                        <span class="text-blue-500 font-black text-xl">PASO {{currentChapterSupervIndex + 1}} DE
+                        <span class="text-blue-500 font-black text-lg">PASO {{currentChapterSupervIndex + 1}} DE
                             {{chapters.length}}</span>
                     </div>
                     <button pButton label="SIGUIENTE CAPÍTULO" icon="pi pi-chevron-right" iconPos="right"
@@ -314,9 +319,13 @@
                         <span class="truncate font-black text-gray-700 tracking-tight uppercase text-sm">{{
                             chap.value.title || 'CAPÍTULO ' + (i+1) }}</span>
                     </div>
-                    <button pButton icon="pi pi-plus" label="AÑADIR CAPÍTULO"
-                        class="p-button-text font-black text-blue-500 mt-6 hover:bg-blue-50 p-4 border-2 border-dashed border-blue-200 rounded-2xl w-full"
-                        (click)="addChapter()"></button>
+                    <button class="gamified-btn-3d btn-3d-indigo !w-full !py-5 mt-6"
+                        (click)="addChapter()">
+                        <div class="flex items-center justify-center gap-3">
+                            <i class="pi pi-plus-circle text-xl"></i>
+                            <span class="text-base font-black uppercase">AÑADIR CAPÍTULO</span>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -324,7 +333,7 @@
             <div class="builder-content p-fluid p-8 bg-slate-50 min-h-screen" [formGroup]="courseForm">
                 <!-- Notebook Toolbar -->
                 <div
-                    class="notebook-status mb-12 p-6 bg-white border-b-8 border-gray-200 rounded-3xl flex justify-content-between align-items-center shadow-lg sticky top-0 z-50">
+                    class="notebook-status mb-8 p-4 border-b-8 border-gray-200 rounded-3xl flex justify-content-between align-items-center shadow-lg sticky top-[80px] z-[100] backdrop-blur-md bg-slate-800/95 transition-all">
                     <div class="status-left flex align-items-center gap-6">
                         <button pButton [icon]="sidebarVisible ? 'pi pi-angle-double-left' : 'pi pi-angle-double-right'"
                             class="p-button-rounded p-button-text p-button-lg text-blue-500 bg-blue-50"
@@ -335,7 +344,7 @@
                                 de Curso</span>
                             <div class="flex align-items-center gap-3">
                                 <span
-                                    class="text-2xl font-black text-gray-800 uppercase tracking-tighter">{{courseForm.get('title')?.value
+                                    class="text-xl font-black text-gray-800 uppercase tracking-tighter">{{courseForm.get('title')?.value
                                     || 'SIN TÍTULO'}}</span>
                                 <span class="ai-badge" *ngIf="autosaving">SYNCING...</span>
                             </div>
@@ -355,22 +364,22 @@
                 </div>
 
                 <!-- Course Header Info -->
-                <div class="gamified-input-card mb-12 border-indigo-100 !p-10">
-                    <div class="flex align-items-center gap-5 mb-10 border-b-4 border-slate-50 pb-6">
+                <div class="gamified-input-card mb-10 border-indigo-100 !p-6">
+                    <div class="flex align-items-center gap-5 mb-8 border-b-4 border-slate-50 pb-4">
                         <div
-                            class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center border-b-4 border-indigo-200">
-                            <i class="pi pi-cog text-3xl text-indigo-500"></i>
+                            class="w-14 h-14 bg-indigo-50 rounded-xl flex items-center justify-center border-b-4 border-indigo-200">
+                            <i class="pi pi-cog text-2xl text-indigo-500"></i>
                         </div>
                         <div>
-                            <h2 class="text-4xl font-black m-0 text-gray-800 tracking-tighter uppercase">Información
+                            <h2 class="text-2xl font-black m-0 text-gray-800 tracking-tighter uppercase">Información
                                 del Curso</h2>
-                            <p class="text-gray-400 font-bold m-0 uppercase tracking-widest text-sm">Configura la
+                            <p class="text-gray-400 font-bold m-0 uppercase tracking-widest text-xs">Configura la
                                 información básica de
                                 tu curso</p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="field">
                             <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Título
                                 del Curso</label>
@@ -380,10 +389,10 @@
                         <div class="field">
                             <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Estatus
                                 de Publicación</label>
-                            <div class="flex align-items-center bg-gray-50 p-3 rounded-2xl border-b-4 border-gray-200">
+                            <div class="flex align-items-center bg-white rounded-2xl border-b-6 border-indigo-100 p-1 shadow-sm">
                                 <p-toggleButton formControlName="isPublic" [onLabel]="'VISIBLE PARA EL MUNDO'"
                                     [offLabel]="'BORRADOR PRIVADO'" [onIcon]="'pi pi-globe'" [offIcon]="'pi pi-lock'"
-                                    styleClass="w-full !border-none !shadow-none !bg-transparent font-black !text-indigo-600 text-lg"></p-toggleButton>
+                                    styleClass="w-full !border-none !shadow-none !bg-transparent font-black !text-indigo-600 text-base !py-3"></p-toggleButton>
                             </div>
                         </div>
                         <div class="field col-span-2">
@@ -400,25 +409,24 @@
                 <!-- CHAPTERS LIST -->
                 <div formArrayName="chapters">
                     <div *ngFor="let chapter of chapters.controls; let i = index" [formGroupName]="i"
-                        [id]="'chapter-card-' + i" class="mb-16">
+                        [id]="'chapter-card-' + i" class="mb-12">
 
-                        <div class="gamified-chapter-card !p-10 border-b-8 border-purple-200 relative mb-12">
+                        <div class="gamified-chapter-card !p-6 border-b-8 border-purple-200 relative mb-10">
                             <div class="chapter-label !text-lg !px-6 !py-2 !-top-6 shadow-md uppercase">CAPÍTULO #{{i +
                                 1}}</div>
 
                             <!-- Chapter Header -->
                             <div
-                                class="flex justify-content-between align-items-center mb-10 bg-slate-50 p-8 rounded-3xl border-3 border-dashed border-slate-200">
+                                class="flex justify-content-between align-items-center mb-8 bg-slate-50 p-6 rounded-2xl border-3 border-dashed border-slate-200">
                                 <div class="flex-1 mr-10">
                                     <span
-                                        class="text-xs font-black text-purple-400 tracking-widest uppercase mb-1 block">Título
+                                        class="text-[10px] font-black text-purple-400 tracking-widest uppercase mb-1 block">Título
                                         del Capítulo</span>
                                     <input pInputText formControlName="title" placeholder="Define el eje temático..."
-                                        class="w-full !bg-transparent !border-none !shadow-none !text-4xl font-black text-gray-800 focus:outline-none uppercase tracking-tighter">
-                                    <textarea pInputTextarea formControlName="shortDescription"
-                                        [autoResize]="true" rows="1"
-                                        placeholder="¿Qué descubrirán en este capítulo?"
-                                        class="w-full !bg-transparent !border-none !shadow-none !text-xl text-gray-400 font-bold focus:outline-none mt-2 resize-none"></textarea>
+                                        class="w-full !bg-transparent !border-none !shadow-none !text-2xl font-black text-gray-800 focus:outline-none uppercase tracking-tighter">
+                                    <textarea pInputTextarea formControlName="shortDescription" [autoResize]="true"
+                                        rows="1" placeholder="¿Qué descubrirán en este capítulo?"
+                                        class="w-full !bg-transparent !border-none !shadow-none !text-lg text-gray-400 font-bold focus:outline-none mt-2 resize-none"></textarea>
                                 </div>
                                 <button pButton icon="pi pi-trash"
                                     class="gamified-action-btn secondary !rounded-full w-20 h-20 !text-red-400 !border-red-100"
@@ -430,9 +438,9 @@
                                 <div *ngFor="let tema of getTemas(i).controls; let j = index" [formGroupName]="j"
                                     class="activity-node mb-12 fade-in">
 
-                                    <div class="gamified-input-card hover:border-blue-400 group !p-8">
+                                    <div class="gamified-input-card hover:border-blue-400 group !p-6">
                                         <div
-                                            class="flex justify-content-between align-items-start mb-8 border-b-2 border-slate-50 pb-6">
+                                            class="flex justify-content-between align-items-start mb-6 border-b-2 border-slate-50 pb-4">
                                             <div class="flex-1">
                                                 <div class="flex align-items-center gap-4 mb-3">
                                                     <div
@@ -440,7 +448,7 @@
                                                         <span class="font-black text-green-600 text-xl">{{j+1}}</span>
                                                     </div>
                                                     <input pInputText formControlName="title"
-                                                        class="!p-0 !border-none !shadow-none !text-3xl font-black text-gray-800 placeholder:text-gray-200 w-full focus:outline-none uppercase tracking-tighter">
+                                                        class="!p-0 !border-none !shadow-none !text-xl font-black text-gray-800 placeholder:text-gray-200 w-full focus:outline-none uppercase tracking-tighter">
                                                 </div>
                                                 <div class="topic-vertical-flow mt-10">
                                                     <!-- Mission Callout Box (Short Description) -->
@@ -450,7 +458,7 @@
                                                             del Tema (Descripción Corta)</label>
                                                         <textarea pInputTextarea formControlName="shortDescription"
                                                             rows="3" autoResize="true"
-                                                            class="!p-0 !bg-transparent !border-none !shadow-none !text-2xl text-gray-700 font-bold w-full focus:outline-none italic leading-relaxed"
+                                                            class="!p-0 !bg-transparent !border-none !shadow-none !text-xl text-gray-700 font-bold w-full focus:outline-none italic leading-relaxed"
                                                             placeholder="Sintetiza el conocimiento de este tema..."></textarea>
                                                     </div>
 
@@ -501,12 +509,15 @@
                                         <div formArrayName="activities" class="activity-list-container mt-10">
                                             <div *ngFor="let activity of getActivities(i, j).controls; let k = index"
                                                 [formGroupName]="k"
-                                                class="p-6 bg-slate-50/50 rounded-3xl border-2 border-white mb-6">
+                                                class="p-4 bg-slate-50/50 rounded-2xl border-2 border-white mb-4">
                                                 <!-- List Item Header (Non-clickable container) -->
-                                                <div class="activity-item-header flex items-center justify-between p-4" style="cursor: default;">
+                                                <div class="activity-item-header flex items-center justify-between p-4"
+                                                    style="cursor: default;">
                                                     <!-- Clickable area for expansion -->
-                                                    <div class="flex align-items-center gap-4 flex-1 cursor-pointer" (click)="toggleActivityExpansion(i, j, k)">
-                                                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center border-b-4 border-indigo-100">
+                                                    <div class="flex align-items-center gap-4 flex-1 cursor-pointer"
+                                                        (click)="toggleActivityExpansion(i, j, k)">
+                                                        <div
+                                                            class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center border-b-4 border-indigo-100">
                                                             <i class="pi pi-bolt text-indigo-500 text-sm"></i>
                                                         </div>
                                                         <div class="flex-1">
@@ -515,12 +526,15 @@
                                                                 class="!bg-transparent !border-none !shadow-none font-black text-gray-700 text-base uppercase tracking-tight focus:outline-none w-full"
                                                                 (click)="$event.stopPropagation()">
                                                         </div>
-                                                        <i class="pi" [ngClass]="isActivityExpanded(i, j, k) ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+                                                        <i class="pi"
+                                                            [ngClass]="isActivityExpanded(i, j, k) ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
                                                     </div>
 
                                                     <!-- Isolated Action Buttons -->
-                                                    <div class="flex align-items-center gap-3 ml-4" (click)="$event.stopPropagation()">
-                                                        <span class="text-xs font-black text-gray-300 uppercase tracking-widest mr-2">
+                                                    <div class="flex align-items-center gap-3 ml-4"
+                                                        (click)="$event.stopPropagation()">
+                                                        <span
+                                                            class="text-xs font-black text-gray-300 uppercase tracking-widest mr-2">
                                                             {{ getExercises(i, j, k).length }} Ejercicios
                                                         </span>
                                                         <div class="flex gap-2">
@@ -528,8 +542,10 @@
                                                                 [pTooltip]="getExercisesViewMode(i, j, k) === 'list' ? 'Interactuar con vista de tarjetas' : 'Ver todo en lista compacta'"
                                                                 [ngClass]="getExercisesViewMode(i, j, k) === 'list' ? 'btn-3d-indigo' : 'btn-3d-amber'"
                                                                 (click)="toggleExercisesView(i, j, k)">
-                                                                <i class="pi" [ngClass]="getExercisesViewMode(i, j, k) === 'list' ? 'pi-th-large' : 'pi-list'"></i>
-                                                                {{ getExercisesViewMode(i, j, k) === 'list' ? 'VISTA TARJETAS' : 'VISTA LISTA' }}
+                                                                <i class="pi"
+                                                                    [ngClass]="getExercisesViewMode(i, j, k) === 'list' ? 'pi-th-large' : 'pi-list'"></i>
+                                                                {{ getExercisesViewMode(i, j, k) === 'list' ? 'VISTA
+                                                                TARJETAS' : 'VISTA LISTA' }}
                                                             </button>
                                                             <button class="gamified-btn-3d btn-3d-blue"
                                                                 (click)="openActivitySandbox(getActivity(i, j, k).value)"
@@ -547,7 +563,7 @@
                                                 <!-- Expanded Content -->
                                                 <div *ngIf="isActivityExpanded(i, j, k)"
                                                     class="activity-expand-content">
-                                                    
+
                                                     <!-- LIST VIEW -->
                                                     <div *ngIf="getExercisesViewMode(i, j, k) === 'list'">
                                                         <div class="flex align-items-center gap-3 mb-6">
@@ -557,57 +573,70 @@
                                                             <div class="flex-1 border-t-2 border-gray-50"></div>
                                                         </div>
 
-                                                    <div formArrayName="exercises"
-                                                        class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index"
-                                                            [formGroupName]="l" class="bg-white border-2 border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all relative group/ex flex flex-col gap-3">
-                                                            
-                                                            <div class="flex justify-between items-center mb-1">
-                                                                <div class="flex items-center gap-3">
-                                                                    <div class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center font-black text-indigo-500 text-sm border-b-2 border-indigo-100">
-                                                                        <i [class]="getExerciseIcon(getExercises(i, j, k).at(l).get('typeExercise')?.value)"
-                                                                            [style.color]="getExerciseColor(getExercises(i, j, k).at(l).get('typeExercise')?.value)"></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="block font-black text-[10px] text-slate-400 uppercase tracking-widest leading-tight">EJERCICIO {{l+1}}</span>
-                                                                        <span class="block font-bold text-xs text-slate-500">{{ exerciseTypeMap[getExercises(i, j, k).at(l).get('typeExercise')?.value]?.label || 'Selección Simple' }}</span>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                <div class="flex gap-1 md:opacity-0 md:group-hover/ex:opacity-100 transition-opacity">
-                                                                    <button pButton icon="pi pi-pencil"
-                                                                        class="p-button-rounded p-button-text p-button-sm !text-indigo-500 hover:!bg-indigo-50"
-                                                                        (click)="openEditExerciseDialog(i, j, k, l)"
-                                                                        pTooltip="Editar"></button>
-                                                                    <button pButton icon="pi pi-trash"
-                                                                        class="p-button-rounded p-button-text p-button-danger p-button-sm hover:!bg-red-50"
-                                                                        (click)="removeExercise(i, j, k, l)"
-                                                                        pTooltip="Quitar"></button>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div class="mt-1">
-                                                                <input pInputText formControlName="statement"
-                                                                    placeholder="Enunciado del ejercicio..."
-                                                                    class="w-full !bg-slate-50 !border-slate-200 !rounded-xl font-bold text-slate-700 text-sm focus:!border-indigo-400 focus:!ring-2 focus:!ring-indigo-100 transition-colors px-4 py-3">
-                                                            </div>
-                                                        </div>
+                                                        <div formArrayName="exercises"
+                                                            class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index"
+                                                                [formGroupName]="l"
+                                                                class="bg-white border-2 border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all relative group/ex flex flex-col gap-3">
 
-                                                        <div class="flex gap-4">
-                                                            <button class="gamified-btn-3d btn-3d-indigo flex-1 !py-4"
-                                                                (click)="addAndEditExercise(i, j, k)">
-                                                                <i class="pi pi-plus"></i> AÑADIR EJERCICIO
-                                                            </button>
-                                                            <button class="gamified-btn-3d btn-3d-amber flex-1 !py-4"
-                                                                (click)="openGenWizard(i, j, k)">
-                                                                <i class="pi pi-sparkles"></i> GENERAR CON IA
-                                                            </button>
+                                                                <div class="flex justify-between items-center mb-1">
+                                                                    <div class="flex items-center gap-3">
+                                                                        <div
+                                                                            class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center font-black text-indigo-500 text-sm border-b-2 border-indigo-100">
+                                                                            <i [class]="getExerciseIcon(getExercises(i, j, k).at(l).get('typeExercise')?.value)"
+                                                                                [style.color]="getExerciseColor(getExercises(i, j, k).at(l).get('typeExercise')?.value)"></i>
+                                                                        </div>
+                                                                        <div>
+                                                                            <span
+                                                                                class="block font-black text-[10px] text-slate-400 uppercase tracking-widest leading-tight">EJERCICIO
+                                                                                {{l+1}}</span>
+                                                                            <span
+                                                                                class="block font-bold text-xs text-slate-500">{{
+                                                                                exerciseTypeMap[getExercises(i, j,
+                                                                                k).at(l).get('typeExercise')?.value]?.label
+                                                                                || 'Selección Simple' }}</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="flex gap-2 md:opacity-0 md:group-hover/ex:opacity-100 transition-opacity">
+                                                                        <button class="gamified-btn-3d btn-3d-indigo !py-1 !px-3 !text-[10px]"
+                                                                            (click)="openEditExerciseDialog(i, j, k, l)"
+                                                                            pTooltip="Editar">
+                                                                            <i class="pi pi-pencil"></i>
+                                                                        </button>
+                                                                        <button class="gamified-btn-3d btn-3d-danger !py-1 !px-3 !text-[10px]"
+                                                                            (click)="removeExercise(i, j, k, l)"
+                                                                            pTooltip="Quitar">
+                                                                            <i class="pi pi-trash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="mt-1">
+                                                                    <input pInputText formControlName="statement"
+                                                                        placeholder="Enunciado del ejercicio..."
+                                                                        class="w-full !bg-slate-50 !border-slate-200 !rounded-xl font-bold text-slate-700 text-sm focus:!border-indigo-400 focus:!ring-2 focus:!ring-indigo-100 transition-colors px-4 py-3">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex gap-4">
+                                                                <button
+                                                                    class="gamified-btn-3d btn-3d-indigo flex-1 !py-4"
+                                                                    (click)="addAndEditExercise(i, j, k)">
+                                                                    <i class="pi pi-plus"></i> AÑADIR EJERCICIO
+                                                                </button>
+                                                                <button
+                                                                    class="gamified-btn-3d btn-3d-amber flex-1 !py-4"
+                                                                    (click)="openGenWizard(i, j, k)">
+                                                                    <i class="pi pi-sparkles"></i> GENERAR CON IA
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- SANDBOX VIEW (Embedded) -->
-                                                    <div *ngIf="getExercisesViewMode(i, j, k) === 'sandbox'" class="embedded-sandbox-container">
+                                                    <!-- SANDBOX VIEW (Embedded) -->
+                                                    <div *ngIf="getExercisesViewMode(i, j, k) === 'sandbox'"
+                                                        class="embedded-sandbox-container">
                                                         <div class="flex align-items-center gap-3 mb-6">
                                                             <h4
                                                                 class="text-sm font-black text-gray-400 uppercase tracking-widest m-0">
@@ -615,102 +644,177 @@
                                                             <div class="flex-1 border-t-2 border-gray-50"></div>
                                                         </div>
 
-                                                        <div *ngIf="getExercises(i, j, k).length === 0" class="p-8 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                                                            <i class="pi pi-info-circle text-4xl text-gray-300 mb-4"></i>
-                                                            <p class="text-gray-400 font-bold m-0">No hay ejercicios para previsualizar. ¡Añade uno!</p>
+                                                        <div *ngIf="getExercises(i, j, k).length === 0"
+                                                            class="p-8 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                                                            <i
+                                                                class="pi pi-info-circle text-4xl text-gray-300 mb-4"></i>
+                                                            <p class="text-gray-400 font-bold m-0">No hay ejercicios
+                                                                para previsualizar. ¡Añade uno!</p>
                                                         </div>
 
-                                                        <div *ngIf="getExercises(i, j, k).length > 0" class="embedded-sandbox-frame">
+                                                        <div *ngIf="getExercises(i, j, k).length > 0"
+                                                            class="embedded-sandbox-frame">
                                                             <!-- Carousel of Exercises in 3D Card style -->
                                                             <div class="flex flex-col gap-6">
-                                                                <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index" 
-                                                                     class="sandbox-preview-card">
+                                                                <div *ngFor="let ex of getExercises(i, j, k).controls; let l = index"
+                                                                    class="sandbox-preview-card">
                                                                     <div class="preview-header">
-                                                                        <span class="preview-badge">EJERCICIO {{l+1}}</span>
+                                                                        <span class="preview-badge">EJERCICIO
+                                                                            {{l+1}}</span>
                                                                         <span class="preview-type">
-                                                                            <i [class]="getExerciseIcon(ex.get('typeExercise')?.value)"></i>
-                                                                            {{ exerciseTypeMap[ex.get('typeExercise')?.value]?.label }}
+                                                                            <i
+                                                                                [class]="getExerciseIcon(ex.get('typeExercise')?.value)"></i>
+                                                                            {{
+                                                                            exerciseTypeMap[ex.get('typeExercise')?.value]?.label
+                                                                            }}
                                                                         </span>
                                                                     </div>
                                                                     <div class="preview-body">
-                                                                        <p class="preview-statement">{{ ex.get('statement')?.value }}</p>
-                                                                        
+                                                                        <p class="preview-statement">{{
+                                                                            ex.get('statement')?.value }}</p>
+
                                                                         <!-- Gamified visual representation of the exercise type -->
-                                                                        <div class="preview-visual-aid mt-4 p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
-                                                                            <div [ngSwitch]="ex.get('typeExercise')?.value">
-                                                                                <div *ngSwitchCase="'selection_single'" class="flex flex-col gap-3">
-                                                                                    <div *ngFor="let opt of (ex.get('optionSelectOptions')?.value?.length ? ex.get('optionSelectOptions')?.value : [{option: 'Opción de ejemplo 1'}, {option: 'Opción de ejemplo 2'}, {option: 'Opción de ejemplo 3'}])" 
-                                                                                         class="min-h-12 bg-white border-2 border-gray-200 rounded-2xl flex items-center px-4 hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm cursor-pointer">
-                                                                                        <div class="h-6 w-6 rounded-full border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center"><div class="hidden h-2.5 w-2.5 bg-blue-500 rounded-full"></div></div>
-                                                                                        <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div *ngSwitchCase="'selection_multiple'" class="flex flex-col gap-3">
-                                                                                    <div *ngFor="let opt of (ex.get('optionSelectOptions')?.value?.length ? ex.get('optionSelectOptions')?.value : [{option: 'Primera opción correcta'}, {option: 'Segunda opción correcta'}])" 
-                                                                                         class="min-h-12 bg-white border-2 border-gray-200 rounded-2xl flex items-center px-4 hover:border-purple-400 hover:bg-purple-50 transition-colors shadow-sm cursor-pointer">
-                                                                                        <div class="h-6 w-6 rounded-lg border-2 border-gray-300 mr-4 flex-shrink-0"></div>
-                                                                                        <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div *ngSwitchCase="'vertical_ordering'" class="flex flex-col gap-3 relative">
-                                                                                    <div class="absolute left-6 top-3 bottom-3 w-1 bg-slate-200 z-0 rounded-full"></div>
-                                                                                    <div *ngFor="let opt of (ex.get('optionsVerticalOrdering')?.value?.length ? ex.get('optionsVerticalOrdering')?.value : [{text: 'Paso 1'}, {text: 'Paso 2'}, {text: 'Paso 3'}])" 
-                                                                                         class="relative z-10 min-h-12 bg-white border-2 border-cyan-200 rounded-2xl flex items-center px-4 shadow-sm cursor-grab hover:shadow-md transition-shadow">
-                                                                                        <div class="h-8 w-8 bg-cyan-50 rounded-lg flex items-center justify-center text-cyan-500 font-black text-xs mr-4"><i class="pi pi-bars"></i></div>
-                                                                                        <div class="text-slate-600 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div *ngSwitchCase="'horizontal_ordering'" class="flex flex-wrap gap-2">
-                                                                                    <div *ngFor="let opt of (ex.get('optionsHorizontalOrdering')?.value?.length ? ex.get('optionsHorizontalOrdering')?.value : [{text: 'Palabra 1'}, {text: 'Palabra 2'}, {text: 'Palabra 3'}])" 
-                                                                                         class="min-h-12 bg-white border-2 border-b-4 border-teal-200 rounded-2xl flex items-center px-5 shadow-sm cursor-grab hover:bg-teal-50 hover:border-teal-300 transition-colors active:border-b-2 active:translate-y-[2px]">
-                                                                                        <div class="text-teal-700 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div *ngSwitchCase="'match_pairs'" class="flex justify-between gap-4">
-                                                                                    <div class="flex flex-col gap-3 flex-1">
-                                                                                        <div *ngFor="let opt of (ex.get('optionsMatchPairsLeft')?.value?.length ? ex.get('optionsMatchPairsLeft')?.value : [{text: 'Idea 1'}, {text: 'Idea 2'}])" 
-                                                                                             class="min-h-14 bg-white border-2 border-orange-200 rounded-2xl flex items-center justify-center px-4 text-center shadow-sm hover:border-orange-400 cursor-pointer transition-colors">
-                                                                                             <span class="text-slate-600 font-bold text-sm">{{ opt.text || opt }}</span>
+                                                                        <div
+                                                                            class="preview-visual-aid mt-4 p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                                                                            <div
+                                                                                [ngSwitch]="ex.get('typeExercise')?.value">
+                                                                                <div *ngSwitchCase="'selection_single'"
+                                                                                    class="flex flex-col gap-3">
+                                                                                    <div *ngFor="let opt of (ex.get('optionSelectOptions')?.value?.length ? ex.get('optionSelectOptions')?.value : [{option: 'Opción de ejemplo 1'}, {option: 'Opción de ejemplo 2'}, {option: 'Opción de ejemplo 3'}])"
+                                                                                        class="min-h-12 bg-white border-2 border-gray-200 rounded-2xl flex items-center px-4 hover:border-blue-400 hover:bg-blue-50 transition-colors shadow-sm cursor-pointer">
+                                                                                        <div
+                                                                                            class="h-6 w-6 rounded-full border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center">
+                                                                                            <div
+                                                                                                class="hidden h-2.5 w-2.5 bg-blue-500 rounded-full">
+                                                                                            </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div class="flex flex-col flex-1 justify-center items-center pointer-events-none opacity-20 px-2 w-8">
-                                                                                        <div *ngFor="let ln of [1,2]" class="h-1 bg-slate-400 w-full mb-14 rotate-12"></div>
-                                                                                    </div>
-                                                                                    <div class="flex flex-col gap-3 flex-1">
-                                                                                        <div *ngFor="let opt of (ex.get('optionsMatchPairsRight')?.value?.length ? ex.get('optionsMatchPairsRight')?.value : [{text: 'Definición A'}, {text: 'Definición B'}])" 
-                                                                                             class="min-h-14 bg-white border-2 border-emerald-200 rounded-2xl flex items-center justify-center px-4 text-center shadow-sm hover:border-emerald-400 cursor-pointer transition-colors">
-                                                                                             <span class="text-slate-600 font-bold text-sm">{{ opt.text || opt }}</span>
+                                                                                        <div
+                                                                                            class="text-slate-600 font-bold text-sm">
+                                                                                            {{ opt.option || opt }}
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div *ngSwitchCase="'phishing_selection_multiple'" class="flex flex-col gap-4">
-                                                                                    <div *ngIf="ex.get('phishingImageUrl')?.value" class="w-full h-40 rounded-2xl overflow-hidden border-2 border-red-200 shadow-sm relative group cursor-pointer hover:border-red-400">
-                                                                                        <img [src]="ex.get('phishingImageUrl')?.value" class="w-full h-full object-cover">
-                                                                                        <div class="absolute inset-0 bg-red-900/10 hidden group-hover:flex items-center justify-center">
-                                                                                            <i class="pi pi-search-plus text-3xl text-white drop-shadow-md"></i>
+                                                                                <div *ngSwitchCase="'selection_multiple'"
+                                                                                    class="flex flex-col gap-3">
+                                                                                    <div *ngFor="let opt of (ex.get('optionSelectOptions')?.value?.length ? ex.get('optionSelectOptions')?.value : [{option: 'Primera opción correcta'}, {option: 'Segunda opción correcta'}])"
+                                                                                        class="min-h-12 bg-white border-2 border-gray-200 rounded-2xl flex items-center px-4 hover:border-purple-400 hover:bg-purple-50 transition-colors shadow-sm cursor-pointer">
+                                                                                        <div
+                                                                                            class="h-6 w-6 rounded-lg border-2 border-gray-300 mr-4 flex-shrink-0">
                                                                                         </div>
-                                                                                    </div>
-                                                                                    <div *ngIf="ex.get('phishingContext')?.value" class="p-4 bg-white rounded-2xl border-l-4 border-l-red-400 border border-slate-200 text-sm text-slate-700 font-semibold shadow-sm">
-                                                                                        <i class="pi pi-comment text-red-400 mr-2 text-lg align-middle"></i> 
-                                                                                        <span class="align-middle">{{ ex.get('phishingContext')?.value }}</span>
-                                                                                    </div>
-                                                                                    <div class="flex flex-col gap-3 mt-2">
-                                                                                        <div *ngFor="let opt of (ex.get('optionsPhishingSelection')?.value?.length ? ex.get('optionsPhishingSelection')?.value : [{option: 'Indicador de Phishing 1'}, {option: 'Indicador 2'}])" 
-                                                                                             class="min-h-12 bg-white border-2 border-red-200 rounded-2xl flex items-center px-4 hover:border-red-400 hover:bg-red-50 transition-colors shadow-sm cursor-pointer">
-                                                                                            <div class="h-6 w-6 rounded-lg border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center"></div>
-                                                                                            <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                                                                                        <div
+                                                                                            class="text-slate-600 font-bold text-sm">
+                                                                                            {{ opt.option || opt }}
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div *ngSwitchDefault class="h-28 bg-white border-2 border-slate-200 border-dashed rounded-2xl flex items-center justify-center text-slate-400 font-bold tracking-wide shadow-sm">
-                                                                                    <i class="pi pi-image text-2xl mr-3 text-slate-300"></i> Elemento interactivo
+                                                                                <div *ngSwitchCase="'vertical_ordering'"
+                                                                                    class="flex flex-col gap-3 relative">
+                                                                                    <div
+                                                                                        class="absolute left-6 top-3 bottom-3 w-1 bg-slate-200 z-0 rounded-full">
+                                                                                    </div>
+                                                                                    <div *ngFor="let opt of (ex.get('optionsVerticalOrdering')?.value?.length ? ex.get('optionsVerticalOrdering')?.value : [{text: 'Paso 1'}, {text: 'Paso 2'}, {text: 'Paso 3'}])"
+                                                                                        class="relative z-10 min-h-12 bg-white border-2 border-cyan-200 rounded-2xl flex items-center px-4 shadow-sm cursor-grab hover:shadow-md transition-shadow">
+                                                                                        <div
+                                                                                            class="h-8 w-8 bg-cyan-50 rounded-lg flex items-center justify-center text-cyan-500 font-black text-xs mr-4">
+                                                                                            <i class="pi pi-bars"></i>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="text-slate-600 font-bold text-sm">
+                                                                                            {{ opt.text || opt.fragment
+                                                                                            || opt }}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'horizontal_ordering'"
+                                                                                    class="flex flex-wrap gap-2">
+                                                                                    <div *ngFor="let opt of (ex.get('optionsHorizontalOrdering')?.value?.length ? ex.get('optionsHorizontalOrdering')?.value : [{text: 'Palabra 1'}, {text: 'Palabra 2'}, {text: 'Palabra 3'}])"
+                                                                                        class="min-h-12 bg-white border-2 border-b-4 border-teal-200 rounded-2xl flex items-center px-5 shadow-sm cursor-grab hover:bg-teal-50 hover:border-teal-300 transition-colors active:border-b-2 active:translate-y-[2px]">
+                                                                                        <div
+                                                                                            class="text-teal-700 font-bold text-sm">
+                                                                                            {{ opt.text || opt.fragment
+                                                                                            || opt }}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'match_pairs'"
+                                                                                    class="flex justify-between gap-4">
+                                                                                    <div
+                                                                                        class="flex flex-col gap-3 flex-1">
+                                                                                        <div *ngFor="let opt of (ex.get('optionsMatchPairsLeft')?.value?.length ? ex.get('optionsMatchPairsLeft')?.value : [{text: 'Idea 1'}, {text: 'Idea 2'}])"
+                                                                                            class="min-h-14 bg-white border-2 border-orange-200 rounded-2xl flex items-center justify-center px-4 text-center shadow-sm hover:border-orange-400 cursor-pointer transition-colors">
+                                                                                            <span
+                                                                                                class="text-slate-600 font-bold text-sm">{{
+                                                                                                opt.text || opt
+                                                                                                }}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="flex flex-col flex-1 justify-center items-center pointer-events-none opacity-20 px-2 w-8">
+                                                                                        <div *ngFor="let ln of [1,2]"
+                                                                                            class="h-1 bg-slate-400 w-full mb-14 rotate-12">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="flex flex-col gap-3 flex-1">
+                                                                                        <div *ngFor="let opt of (ex.get('optionsMatchPairsRight')?.value?.length ? ex.get('optionsMatchPairsRight')?.value : [{text: 'Definición A'}, {text: 'Definición B'}])"
+                                                                                            class="min-h-14 bg-white border-2 border-emerald-200 rounded-2xl flex items-center justify-center px-4 text-center shadow-sm hover:border-emerald-400 cursor-pointer transition-colors">
+                                                                                            <span
+                                                                                                class="text-slate-600 font-bold text-sm">{{
+                                                                                                opt.text || opt
+                                                                                                }}</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchCase="'phishing_selection_multiple'"
+                                                                                    class="flex flex-col gap-4">
+                                                                                    <div *ngIf="ex.get('phishingImageUrl')?.value"
+                                                                                        class="w-full h-40 rounded-2xl overflow-hidden border-2 border-red-200 shadow-sm relative group cursor-pointer hover:border-red-400">
+                                                                                        <img [src]="ex.get('phishingImageUrl')?.value"
+                                                                                            class="w-full h-full object-cover">
+                                                                                        <div
+                                                                                            class="absolute inset-0 bg-red-900/10 hidden group-hover:flex items-center justify-center">
+                                                                                            <i
+                                                                                                class="pi pi-search-plus text-3xl text-white drop-shadow-md"></i>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div *ngIf="ex.get('phishingContext')?.value"
+                                                                                        class="p-4 bg-white rounded-2xl border-l-4 border-l-red-400 border border-slate-200 text-sm text-slate-700 font-semibold shadow-sm">
+                                                                                        <i
+                                                                                            class="pi pi-comment text-red-400 mr-2 text-lg align-middle"></i>
+                                                                                        <span class="align-middle">{{
+                                                                                            ex.get('phishingContext')?.value
+                                                                                            }}</span>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="flex flex-col gap-3 mt-2">
+                                                                                        <div *ngFor="let opt of (ex.get('optionsPhishingSelection')?.value?.length ? ex.get('optionsPhishingSelection')?.value : [{option: 'Indicador de Phishing 1'}, {option: 'Indicador 2'}])"
+                                                                                            class="min-h-12 bg-white border-2 border-red-200 rounded-2xl flex items-center px-4 hover:border-red-400 hover:bg-red-50 transition-colors shadow-sm cursor-pointer">
+                                                                                            <div
+                                                                                                class="h-6 w-6 rounded-lg border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center">
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="text-slate-600 font-bold text-sm">
+                                                                                                {{ opt.option || opt }}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div *ngSwitchDefault
+                                                                                    class="h-28 bg-white border-2 border-slate-200 border-dashed rounded-2xl flex items-center justify-center text-slate-400 font-bold tracking-wide shadow-sm">
+                                                                                    <i
+                                                                                        class="pi pi-image text-2xl mr-3 text-slate-300"></i>
+                                                                                    Elemento interactivo
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="preview-footer">
-                                                                        <button pButton icon="pi pi-pencil" label="Editar" class="p-button-text p-button-sm" (click)="openEditExerciseDialog(i, j, k, l)"></button>
-                                                                        <button pButton icon="pi pi-external-link" label="Probar" class="p-button-sm p-button-outlined" (click)="openExercisePreview(ex.value)"></button>
+                                                                    <div class="preview-footer flex gap-3">
+                                                                        <button class="gamified-btn-3d btn-3d-indigo !py-2 !px-4 !text-xs"
+                                                                            (click)="openEditExerciseDialog(i, j, k, l)">
+                                                                            <i class="pi pi-pencil"></i> EDITAR
+                                                                        </button>
+                                                                        <button class="gamified-btn-3d btn-3d-amber !py-2 !px-4 !text-xs"
+                                                                            (click)="openExercisePreview(ex.value)">
+                                                                            <i class="pi pi-external-link"></i> PROBAR
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -740,8 +844,7 @@
                                 </div>
 
                                 <div class="mt-8">
-                                    <button class="gamified-btn-3d btn-3d-indigo !py-4 !px-8"
-                                        (click)="addTema(i)">
+                                    <button class="gamified-btn-3d btn-3d-indigo !py-4 !px-8" (click)="addTema(i)">
                                         <i class="pi pi-plus"></i> NUEVO TEMA
                                     </button>
                                 </div>
@@ -750,8 +853,7 @@
                     </div>
 
                     <div class="flex justify-content-center py-16 border-t-8 border-dashed border-gray-100 mt-10">
-                        <button class="gamified-btn-3d btn-3d-indigo !px-12 !py-6 !text-xl"
-                            (click)="addChapter()">
+                        <button class="gamified-btn-3d btn-3d-indigo !px-12 !py-6 !text-xl" (click)="addChapter()">
                             <i class="pi pi-plus-circle"></i> EXPANDIR CUADERNO CON UN NUEVO CAPÍTULO
                         </button>
                     </div>
@@ -762,49 +864,115 @@
 </div>
 
 <!-- EXERCISE PREVIEW DIALOG -->
-<p-dialog [(visible)]="displayExercisePreview" [modal]="true" [draggable]="false" [resizable]="false" 
+<p-dialog [(visible)]="displayExercisePreview" [modal]="true" [draggable]="false" [resizable]="false"
     [header]="'Previsualización de Ejercicio'" [style]="{ width: '600px' }">
     <div *ngIf="selectedExerciseForPreview" class="p-4">
         <div class="bg-gray-50 p-6 rounded-3xl border-b-6 border-gray-100">
             <div class="flex items-center gap-3 mb-4">
-                <i [class]="getExerciseIcon(selectedExerciseForPreview.typeExercise)" 
-                   class="text-2xl text-indigo-500"></i>
+                <i [class]="getExerciseIcon(selectedExerciseForPreview.typeExercise)"
+                    class="text-2xl text-indigo-500"></i>
                 <span class="font-black text-gray-400 uppercase tracking-widest text-xs">
                     {{ exerciseTypeMap[selectedExerciseForPreview.typeExercise]?.label }}
                 </span>
             </div>
             <h3 class="text-2xl font-black text-gray-800 mb-6">{{ selectedExerciseForPreview.statement }}</h3>
-            
-            <div class="space-y-3">
-                <div *ngFor="let opt of selectedExerciseForPreview.optionSelectOptions" 
-                    class="p-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-600 flex items-center gap-3">
-                    <div class="w-6 h-6 rounded-full border-2 border-gray-200"></div>
-                    {{ opt }}
+
+            <!-- Visual representation of the exercise type -->
+            <div class="preview-visual-aid mt-4 p-4 bg-white rounded-2xl border-2 border-slate-100 shadow-sm">
+                <div [ngSwitch]="selectedExerciseForPreview.typeExercise">
+                    
+                    <!-- Selection Types -->
+                    <div *ngSwitchCase="'selection_single'" class="flex flex-col gap-3">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionSelectOptions?.length ? selectedExerciseForPreview.optionSelectOptions : [])" 
+                             class="min-h-12 bg-white border-2 border-gray-100 rounded-2xl flex items-center px-4">
+                            <div class="h-6 w-6 rounded-full border-2 border-gray-200 mr-4 flex-shrink-0"></div>
+                            <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                        </div>
+                    </div>
+
+                    <div *ngSwitchCase="'selection_multiple'" class="flex flex-col gap-3">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionSelectOptions?.length ? selectedExerciseForPreview.optionSelectOptions : [])" 
+                             class="min-h-12 bg-white border-2 border-gray-100 rounded-2xl flex items-center px-4">
+                            <div class="h-6 w-6 rounded-lg border-2 border-gray-200 mr-4 flex-shrink-0"></div>
+                            <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Ordering Types -->
+                    <div *ngSwitchCase="'vertical_ordering'" class="flex flex-col gap-3 relative">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsVerticalOrdering?.length ? selectedExerciseForPreview.optionsVerticalOrdering : [])" 
+                             class="min-h-12 bg-indigo-50/30 border-2 border-indigo-100 rounded-2xl flex items-center px-4">
+                            <div class="h-8 w-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-500 font-black text-xs mr-4"><i class="pi pi-bars"></i></div>
+                            <div class="text-slate-600 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
+                        </div>
+                    </div>
+
+                    <div *ngSwitchCase="'horizontal_ordering'" class="flex flex-wrap gap-2">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsHorizontalOrdering?.length ? selectedExerciseForPreview.optionsHorizontalOrdering : [])" 
+                             class="min-h-12 bg-teal-50/30 border-2 border-teal-100 rounded-2xl flex items-center px-5">
+                            <div class="text-teal-700 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Phishing Selection -->
+                    <div *ngSwitchCase="'phishing_selection_multiple'" class="flex flex-col gap-4">
+                        <div *ngIf="selectedExerciseForPreview.phishingImageUrl" class="w-full h-40 rounded-2xl overflow-hidden border-2 border-red-100 mb-2">
+                            <img [src]="selectedExerciseForPreview.phishingImageUrl" class="w-full h-full object-cover">
+                        </div>
+                        <div *ngIf="selectedExerciseForPreview.phishingContext" class="p-3 bg-red-50 rounded-xl border-l-4 border-l-red-400 text-sm text-red-700 font-bold italic mb-2">
+                            "{{ selectedExerciseForPreview.phishingContext }}"
+                        </div>
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsPhishingSelection?.length ? selectedExerciseForPreview.optionsPhishingSelection : [])" 
+                             class="min-h-12 bg-white border-2 border-red-100 rounded-2xl flex items-center px-4">
+                            <div class="h-6 w-6 rounded-lg border-2 border-red-200 mr-4 flex-shrink-0"></div>
+                            <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Matching Type -->
+                    <div *ngSwitchCase="'match_pairs'" class="flex flex-col gap-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="flex flex-col gap-2">
+                                <div *ngFor="let opt of selectedExerciseForPreview.optionsMatchPairsLeft" class="p-3 bg-orange-50 border-2 border-orange-100 rounded-xl text-xs font-black text-orange-700 text-center">
+                                    {{ opt.text || opt }}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <div *ngFor="let opt of selectedExerciseForPreview.optionsMatchPairsRight" class="p-3 bg-emerald-50 border-2 border-emerald-100 rounded-xl text-xs font-black text-emerald-700 text-center">
+                                    {{ opt.text || opt }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngSwitchDefault class="h-24 bg-slate-50 border-2 border-slate-100 border-dashed rounded-2xl flex items-center justify-center text-slate-400 font-bold">
+                        <i class="pi pi-eye text-2xl mr-3 opacity-30"></i> Vista previa no disponible para este tipo
+                    </div>
                 </div>
             </div>
 
-            <div *ngIf="selectedExerciseForPreview.hind" class="mt-6 p-4 bg-amber-50 border-2 border-amber-100 rounded-2xl flex gap-3">
+            <div *ngIf="selectedExerciseForPreview.hind"
+                class="mt-6 p-4 bg-amber-50 border-2 border-amber-100 rounded-2xl flex gap-3">
                 <i class="pi pi-lightbulb text-amber-500"></i>
-                <p class="m-0 text-sm font-bold text-amber-700"><strong>Pista:</strong> {{ selectedExerciseForPreview.hind }}</p>
+                <p class="m-0 text-sm font-bold text-amber-700"><strong>Pista:</strong> {{
+                    selectedExerciseForPreview.hind }}</p>
             </div>
         </div>
     </div>
     <ng-template pTemplate="footer">
-        <p-button label="CERRAR" icon="pi pi-times" (click)="displayExercisePreview = false" 
-            class="gamified-toggle-btn"></p-button>
+        <button class="gamified-btn-3d btn-3d-danger !py-3 !px-8" (click)="displayExercisePreview = false">
+            <i class="pi pi-times"></i> CERRAR
+        </button>
     </ng-template>
 </p-dialog>
 
 <!-- AI EXERCISE GENERATION WIZARD -->
-<app-generate-exercises-dialog #genWizard
-    [activityId]="null"
-    [saveToDatabase]="false"
+<app-generate-exercises-dialog #genWizard [activityId]="null" [saveToDatabase]="false"
     (exercisesGenerated)="onExercisesGenerated($event)">
 </app-generate-exercises-dialog>
 
 <!-- NUEVO DIÁLOGO DE EDICIÓN DE EJERCICIO -->
-<app-exercise-editor-dialog #exerciseEditorDialog
-    (onSave)="onExerciseSave($event)">
+<app-exercise-editor-dialog #exerciseEditorDialog (onSave)="onExerciseSave($event)">
 </app-exercise-editor-dialog>
 
 <!-- Floating Amauta Fab -->

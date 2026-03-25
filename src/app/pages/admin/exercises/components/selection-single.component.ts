@@ -18,50 +18,58 @@ import { RadioButtonModule } from 'primeng/radiobutton';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
-    <div class="space-y-4" [formGroup]="form">
-      <div class="field space-y-2">
-        <label class="block text-sm font-medium text-gray-700">Opciones de Selección</label>
-        <div formArrayName="options" class="space-y-2">
+    <div class="space-y-6" [formGroup]="form">
+      <div class="field space-y-4">
+        <label class="block text-sm font-black text-gray-400 uppercase tracking-widest">Opciones de Selección</label>
+        <div formArrayName="options" class="space-y-4">
           <div *ngFor="let option of optionsArray.controls; let i = index" 
                [formGroupName]="i" 
-               class="flex items-center gap-2">
-            <input 
-              type="text" 
-              formControlName="text"
-              placeholder="Ingresa la opción {{i + 1}}"
-              class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
-            <p-radioButton 
-              [inputId]="'correct_' + i"
-              name="correctAnswer" 
-              [value]="i"
-              [(ngModel)]="selectedCorrectIndex"
-              (onClick)="setCorrectAnswer(i)"
-              [ngModelOptions]="{standalone: true}"></p-radioButton>
-            <label [for]="'correct_' + i" class="text-sm text-gray-600">Correcta</label>
-            <p-button 
-              *ngIf="optionsArray.length > 2"
-              icon="pi pi-trash" 
-              severity="danger"
-              size="small"
-              class="p-button-rounded p-button-text"
-              (onClick)="removeOption(i)"></p-button>
+               class="flex items-center gap-4 bg-white p-2 rounded-2xl border-4"
+               [ngClass]="selectedCorrectIndex === i ? 'border-green-400 bg-green-50/50' : 'border-slate-100'">
+            
+            <div class="flex-1 flex gap-3 items-center">
+              <!-- Custom Radio Button look -->
+              <div class="h-8 w-8 rounded-full border-4 flex items-center justify-center cursor-pointer flex-shrink-0 transition-colors"
+                [ngClass]="selectedCorrectIndex === i ? 'border-green-500 bg-green-500' : 'border-slate-300 hover:border-indigo-400 bg-white'"
+                (click)="setCorrectAnswer(i)">
+                <i class="pi pi-check text-white text-sm" *ngIf="selectedCorrectIndex === i"></i>
+              </div>
+
+              <input 
+                type="text" 
+                formControlName="text"
+                placeholder="Ingresa la opción {{i + 1}}"
+                class="flex-1 p-3 bg-transparent border-none rounded-xl font-bold text-gray-700 text-lg focus:ring-0 outline-none w-full placeholder:text-gray-300" />
+            </div>
+
+            <div class="flex items-center gap-3 pr-2">
+              <span class="text-sm font-black uppercase tracking-wider" 
+                [ngClass]="selectedCorrectIndex === i ? 'text-green-600' : 'text-gray-400'">
+                Correcta
+              </span>
+              <button 
+                *ngIf="optionsArray.length > 2"
+                type="button"
+                class="h-10 w-10 rounded-xl bg-red-100 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center"
+                (click)="removeOption(i)">
+                <i class="pi pi-trash font-bold"></i>
+              </button>
+            </div>
           </div>
         </div>
-        <p-button 
-          label="Agregar Opción" 
-          icon="pi pi-plus" 
-          size="small"
-          class="p-button-outlined"
-          (onClick)="addOption()"></p-button>
+        <button 
+          type="button"
+          class="gamified-btn-3d btn-3d-indigo !py-3 !px-6 text-sm flex items-center gap-2 mt-4"
+          (click)="addOption()">
+          <i class="pi pi-plus font-bold"></i> AGREGAR OPCIÓN
+        </button>
       </div>
 
-      <div class="field space-y-2">
-        <label class="block text-sm font-medium text-gray-700">Respuesta Correcta Seleccionada</label>
-        <input 
-          type="text" 
-          [value]="getCorrectAnswerText()"
-          readonly
-          class="w-full p-2 border border-gray-300 rounded-md bg-gray-50" />
+      <div class="field space-y-3 pt-4 border-t-4 border-gray-100">
+        <label class="block text-sm font-black text-gray-400 uppercase tracking-widest">Respuesta Correcta Seleccionada</label>
+        <div class="w-full p-4 bg-green-50 border-4 border-green-200 rounded-2xl font-black text-green-700 text-lg">
+          {{ getCorrectAnswerText() || 'Ninguna seleccionada' }}
+        </div>
       </div>
     </div>
   `

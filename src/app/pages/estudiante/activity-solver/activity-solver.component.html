@@ -63,84 +63,97 @@
 
       <!-- Right Panel (Exercise Area) -->
       <section class="flex-1 flex flex-col min-h-[450px]">
-        <h1 class="duo-question-title">{{ currentExercise.statement }}</h1>
-        <p class="duo-question-subtitle">{{ currentExerciseGuide.objective }}</p>
+        <ng-container *ngIf="safeActivity.exercises.length > 0; else noExercises">
+          <h1 class="duo-question-title text-center md:text-left">{{ currentExercise.statement }}</h1>
+          <p class="duo-question-subtitle">{{ currentExerciseGuide.objective }}</p>
 
-        <div class="exercise-content-area flex-1 mt-2">
-          <div [ngSwitch]="currentExercise.typeExercise" class="w-full" *ngIf="currentExercise">
-            <app-single-selection-exercise
-              *ngSwitchCase="'selection_single'"
-              [options]="currentExercise.optionSelectOptions"
-              [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-single-selection-exercise>
+          <div class="exercise-content-area flex-1 mt-2">
+            <div [ngSwitch]="currentExercise.typeExercise" class="w-full" *ngIf="currentExercise">
+              <app-single-selection-exercise
+                *ngSwitchCase="'selection_single'"
+                [options]="currentExercise.optionSelectOptions"
+                [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-single-selection-exercise>
 
-            <app-multiple-selection-exercise
-              *ngSwitchCase="'selection_multiple'"
-              [options]="currentExercise.optionSelectOptions"
-              [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-multiple-selection-exercise>
+              <app-multiple-selection-exercise
+                *ngSwitchCase="'selection_multiple'"
+                [options]="currentExercise.optionSelectOptions"
+                [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-multiple-selection-exercise>
 
-            <app-order-fragment-code-exercise
-              *ngSwitchCase="'order_fragment_code'"
-              [fragments]="currentExercise.optionOrderFragmentCode"
-              [orderedFragments]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderFragmentCode : []"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-order-fragment-code-exercise>
+              <app-order-fragment-code-exercise
+                *ngSwitchCase="'order_fragment_code'"
+                [fragments]="currentExercise.optionOrderFragmentCode"
+                [orderedFragments]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderFragmentCode : []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-order-fragment-code-exercise>
 
-            <app-order-line-code-exercise
-              *ngSwitchCase="'order_line_code'"
-              [lines]="currentExercise.optionOrderLineCode"
-              [orderedLines]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderLineCode : []"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-order-line-code-exercise>
+              <app-order-line-code-exercise
+                *ngSwitchCase="'order_line_code'"
+                [lines]="currentExercise.optionOrderLineCode"
+                [orderedLines]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerOrderLineCode : []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-order-line-code-exercise>
 
-            <app-write-code-exercise
-              *ngSwitchCase="'write_code'"
-              [code]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerWriteCode : ''"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-write-code-exercise>
+              <app-write-code-exercise
+                *ngSwitchCase="'write_code'"
+                [code]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerWriteCode : ''"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-write-code-exercise>
 
-            <app-find-error-code-exercise
-              *ngSwitchCase="'find_error_code'"
-              [options]="currentExercise.optionFindErrorCode"
-              [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-find-error-code-exercise>
+              <app-find-error-code-exercise
+                *ngSwitchCase="'find_error_code'"
+                [options]="currentExercise.optionFindErrorCode"
+                [selectedError]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerFindError : undefined"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-find-error-code-exercise>
 
-            <app-vertical-ordering-exercise
-              *ngSwitchCase="'vertical_ordering'"
-              [fragments]="currentExercise.optionsVerticalOrdering"
-              [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-vertical-ordering-exercise>
+              <app-vertical-ordering-exercise
+                *ngSwitchCase="'vertical_ordering'"
+                [fragments]="currentExercise.optionsVerticalOrdering"
+                [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-vertical-ordering-exercise>
 
-            <app-horizontal-ordering-exercise
-              *ngSwitchCase="'horizontal_ordering'"
-              [lines]="currentExercise.optionsHorizontalOrdering"
-              [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-horizontal-ordering-exercise>
+              <app-horizontal-ordering-exercise
+                *ngSwitchCase="'horizontal_ordering'"
+                [lines]="currentExercise.optionsHorizontalOrdering"
+                [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-horizontal-ordering-exercise>
 
-            <app-phishing-selection-multiple-exercise
-              *ngSwitchCase="'phishing_selection_multiple'"
-              [options]="currentExercise.optionsPhishingSelection"
-              [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
-              [phishingContext]="currentExercise.phishingContext"
-              [phishingImageUrl]="currentExercise.phishingImageUrl"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-phishing-selection-multiple-exercise>
+              <app-phishing-selection-multiple-exercise
+                *ngSwitchCase="'phishing_selection_multiple'"
+                [options]="currentExercise.optionsPhishingSelection"
+                [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
+                [phishingContext]="currentExercise.phishingContext"
+                [phishingImageUrl]="currentExercise.phishingImageUrl"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-phishing-selection-multiple-exercise>
 
-            <app-match-pairs-exercise
-              *ngSwitchCase="'match_pairs'"
-              [leftOptions]="currentExercise.optionsMatchPairsLeft"
-              [rightOptions]="currentExercise.optionsMatchPairsRight"
-              [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
-              (answerSubmitted)="onAnswerSubmitted($event)">
-            </app-match-pairs-exercise>
+              <app-match-pairs-exercise
+                *ngSwitchCase="'match_pairs'"
+                [leftOptions]="currentExercise.optionsMatchPairsLeft"
+                [rightOptions]="currentExercise.optionsMatchPairsRight"
+                [matchedPairs]="answers()[currentExerciseIndex()].answerMatchPairs || []"
+                (answerSubmitted)="onAnswerSubmitted($event)">
+              </app-match-pairs-exercise>
+            </div>
           </div>
-        </div>
+        </ng-container>
+        <ng-template #noExercises>
+          <div class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
+            <div class="w-32 h-32 rounded-full bg-blue-50 flex items-center justify-center mb-6">
+              <i class="pi pi-info-circle text-6xl text-blue-500 font-extrabold"></i>
+            </div>
+            <h1 class="text-3xl font-black mb-2" style="color: var(--text-primary)">Actividad sin ejercicios</h1>
+            <p class="text-xl text-gray-500 font-bold max-w-md mx-auto" style="color: var(--text-secondary)">
+              Esta actividad no contiene ejercicios todavía. Puedes finalizarla para continuar con tu progreso.
+            </p>
+          </div>
+        </ng-template>
       </section>
     </div>
   </main>
@@ -153,12 +166,20 @@
       </div>
       <div class="flex items-center gap-4 w-full sm:w-auto">
         <button
+          *ngIf="safeActivity.exercises.length > 0"
           class="duo-btn w-full sm:w-auto"
           [class.duo-btn-primary]="hasAnswer()"
           [class.duo-btn-disabled]="!hasAnswer()"
           (click)="hasAnswer() && !submitting() ? verifyAnswer() : null">
           <i class="pi pi-spin pi-spinner" *ngIf="submitting()"></i>
           {{ submitting() ? 'COMPROBANDO...' : 'COMPROBAR' }}
+        </button>
+
+        <button
+          *ngIf="safeActivity.exercises.length === 0"
+          class="duo-btn duo-btn-success w-full sm:w-auto"
+          (click)="confirmFinishActivity()">
+          FINALIZAR
         </button>
       </div>
     </div>

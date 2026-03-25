@@ -813,6 +813,11 @@ export class ActivitySolverComponent implements OnInit {
   }
 
   confirmFinishActivity(): void {
+    if (this.safeActivity.exercises.length === 0) {
+      this.finishActivity();
+      return;
+    }
+
     // Verificar si todos los ejercicios tienen respuesta
     const unansweredExercises = this.answers().filter(answer => {
       switch (answer.type) {

@@ -1,0 +1,137 @@
+:host {
+    display: block;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.animate-fadein {
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scalein {
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* SEARCH & TOGGLE */
+.premium-search .gamified-input {
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    color: #334155;
+    width: 250px;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.premium-search .gamified-input:focus {
+    background: white;
+    border-color: #6366f1;
+    width: 300px;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+.view-toggle {
+    background: #f1f5f9 !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+.toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    color: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    background: transparent;
+    border: none;
+}
+
+.toggle-btn:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.toggle-btn.active {
+    background: #6366f1;
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* PREMIUM TABLE */
+::ng-deep .p-datatable-premium {
+    border: none !important;
+}
+
+::ng-deep .p-datatable-premium .p-datatable-header {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+::ng-deep .p-datatable-premium .p-datatable-thead > tr > th {
+    border: none !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+}
+
+::ng-deep .p-datatable-premium .p-datatable-tbody > tr {
+    background: transparent !important;
+}
+
+::ng-deep .p-datatable-premium .p-datatable-tbody > tr > td {
+    border: none !important;
+    border-bottom: 1px solid #f8fafc !important;
+    padding: 1.25rem 1rem !important;
+}
+
+/* CARDS */
+.admin-path-card {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* BREADCRUMB OVERRIDES */
+::ng-deep .p-breadcrumb {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+::ng-deep .p-breadcrumb .p-menuitem-link .p-menuitem-text {
+    color: #64748b !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+::ng-deep .p-breadcrumb .p-menuitem-link:hover .p-menuitem-text {
+    color: #6366f1 !important;
+}
+
+/* DIALOG CUSTOM */
+::ng-deep .premium-dialog .p-dialog-header {
+    background: #f8fafc !important;
+    padding: 2rem !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+}
+
+::ng-deep .premium-dialog .p-dialog-content {
+    background: white !important;
+    padding: 0 !important;
+}
+
+::ng-deep .premium-confirm .p-dialog-header {
+    background: #fee2e2 !important;
+    color: #ef4444 !important;
+}

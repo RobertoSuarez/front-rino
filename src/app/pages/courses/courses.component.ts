@@ -25,6 +25,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } 
 import { environment } from '../../../environments/environment';
 import { AiService } from '../../core/services/ai.service';
 import { TooltipModule } from 'primeng/tooltip';
+import { ToolbarModule } from 'primeng/toolbar';
+import { RippleModule } from 'primeng/ripple';
 
 @Component({
   selector: 'app-courses',
@@ -46,7 +48,9 @@ import { TooltipModule } from 'primeng/tooltip';
     ConfirmDialogModule,
     BreadcrumbModule,
     RouterModule,
-    TooltipModule
+    TooltipModule,
+    ToolbarModule,
+    RippleModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './courses.component.html'

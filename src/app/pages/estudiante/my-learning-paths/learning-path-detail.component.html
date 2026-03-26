@@ -1,0 +1,245 @@
+<div class="detail-container animate-fadein p-4 sm:p-6 lg:p-8">
+    <p-toast position="top-right"></p-toast>
+    
+    <!-- BREADCRUMB -->
+    <div class="mb-8 scalein">
+        <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome"></p-breadcrumb>
+    </div>
+
+    <!-- BACK BUTTON -->
+    <div class="mb-6">
+        <button 
+            pButton 
+            label="VOLVER A MIS RUTAS" 
+            icon="pi pi-arrow-left" 
+            class="p-button-text p-button-secondary font-black tracking-widest text-xs hover:bg-slate-100/50"
+            (click)="goBack()">
+        </button>
+    </div>
+
+    <!-- LOADING STATE -->
+    <div *ngIf="loading" class="space-y-8">
+        <div class="h-64 bg-slate-100 rounded-[40px] animate-pulse"></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div *ngFor="let i of [1,2,3,4]" class="h-32 bg-slate-100 rounded-3xl animate-pulse"></div>
+        </div>
+        <div class="h-96 bg-slate-100 rounded-[40px] animate-pulse"></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div *ngIf="!loading && pathDetail" class="space-y-10">
+        
+        <!-- Hero Card - LIGHT PREMIUM -->
+        <div class="hero-card relative overflow-hidden rounded-[40px] shadow-xl bg-white border-2 border-slate-100 p-8 md:p-12 mb-12 animate-in fade-in slide-in-from-top-10 duration-1000">
+            <!-- Ambient Glows -->
+            <div class="absolute -top-32 -right-32 w-96 h-96 bg-emerald-50 rounded-full blur-[80px] opacity-70"></div>
+            <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-50 rounded-full blur-[80px] opacity-70"></div>
+            
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="px-4 py-1.5 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 font-black text-xs tracking-[3px] uppercase shadow-sm">
+                            {{ pathDetail.code }}
+                        </span>
+                        <p-tag 
+                            [value]="pathDetail.isActive ? 'OPERATIVO' : 'EN ESPERA'" 
+                            [severity]="pathDetail.isActive ? 'success' : 'danger'"
+                            styleClass="font-black text-[10px] tracking-widest px-4 py-1 rounded-lg">
+                        </p-tag>
+                    </div>
+                    
+                    <h1 class="text-4xl md:text-6xl font-black text-slate-800 tracking-tighter uppercase mb-6 leading-none">
+                        {{ pathDetail.name }}
+                    </h1>
+                    
+                    <div class="max-w-3xl">
+                        <h4 class="text-emerald-500 font-black text-xs tracking-[2px] uppercase mb-3 text-left">Manifiesto del Trayecto</h4>
+                        <p class="text-slate-600 text-xl font-medium leading-relaxed italic border-l-4 border-emerald-500/30 pl-6 text-left">
+                            "{{ pathDetail.description }}"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Professor Spotlight - Light -->
+                <div class="prof-spotlight p-6 rounded-[32px] bg-slate-50 border border-slate-100 flex items-center gap-5 transition-transform hover:scale-105" *ngIf="pathDetail.createdBy">
+                    <p-avatar 
+                        [image]="pathDetail.createdBy.urlAvatar" 
+                        [label]="pathDetail.createdBy.firstName.charAt(0) + pathDetail.createdBy.lastName.charAt(0)"
+                        size="xlarge" 
+                        shape="circle"
+                        styleClass="border-4 border-emerald-500/50 shadow-lg">
+                    </p-avatar>
+                    <div>
+                        <span class="block text-emerald-600 font-black text-[10px] tracking-widest uppercase mb-1">Guía del Trayecto</span>
+                        <div class="text-slate-800 font-black text-xl leading-tight">
+                            {{ pathDetail.createdBy.firstName }} {{ pathDetail.createdBy.lastName }}
+                        </div>
+                        <div class="text-slate-400 text-sm font-bold mt-1 uppercase tracking-tight">Catedrático Senior</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="stat-card bg-white p-6 rounded-[32px] border-b-4 border-blue-500/20 shadow-lg hover:shadow-xl transition-all group overflow-hidden relative">
+                <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-blue-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10">
+                    <i class="pi pi-book text-3xl text-blue-500 mb-4 block"></i>
+                    <div class="text-3xl font-black text-slate-800 leading-none mb-1">{{ pathDetail.courses?.length || 0 }}</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Misiones Totales</div>
+                </div>
+            </div>
+            
+            <div class="stat-card bg-white p-6 rounded-[32px] border-b-4 border-emerald-500/20 shadow-lg hover:shadow-xl transition-all group overflow-hidden relative">
+                <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-emerald-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10">
+                    <i class="pi pi-bookmark text-3xl text-emerald-500 mb-4 block"></i>
+                    <div class="text-3xl font-black text-slate-800 leading-none mb-1">{{ getTotalChapters() }}</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Objetivos Base</div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-[32px] border-b-4 border-orange-500/20 shadow-lg hover:shadow-xl transition-all group overflow-hidden relative">
+                <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-orange-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10">
+                    <i class="pi pi-bolt text-3xl text-orange-500 mb-4 block"></i>
+                    <div class="text-3xl font-black text-slate-800 leading-none mb-1">{{ getTotalTemas() }}</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Desafíos de Tema</div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-[32px] border-b-4 border-purple-500/20 shadow-lg hover:shadow-xl transition-all group overflow-hidden relative">
+                <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-purple-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10">
+                    <i class="pi pi-users text-3xl text-purple-500 mb-4 block"></i>
+                    <div class="text-3xl font-black text-slate-800 leading-none mb-1">{{ pathDetail.studentsCount || 0 }}</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Agentes en Ruta</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN LAYOUT -->
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Left Side: Content Hierarchy -->
+            <div class="col-span-12 lg:col-span-8">
+                <div class="content-panel bg-white rounded-[40px] shadow-2xl border-4 border-slate-50 overflow-hidden">
+                    <header class="p-8 border-b-2 border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-1">Contenido Genético de la Ruta</h2>
+                            <p class="text-slate-400 font-bold text-sm uppercase tracking-widest">Estructura completa de aprendizaje</p>
+                        </div>
+                        <i class="pi pi-sitemap text-3xl text-slate-200"></i>
+                    </header>
+
+                    <div class="p-4 md:p-8 space-y-6">
+                        <div *ngFor="let course of pathDetail.courses; let i = index" class="course-node rounded-[32px] border-2 transition-all duration-300" [class.border-emerald-500]="expandedCourses[i]" [class.border-slate-100]="!expandedCourses[i]">
+                            <div 
+                                class="course-header p-6 flex items-center gap-4 cursor-pointer relative overflow-hidden group"
+                                (click)="toggleCourse(i)">
+                                
+                                <div class="absolute inset-0 bg-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                
+                                <img 
+                                    *ngIf="course.urlLogo" 
+                                    [src]="course.urlLogo" 
+                                    [alt]="course.title"
+                                    class="w-16 h-16 rounded-2xl relative z-10 border-2 border-white shadow-md object-cover">
+                                
+                                <div class="flex-1 relative z-10">
+                                    <h3 class="text-xl font-black text-slate-800 leading-tight uppercase tracking-tight">{{ course.title }}</h3>
+                                    <span class="text-emerald-600 font-bold text-xs tracking-widest uppercase">{{ course.code }}</span>
+                                </div>
+
+                                <div class="flex items-center gap-4 relative z-10">
+                                    <span class="hidden md:inline-flex px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black text-slate-500 tracking-widest uppercase">
+                                        {{ course.chaptersCount }} CAPÍTULOS
+                                    </span>
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300" [class.rotate-180]="expandedCourses[i]" [class.bg-emerald-500]="expandedCourses[i]" [class.text-white]="expandedCourses[i]" [class.bg-slate-100]="!expandedCourses[i]">
+                                        <i class="pi pi-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chapters and Temas (Expandable) -->
+                            <div *ngIf="expandedCourses[i]" class="p-6 pt-2 space-y-8 animate-fadein">
+                                <p class="course-desc text-slate-500 font-medium italic border-l-4 border-emerald-500 pl-4 mb-8">
+                                    {{ course.description }}
+                                </p>
+
+                                <div class="space-y-6" *ngIf="course.chapters && course.chapters.length > 0">
+                                    <div *ngFor="let chapter of course.chapters; let chIdx = index" class="chapter-card bg-slate-50 rounded-3xl p-6 relative">
+                                        <div class="flex items-center gap-4 mb-6">
+                                            <div class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center font-black shadow-lg">
+                                                {{ chIdx + 1 }}
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-lg font-black text-slate-800 uppercase tracking-tight">{{ chapter.title }}</h4>
+                                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ chapter.temasCount }} DESAFÍOS</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Themes Grid - Filtrat temas sin actividades -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" *ngIf="chapter.temas && chapter.temas.length > 0">
+                                            <ng-container *ngFor="let tema of chapter.temas">
+                                                <div 
+                                                    *ngIf="tema.activitiesCount > 0"
+                                                    class="theme-btn flex items-center gap-3 p-4 bg-white rounded-2xl border-2 border-transparent hover:border-emerald-500/50 hover:shadow-xl hover:translate-x-1 cursor-pointer transition-all duration-300 group"
+                                                    (click)="navigateToTema(course.id, chapter.id)">
+                                                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                                                    <i class="pi pi-book text-emerald-600 group-hover:text-white transition-colors"></i>
+                                                </div>
+                                                <span class="text-sm font-black text-slate-600 group-hover:text-emerald-600 flex-1 truncate">{{ tema.title }}</span>
+                                                <div class="flex flex-col items-end">
+                                                    <span class="text-[9px] font-black text-slate-300 group-hover:text-emerald-300 uppercase leading-none">{{ tema.activitiesCount }}</span>
+                                                    <span class="text-[7px] font-black text-slate-300 group-hover:text-emerald-300 uppercase leading-none">ACTS</span>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Sidebar Info -->
+            <div class="col-span-12 lg:col-span-4 space-y-8">
+                <!-- Companion Radar -->
+                <div class="companion-radar bg-white p-8 rounded-[40px] shadow-2xl border-4 border-slate-50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -mr-16 -mt-16"></div>
+                    
+                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter mb-6">Radar de Agentes</h3>
+                    <div *ngIf="pathDetail.students && pathDetail.students.length > 0" class="space-y-4">
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Compañeros activos en la red:</p>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <div *ngFor="let student of pathDetail.students" 
+                                 class="avatar-wrapper p-1 rounded-full border-2 border-slate-100 hover:border-purple-500 transition-colors cursor-help"
+                                 [pTooltip]="student.firstName + ' ' + student.lastName"
+                                 tooltipPosition="top">
+                                <p-avatar 
+                                    [image]="student.urlAvatar" 
+                                    [label]="student.firstName.charAt(0) + student.lastName.charAt(0)"
+                                    size="large" 
+                                    shape="circle">
+                                </p-avatar>
+                            </div>
+                            <!-- More agents indicator -->
+                            <div *ngIf="pathDetail.studentsCount > pathDetail.students.length" 
+                                 class="flex items-center justify-center w-12 h-12 rounded-full bg-slate-800 text-white font-black text-xs shadow-lg border-2 border-white">
+                                +{{ pathDetail.studentsCount - pathDetail.students.length }}
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="!pathDetail.students || pathDetail.students.length === 0" class="py-10 text-center text-slate-300 font-black italic uppercase tracking-widest text-sm">
+                        Sin otros agentes detectados
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

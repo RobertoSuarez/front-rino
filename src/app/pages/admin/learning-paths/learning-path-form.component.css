@@ -1,0 +1,172 @@
+:host {
+    display: block;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.animate-fadein {
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scalein {
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* GAMIFIED INPUTS */
+.gamified-input, .gamified-textarea {
+    background: #ffffff;
+    border: 2px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.gamified-input:focus, .gamified-textarea:focus {
+    border-color: #10b981;
+    background: white;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+    outline: none;
+}
+
+/* PREMIUM PICKLIST OVERRIDES - EMERALD THEME (COMPACT) */
+.premium-picklist {
+    width: 100%;
+    max-width: 900px;
+}
+
+::ng-deep .compact-picklist .p-picklist-listwrapper {
+    flex: 1 1 300px !important;
+    min-width: 250px !important;
+    max-width: 350px !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-list {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 0.4rem !important;
+    background: #ffffff !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-item {
+    border-radius: 8px !important;
+    margin-bottom: 0.3rem !important;
+    border: 1px solid transparent !important;
+    transition: all 0.2s !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-item:hover {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-item.p-highlight {
+    background: #10b981 !important;
+    color: white !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-header {
+    background: transparent !important;
+    border: none !important;
+    color: #475569 !important;
+    font-weight: 800 !important;
+    font-size: 0.7rem !important;
+    padding: 0 0 0.5rem 0 !important;
+    text-align: left !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-filter-container {
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 0.3rem 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-filter-input {
+    background: transparent !important;
+    border: none !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+
+::ng-deep .premium-picklist .p-picklist .p-picklist-buttons {
+    padding: 0.5rem !important;
+    gap: 0.3rem !important;
+    flex: 0 0 auto !important;
+}
+
+::ng-deep .p-picklist-buttons p-button button {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    width: 28px !important;
+    height: 28px !important;
+    color: #64748b !important;
+    transition: all 0.2s !important;
+}
+
+::ng-deep .p-picklist-buttons p-button button:hover {
+    background: #f1f5f9 !important;
+    color: #10b981 !important;
+    border-color: #10b981 !important;
+    transform: scale(1.05) !important;
+}
+
+::ng-deep .p-picklist-source-controls, ::ng-deep .p-picklist-target-controls {
+    padding: 0.5rem !important;
+    flex: 0 0 auto !important;
+}
+
+/* ACTION BUTTONS - EMERALD */
+.emerald-save-btn {
+    background: #10b981 !important;
+    border: none !important;
+    border-radius: 16px !important;
+    font-weight: 800 !important;
+    color: white !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39) !important;
+    transition: all 0.2s ease !important;
+}
+
+.emerald-save-btn:hover {
+    background: #059669 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.23) !important;
+}
+
+/* RESPONSIVE PICKLIST */
+@media screen and (max-width: 960px) {
+    ::ng-deep .responsive-picklist .p-picklist {
+        flex-direction: column !important;
+    }
+    
+    ::ng-deep .responsive-picklist .p-picklist-buttons {
+        flex-direction: row !important;
+        justify-content: center !important;
+        padding: 1rem !important;
+    }
+    
+    ::ng-deep .responsive-picklist .p-picklist-buttons p-button button {
+        transform: rotate(90deg) !important;
+    }
+
+    ::ng-deep .compact-picklist .p-picklist-listwrapper {
+        max-width: 100% !important;
+    }
+}

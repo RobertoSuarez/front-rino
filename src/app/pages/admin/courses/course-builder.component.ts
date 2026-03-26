@@ -1232,8 +1232,6 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: any) {
-    if (!this.isEditMode) return;
-    
     const file = event.target.files[0];
     if (file) {
       this.loading = true;
@@ -1244,17 +1242,32 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       this.http.post(`${environment.apiUrl}/courses/upload-image`, formData)
         .subscribe({
           next: (response: any) => {
-            if (response && response.data.url) {
-              this.uploadedImages.push(response.data.url);
-              this.defaultImages = [...this.defaultImages, response.data.url];
-              this.courseForm.patchValue({ urlLogo: response.data.url });
+            // Manejo robusto de la respuesta (puede venir envuelta en 'data' por el interceptor o el back)
+            const responseData = response.data || response;
+            const imageUrl = responseData.url || (response.data && response.data.url);
+
+            if (imageUrl) {
+              // Actualizar estados locales
+              this.uploadedImages.push(imageUrl);
+              this.defaultImages = [...this.defaultImages, imageUrl];
+              
+              // Asignar al formulario
+              this.courseForm.patchValue({ urlLogo: imageUrl });
+              
               this.displayImageModal = false;
-              this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Imagen subida y asignada correctamente.' });
+              this.messageService.add({ 
+                severity: 'success', 
+                summary: '¡Éxito!', 
+                detail: 'Imagen subida y asignada correctamente a la portada.' 
+              });
+            } else {
+              console.error('No se encontró URL en la respuesta:', response);
+              this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'La imagen se subió pero no pudimos obtener su ubicación.' });
             }
           },
           error: (err) => {
             console.error('Error al subir imagen', err);
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al subir la imagen' });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo procesar la subida de la imagen. Intenta con otro formato.' });
           },
           complete: () => this.loading = false
         });

@@ -1,0 +1,267 @@
+<div class="admin-container animate-fadein p-4 sm:p-6 lg:p-8">
+    <p-toast position="top-right"></p-toast>
+    <p-confirmDialog [style]="{ width: '450px' }" styleClass="premium-confirm"></p-confirmDialog>
+    
+    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-8 scalein"></p-breadcrumb>
+
+    <!-- HEADER AREA - LIGHT PREMIUM -->
+    <header class="admin-header mb-10 p-8 rounded-[40px] relative overflow-hidden shadow-xl bg-white border-2 border-slate-100">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-slate-50 rounded-full blur-3xl opacity-60"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="header-text">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-1.5 h-8 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.3)]"></div>
+                    <h1 class="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-0">Gestión de Rutas</h1>
+                </div>
+                <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">
+                    Arquitectura y despliegue de trayectos formativos
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-4">
+                <!-- Search -->
+                <span class="p-input-icon-left premium-search">
+                    <i class="pi pi-search text-indigo-400"></i>
+                    <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="BUSCAR RUTA..." class="gamified-input" />
+                </span>
+
+                <!-- View Mode Toggle -->
+                <div class="view-toggle p-1 bg-white/5 rounded-2xl border border-white/10 flex gap-1">
+                    <button (click)="viewMode = 'table'" 
+                            [class.active]="viewMode === 'table'"
+                            class="toggle-btn" 
+                            pTooltip="VISTA TABLA">
+                        <i class="pi pi-list"></i>
+                    </button>
+                    <button (click)="viewMode = 'grid'" 
+                            [class.active]="viewMode === 'grid'"
+                            class="toggle-btn"
+                            pTooltip="VISTA TARJETAS">
+                        <i class="pi pi-th-large"></i>
+                    </button>
+                </div>
+
+                <button pButton 
+                    label="NUEVA RUTA" 
+                    icon="pi pi-plus-circle" 
+                    class="premium-add-btn group"
+                    (click)="createNew()">
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-wrapper">
+        
+        <!-- TABLE VIEW -->
+        <div *ngIf="viewMode === 'table'" class="table-card bg-white rounded-[40px] shadow-2xl border-4 border-slate-50 overflow-hidden">
+            <p-table 
+                [value]="filteredPaths" 
+                [rows]="10"
+                [paginator]="true"
+                [loading]="loading"
+                [rowsPerPageOptions]="[10, 25, 50]"
+                [rowHover]="true"
+                styleClass="p-datatable-premium"
+                responsiveLayout="scroll">
+                
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6">ID</th>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6">Código</th>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6">Ruta de Aprendizaje</th>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6">Misiones</th>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6">Estado</th>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6">Autor</th>
+                        <th class="!bg-slate-50 !text-slate-400 font-black text-[10px] tracking-widest uppercase py-6 text-right pr-8">Operaciones</th>
+                    </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="body" let-path>
+                    <tr class="group hover:bg-indigo-50/30 transition-colors">
+                        <td class="font-bold text-slate-400 text-xs pl-6">#{{ path.id }}</td>
+                        <td>
+                            <span class="px-3 py-1 bg-slate-100 rounded-lg font-mono text-xs font-black text-indigo-600 border border-slate-200">
+                                {{ path.code }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="flex flex-col">
+                                <span class="font-black text-slate-800 uppercase tracking-tight">{{ path.name }}</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase truncate max-w-[200px]">{{ path.description }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                                    <i class="pi pi-book text-blue-500 text-xs"></i>
+                                </div>
+                                <span class="font-black text-slate-600 text-sm">{{ path.coursesCount }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <p-tag 
+                                [value]="path.isActive ? 'OPERATIVO' : 'EN PAUSA'" 
+                                [severity]="path.isActive ? 'success' : 'danger'"
+                                styleClass="font-black text-[9px] tracking-widest px-3 border-2 border-white shadow-sm">
+                            </p-tag>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-2" *ngIf="path.createdBy">
+                                <p-avatar [image]="path.createdBy.urlAvatar" shape="circle" size="normal"></p-avatar>
+                                <span class="text-xs font-bold text-slate-600 truncate max-w-[120px]">{{ path.createdBy.firstName }}</span>
+                            </div>
+                        </td>
+                        <td class="text-right pr-6">
+                            <div class="flex justify-end gap-1">
+                                <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-info p-button-sm" (click)="viewDetails(path)" pTooltip="VER ANALÍTICAS"></button>
+                                <button *ngIf="canEditOrDelete(path)" pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-warning p-button-sm" (click)="edit(path)" pTooltip="EDITAR ESTRUCTURA"></button>
+                                <button *ngIf="canEditOrDelete(path)" pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="confirmDelete(path)" pTooltip="ELIMINAR ASSET"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <!-- GRID VIEW -->
+        <div *ngIf="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div *ngFor="let path of filteredPaths" 
+                 class="admin-path-card group bg-white rounded-[40px] border-b-8 border-slate-100 shadow-xl hover:shadow-2xl hover:border-indigo-400/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden flex flex-col h-full">
+                
+                <div class="p-8 flex flex-col h-full relative">
+                    <!-- Status Badge -->
+                    <div class="absolute top-6 right-6 z-10">
+                        <p-tag 
+                            [value]="path.isActive ? 'ACTIVO' : 'PAUSA'" 
+                            [severity]="path.isActive ? 'success' : 'danger'"
+                            styleClass="font-black text-[9px] tracking-widest px-3 opacity-90">
+                        </p-tag>
+                    </div>
+
+                    <div class="mb-6">
+                        <span class="block font-mono text-[10px] font-black text-indigo-400 uppercase tracking-[3px] mb-2">{{ path.code }}</span>
+                        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter leading-tight line-clamp-2 min-h-[3rem]">
+                            {{ path.name }}
+                        </h3>
+                    </div>
+
+                    <p class="text-slate-400 font-bold text-xs leading-relaxed line-clamp-3 mb-8">
+                        {{ path.description || 'Sin descripción técnica disponible para esta unidad operativa.' }}
+                    </p>
+
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="flex-1 bg-slate-50 p-3 rounded-2xl flex items-center justify-center gap-3">
+                            <i class="pi pi-book text-indigo-500"></i>
+                            <span class="text-sm font-black text-slate-700">{{ path.coursesCount }} Cursos</span>
+                        </div>
+                        <div class="flex-1 bg-slate-50 p-3 rounded-2xl flex items-center justify-center gap-3" *ngIf="path.createdBy">
+                            <p-avatar [image]="path.createdBy.urlAvatar" shape="circle" size="normal"></p-avatar>
+                            <span class="text-xs font-black text-slate-500 truncate">{{ path.createdBy.firstName }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-6 border-t-2 border-slate-50 flex justify-between items-center bg-slate-50/50 -mx-8 px-8 py-4">
+                        <div class="flex gap-1">
+                            <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-info p-button-sm" (click)="viewDetails(path)" pTooltip="VISTA PREVIA"></button>
+                            <button *ngIf="canEditOrDelete(path)" pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-warning p-button-sm" (click)="edit(path)" pTooltip="EDITAR"></button>
+                        </div>
+                        <button *ngIf="canEditOrDelete(path)" pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="confirmDelete(path)" pTooltip="ELIMINAR"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty Grid Condition -->
+            <div *ngIf="filteredPaths.length === 0" class="col-span-full py-20 text-center bg-white/50 backdrop-blur-md rounded-[40px] border-4 border-dashed border-slate-200">
+                <i class="pi pi-search text-6xl text-slate-200 mb-4 block"></i>
+                <h3 class="text-2xl font-black text-slate-400 uppercase tracking-tighter">Sin coincidencias detectadas</h3>
+                <p class="text-slate-300 font-bold uppercase tracking-widest text-xs mt-2">Ajusta los parámetros de búsqueda</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAIL DIALOG -->
+    <p-dialog 
+        [(visible)]="detailsDialogVisible" 
+        [modal]="true"
+        [draggable]="false"
+        [resizable]="false"
+        header="Expediente de la Ruta"
+        [style]="{ width: '700px' }"
+        styleClass="premium-dialog rounded-[40px] shadow-2xl overflow-hidden">
+        
+        <ng-template pTemplate="content">
+            <div *ngIf="selectedPath" class="py-6 animate-fadein">
+                <div class="flex items-center gap-6 mb-8 p-6 bg-slate-50 rounded-[32px] border-2 border-slate-100">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-[28px] flex items-center justify-center shadow-xl rotate-3">
+                        <i class="pi pi-map text-white text-4xl"></i>
+                    </div>
+                    <div>
+                        <span class="px-3 py-1 bg-white rounded-lg font-mono text-[10px] font-black text-indigo-500 shadow-sm border border-slate-100">
+                            {{ selectedPath.code }}
+                        </span>
+                        <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter mt-2 leading-none">
+                            {{ selectedPath.name }}
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="space-y-8 px-2">
+                    <section>
+                        <h4 class="text-indigo-500 font-black text-[10px] tracking-widest uppercase mb-3 flex items-center gap-2">
+                            <i class="pi pi-align-left"></i> Resumen de Contenido
+                        </h4>
+                        <p class="text-slate-600 font-medium leading-relaxed italic border-l-4 border-indigo-100 pl-4">
+                            "{{ selectedPath.description || 'Sin descripción técnica detallada.' }}"
+                        </p>
+                    </section>
+
+                    <section>
+                        <h4 class="text-indigo-500 font-black text-[10px] tracking-widest uppercase mb-4 flex items-center gap-2">
+                            <i class="pi pi-book"></i> Misiones Vinculadas ({{ selectedPath.courses.length }})
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div *ngFor="let course of selectedPath.courses" 
+                                 class="p-4 bg-white border-2 border-slate-50 rounded-2xl flex items-center gap-4 hover:border-indigo-200 transition-all group">
+                                <img 
+                                    *ngIf="course.urlLogo" 
+                                    [src]="course.urlLogo" 
+                                    [alt]="course.title"
+                                    class="w-12 h-12 rounded-xl group-hover:rotate-6 transition-transform shadow-md object-cover">
+                                <div class="flex-1 truncate">
+                                    <div class="font-black text-slate-800 text-sm uppercase truncate">{{ course.title }}</div>
+                                    <div class="text-[9px] font-bold text-slate-400 tracking-widest">{{ course.code }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="grid grid-cols-2 gap-6 pt-6 border-t-2 border-slate-50 mt-8">
+                        <div>
+                            <span class="block text-slate-400 font-black text-[9px] tracking-widest uppercase mb-1">Inicializado el:</span>
+                            <span class="text-slate-700 font-bold text-xs">{{ selectedPath.createdAt }}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-slate-400 font-black text-[9px] tracking-widest uppercase mb-1">Sincronización final:</span>
+                            <span class="text-slate-700 font-bold text-xs">{{ selectedPath.updatedAt }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        
+        <ng-template pTemplate="footer">
+            <div class="flex gap-4 p-2 bg-slate-50 rounded-b-[40px] border-t-2 border-slate-100">
+                <button pButton 
+                    label="CERRAR EXPEDIENTE" 
+                    icon="pi pi-times" 
+                    class="p-button-text !text-slate-400 font-black !rounded-2xl flex-1"
+                    (click)="detailsDialogVisible = false">
+                </button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>

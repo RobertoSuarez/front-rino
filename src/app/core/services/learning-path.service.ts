@@ -20,6 +20,7 @@ export interface LearningPath {
     id: number;
     firstName: string;
     lastName: string;
+    urlAvatar?: string;
   } | null;
   createdAt: string;
   updatedAt: string;

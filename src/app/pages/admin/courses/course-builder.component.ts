@@ -24,6 +24,8 @@ import { ExerciseGenerationService, GeneratedExercise } from '../../../core/serv
 import { ExerciseService } from '../../../core/services/exercise.service';
 import { GenerateExercisesDialogComponent } from '../../admin/exercises/components/generate-exercises-dialog.component';
 import { ExerciseEditorDialogComponent } from '../../admin/exercises/components/exercise-editor-dialog/exercise-editor-dialog.component';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 interface BuilderActivity {
   title: string;
@@ -115,6 +117,18 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   // UI State: track view mode per activity (key: "chapIndex-temaIndex-actIndex", value: 'list' | 'sandbox')
   exercisesViewMode: { [key: string]: 'list' | 'sandbox' } = {};
 
+  defaultImages: string[] = [
+    'https://i.ibb.co/chdPzT1f/Quiero-un-logo-para-mi-aplicaci-n-web-gamificada-para-ense-ar-cyberseguridad.jpg',
+    'https://i.ibb.co/YBRnQLst/quiero-que-me-ayudes-creando-una-imagen-que-pueda-usar-de-portada-para-un-curso-de-varios-que-tengo.jpg',
+    'https://i.ibb.co/hPLvgjc/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/mdBjLyJ/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/77tzGmy/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/932zmNVD/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg',
+    'https://i.ibb.co/gZLQn5Jg/generame-imagenes-para-cursos-de-ciberseguridad-gamificados-para-estudiantes-de-educaci-n-general-b.jpg'
+  ];
+
+  uploadedImages: string[] = [];
+
   // Exercise Type Metadata
   exerciseTypeMap: Record<string, { label: string; icon: string; color: string; bg: string }> = {
     'selection_single': { label: 'Selección Simple', icon: 'pi pi-check-circle', color: '#2563eb', bg: '#eff6ff' },
@@ -128,6 +142,9 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   // Preview State
   displayExercisePreview: boolean = false;
   selectedExerciseForPreview: any = null;
+
+  // Cover Image Modal State
+  displayImageModal: boolean = false;
 
   // AI Wizard State
   @ViewChild('genWizard') genWizard!: GenerateExercisesDialogComponent;
@@ -186,7 +203,8 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     public layoutService: LayoutService,
     private exerciseGenerationService: ExerciseGenerationService,
-    private exerciseService: ExerciseService
+    private exerciseService: ExerciseService,
+    private http: HttpClient
   ) {
     this.courseForm = this.fb.group({
       title: ['', Validators.required],
@@ -241,6 +259,15 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     this.chatMessages.push({
       role: 'ai',
       text: '¡Hola! Soy Amauta, tu asistente pedagógico. Tu cuaderno de trabajo está listo. ¿En qué puedo ayudarte a diseñar hoy?'
+    });
+
+    // Logo Auto-generation
+    this.courseForm.get('title')?.valueChanges.subscribe((title: string) => {
+      if (!this.isEditMode && title) {
+        const formattedTitle = title.trim().replace(/\s+/g, '+');
+        const generatedUrl = `https://ui-avatars.com/api/?name=${formattedTitle}&background=12BA82&color=fff`;
+        this.courseForm.patchValue({ urlLogo: generatedUrl }, { emitEvent: false });
+      }
     });
 
     // Autosave listener
@@ -1194,5 +1221,43 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   private generateTempCode(): string {
     return 'CRSE-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  }
+
+  selectImage(imageUrl: string) {
+    if (this.isEditMode) {
+      this.courseForm.patchValue({ urlLogo: imageUrl });
+      this.displayImageModal = false;
+      this.messageService.add({ severity: 'success', summary: 'Cambio de Póster', detail: 'La imagen ha sido asignada. Recuerda guardar el curso.' });
+    }
+  }
+
+  onFileSelected(event: any) {
+    if (!this.isEditMode) return;
+    
+    const file = event.target.files[0];
+    if (file) {
+      this.loading = true;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.http.post(`${environment.apiUrl}/courses/upload-image`, formData)
+        .subscribe({
+          next: (response: any) => {
+            if (response && response.data.url) {
+              this.uploadedImages.push(response.data.url);
+              this.defaultImages = [...this.defaultImages, response.data.url];
+              this.courseForm.patchValue({ urlLogo: response.data.url });
+              this.displayImageModal = false;
+              this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Imagen subida y asignada correctamente.' });
+            }
+          },
+          error: (err) => {
+            console.error('Error al subir imagen', err);
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al subir la imagen' });
+          },
+          complete: () => this.loading = false
+        });
+    }
   }
 }

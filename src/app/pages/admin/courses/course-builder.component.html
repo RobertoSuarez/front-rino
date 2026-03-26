@@ -319,8 +319,7 @@
                         <span class="truncate font-black text-gray-700 tracking-tight uppercase text-sm">{{
                             chap.value.title || 'CAPÍTULO ' + (i+1) }}</span>
                     </div>
-                    <button class="gamified-btn-3d btn-3d-indigo !w-full !py-5 mt-6"
-                        (click)="addChapter()">
+                    <button class="gamified-btn-3d btn-3d-indigo !w-full !py-5 mt-6" (click)="addChapter()">
                         <div class="flex items-center justify-center gap-3">
                             <i class="pi pi-plus-circle text-xl"></i>
                             <span class="text-base font-black uppercase">AÑADIR CAPÍTULO</span>
@@ -371,37 +370,99 @@
                             <i class="pi pi-cog text-2xl text-indigo-500"></i>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-black m-0 text-gray-800 tracking-tighter uppercase">Información
-                                del Curso</h2>
+                            <h4 class="text-lg font-black m-0 text-gray-800 tracking-tighter uppercase">Información
+                                del Curso</h4>
                             <p class="text-gray-400 font-bold m-0 uppercase tracking-widest text-xs">Configura la
                                 información básica de
                                 tu curso</p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="field">
-                            <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Título
-                                del Curso</label>
-                            <input pInputText formControlName="title"
-                                class="gamified-title-input w-full !text-2xl font-black !p-5 !border-gray-100 hover:border-indigo-200">
-                        </div>
-                        <div class="field">
-                            <label class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Estatus
-                                de Publicación</label>
-                            <div class="flex align-items-center bg-white rounded-2xl border-b-6 border-indigo-100 p-1 shadow-sm">
-                                <p-toggleButton formControlName="isPublic" [onLabel]="'VISIBLE PARA EL MUNDO'"
-                                    [offLabel]="'BORRADOR PRIVADO'" [onIcon]="'pi pi-globe'" [offIcon]="'pi pi-lock'"
-                                    styleClass="w-full !border-none !shadow-none !bg-transparent font-black !text-indigo-600 text-base !py-3"></p-toggleButton>
+
+                    <div class="field col-span-2 mt-8" *ngIf="isEditMode">
+                        <div
+                            class="flex flex-col lg:flex-row items-center gap-6 p-5 bg-slate-50 border-4 border-slate-100 rounded-[2rem] shadow-sm relative overflow-hidden">
+                            <!-- Background Accent Decoration -->
+                            <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-100/30 rounded-full blur-3xl">
+                            </div>
+
+                            <!-- Part 1: Cover Image Preview (Compact) -->
+                            <div
+                                class="w-full lg:w-44 h-28 rounded-2xl overflow-hidden shadow-lg border-2 border-white flex-shrink-0 relative group z-10 transition-transform hover:scale-105 duration-300">
+                                <img [src]="courseForm.get('urlLogo')?.value" class="w-full h-full object-cover"
+                                    alt="Portada del curso">
+                                <div
+                                    class="absolute inset-0 bg-indigo-900/10 hidden group-hover:flex items-center justify-center pointer-events-none transition-all">
+                                    <i class="pi pi-images text-2xl text-white drop-shadow-md"></i>
+                                </div>
+                            </div>
+
+                            <!-- Part 2: Help Text and Action Button (Compact) -->
+                            <div class="flex flex-col flex-1 gap-1 text-center lg:text-left z-10">
+                                <h4
+                                    class="text-lg font-black text-slate-700 uppercase leading-none m-0 tracking-tighter">
+                                    Personaliza la Apariencia</h4>
+                                <p
+                                    class="text-[11px] font-bold text-slate-400 m-0 leading-tight max-w-sm mb-2 opacity-80">
+                                    Haz que tu curso destaque con una imagen vibrante que motive a los estudiantes.</p>
+                                <button type="button"
+                                    class="gamified-btn-3d btn-3d-indigo !py-2 !px-6 flex items-center justify-center gap-2 !text-xs w-full lg:w-fit"
+                                    (click)="displayImageModal = true" aria-label="Abrir galería de portadas">
+                                    <i class="pi pi-pencil"></i> CAMBIAR PORTADA
+                                </button>
+                            </div>
+
+                            <!-- Modern Divider (Compact) -->
+                            <div class="hidden lg:block w-px h-16 bg-slate-200/80 mx-2"></div>
+                            <div class="block lg:hidden w-full h-px bg-slate-200/80 my-4"></div>
+
+                            <!-- Part 3: Publication Status Integration (Compact) -->
+                            <div class="w-full lg:w-56 flex flex-col gap-1 z-10">
+                                <label
+                                    class="font-black text-slate-400 block tracking-widest text-[9px] uppercase text-center lg:text-left mb-1 opacity-60">Estatus
+                                    de Publicación</label>
+                                <div
+                                    class="bg-white rounded-xl border-b-4 border-indigo-100 p-1 shadow-sm hover:shadow-md transition-shadow">
+                                    <p-toggleButton formControlName="isPublic" [onLabel]="'VISIBLE PARA EL MUNDO'"
+                                        [offLabel]="'BORRADOR PRIVADO'" [onIcon]="'pi pi-globe'"
+                                        [offIcon]="'pi pi-lock'"
+                                        styleClass="w-full !border-none !shadow-none !bg-transparent font-black !text-indigo-600 text-[10px] !py-3"></p-toggleButton>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Course Form Fields Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10" [class.mt-10]="isEditMode">
+                        <!-- ONLY IN CREATION MODE: Show Status separately if needed -->
+                        <div class="field" *ngIf="!isEditMode">
+                            <label class="font-black text-gray-400 mb-3 block tracking-widest text-xs uppercase">Estatus
+                                de Publicación</label>
+                            <div
+                                class="flex align-items-center bg-white rounded-2xl border-b-6 border-indigo-100 p-1 shadow-sm">
+                                <p-toggleButton formControlName="isPublic" [onLabel]="'VISIBLE PARA EL MUNDO'"
+                                    [offLabel]="'BORRADOR PRIVADO'" [onIcon]="'pi pi-globe'" [offIcon]="'pi pi-lock'"
+                                    styleClass="w-full !border-none !shadow-none !bg-transparent font-black !text-indigo-600 text-xs !py-3"></p-toggleButton>
+                            </div>
+                        </div>
+
+                        <!-- Course Title (Full width for better focus) -->
+                        <div class="field col-span-2">
+                            <label class="font-black text-gray-400 mb-3 block tracking-widest text-xs uppercase">Título
+                                del Curso</label>
+                            <input pInputText formControlName="title"
+                                class="gamified-title-input w-full !text-2xl font-black !p-6 !border-slate-100 hover:border-indigo-200"
+                                placeholder="Escribe el título de tu curso aquí...">
+                        </div>
+
+                        <!-- Course Description -->
                         <div class="field col-span-2">
                             <label
-                                class="font-black text-gray-500 mb-3 block tracking-widest text-xs uppercase">Descripción
+                                class="font-black text-gray-400 mb-3 block tracking-widest text-xs uppercase">Descripción
                                 del curso</label>
                             <textarea pInputTextarea formControlName="description" rows="5" autoResize="true"
-                                class="gamified-desc-preview w-full !text-xl !leading-relaxed !font-bold !bg-slate-50 !border-none"
-                                placeholder="Escribe la descripción de este curso..."></textarea>
+                                class="gamified-desc-preview w-full !text-xl !leading-relaxed !font-bold !bg-slate-50 !border-none !p-6 rounded-3xl"
+                                placeholder="Comparte de qué trata tu curso con los estudiantes..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -598,13 +659,16 @@
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="flex gap-2 md:opacity-0 md:group-hover/ex:opacity-100 transition-opacity">
-                                                                        <button class="gamified-btn-3d btn-3d-indigo !py-1 !px-3 !text-[10px]"
+                                                                    <div
+                                                                        class="flex gap-2 md:opacity-0 md:group-hover/ex:opacity-100 transition-opacity">
+                                                                        <button
+                                                                            class="gamified-btn-3d btn-3d-indigo !py-1 !px-3 !text-[10px]"
                                                                             (click)="openEditExerciseDialog(i, j, k, l)"
                                                                             pTooltip="Editar">
                                                                             <i class="pi pi-pencil"></i>
                                                                         </button>
-                                                                        <button class="gamified-btn-3d btn-3d-danger !py-1 !px-3 !text-[10px]"
+                                                                        <button
+                                                                            class="gamified-btn-3d btn-3d-danger !py-1 !px-3 !text-[10px]"
                                                                             (click)="removeExercise(i, j, k, l)"
                                                                             pTooltip="Quitar">
                                                                             <i class="pi pi-trash"></i>
@@ -807,11 +871,13 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="preview-footer flex gap-3">
-                                                                        <button class="gamified-btn-3d btn-3d-indigo !py-2 !px-4 !text-xs"
+                                                                        <button
+                                                                            class="gamified-btn-3d btn-3d-indigo !py-2 !px-4 !text-xs"
                                                                             (click)="openEditExerciseDialog(i, j, k, l)">
                                                                             <i class="pi pi-pencil"></i> EDITAR
                                                                         </button>
-                                                                        <button class="gamified-btn-3d btn-3d-amber !py-2 !px-4 !text-xs"
+                                                                        <button
+                                                                            class="gamified-btn-3d btn-3d-amber !py-2 !px-4 !text-xs"
                                                                             (click)="openExercisePreview(ex.value)">
                                                                             <i class="pi pi-external-link"></i> PROBAR
                                                                         </button>
@@ -880,19 +946,19 @@
             <!-- Visual representation of the exercise type -->
             <div class="preview-visual-aid mt-4 p-4 bg-white rounded-2xl border-2 border-slate-100 shadow-sm">
                 <div [ngSwitch]="selectedExerciseForPreview.typeExercise">
-                    
+
                     <!-- Selection Types -->
                     <div *ngSwitchCase="'selection_single'" class="flex flex-col gap-3">
-                        <div *ngFor="let opt of (selectedExerciseForPreview.optionSelectOptions?.length ? selectedExerciseForPreview.optionSelectOptions : [])" 
-                             class="min-h-12 bg-white border-2 border-gray-100 rounded-2xl flex items-center px-4">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionSelectOptions?.length ? selectedExerciseForPreview.optionSelectOptions : [])"
+                            class="min-h-12 bg-white border-2 border-gray-100 rounded-2xl flex items-center px-4">
                             <div class="h-6 w-6 rounded-full border-2 border-gray-200 mr-4 flex-shrink-0"></div>
                             <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
                         </div>
                     </div>
 
                     <div *ngSwitchCase="'selection_multiple'" class="flex flex-col gap-3">
-                        <div *ngFor="let opt of (selectedExerciseForPreview.optionSelectOptions?.length ? selectedExerciseForPreview.optionSelectOptions : [])" 
-                             class="min-h-12 bg-white border-2 border-gray-100 rounded-2xl flex items-center px-4">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionSelectOptions?.length ? selectedExerciseForPreview.optionSelectOptions : [])"
+                            class="min-h-12 bg-white border-2 border-gray-100 rounded-2xl flex items-center px-4">
                             <div class="h-6 w-6 rounded-lg border-2 border-gray-200 mr-4 flex-shrink-0"></div>
                             <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
                         </div>
@@ -900,30 +966,35 @@
 
                     <!-- Ordering Types -->
                     <div *ngSwitchCase="'vertical_ordering'" class="flex flex-col gap-3 relative">
-                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsVerticalOrdering?.length ? selectedExerciseForPreview.optionsVerticalOrdering : [])" 
-                             class="min-h-12 bg-indigo-50/30 border-2 border-indigo-100 rounded-2xl flex items-center px-4">
-                            <div class="h-8 w-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-500 font-black text-xs mr-4"><i class="pi pi-bars"></i></div>
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsVerticalOrdering?.length ? selectedExerciseForPreview.optionsVerticalOrdering : [])"
+                            class="min-h-12 bg-indigo-50/30 border-2 border-indigo-100 rounded-2xl flex items-center px-4">
+                            <div
+                                class="h-8 w-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-500 font-black text-xs mr-4">
+                                <i class="pi pi-bars"></i>
+                            </div>
                             <div class="text-slate-600 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
                         </div>
                     </div>
 
                     <div *ngSwitchCase="'horizontal_ordering'" class="flex flex-wrap gap-2">
-                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsHorizontalOrdering?.length ? selectedExerciseForPreview.optionsHorizontalOrdering : [])" 
-                             class="min-h-12 bg-teal-50/30 border-2 border-teal-100 rounded-2xl flex items-center px-5">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsHorizontalOrdering?.length ? selectedExerciseForPreview.optionsHorizontalOrdering : [])"
+                            class="min-h-12 bg-teal-50/30 border-2 border-teal-100 rounded-2xl flex items-center px-5">
                             <div class="text-teal-700 font-bold text-sm">{{ opt.text || opt.fragment || opt }}</div>
                         </div>
                     </div>
 
                     <!-- Phishing Selection -->
                     <div *ngSwitchCase="'phishing_selection_multiple'" class="flex flex-col gap-4">
-                        <div *ngIf="selectedExerciseForPreview.phishingImageUrl" class="w-full h-40 rounded-2xl overflow-hidden border-2 border-red-100 mb-2">
+                        <div *ngIf="selectedExerciseForPreview.phishingImageUrl"
+                            class="w-full h-40 rounded-2xl overflow-hidden border-2 border-red-100 mb-2">
                             <img [src]="selectedExerciseForPreview.phishingImageUrl" class="w-full h-full object-cover">
                         </div>
-                        <div *ngIf="selectedExerciseForPreview.phishingContext" class="p-3 bg-red-50 rounded-xl border-l-4 border-l-red-400 text-sm text-red-700 font-bold italic mb-2">
+                        <div *ngIf="selectedExerciseForPreview.phishingContext"
+                            class="p-3 bg-red-50 rounded-xl border-l-4 border-l-red-400 text-sm text-red-700 font-bold italic mb-2">
                             "{{ selectedExerciseForPreview.phishingContext }}"
                         </div>
-                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsPhishingSelection?.length ? selectedExerciseForPreview.optionsPhishingSelection : [])" 
-                             class="min-h-12 bg-white border-2 border-red-100 rounded-2xl flex items-center px-4">
+                        <div *ngFor="let opt of (selectedExerciseForPreview.optionsPhishingSelection?.length ? selectedExerciseForPreview.optionsPhishingSelection : [])"
+                            class="min-h-12 bg-white border-2 border-red-100 rounded-2xl flex items-center px-4">
                             <div class="h-6 w-6 rounded-lg border-2 border-red-200 mr-4 flex-shrink-0"></div>
                             <div class="text-slate-600 font-bold text-sm">{{ opt.option || opt }}</div>
                         </div>
@@ -933,19 +1004,22 @@
                     <div *ngSwitchCase="'match_pairs'" class="flex flex-col gap-4">
                         <div class="grid grid-cols-2 gap-3">
                             <div class="flex flex-col gap-2">
-                                <div *ngFor="let opt of selectedExerciseForPreview.optionsMatchPairsLeft" class="p-3 bg-orange-50 border-2 border-orange-100 rounded-xl text-xs font-black text-orange-700 text-center">
+                                <div *ngFor="let opt of selectedExerciseForPreview.optionsMatchPairsLeft"
+                                    class="p-3 bg-orange-50 border-2 border-orange-100 rounded-xl text-xs font-black text-orange-700 text-center">
                                     {{ opt.text || opt }}
                                 </div>
                             </div>
                             <div class="flex flex-col gap-2">
-                                <div *ngFor="let opt of selectedExerciseForPreview.optionsMatchPairsRight" class="p-3 bg-emerald-50 border-2 border-emerald-100 rounded-xl text-xs font-black text-emerald-700 text-center">
+                                <div *ngFor="let opt of selectedExerciseForPreview.optionsMatchPairsRight"
+                                    class="p-3 bg-emerald-50 border-2 border-emerald-100 rounded-xl text-xs font-black text-emerald-700 text-center">
                                     {{ opt.text || opt }}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div *ngSwitchDefault class="h-24 bg-slate-50 border-2 border-slate-100 border-dashed rounded-2xl flex items-center justify-center text-slate-400 font-bold">
+                    <div *ngSwitchDefault
+                        class="h-24 bg-slate-50 border-2 border-slate-100 border-dashed rounded-2xl flex items-center justify-center text-slate-400 font-bold">
                         <i class="pi pi-eye text-2xl mr-3 opacity-30"></i> Vista previa no disponible para este tipo
                     </div>
                 </div>
@@ -1027,3 +1101,74 @@
         </div>
     </div>
 </div>
+
+<!-- IMAGE SELECTION MODAL -->
+<p-dialog [(visible)]="displayImageModal" [modal]="true" [draggable]="false" [resizable]="false"
+    header="Seleccionar Portada" [style]="{ width: '700px', maxWidth: '95vw' }"
+    styleClass="rounded-3xl shadow-2xl border-4 border-indigo-100 overflow-hidden">
+
+    <div class="p-4 bg-slate-50">
+        <div class="mb-6 flex flex-col md:flex-row gap-6 items-stretch">
+
+            <!-- Upload Option -->
+            <div
+                class="flex-1 bg-white p-6 rounded-3xl border-4 border-dashed border-indigo-200 hover:border-indigo-400 transition-colors flex flex-col items-center justify-center text-center">
+                <div
+                    class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4 text-indigo-500 border-b-4 border-indigo-100">
+                    <i class="pi pi-cloud-upload text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-black text-slate-700 uppercase mb-2">Subir desde PC</h3>
+                <p class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">Formatos: JPG, PNG, WebP</p>
+
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" class="sr-only"
+                    id="fileUploadModal" aria-label="Seleccionar archivo de imagen">
+                <label for="fileUploadModal" tabindex="0"
+                    class="gamified-btn-3d btn-3d-indigo w-full flex items-center justify-center p-3 cursor-pointer">
+                    <i class="pi pi-search mr-2"></i> EXAMINAR
+                </label>
+            </div>
+
+            <!-- Current Image Visualizer -->
+            <div
+                class="flex-1 rounded-3xl overflow-hidden shadow-inner border-4 border-slate-200 relative bg-gray-100 min-h-[180px]">
+                <img [src]="courseForm.get('urlLogo')?.value" alt="Portada actual" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <span class="text-xs font-black text-white uppercase tracking-widest drop-shadow-md">PORTADA
+                        ACTUAL</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Predefined Gallery -->
+        <h3 class="text-sm font-black tracking-widest text-slate-500 uppercase mb-4 flex items-center gap-2">
+            <i class="pi pi-images text-indigo-400"></i> Galería Exclusiva
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto custom-scrollbar max-h-64 p-2">
+            <button type="button" *ngFor="let image of defaultImages; let i = index"
+                class="relative rounded-2xl overflow-hidden cursor-pointer border-4 transition-all hover:-translate-y-1 hover:shadow-md text-left p-0 bg-transparent block w-full"
+                [class.border-indigo-500]="courseForm.get('urlLogo')?.value === image"
+                [class.border-slate-200]="courseForm.get('urlLogo')?.value !== image" (click)="selectImage(image)"
+                [attr.aria-label]="'Seleccionar imagen de galería ' + (i + 1)"
+                [attr.aria-pressed]="courseForm.get('urlLogo')?.value === image">
+                <img [src]="image" [alt]="'Opción ' + (i + 1)" class="w-full h-24 object-cover">
+                <div *ngIf="courseForm.get('urlLogo')?.value === image"
+                    class="absolute inset-0 bg-indigo-500/20 flex items-center justify-center transition-all">
+                    <div
+                        class="bg-indigo-500 text-white rounded-full w-8 h-8 flex items-center justify-center border-4 border-white shadow-lg">
+                        <i class="pi pi-check text-sm font-black"></i>
+                    </div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="bg-white p-2 border-t border-slate-100">
+            <button class="gamified-btn-3d btn-3d-danger w-full sm:w-auto px-8" (click)="displayImageModal = false"
+                aria-label="Cerrar ventana de selección de imagen">
+                <i class="pi pi-times"></i> CERRAR
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>

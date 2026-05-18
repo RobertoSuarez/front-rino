@@ -56,12 +56,12 @@ export class LearningPathDetailComponent implements OnInit {
     private messageService: MessageService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
     this.breadcrumbItems = [
-      { label: 'Mis Rutas', routerLink: '/estudiante/my-learning-paths' },
+      { label: 'Mis rutas', routerLink: '/estudiante/my-learning-paths' },
       { label: 'Detalle de la Ruta' }
     ];
     this.pathId = parseInt(this.route.snapshot.paramMap.get('id') || '0', 10);
@@ -100,7 +100,7 @@ export class LearningPathDetailComponent implements OnInit {
 
   getTotalChapters(): number {
     if (!this.pathDetail?.courses) return 0;
-    return this.pathDetail.courses.reduce((total: number, course: any) => 
+    return this.pathDetail.courses.reduce((total: number, course: any) =>
       total + (course.chaptersCount || 0), 0
     );
   }
@@ -109,7 +109,7 @@ export class LearningPathDetailComponent implements OnInit {
     if (!this.pathDetail?.courses) return 0;
     return this.pathDetail.courses.reduce((total: number, course: any) => {
       if (!course.chapters) return total;
-      return total + course.chapters.reduce((sum: number, chapter: any) => 
+      return total + course.chapters.reduce((sum: number, chapter: any) =>
         sum + (chapter.temasCount || 0), 0
       );
     }, 0);

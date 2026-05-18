@@ -33,10 +33,12 @@
 
             <!-- STEP 1: TOPIC INPUT -->
             <div *ngIf="wizardStep === 'topic'" class="step-content p-8 text-center">
-                <div class="gamified-icon-box mx-auto mb-6 flex items-center justify-center">
-                    <i class="pi pi-sparkles text-5xl text-white"></i>
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <div class="gamified-icon-box flex-shrink-0 flex items-center justify-center">
+                        <i class="pi pi-sparkles text-3xl text-white"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-gray-800 uppercase m-0">¿Qué vamos a crear hoy?</h2>
                 </div>
-                <h2 class="text-3xl font-black mb-4 text-gray-800 uppercase">¿Qué vamos a crear hoy?</h2>
                 <p class="text-xl text-gray-500 mb-8 font-bold">Escribe un tema y Amauta sugerirá una estructura
                     académica de alto nivel.</p>
 
@@ -45,7 +47,7 @@
                         <i class="pi pi-search text-2xl text-red-300"></i>
                         <input type="text" pInputText [(ngModel)]="wizardTopic"
                             class="w-full gamified-title-input text-2xl font-black border-red-400 border-2"
-                            placeholder="Ej: Fundamentos de Criptografía...">
+                            placeholder="Ej: Ciberseguridad básica">
                     </span>
                 </div>
                 <div class="mt-10">
@@ -58,10 +60,12 @@
             <!-- STEP 2: TITLE SUGGESTIONS -->
             <div *ngIf="wizardStep === 'title-suggestions'" class="step-content p-8">
                 <div class="text-center mb-10">
-                    <div class="gamified-icon-box mx-auto mb-4 flex items-center justify-center">
-                        <i class="pi pi-pencil text-5xl text-white"></i>
+                    <div class="flex items-center justify-center gap-4 mb-4">
+                        <div class="gamified-icon-box flex-shrink-0 flex items-center justify-center">
+                            <i class="pi pi-pencil text-3xl text-white"></i>
+                        </div>
+                        <h2 class="text-3xl font-black text-gray-800 uppercase m-0">Títulos sugeridos</h2>
                     </div>
-                    <h2 class="text-3xl font-black text-gray-800 mb-2 uppercase">Títulos Sugeridos</h2>
                     <p class="text-xl text-gray-500 font-bold">Haz clic en uno para cargarlo y edítalo si prefieres
                         otro nombre.</p>
                 </div>
@@ -93,11 +97,13 @@
             <!-- STEP 2.5: DESCRIPTION SUGGESTION -->
             <div *ngIf="wizardStep === 'description-suggestion'" class="step-content p-8">
                 <div class="text-center mb-10">
-                    <div class="gamified-icon-box mx-auto mb-4"
-                        style="background: var(--duo-purple); border-color: var(--duo-purple-dark);">
-                        <i class="pi pi-align-left text-5xl text-white"></i>
+                    <div class="flex items-center justify-center gap-4 mb-4">
+                        <div class="gamified-icon-box flex-shrink-0 flex items-center justify-center"
+                            style="background: var(--duo-purple); border-color: var(--duo-purple-dark);">
+                            <i class="pi pi-align-left text-3xl text-white"></i>
+                        </div>
+                        <h2 class="text-3xl font-black text-gray-800 uppercase m-0">Asistente de narrativa</h2>
                     </div>
-                    <h2 class="text-3xl font-black text-gray-800 mb-2 uppercase">Asistente de Narrativa</h2>
                     <p class="text-xl text-gray-500 font-bold">Amauta ha redactado esto para tu curso. ¡Ajústalo a tu
                         gusto!</p>
                 </div>
@@ -125,11 +131,13 @@
 
             <!-- STEP 3: CHAPTER SUGGESTIONS -->
             <div *ngIf="wizardStep === 'chapter-suggestions'" class="step-content p-8 text-center">
-                <div class="gamified-icon-box mx-auto mb-6"
-                    style="background: var(--duo-yellow); border-color: var(--duo-yellow-dark);">
-                    <i class="pi pi-bookmark-fill text-5xl text-white"></i>
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <div class="gamified-icon-box flex-shrink-0 flex items-center justify-center"
+                        style="background: var(--duo-yellow); border-color: var(--duo-yellow-dark);">
+                        <i class="pi pi-bookmark-fill text-3xl text-white"></i>
+                    </div>
+                    <h2 class="text-3xl font-black uppercase m-0 text-gray-800">Mapa de capítulos</h2>
                 </div>
-                <h2 class="text-3xl font-black mb-4 uppercase">Mapa de Capítulos</h2>
                 <p class="text-xl text-gray-500 font-bold mb-8">Usa el sistema de aprobación para construir tu
                     cuaderno.</p>
 
@@ -138,19 +146,18 @@
                         <div class="card-header-art">
                             <i class="pi pi-map text-6xl"></i>
                         </div>
-                        <div class="p-8">
+                        <div class="p-8 text-center">
                             <h3 class="text-3xl font-black text-indigo-900 mb-4">
                                 {{suggestedChapters[currentChapterIndex].title}}</h3>
                             <p class="text-xl text-gray-600 font-medium leading-relaxed">
                                 {{suggestedChapters[currentChapterIndex].description}}</p>
 
-                            <div class="flex justify-content-center gap-8 mt-10">
-                                <button pButton icon="pi pi-times"
-                                    class="gamified-action-btn secondary !rounded-full w-20 h-20 text-red-400 !border-red-200"
+                            <div class="flex justify-center gap-8 mt-10">
+                                <button pButton icon="pi pi-times" label="SALTAR"
+                                    class="gamified-action-btn secondary px-10 py-5 text-red-500"
                                     (click)="dislikeChapter()"></button>
-                                <button pButton icon="pi pi-check"
-                                    class="gamified-publish-btn !rounded-full w-20 h-20 text-3xl"
-                                    (click)="likeChapter()"></button>
+                                <button pButton icon="pi pi-check" label="APROBAR"
+                                    class="gamified-publish-btn px-10 py-5 text-xl" (click)="likeChapter()"></button>
                             </div>
                         </div>
                     </div>
@@ -178,7 +185,7 @@
                         class="gamified-action-btn secondary px-6" [disabled]="currentChapterSupervIndex === 0"
                         (click)="prevSupervStep()"></button>
                     <div class="text-center">
-                        <h2 class="text-2xl font-black m-0 text-gray-800 uppercase">{{
+                        <h2 class="text-2xl font-black m-0 text-gray-800">{{
                             chapters.at(currentChapterSupervIndex).value.title }}</h2>
                         <span class="text-blue-500 font-black text-lg">PASO {{currentChapterSupervIndex + 1}} DE
                             {{chapters.length}}</span>
@@ -205,7 +212,7 @@
                             <div *ngIf="!loadingSuggestions && tempTopicSuggestions.length === 0 && !supervisingExercises"
                                 class="text-center py-16 text-gray-300">
                                 <i class="pi pi-bolt text-8xl mb-5 text-indigo-100"></i>
-                                <p class="text-2xl font-black uppercase tracking-tighter">Haz clic en Sugerir Temas para
+                                <p class="text-2xl font-black uppercase tracking-tighter">Haz clic en Sugerir temas para
                                     recibir ideas inteligentes.</p>
                             </div>
 
@@ -223,7 +230,7 @@
                                         IDEA DE AMAUTA
                                     </div>
                                     <div class="p-8">
-                                        <h4 class="text-3xl font-black mb-4 text-gray-800 leading-tight uppercase">
+                                        <h4 class="text-3xl font-black mb-4 text-gray-800 leading-tight">
                                             {{tempTopicSuggestions[currentTopicSuggestionIndex]?.title}}</h4>
                                         <p class="text-xl text-gray-600 font-medium leading-relaxed mb-6">
                                             {{tempTopicSuggestions[currentTopicSuggestionIndex]?.shortDescription ||
@@ -241,7 +248,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flex justify-content-center gap-10 mt-10">
+                                <div class="flex justify-center gap-10 mt-10">
                                     <button pButton icon="pi pi-times" label="SALTAR"
                                         class="gamified-action-btn secondary px-10 py-5 text-red-500"
                                         (click)="rejectTopic()"></button>
@@ -268,10 +275,10 @@
                             </div>
                             <div *ngFor="let tema of $any(getTemas(currentChapterSupervIndex)).controls; let j = index"
                                 class="bg-white border-gray-200 border-2 rounded-3xl p-6 mb-6 shadow-sm slide-in flex justify-content-between align-items-center border-l-8 border-l-green-400">
-                                <div class="flex-1">
-                                    <div class="font-black text-2xl text-gray-800 uppercase leading-none mb-2">
+                                <div class="flex-1 min-w-0 pr-4">
+                                    <div class="font-black text-xl text-gray-800 leading-tight mb-2 break-words">
                                         {{tema.value.title}}</div>
-                                    <div class="text-lg text-gray-500 font-bold truncate">
+                                    <div class="text-base text-gray-500 font-bold leading-snug break-words">
                                         {{tema.value.shortDescription}}</div>
                                 </div>
                                 <button pButton icon="pi pi-trash"
@@ -304,8 +311,8 @@
                 [style.opacity]="sidebarVisible ? '1' : '0'">
 
                 <div class="sidebar-header flex justify-content-between align-items-center">
-                    <h3 class="truncate text-xl font-black m-0 tracking-tighter uppercase font-serif">📓 {{
-                        (courseForm.get('title')?.value || 'Nuevo Curso') }}</h3>
+                    <h3 class="truncate text-xl font-black m-0 tracking-tighter font-serif">📓 {{
+                        (courseForm.get('title')?.value || 'Nuevo curso') }}</h3>
                 </div>
 
                 <div class="chapters-nav mt-8">
@@ -316,7 +323,7 @@
                             class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-400 transition-colors">
                             <i class="pi pi-bookmark-fill text-blue-500 group-hover:text-white"></i>
                         </div>
-                        <span class="truncate font-black text-gray-700 tracking-tight uppercase text-sm">{{
+                        <span class="truncate font-black text-gray-700 tracking-tight text-sm">{{
                             chap.value.title || 'CAPÍTULO ' + (i+1) }}</span>
                     </div>
                     <button class="gamified-btn-3d btn-3d-indigo !w-full !py-5 mt-6" (click)="addChapter()">
@@ -484,7 +491,7 @@
                                         class="text-[10px] font-black text-purple-400 tracking-widest uppercase mb-1 block">Título
                                         del Capítulo</span>
                                     <input pInputText formControlName="title" placeholder="Define el eje temático..."
-                                        class="w-full !bg-transparent !border-none !shadow-none !text-2xl font-black text-gray-800 focus:outline-none uppercase tracking-tighter">
+                                        class="w-full !bg-transparent !border-none !shadow-none !text-2xl font-black text-gray-800 focus:outline-none tracking-tighter">
                                     <textarea pInputTextarea formControlName="shortDescription" [autoResize]="true"
                                         rows="1" placeholder="¿Qué descubrirán en este capítulo?"
                                         class="w-full !bg-transparent !border-none !shadow-none !text-lg text-gray-400 font-bold focus:outline-none mt-2 resize-none"></textarea>
@@ -509,7 +516,7 @@
                                                         <span class="font-black text-green-600 text-xl">{{j+1}}</span>
                                                     </div>
                                                     <input pInputText formControlName="title"
-                                                        class="!p-0 !border-none !shadow-none !text-xl font-black text-gray-800 placeholder:text-gray-200 w-full focus:outline-none uppercase tracking-tighter">
+                                                        class="!p-0 !border-none !shadow-none !text-xl font-black text-gray-800 placeholder:text-gray-200 w-full focus:outline-none tracking-tighter">
                                                 </div>
                                                 <div class="topic-vertical-flow mt-10">
                                                     <!-- Mission Callout Box (Short Description) -->
@@ -1049,58 +1056,6 @@
 <app-exercise-editor-dialog #exerciseEditorDialog (onSave)="onExerciseSave($event)">
 </app-exercise-editor-dialog>
 
-<!-- Floating Amauta Fab -->
-<button class="amauta-fab shadow-xl" (click)="toggleChat()" pTooltip="Consultar al Amauta" tooltipPosition="left">
-    <img src="https://i.ibb.co/Lz7Dq1x/robot-assistant.jpg" alt="Amauta AI">
-</button>
-
-<!-- Amauta Chat window -->
-<div class="amauta-chat shadow-2xl border-4 border-indigo-100" *ngIf="displayChat">
-    <div class="chat-header !bg-indigo-600 border-b-4 border-indigo-800 p-6">
-        <div class="agent-info">
-            <div class="relative">
-                <img src="https://i.ibb.co/Lz7Dq1x/robot-assistant.jpg" alt="Amauta"
-                    class="w-16 h-16 border-4 border-white">
-                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-4 border-indigo-600 rounded-full">
-                </div>
-            </div>
-            <div>
-                <span class="font-black text-white text-2xl block tracking-tighter">AMAUTA AI</span>
-                <span
-                    class="status !bg-green-400/20 !px-3 !py-1 !rounded-full font-black text-green-300 text-xs tracking-widest uppercase">Eminencia
-                    Digital</span>
-            </div>
-        </div>
-        <button pButton icon="pi pi-times" class="p-button-rounded p-button-text text-white p-button-lg"
-            (click)="toggleChat()"></button>
-    </div>
-
-    <div class="chat-body p-8 bg-slate-50 flex flex-column gap-6">
-        <div *ngFor="let msg of chatMessages" class="message flex w-full"
-            [ngClass]="msg.role === 'user' ? 'justify-content-end' : 'justify-content-start'">
-            <div class="bubble p-5 rounded-3xl font-bold leading-relaxed shadow-md max-w-[90%] text-lg"
-                [ngClass]="msg.role === 'user' ? '!bg-indigo-500 text-white !rounded-br-none border-b-6 border-indigo-700' : 'bg-white text-gray-700 !rounded-bl-none border-b-6 border-gray-100'">
-                {{ msg.text }}
-            </div>
-        </div>
-        <div *ngIf="aiTyping" class="message justify-content-start">
-            <div
-                class="bubble bg-white text-gray-400 italic p-5 rounded-3xl border-b-6 border-gray-100 font-bold text-lg animate-pulse">
-                Amauta está canalizando sabiduría...
-            </div>
-        </div>
-    </div>
-
-    <div class="chat-footer p-6 border-t-4 border-gray-100 bg-white">
-        <div class="flex gap-4">
-            <input type="text" pInputText [(ngModel)]="userMessage" (keyup.enter)="sendMessage()"
-                placeholder="Escribe tu duda pedagógica aquí..."
-                class="!rounded-3xl border-4 border-slate-50 !p-5 font-bold text-lg flex-1 focus:border-indigo-100">
-            <button type="button" pButton icon="pi pi-send" (click)="sendMessage()"
-                class="gamified-publish-btn !h-[70px] !w-[70px] !rounded-3xl flex-shrink-0 !p-0"></button>
-        </div>
-    </div>
-</div>
 
 <!-- IMAGE SELECTION MODAL -->
 <p-dialog [(visible)]="displayImageModal" [modal]="true" [draggable]="false" [resizable]="false"

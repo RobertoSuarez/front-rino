@@ -47,7 +47,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
       <!-- Header -->
       <div class="col-span-12">
-        <h1 class="text-3xl font-bold text-900 mb-2">Parámetros del Sistema</h1>
+        <h1 class="text-3xl font-bold text-900 mb-2">Parámetros del sistema</h1>
         <p class="text-600">Gestiona las configuraciones y API Keys de la plataforma</p>
       </div>
 
@@ -82,7 +82,7 @@ import { TooltipModule } from 'primeng/tooltip';
                 <th style="width: 25%">Valor</th>
                 <th style="width: 20%">Descripción</th>
                 <th style="width: 10%">Estado</th>
-                <th style="width: 15%">Última Actualización</th>
+                <th style="width: 15%">Última actualización</th>
                 <th style="width: 10%">Acciones</th>
               </tr>
             </ng-template>
@@ -348,7 +348,7 @@ export class ParametersComponent implements OnInit {
     private apiKeyService: ApiKeyService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };

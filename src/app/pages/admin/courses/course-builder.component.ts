@@ -923,7 +923,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     }
 
     const safeTitle = chapter.value.title || 'Capítulo Inicial';
-    const safeCourseTitle = courseTitle || 'Nuevo Curso';
+    const safeCourseTitle = courseTitle || 'Nuevo curso';
 
     this.loadingSuggestions = true;
     this.aiService.generateTopicsAI(safeCourseTitle, safeTitle).subscribe({
@@ -1250,15 +1250,15 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
               // Actualizar estados locales
               this.uploadedImages.push(imageUrl);
               this.defaultImages = [...this.defaultImages, imageUrl];
-              
+
               // Asignar al formulario
               this.courseForm.patchValue({ urlLogo: imageUrl });
-              
+
               this.displayImageModal = false;
-              this.messageService.add({ 
-                severity: 'success', 
-                summary: '¡Éxito!', 
-                detail: 'Imagen subida y asignada correctamente a la portada.' 
+              this.messageService.add({
+                severity: 'success',
+                summary: '¡Éxito!',
+                detail: 'Imagen subida y asignada correctamente a la portada.'
               });
             } else {
               console.error('No se encontró URL en la respuesta:', response);

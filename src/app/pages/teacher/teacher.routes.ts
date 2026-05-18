@@ -2,15 +2,15 @@ import { Routes } from '@angular/router';
 import { TeacherDashboardComponent } from './dashboard/teacher-dashboard.component';
 
 export default [
-    { 
-        path: 'dashboard', 
+    {
+        path: 'dashboard',
         component: TeacherDashboardComponent,
-        title: 'Dashboard del Profesor'
+        title: 'Dashboard del profesor'
     },
-    { 
-        path: 'change-password', 
+    {
+        path: 'change-password',
         loadComponent: () => import('../change-password/change-password.component').then(m => m.ChangePasswordComponent),
-        title: 'Cambiar Contraseña'
+        title: 'Cambiar contraseña'
     },
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ] as Routes;

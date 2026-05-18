@@ -39,7 +39,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
 
       <!-- Header -->
       <div class="col-span-12">
-        <h1 class="text-3xl font-bold text-900 mb-2">Dashboard del Profesor</h1>
+        <h1 class="text-3xl font-bold text-900 mb-2">Dashboard del profesor</h1>
         <p class="text-600">Resumen de tu actividad docente y progreso de tus estudiantes</p>
       </div>
 
@@ -59,7 +59,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-500 font-medium mb-2">Total Estudiantes</div>
+                <div class="text-500 font-medium mb-2">Total estudiantes</div>
                 <div class="text-4xl font-bold text-900">{{ stats.totalStudents }}</div>
               </div>
               <div class="flex items-center justify-center w-16 h-16 bg-blue-100 border-round">
@@ -74,7 +74,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-500 font-medium mb-2">Rutas de Aprendizaje</div>
+                <div class="text-500 font-medium mb-2">Rutas de aprendizaje</div>
                 <div class="text-4xl font-bold text-900">{{ stats.totalLearningPaths }}</div>
               </div>
               <div class="flex items-center justify-center w-16 h-16 bg-green-100 border-round">
@@ -89,7 +89,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-500 font-medium mb-2">Cursos Creados</div>
+                <div class="text-500 font-medium mb-2">Cursos creados</div>
                 <div class="text-4xl font-bold text-900">{{ stats.totalCourses }}</div>
               </div>
               <div class="flex items-center justify-center w-16 h-16 bg-orange-100 border-round">
@@ -104,7 +104,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-500 font-medium mb-2">Suscripciones Activas</div>
+                <div class="text-500 font-medium mb-2">Suscripciones activas</div>
                 <div class="text-4xl font-bold text-900">{{ stats.activeSubscriptions }}</div>
               </div>
               <div class="flex items-center justify-center w-16 h-16 bg-purple-100 border-round">
@@ -119,7 +119,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-500 font-medium mb-2">Precisión Global</div>
+                <div class="text-500 font-medium mb-2">Precisión global</div>
                 <div class="text-4xl font-bold text-900">{{ stats.averageAccuracy }}%</div>
               </div>
               <div class="flex items-center justify-center w-16 h-16 bg-cyan-100 border-round">
@@ -134,7 +134,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <div class="flex items-center justify-between">
               <div>
-                <div class="text-500 font-medium mb-2">Estudiantes en Riesgo</div>
+                <div class="text-500 font-medium mb-2">Estudiantes en riesgo</div>
                 <div class="text-4xl font-bold text-red-600">{{ stats.studentsAtRiskCount }}</div>
                 <div class="text-sm text-600 mt-1">Precisión < 70%</div>
               </div>
@@ -150,7 +150,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card>
             <ng-template pTemplate="header">
               <div class="px-6 pt-6">
-                <h3 class="text-xl font-bold text-900 mb-1">Distribución de Estudiantes por Ruta</h3>
+                <h3 class="text-xl font-bold text-900 mb-1">Distribución de estudiantes por ruta</h3>
                 <p class="text-600 text-sm">Número de estudiantes en cada ruta de aprendizaje</p>
               </div>
             </ng-template>
@@ -173,7 +173,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card styleClass="h-full">
             <ng-template pTemplate="header">
               <div class="px-6 pt-6">
-                <h3 class="text-xl font-bold text-900 mb-1">Precisión General</h3>
+                <h3 class="text-xl font-bold text-900 mb-1">Precisión general</h3>
                 <p class="text-600 text-sm">Promedio de aciertos en actividades</p>
               </div>
             </ng-template>
@@ -181,7 +181,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
               <p-chart type="doughnut" [data]="pieData" [options]="pieOptions" width="200px" height="200px"></p-chart>
               <div class="mt-4 text-center">
                 <span class="text-3xl font-bold text-900">{{ stats.averageAccuracy }}%</span>
-                <div class="text-sm text-600">Precisión Media</div>
+                <div class="text-sm text-600">Precisión media</div>
               </div>
             </div>
             <div *ngIf="!pieData" class="text-center py-8 text-600">
@@ -197,7 +197,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
             <ng-template pTemplate="header">
               <div class="px-6 pt-6 flex justify-between items-center">
                 <div>
-                  <h3 class="text-xl font-bold text-900 mb-1">Alertas de Rendimiento</h3>
+                  <h3 class="text-xl font-bold text-900 mb-1">Alertas de rendimiento</h3>
                   <p class="text-600 text-sm">Estudiantes con precisión baja (< 70%)</p>
                 </div>
               </div>
@@ -233,7 +233,7 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
           <p-card>
             <ng-template pTemplate="header">
               <div class="px-6 pt-6">
-                <h3 class="text-xl font-bold text-900 mb-1">Top Rutas de Aprendizaje</h3>
+                <h3 class="text-xl font-bold text-900 mb-1">Top rutas de aprendizaje</h3>
                 <p class="text-600 text-sm">Rutas con más estudiantes suscritos</p>
               </div>
             </ng-template>
@@ -267,12 +267,12 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
             <ng-template pTemplate="header">
               <div class="px-6 pt-6 flex justify-between items-center">
                 <div>
-                  <h3 class="text-xl font-bold text-900 mb-1">Estudiantes Recientes</h3>
+                  <h3 class="text-xl font-bold text-900 mb-1">Estudiantes recientes</h3>
                   <p class="text-600 text-sm">Últimas suscripciones a tus rutas</p>
                 </div>
                 <button 
                   pButton 
-                  label="Ver Todos" 
+                  label="Ver todos" 
                   icon="pi pi-arrow-right" 
                   class="p-button-text p-button-sm"
                   (click)="viewAllStudents()">
@@ -309,12 +309,12 @@ import { TeacherDashboardService, DashboardStats } from '../../../core/services/
             <ng-template pTemplate="header">
               <div class="px-6 pt-6 flex justify-between items-center">
                 <div>
-                  <h3 class="text-xl font-bold text-900 mb-1">Cursos Recientes</h3>
+                  <h3 class="text-xl font-bold text-900 mb-1">Cursos recientes</h3>
                   <p class="text-600 text-sm">Últimos cursos que has creado</p>
                 </div>
                 <button 
                   pButton 
-                  label="Ver Todos" 
+                  label="Ver todos" 
                   icon="pi pi-arrow-right" 
                   class="p-button-text p-button-sm"
                   (click)="viewAllCourses()">

@@ -91,14 +91,14 @@ export class UsersListComponent implements OnInit, OnDestroy {
         this.currentUserType = user.typeUser;
       }
     });
-    
+
     this.loadUsers();
     this.updateBreadcrumbs();
   }
 
   updateBreadcrumbs() {
     this.breadcrumbItems = [
-      { label: 'Gestión de Usuarios' }
+      { label: 'Gestión de usuarios' }
     ];
   }
 
@@ -119,7 +119,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response && response.data) {
           let users = response.data.users;
-          
+
           // Si el usuario actual es profesor, filtrar solo estudiantes
           if (this.currentUserType === 'teacher') {
             users = users.filter((user: User) => user.typeUser === 'student');
@@ -127,7 +127,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
           } else {
             this.totalRecords = response.data.total;
           }
-          
+
           this.users = users;
         } else {
           this.users = [];

@@ -94,7 +94,7 @@ export class LearningPathsListComponent implements OnInit {
 
     this.breadcrumbItems = [
       { label: 'Administración' },
-      { label: 'Rutas de Aprendizaje' }
+      { label: 'Rutas de aprendizaje' }
     ];
 
     this.loadLearningPaths();
@@ -149,7 +149,7 @@ export class LearningPathsListComponent implements OnInit {
   confirmDelete(path: LearningPath): void {
     this.confirmationService.confirm({
       message: `¿Estás seguro de que deseas eliminar la ruta "${path.name}"?`,
-      header: 'Confirmar Eliminación',
+      header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sí, eliminar',
       rejectLabel: 'Cancelar',

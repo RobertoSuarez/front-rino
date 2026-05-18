@@ -47,8 +47,8 @@ export class ChangePasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.breadcrumbItems = [
-      { label: 'Mi Cuenta', routerLink: '/profile' },
-      { label: 'Cambiar Contraseña' }
+      { label: 'Mi cuenta', routerLink: '/profile' },
+      { label: 'Cambiar contraseña' }
     ];
     this.initForm();
   }

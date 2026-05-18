@@ -70,13 +70,13 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   generating: boolean = false;
   saving: boolean = false;
   courseId: number | null = null;
-  
+
   // Amauta Chatbot state
   displayChat: boolean = false;
   chatMessages: { role: 'user' | 'ai', text: string }[] = [];
   userMessage: string = '';
   aiTyping: boolean = false;
-  
+
   // Wizard state
   wizardStep: 'topic' | 'title-suggestions' | 'description-suggestion' | 'chapter-suggestions' | 'supervised-curation' | 'builder' = 'topic';
   wizardTopic: string = '';
@@ -84,7 +84,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   suggestedChapters: any[] = [];
   currentTitleIndex: number = 0;
   currentChapterIndex: number = 0;
-  
+
   // Supervised curation state
   currentChapterSupervIndex: number = 0;
   tempTopicSuggestions: any[] = []; // Topics suggested by AI but not yet approved
@@ -93,7 +93,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   supervisingExercises: boolean = false;
   currentSupervisingTemaIndex: number = -1;
   loadingSuggestions: boolean = false;
-  
+
   // Builder state
   sidebarVisible: boolean = true;
   autosaving: boolean = false;
@@ -142,11 +142,11 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         this.courseId = +id;
         this.loadCourseForEdit(this.courseId);
         this.wizardStep = 'builder';
-        
+
         // Hide platform sidebar for focus mode
-        this.layoutService.layoutState.update(prev => ({ 
-            ...prev, 
-            staticMenuDesktopInactive: true 
+        this.layoutService.layoutState.update(prev => ({
+          ...prev,
+          staticMenuDesktopInactive: true
         }));
       } else {
         // Flujo normal de creación
@@ -157,9 +157,9 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.chatMessages.push({ 
-      role: 'ai', 
-      text: '¡Hola! Soy Amauta, tu asistente pedagógico. Tu cuaderno de trabajo está listo. ¿En qué puedo ayudarte a diseñar hoy?' 
+    this.chatMessages.push({
+      role: 'ai',
+      text: '¡Hola! Soy Amauta, tu asistente pedagógico. Tu cuaderno de trabajo está listo. ¿En qué puedo ayudarte a diseñar hoy?'
     });
 
     // Autosave listener
@@ -170,16 +170,16 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Restore platform sidebar
-    this.layoutService.layoutState.update(prev => ({ 
-        ...prev, 
-        staticMenuDesktopInactive: false 
+    this.layoutService.layoutState.update(prev => ({
+      ...prev,
+      staticMenuDesktopInactive: false
     }));
   }
 
   loadCourseForEdit(id: number) {
     this.generating = true;
     this.loadingSuggestions = true;
-    
+
     this.courseService.getCourseFullDetail(id).subscribe({
       next: (res) => {
         // El backend responde con { statusCode, message, data: { message, data: { ... } } }
@@ -283,9 +283,9 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       description: [data?.description || '', Validators.required],
       temas: this.fb.array([])
     });
-    
+
     this.chapters.push(chapterGroup);
-    
+
     if (data?.temas) {
       data.temas.forEach((t: any) => this.addTema(this.chapters.length - 1, t));
     }
@@ -368,7 +368,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   }
 
   // WIZARD METHODS
-  
+
   startWizard() {
     if (!this.wizardTopic.trim()) {
       this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Ingresa un tema para comenzar' });
@@ -415,7 +415,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     this.loadingSuggestions = true;
     this.wizardStep = 'description-suggestion';
     const title = this.courseForm.get('courseTitle')?.value;
-    
+
     this.aiService.generateCourseDescription(title).subscribe({
       next: (res: any) => {
         if (res.data && res.data.description) {
@@ -496,47 +496,47 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   prevSupervStep() {
     if (this.currentChapterSupervIndex > 0) {
-        this.currentChapterSupervIndex--;
-        this.tempTopicSuggestions = [];
+      this.currentChapterSupervIndex--;
+      this.tempTopicSuggestions = [];
     }
   }
 
   nextSupervStep() {
     if (this.currentChapterSupervIndex < this.chapters.length - 1) {
-        this.currentChapterSupervIndex++;
-        this.tempTopicSuggestions = [];
+      this.currentChapterSupervIndex++;
+      this.tempTopicSuggestions = [];
     }
   }
 
   generateTopicsAI(chapterIndex: number) {
     const chapter = this.chapters.at(chapterIndex);
     const courseTitle = this.courseForm.get('courseTitle')?.value;
-    
+
     if (!chapter.value.title) {
-        this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'El capítulo necesita un título' });
-        return;
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'El capítulo necesita un título' });
+      return;
     }
 
     this.loadingSuggestions = true;
     this.aiService.generateTopicsAI(courseTitle, chapter.value.title).subscribe({
-        next: (res: any) => {
-            const data = res.data || res;
-            const suggestedTopics = data.temas || data;
-            
-            if (this.wizardStep === 'supervised-curation') {
-                this.tempTopicSuggestions = suggestedTopics;
-                this.currentTopicSuggestionIndex = 0;
-            } else {
-                // Background flow (legacy/manual)
-                suggestedTopics.forEach((t: any) => this.addTema(chapterIndex, t));
-            }
-            
-            this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: 'Sugerencias de temas recibidas' });
-            this.loadingSuggestions = false;
-        },
-        error: () => {
-            this.loadingSuggestions = false;
+      next: (res: any) => {
+        const data = res.data || res;
+        const suggestedTopics = data.temas || data;
+
+        if (this.wizardStep === 'supervised-curation') {
+          this.tempTopicSuggestions = suggestedTopics;
+          this.currentTopicSuggestionIndex = 0;
+        } else {
+          // Background flow (legacy/manual)
+          suggestedTopics.forEach((t: any) => this.addTema(chapterIndex, t));
         }
+
+        this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: 'Sugerencias de temas recibidas' });
+        this.loadingSuggestions = false;
+      },
+      error: () => {
+        this.loadingSuggestions = false;
+      }
     });
   }
 
@@ -544,17 +544,17 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     this.addTema(chapterIndex, topic);
     this.tempTopicSuggestions.splice(this.currentTopicSuggestionIndex, 1);
     this.messageService.add({ severity: 'success', summary: 'Aprobado', detail: `Tema "${topic.title}" añadido.` });
-    
+
     // Si llegamos al final, reset o cargar más si el usuario quiere
     if (this.currentTopicSuggestionIndex >= this.tempTopicSuggestions.length && this.tempTopicSuggestions.length > 0) {
-        this.currentTopicSuggestionIndex = 0;
+      this.currentTopicSuggestionIndex = 0;
     }
   }
 
   rejectTopic() {
     this.tempTopicSuggestions.splice(this.currentTopicSuggestionIndex, 1);
     if (this.currentTopicSuggestionIndex >= this.tempTopicSuggestions.length && this.tempTopicSuggestions.length > 0) {
-        this.currentTopicSuggestionIndex = 0;
+      this.currentTopicSuggestionIndex = 0;
     }
   }
 
@@ -566,29 +566,29 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     this.currentSupervisingTemaIndex = temaIndex;
 
     this.aiService.generateExerciseSetAI(tema.value.title).subscribe({
-        next: (res: any) => {
-            this.tempExerciseSuggestions = res.data || res;
-            this.supervisingExercises = true;
-            this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: `Se han sugerido ${this.tempExerciseSuggestions.length} ejercicios` });
-            this.loadingSuggestions = false;
-        },
-        error: () => {
-            this.loadingSuggestions = false;
-        }
+      next: (res: any) => {
+        this.tempExerciseSuggestions = res.data || res;
+        this.supervisingExercises = true;
+        this.messageService.add({ severity: 'success', summary: 'Amauta AI', detail: `Se han sugerido ${this.tempExerciseSuggestions.length} ejercicios` });
+        this.loadingSuggestions = false;
+      },
+      error: () => {
+        this.loadingSuggestions = false;
+      }
     });
   }
 
   confirmExercises() {
     if (this.currentSupervisingTemaIndex === -1) return;
-    
+
     const activities = this.getActivities(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex);
     if (activities.length === 0) {
-        this.addActivity(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, { title: 'Práctica con Amauta', exercises: [] });
+      this.addActivity(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, { title: 'Práctica con Amauta', exercises: [] });
     }
-    
+
     const activityIndex = 0;
     this.tempExerciseSuggestions.forEach((ex: any) => {
-        this.addExercise(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, activityIndex, ex);
+      this.addExercise(this.currentChapterSupervIndex, this.currentSupervisingTemaIndex, activityIndex, ex);
     });
 
     this.supervisingExercises = false;
@@ -610,7 +610,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
   scrollToChapter(index: number) {
     const element = document.getElementById(`chapter-card-${index}`);
     if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
     }
   }
 
@@ -642,17 +642,17 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     if (this.courseForm.invalid) {
       console.log('--- Resumen de Errores de Formulario ---');
       this.logInvalidControls(this.courseForm);
-      
+
       const missingFields: string[] = [];
       if (this.courseForm.get('courseTitle')?.invalid) missingFields.push('Título del Curso');
       if (this.courseForm.get('description')?.invalid) missingFields.push('Descripción del Curso');
-      
+
       // Check for errors in chapters
       this.chapters.controls.forEach((chap, i) => {
         if (chap.invalid) {
           if (chap.get('title')?.invalid) missingFields.push(`Título del Capítulo ${i + 1}`);
           if (chap.get('description')?.invalid) missingFields.push(`Descripción del Capítulo ${i + 1}`);
-          
+
           const temas = this.getTemas(i);
           temas.controls.forEach((tema, j) => {
             if (tema.invalid) {
@@ -663,29 +663,29 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.messageService.add({ 
-        severity: 'error', 
-        summary: 'Faltan Datos Obligatorios', 
-        detail: `Por favor completa: ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}` 
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Faltan Datos Obligatorios',
+        detail: `Por favor completa: ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}`
       });
       return;
     }
 
     this.saving = true;
     const payload = {
-        ...this.courseForm.value,
-        id: this.courseId, // Incluir el ID si estamos en modo edición
-        isDraft: false
+      ...this.courseForm.value,
+      id: this.courseId, // Incluir el ID si estamos en modo edición
+      isDraft: false
     };
 
     this.courseService.createBulkCourse(payload).subscribe({
       next: (res) => {
-        this.messageService.add({ 
-          severity: 'success', 
-          summary: '¡Curso Publicado!', 
-          detail: 'Tu obra maestra ha sido guardada con éxito.' 
+        this.messageService.add({
+          severity: 'success',
+          summary: '¡Curso Publicado!',
+          detail: 'Tu obra maestra ha sido guardada con éxito.'
         });
-        
+
         localStorage.removeItem('course_builder_draft');
         this.saving = false;
 
@@ -698,10 +698,10 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al guardar:', err);
-        this.messageService.add({ 
-          severity: 'error', 
-          summary: 'Error de Guardado', 
-          detail: 'No pudimos conectar con Amauta para guardar el curso. Inténtalo de nuevo.' 
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error de Guardado',
+          detail: 'No pudimos conectar con Amauta para guardar el curso. Inténtalo de nuevo.'
         });
         this.saving = false;
       }
@@ -724,7 +724,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     // Here we could call a specific "AMAUTA" agent endpoint 
     // For now, let's use a generic prompt to simulate the agent
     const context = JSON.stringify(this.courseForm.value);
-    
+
     // Simulating AI response for now to keep it responsive, 
     // or we can use AiService.generateContent with custom prompt
     this.aiService.generateTheoryWithPrompt(
@@ -758,7 +758,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
   isPreviewMode(chapterIndex: number, temaIndex: number): boolean {
     const key = `${chapterIndex}-${temaIndex}`;
-    // Por defecto es true (Vista Previa)
+    // Por defecto es true (Vista previa)
     return this.previewModes[key] !== false;
   }
 }

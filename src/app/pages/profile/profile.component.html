@@ -5,288 +5,290 @@
 
 <div class="px-4 sm:px-8 pb-12">
     <div class="grid grid-cols-12 gap-4 md:gap-8">
-    <div class="col-span-12">
-        <div class="profile-modern-header card mb-0">
-            <div class="profile-modern-header__copy">
-                <h1>Mi Perfil</h1>
-                <p>Gestiona tu información personal y visualiza tu progreso en el imperio.</p>
-            </div>
-        </div>
-
-        <!-- Loading State -->
-        <div *ngIf="loading"
-            style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 50vh; text-align: center;">
-            <p-progressSpinner strokeWidth="4" animationDuration="1s" styleClass="w-3rem h-3rem"></p-progressSpinner>
-            <p style="color: #64748b; margin-top: 1.5rem; font-size: 1rem; font-weight: 500;">Cargando información del
-                perfil...</p>
-        </div>
-
-        <!-- Error State -->
-        @if(error && !loading) {
-        <div class="card">
-            <div class="flex align-items-center justify-content-center p-4 md:p-6 border-round-lg"
-                style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 1px solid #f87171;">
-                <div class="text-center">
-                    <i class="pi pi-exclamation-triangle text-red-500 text-3xl md:text-4xl mb-3"></i>
-                    <h4 class="text-red-800 m-0 mb-2 text-lg md:text-xl">Error al cargar el perfil</h4>
-                    <p class="text-red-600 m-0 text-sm md:text-base">{{ error }}</p>
-                </div>
-            </div>
-        </div>
-        }
-
-        <!-- Modo visualización -->
-        @if (profileData && !loading && !editMode) {
-        <div class="profile-modern-container card">
-            <!-- Sección Superior: Info y Recursos -->
-            <div class="profile-top-row">
-                <div class="profile-info-column">
-                    <div class="profile-avatar-wrapper">
-                        <img [src]="profileData.urlAvatar" alt="Avatar">
-                        <span class="status-dot"></span>
-                    </div>
-                    <div class="profile-identity-info">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="profile-completion-tag">{{ getProfileCompletion() }}%</span>
-                        </div>
-                        <h2>{{ profileData.firstName }} {{ profileData.lastName }}</h2>
-                        <p class="email-text">{{ profileData.email }}</p>
-                        <div class="mt-2">
-                            <p-tag [value]="getUserTypeLabel(profileData.typeUser)"
-                                [severity]="getUserTypeColor(profileData.typeUser)" icon="pi pi-user">
-                            </p-tag>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-resources-row">
-                    <div class="resource-container">
-                        <span class="resource-label-top">PUNTOS YACHAY</span>
-                        <div class="resource-pill-large xp-pill">
-                            <img src="assets/elementos/yachay.png" alt="XP">
-                            <div class="resource-text">
-                                <span class="res-value">{{ userIndicators?.yachay || 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="resource-container">
-                        <span class="resource-label-top">VIDAS TUMIS</span>
-                        <div class="resource-pill-large tumi-pill">
-                            <img src="assets/elementos/corazon_de_tumi.png" alt="Vidas">
-                            <div class="resource-text">
-                                <span class="res-value">{{ userIndicators?.tumis || 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="resource-container">
-                        <span class="resource-label-top">MONEDAS MULLU</span>
-                        <div class="resource-pill-large mullu-pill">
-                            <img src="assets/elementos/mullu.png" alt="Mullu">
-                            <div class="resource-text">
-                                <span class="res-value">{{ userIndicators?.mullu || 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-span-12">
+            <div class="profile-modern-header card mb-0">
+                <div class="profile-modern-header__copy">
+                    <h1>Mi perfil</h1>
+                    <p>Gestiona tu información personal y visualiza tu progreso en el imperio.</p>
                 </div>
             </div>
 
-            <!-- Sección Media: Metadatos -->
-            <div class="profile-meta-row">
-                <div class="meta-item">
-                    <div class="meta-icon bg-blue-50 dark:bg-blue-900/20">
-                        <i class="pi pi-calendar text-blue-500"></i>
-                    </div>
-                    <div class="meta-content">
-                        <span class="meta-label">Miembro desde</span>
-                        <span class="meta-value">{{ formatDateShort(profileData.createdAt) }}</span>
-                    </div>
-                </div>
-                <div class="meta-item" *ngIf="profileData.birthday">
-                    <div class="meta-icon bg-pink-50 dark:bg-pink-900/20">
-                        <i class="pi pi-gift text-pink-500"></i>
-                    </div>
-                    <div class="meta-content">
-                        <span class="meta-label">Cumpleaños</span>
-                        <span class="meta-value">{{ formatDateShort(profileData.birthday) }}</span>
+            <!-- Loading State -->
+            <div *ngIf="loading"
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 50vh; text-align: center;">
+                <p-progressSpinner strokeWidth="4" animationDuration="1s"
+                    styleClass="w-3rem h-3rem"></p-progressSpinner>
+                <p style="color: #64748b; margin-top: 1.5rem; font-size: 1rem; font-weight: 500;">Cargando información
+                    del
+                    perfil...</p>
+            </div>
+
+            <!-- Error State -->
+            @if(error && !loading) {
+            <div class="card">
+                <div class="flex align-items-center justify-content-center p-4 md:p-6 border-round-lg"
+                    style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 1px solid #f87171;">
+                    <div class="text-center">
+                        <i class="pi pi-exclamation-triangle text-red-500 text-3xl md:text-4xl mb-3"></i>
+                        <h4 class="text-red-800 m-0 mb-2 text-lg md:text-xl">Error al cargar el perfil</h4>
+                        <p class="text-red-600 m-0 text-sm md:text-base">{{ error }}</p>
                     </div>
                 </div>
             </div>
+            }
 
-            <!-- Sección Inferior: Botones -->
-            <div class="profile-actions-row">
-                <button type="button" class="action-btn btn-primary" (click)="toggleEditMode()">
-                    <i class="pi pi-user-edit"></i>
-                    <span>Editar Perfil</span>
-                </button>
-                <button type="button" class="action-btn btn-outline" routerLink="change-password">
-                    <i class="pi pi-lock"></i>
-                    <span>Cambiar Contraseña</span>
-                </button>
-            </div>
-        </div>
-        }
-
-        <!-- Modo edición -->
-        @if (profileData && !loading && editMode) {
-        <div class="profile-edit-wrapper">
-            <form [formGroup]="profileForm" (ngSubmit)="saveProfile($event)">
-
-                <!-- Header del editor -->
-                <div class="profile-edit-header">
-                    <div class="profile-edit-header__left">
-                        <div class="profile-edit-icon">
-                            <i class="pi pi-user-edit"></i>
+            <!-- Modo visualización -->
+            @if (profileData && !loading && !editMode) {
+            <div class="profile-modern-container card">
+                <!-- Sección Superior: Info y Recursos -->
+                <div class="profile-top-row">
+                    <div class="profile-info-column">
+                        <div class="profile-avatar-wrapper">
+                            <img [src]="profileData.urlAvatar" alt="Avatar">
+                            <span class="status-dot"></span>
                         </div>
-                        <div>
-                            <h2>Editar Perfil</h2>
-                            <p>Actualiza tu información personal y avatar</p>
+                        <div class="profile-identity-info">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="profile-completion-tag">{{ getProfileCompletion() }}%</span>
+                            </div>
+                            <h2>{{ profileData.firstName }} {{ profileData.lastName }}</h2>
+                            <p class="email-text">{{ profileData.email }}</p>
+                            <div class="mt-2">
+                                <p-tag [value]="getUserTypeLabel(profileData.typeUser)"
+                                    [severity]="getUserTypeColor(profileData.typeUser)" icon="pi pi-user">
+                                </p-tag>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-resources-row">
+                        <div class="resource-container">
+                            <span class="resource-label-top">PUNTOS YACHAY</span>
+                            <div class="resource-pill-large xp-pill">
+                                <img src="assets/elementos/yachay.png" alt="XP">
+                                <div class="resource-text">
+                                    <span class="res-value">{{ userIndicators?.yachay || 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-container">
+                            <span class="resource-label-top">VIDAS TUMIS</span>
+                            <div class="resource-pill-large tumi-pill">
+                                <img src="assets/elementos/corazon_de_tumi.png" alt="Vidas">
+                                <div class="resource-text">
+                                    <span class="res-value">{{ userIndicators?.tumis || 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resource-container">
+                            <span class="resource-label-top">MONEDAS MULLU</span>
+                            <div class="resource-pill-large mullu-pill">
+                                <img src="assets/elementos/mullu.png" alt="Mullu">
+                                <div class="resource-text">
+                                    <span class="res-value">{{ userIndicators?.mullu || 0 }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Cuerpo: dos columnas -->
-                <div class="profile-edit-body">
-
-                    <!-- Izquierda: Avatar -->
-                    <aside class="profile-edit-avatar-panel">
-                        <h4 class="profile-edit-section-title">
-                            <i class="pi pi-image"></i> Elige tu avatar
-                        </h4>
-                        <div class="profile-edit-avatar-preview">
-                            <img [src]="selectedAvatarPath || profileData.urlAvatar" alt="Avatar seleccionado">
-                            <span class="profile-edit-avatar-badge"><i class="pi pi-check"></i></span>
+                <!-- Sección Media: Metadatos -->
+                <div class="profile-meta-row">
+                    <div class="meta-item">
+                        <div class="meta-icon bg-blue-50 dark:bg-blue-900/20">
+                            <i class="pi pi-calendar text-blue-500"></i>
                         </div>
-                        <div class="profile-edit-avatar-grid">
-                            @for (avatar of availableAvatars; track avatar) {
-                            <button type="button" class="avatar-option" [class.selected]="selectedAvatarPath === avatar"
-                                (click)="selectAvatar(avatar)">
-                                <img [src]="avatar" alt="Avatar">
-                            </button>
-                            }
+                        <div class="meta-content">
+                            <span class="meta-label">Miembro desde</span>
+                            <span class="meta-value">{{ formatDateShort(profileData.createdAt) }}</span>
                         </div>
-                        <small class="profile-edit-hint">
-                            <i class="pi pi-info-circle"></i> Haz clic en un avatar para seleccionarlo
-                        </small>
-                    </aside>
+                    </div>
+                    <div class="meta-item" *ngIf="profileData.birthday">
+                        <div class="meta-icon bg-pink-50 dark:bg-pink-900/20">
+                            <i class="pi pi-gift text-pink-500"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">Cumpleaños</span>
+                            <span class="meta-value">{{ formatDateShort(profileData.birthday) }}</span>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Derecha: Campos -->
-                    <div class="profile-edit-fields">
-                        <h4 class="profile-edit-section-title">
-                            <i class="pi pi-id-card"></i> Información Personal
-                        </h4>
+                <!-- Sección Inferior: Botones -->
+                <div class="profile-actions-row">
+                    <button type="button" class="action-btn btn-primary" (click)="toggleEditMode()">
+                        <i class="pi pi-user-edit"></i>
+                        <span>Editar perfil</span>
+                    </button>
+                    <button type="button" class="action-btn btn-outline" routerLink="change-password">
+                        <i class="pi pi-lock"></i>
+                        <span>Cambiar contraseña</span>
+                    </button>
+                </div>
+            </div>
+            }
 
-                        <div class="edit-fields-grid">
+            <!-- Modo edición -->
+            @if (profileData && !loading && editMode) {
+            <div class="profile-edit-wrapper">
+                <form [formGroup]="profileForm" (ngSubmit)="saveProfile($event)">
 
-                            <!-- Nombre -->
-                            <div class="edit-field">
-                                <label for="ef-firstName" class="edit-label">
-                                    <i class="pi pi-user"></i> Nombre
-                                </label>
-                                <input id="ef-firstName" type="text" pInputText formControlName="firstName"
-                                    placeholder="Tu nombre" class="w-full">
-                                <small class="edit-error"
-                                    *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
-                                    <i class="pi pi-exclamation-circle"></i> Nombre es requerido
-                                </small>
+                    <!-- Header del editor -->
+                    <div class="profile-edit-header">
+                        <div class="profile-edit-header__left">
+                            <div class="profile-edit-icon">
+                                <i class="pi pi-user-edit"></i>
                             </div>
-
-                            <!-- Apellido -->
-                            <div class="edit-field">
-                                <label for="ef-lastName" class="edit-label">
-                                    <i class="pi pi-user"></i> Apellido
-                                </label>
-                                <input id="ef-lastName" type="text" pInputText formControlName="lastName"
-                                    placeholder="Tu apellido" class="w-full">
-                                <small class="edit-error"
-                                    *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
-                                    <i class="pi pi-exclamation-circle"></i> Apellido es requerido
-                                </small>
+                            <div>
+                                <h2>Editar Perfil</h2>
+                                <p>Actualiza tu información personal y avatar</p>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Cumpleaños -->
-                            <div class="edit-field">
-                                <label for="ef-birthday" class="edit-label">
-                                    <i class="pi pi-calendar"></i> Fecha de Nacimiento
-                                </label>
-                                <input id="ef-birthday" type="text" pInputText formControlName="birthday"
-                                    placeholder="DD/MM/YYYY" class="w-full">
-                                <small class="edit-hint">Formato: DD/MM/YYYY</small>
+                    <!-- Cuerpo: dos columnas -->
+                    <div class="profile-edit-body">
+
+                        <!-- Izquierda: Avatar -->
+                        <aside class="profile-edit-avatar-panel">
+                            <h4 class="profile-edit-section-title">
+                                <i class="pi pi-image"></i> Elige tu avatar
+                            </h4>
+                            <div class="profile-edit-avatar-preview">
+                                <img [src]="selectedAvatarPath || profileData.urlAvatar" alt="Avatar seleccionado">
+                                <span class="profile-edit-avatar-badge"><i class="pi pi-check"></i></span>
                             </div>
-
-                            <!-- WhatsApp -->
-                            <div class="edit-field">
-                                <label for="ef-whatsApp" class="edit-label">
-                                    <i class="pi pi-whatsapp"></i> WhatsApp
-                                </label>
-                                <p-inputMask id="ef-whatsApp" mask="(999) 999-9999" formControlName="whatsApp"
-                                    placeholder="(123) 456-7890" styleClass="w-full">
-                                </p-inputMask>
-                                <small class="edit-hint">Opcional — para contacto directo</small>
+                            <div class="profile-edit-avatar-grid">
+                                @for (avatar of availableAvatars; track avatar) {
+                                <button type="button" class="avatar-option"
+                                    [class.selected]="selectedAvatarPath === avatar" (click)="selectAvatar(avatar)">
+                                    <img [src]="avatar" alt="Avatar">
+                                </button>
+                                }
                             </div>
+                            <small class="profile-edit-hint">
+                                <i class="pi pi-info-circle"></i> Haz clic en un avatar para seleccionarlo
+                            </small>
+                        </aside>
 
-                            <!-- Género -->
-                            <div class="edit-field">
-                                <label for="ef-gender" class="edit-label">
-                                    <i class="pi pi-heart"></i> Género
-                                </label>
-                                <p-select id="ef-gender" formControlName="gender" [options]="[
+                        <!-- Derecha: Campos -->
+                        <div class="profile-edit-fields">
+                            <h4 class="profile-edit-section-title">
+                                <i class="pi pi-id-card"></i> Información Personal
+                            </h4>
+
+                            <div class="edit-fields-grid">
+
+                                <!-- Nombre -->
+                                <div class="edit-field">
+                                    <label for="ef-firstName" class="edit-label">
+                                        <i class="pi pi-user"></i> Nombre
+                                    </label>
+                                    <input id="ef-firstName" type="text" pInputText formControlName="firstName"
+                                        placeholder="Tu nombre" class="w-full">
+                                    <small class="edit-error"
+                                        *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                                        <i class="pi pi-exclamation-circle"></i> Nombre es requerido
+                                    </small>
+                                </div>
+
+                                <!-- Apellido -->
+                                <div class="edit-field">
+                                    <label for="ef-lastName" class="edit-label">
+                                        <i class="pi pi-user"></i> Apellido
+                                    </label>
+                                    <input id="ef-lastName" type="text" pInputText formControlName="lastName"
+                                        placeholder="Tu apellido" class="w-full">
+                                    <small class="edit-error"
+                                        *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                                        <i class="pi pi-exclamation-circle"></i> Apellido es requerido
+                                    </small>
+                                </div>
+
+                                <!-- Cumpleaños -->
+                                <div class="edit-field">
+                                    <label for="ef-birthday" class="edit-label">
+                                        <i class="pi pi-calendar"></i> Fecha de Nacimiento
+                                    </label>
+                                    <input id="ef-birthday" type="text" pInputText formControlName="birthday"
+                                        placeholder="DD/MM/YYYY" class="w-full">
+                                    <small class="edit-hint">Formato: DD/MM/YYYY</small>
+                                </div>
+
+                                <!-- WhatsApp -->
+                                <div class="edit-field">
+                                    <label for="ef-whatsApp" class="edit-label">
+                                        <i class="pi pi-whatsapp"></i> WhatsApp
+                                    </label>
+                                    <p-inputMask id="ef-whatsApp" mask="(999) 999-9999" formControlName="whatsApp"
+                                        placeholder="(123) 456-7890" styleClass="w-full">
+                                    </p-inputMask>
+                                    <small class="edit-hint">Opcional — para contacto directo</small>
+                                </div>
+
+                                <!-- Género -->
+                                <div class="edit-field">
+                                    <label for="ef-gender" class="edit-label">
+                                        <i class="pi pi-heart"></i> Género
+                                    </label>
+                                    <p-select id="ef-gender" formControlName="gender" [options]="[
                         { label: 'Prefiero no indicar', value: '' },
                         { label: 'Masculino', value: 'masculino' },
                         { label: 'Femenino', value: 'femenino' }
                       ]" optionLabel="label" optionValue="value" placeholder="Selecciona" [showClear]="true"
-                                    styleClass="w-full">
-                                </p-select>
-                                <small class="edit-hint">Opcional</small>
-                            </div>
-
-                            <!-- Institución -->
-                            <div class="edit-field">
-                                <label for="ef-institution" class="edit-label">
-                                    <i class="pi pi-building"></i> Institución
-                                </label>
-                                <p-select id="ef-institution" formControlName="institutionId"
-                                    [options]="institutionsOptions" optionLabel="name" optionValue="id"
-                                    placeholder="Selecciona tu institución" [showClear]="true"
-                                    [loading]="loadingInstitutions" styleClass="w-full">
-                                </p-select>
-                                <small class="edit-hint">Opcional</small>
-                            </div>
-
-                            <!-- Email (solo lectura) -->
-                            <div class="edit-field edit-field--full">
-                                <label class="edit-label edit-label--muted">
-                                    <i class="pi pi-envelope"></i> Email
-                                </label>
-                                <div class="edit-readonly-field">
-                                    <span>{{ profileData.email }}</span>
-                                    <span class="edit-readonly-badge">
-                                        <i class="pi pi-lock"></i> No editable
-                                    </span>
+                                        styleClass="w-full">
+                                    </p-select>
+                                    <small class="edit-hint">Opcional</small>
                                 </div>
-                            </div>
 
+                                <!-- Institución -->
+                                <div class="edit-field">
+                                    <label for="ef-institution" class="edit-label">
+                                        <i class="pi pi-building"></i> Institución
+                                    </label>
+                                    <p-select id="ef-institution" formControlName="institutionId"
+                                        [options]="institutionsOptions" optionLabel="name" optionValue="id"
+                                        placeholder="Selecciona tu institución" [showClear]="true"
+                                        [loading]="loadingInstitutions" styleClass="w-full">
+                                    </p-select>
+                                    <small class="edit-hint">Opcional</small>
+                                </div>
+
+                                <!-- Email (solo lectura) -->
+                                <div class="edit-field edit-field--full">
+                                    <label class="edit-label edit-label--muted">
+                                        <i class="pi pi-envelope"></i> Email
+                                    </label>
+                                    <div class="edit-readonly-field">
+                                        <span>{{ profileData.email }}</span>
+                                        <span class="edit-readonly-badge">
+                                            <i class="pi pi-lock"></i> No editable
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Footer: botones -->
-                <div class="profile-edit-footer">
-                    <button type="button" class="edit-btn edit-btn--cancel" (click)="cancelEdit()">
-                        <i class="pi pi-times"></i> Cancelar
-                    </button>
-                    <button type="submit" class="edit-btn edit-btn--save"
-                        [disabled]="profileForm.invalid || savingChanges">
-                        <i class="pi" [ngClass]="savingChanges ? 'pi-spin pi-spinner' : 'pi-check'"></i>
-                        {{ savingChanges ? 'Guardando...' : 'Guardar Cambios' }}
-                    </button>
-                </div>
+                    <!-- Footer: botones -->
+                    <div class="profile-edit-footer">
+                        <button type="button" class="edit-btn edit-btn--cancel" (click)="cancelEdit()">
+                            <i class="pi pi-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="edit-btn edit-btn--save"
+                            [disabled]="profileForm.invalid || savingChanges">
+                            <i class="pi" [ngClass]="savingChanges ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+                            {{ savingChanges ? 'Guardando...' : 'Guardar Cambios' }}
+                        </button>
+                    </div>
 
-            </form>
-        </div>
-        }
-
+                </form>
             </div>
-</div>
+            }
+
+        </div>
+    </div>
 </div>

@@ -74,7 +74,7 @@ export class CursosListComponent implements OnInit {
   ngOnInit(): void {
     this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
     this.breadcrumbItems = [
-      { label: 'Mis Cursos' }
+      { label: 'Mis cursos' }
     ];
     this.cargarCursos();
     this.cursosService.getAllCursos().subscribe(response => {

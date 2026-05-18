@@ -6,11 +6,12 @@
             <div class="flex flex-col">
                 <h2 class="text-3xl font-extrabold text-surface-900 dark:text-surface-0 mb-1 flex items-center gap-3">
                     <i class="pi pi-book text-primary-500 font-bold"></i>
-                    Catálogo de Cursos
+                    Catálogo de cursos
                 </h2>
                 <div class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
-                    <p class="text-surface-600 dark:text-surface-400 font-medium">Gestiona y crea rutas de aprendizaje gamificadas</p>
+                    <p class="text-surface-600 dark:text-surface-400 font-medium">Gestiona y crea rutas de aprendizaje
+                        gamificadas</p>
                 </div>
             </div>
         </ng-template>
@@ -21,12 +22,13 @@
                     <p-inputIcon>
                         <i class="pi pi-search"></i>
                     </p-inputIcon>
-                    <input pInputText type="text" [(ngModel)]="searchTerm" placeholder="Buscar curso..." 
+                    <input pInputText type="text" [(ngModel)]="searchTerm" placeholder="Buscar curso..."
                         class="w-full rounded-xl border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900"
                         (input)="viewMode === 'table' ? dt.filterGlobal($any($event.target).value, 'contains') : null" />
                 </p-iconField>
 
-                <div class="flex items-center gap-2 bg-surface-100 dark:bg-surface-900 p-1.5 rounded-xl border border-surface-200 dark:border-surface-800 shadow-inner">
+                <div
+                    class="flex items-center gap-2 bg-surface-100 dark:bg-surface-900 p-1.5 rounded-xl border border-surface-200 dark:border-surface-800 shadow-inner">
                     <button (click)="viewMode = 'table'"
                         [class]="viewMode === 'table' ? 'bg-white dark:bg-surface-800 shadow-md text-primary-600 dark:text-primary-400' : 'text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200'"
                         class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 font-bold text-sm"
@@ -54,35 +56,45 @@
     </p-toolbar>
 
     @if (viewMode === 'table') {
-    <p-table #dt [value]="courses" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
-        [paginator]="true" [globalFilterFields]="['title', 'createdBy', 'code']" responsiveLayout="scroll"
-        styleClass="p-datatable-sm" [showGridlines]="false">
+    <p-table #dt [value]="courses" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true" [paginator]="true"
+        [globalFilterFields]="['title', 'createdBy', 'code']" responsiveLayout="scroll" styleClass="p-datatable-sm"
+        [showGridlines]="false">
         <ng-template pTemplate="header">
             <tr class="bg-surface-50 dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800">
-                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider" style="width: 8rem">Portada</th>
-                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider">Detalles del Curso</th>
-                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider">Creador</th>
-                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider text-center" style="width: 10rem">Progreso</th>
-                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider text-center" style="width: 8rem">Estado</th>
-                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider text-center" style="width: 10rem">Acciones</th>
+                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider"
+                    style="width: 8rem">Portada</th>
+                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider">
+                    Detalles del Curso</th>
+                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider">
+                    Creador</th>
+                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider text-center"
+                    style="width: 10rem">Progreso</th>
+                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider text-center"
+                    style="width: 8rem">Estado</th>
+                <th class="py-4 font-bold text-surface-700 dark:text-surface-100 uppercase text-xs tracking-wider text-center"
+                    style="width: 10rem">Acciones</th>
             </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-course>
-            <tr class="hover:bg-surface-50 dark:hover:bg-surface-900/50 transition-colors duration-200 border-b border-surface-100 dark:border-surface-800/50">
+            <tr
+                class="hover:bg-surface-50 dark:hover:bg-surface-900/50 transition-colors duration-200 border-b border-surface-100 dark:border-surface-800/50">
                 <td>
-                    <div class="relative w-24 h-14 rounded-lg overflow-hidden shadow-sm border border-surface-200 dark:border-surface-700 bg-surface-100 flex items-center justify-center group/img">
-                        <img [src]="course.urlLogo || 'https://via.placeholder.com/150x80?text=Sin+Imagen'" 
-                             [alt]="course.title"
-                             class="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110" />
+                    <div
+                        class="relative w-24 h-14 rounded-lg overflow-hidden shadow-sm border border-surface-200 dark:border-surface-700 bg-surface-100 flex items-center justify-center group/img">
+                        <img [src]="course.urlLogo || 'https://via.placeholder.com/150x80?text=Sin+Imagen'"
+                            [alt]="course.title"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110" />
                         <div class="absolute inset-0 bg-black/5 group-hover/img:bg-transparent transition-colors"></div>
                     </div>
                 </td>
                 <td>
                     <div class="flex flex-col gap-1">
-                        <span class="font-bold text-surface-900 dark:text-surface-0 text-md leading-tight group-hover:text-primary-600 transition-colors">{{course.title}}</span>
+                        <span
+                            class="font-bold text-surface-900 dark:text-surface-0 text-md leading-tight group-hover:text-primary-600 transition-colors">{{course.title}}</span>
                         <div class="flex items-center gap-2">
-                            <span class="px-1.5 py-0.5 bg-surface-100 dark:bg-surface-800 text-surface-500 dark:text-surface-400 rounded font-mono text-[10px] uppercase font-bold tracking-widest border border-surface-200 dark:border-surface-700">
+                            <span
+                                class="px-1.5 py-0.5 bg-surface-100 dark:bg-surface-800 text-surface-500 dark:text-surface-400 rounded font-mono text-[10px] uppercase font-bold tracking-widest border border-surface-200 dark:border-surface-700">
                                 {{course.code}}
                             </span>
                             <span class="text-[10px] text-surface-400 dark:text-surface-500 font-medium italic">
@@ -93,24 +105,27 @@
                 </td>
                 <td>
                     <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold text-[10px]">
+                        <div
+                            class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold text-[10px]">
                             {{ course.createdBy?.substring(0, 1) }}
                         </div>
-                        <span class="font-medium text-surface-600 dark:text-surface-400 text-sm italic">{{course.createdBy}}</span>
+                        <span
+                            class="font-medium text-surface-600 dark:text-surface-400 text-sm italic">{{course.createdBy}}</span>
                     </div>
                 </td>
                 <td>
                     <div class="flex flex-col items-center gap-1.5">
-                        <div class="flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full border border-blue-100 dark:border-blue-800/50 shadow-sm">
+                        <div
+                            class="flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full border border-blue-100 dark:border-blue-800/50 shadow-sm">
                             <i class="pi pi-list text-[10px]"></i>
-                            <span class="font-bold text-[11px] uppercase tracking-tighter">{{course.chapters || 0}} Capítulos</span>
+                            <span class="font-bold text-[11px] uppercase tracking-tighter">{{course.chapters || 0}}
+                                Capítulos</span>
                         </div>
                     </div>
                 </td>
                 <td>
                     <div class="flex justify-center">
-                        <p-tag 
-                            [value]="course.isPublic ? 'PÚBLICO' : 'PRIVADO'" 
+                        <p-tag [value]="course.isPublic ? 'PÚBLICO' : 'PRIVADO'"
                             [severity]="course.isPublic ? 'success' : 'danger'"
                             styleClass="text-[9px] font-extrabold px-3 py-1.5 rounded-full shadow-sm">
                         </p-tag>
@@ -118,34 +133,44 @@
                 </td>
                 <td>
                     <div class="flex justify-center items-center gap-0.5">
-                        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-secondary p-button-text hover:bg-surface-200/50 dark:hover:bg-surface-800/50"
-                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Visualizar Curso" tooltipPosition="bottom"></button>
-                        
-                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info p-button-text hover:bg-info-50/20"
-                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Editar Estructura" tooltipPosition="bottom"></button>
-                        
-                        <button pButton pRipple icon="pi pi-list" class="p-button-rounded p-button-success p-button-text hover:bg-success-50/20"
-                            (click)="navigateToChapters(course)" pTooltip="Gestionar Capítulos" tooltipPosition="bottom"></button>
-                        
-                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text hover:bg-danger-50/20"
+                        <button pButton pRipple icon="pi pi-eye"
+                            class="p-button-rounded p-button-secondary p-button-text hover:bg-surface-200/50 dark:hover:bg-surface-800/50"
+                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Visualizar Curso"
+                            tooltipPosition="bottom"></button>
+
+                        <button pButton pRipple icon="pi pi-pencil"
+                            class="p-button-rounded p-button-info p-button-text hover:bg-info-50/20"
+                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Editar Estructura"
+                            tooltipPosition="bottom"></button>
+
+                        <button pButton pRipple icon="pi pi-list"
+                            class="p-button-rounded p-button-success p-button-text hover:bg-success-50/20"
+                            (click)="navigateToChapters(course)" pTooltip="Gestionar Capítulos"
+                            tooltipPosition="bottom"></button>
+
+                        <button pButton pRipple icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger p-button-text hover:bg-danger-50/20"
                             (click)="confirmDelete(course)" pTooltip="Eliminar Curso" tooltipPosition="bottom"></button>
                     </div>
                 </td>
             </tr>
         </ng-template>
-        
+
         <ng-template pTemplate="emptymessage">
             <tr>
                 <td colspan="6" class="text-center py-16">
                     <div class="flex flex-col items-center gap-4">
-                        <div class="w-20 h-20 bg-surface-100 dark:bg-surface-900 rounded-full flex items-center justify-center text-surface-300 dark:text-surface-700 shadow-inner">
+                        <div
+                            class="w-20 h-20 bg-surface-100 dark:bg-surface-900 rounded-full flex items-center justify-center text-surface-300 dark:text-surface-700 shadow-inner">
                             <i class="pi pi-inbox text-5xl"></i>
                         </div>
                         <div class="flex flex-col">
-                            <p class="text-surface-900 dark:text-surface-0 text-2xl font-bold mb-1">Tu catálogo está vacío</p>
+                            <p class="text-surface-900 dark:text-surface-0 text-2xl font-bold mb-1">Tu catálogo está
+                                vacío</p>
                             <p class="text-surface-500 italic">Comienza creando un curso con nuestro asistente de IA</p>
                         </div>
-                        <p-button label="Crear curso ahora" icon="pi pi-sparkles" severity="help" [raised]="true" (click)="showCreateDialog()"></p-button>
+                        <p-button label="Crear curso ahora" icon="pi pi-sparkles" severity="help" [raised]="true"
+                            (click)="showCreateDialog()"></p-button>
                     </div>
                 </td>
             </tr>
@@ -154,47 +179,60 @@
     }
 
     @if (viewMode === 'grid') {
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
         @for (course of filteredCourses; track course.id) {
-        <div class="group bg-white dark:bg-surface-950 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col border border-surface-100 dark:border-surface-800/50 hover:-translate-y-2 relative">
-            
+        <div
+            class="group bg-white dark:bg-surface-950 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col border border-surface-100 dark:border-surface-800/50 hover:-translate-y-2 relative">
+
             <!-- Badge de Estado en Grid -->
             <div class="absolute top-4 left-4 z-10">
                 <p-tag [value]="course.isPublic ? 'Público' : 'Privado'"
-                    [severity]="course.isPublic ? 'success' : 'danger'" 
+                    [severity]="course.isPublic ? 'success' : 'danger'"
                     styleClass="shadow-lg backdrop-blur-md bg-opacity-90 font-bold px-3 py-1.5 rounded-xl border border-white/20"></p-tag>
             </div>
 
             <!-- Imagen de Curso -->
-            <div class="h-52 relative overflow-hidden bg-surface-100 dark:bg-surface-900 border-b border-surface-100 dark:border-surface-800/50">
-                <img [src]="course.urlLogo || 'https://via.placeholder.com/300x150?text=Sin+Imagen'" [alt]="course.title"
+            <div
+                class="h-52 relative overflow-hidden bg-surface-100 dark:bg-surface-900 border-b border-surface-100 dark:border-surface-800/50">
+                <img [src]="course.urlLogo || 'https://via.placeholder.com/300x150?text=Sin+Imagen'"
+                    [alt]="course.title"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
             </div>
 
             <div class="p-6 flex-1 flex flex-col gap-3">
                 <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="px-2 py-0.5 bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 rounded-lg font-mono text-[9px] font-black tracking-widest border border-primary-100 dark:border-primary-800 shadow-sm">
+                        <span
+                            class="px-2 py-0.5 bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 rounded-lg font-mono text-[9px] font-black tracking-widest border border-primary-100 dark:border-primary-800 shadow-sm">
                             {{course.code}}
                         </span>
-                        <span class="text-[9px] text-surface-400 dark:text-surface-500 font-bold uppercase tracking-tighter">
+                        <span
+                            class="text-[9px] text-surface-400 dark:text-surface-500 font-bold uppercase tracking-tighter">
                             {{course.createAt}}
                         </span>
                     </div>
-                    <h3 class="text-xl font-black text-surface-900 dark:text-surface-0 line-clamp-2 leading-tight group-hover:text-primary-600 transition-colors">
+                    <h3
+                        class="text-xl font-black text-surface-900 dark:text-surface-0 line-clamp-2 leading-tight group-hover:text-primary-600 transition-colors">
                         {{ course.title }}
                     </h3>
                 </div>
 
-                <p class="text-sm text-surface-500 dark:text-surface-400 line-clamp-3 flex-1 leading-relaxed italic border-l-2 border-surface-200 dark:border-surface-700 pl-3">
-                    {{ course.description || 'Este curso gamificado te guiará a través de emocionantes desafíos de ciberseguridad.' }}
+                <p
+                    class="text-sm text-surface-500 dark:text-surface-400 line-clamp-3 flex-1 leading-relaxed italic border-l-2 border-surface-200 dark:border-surface-700 pl-3">
+                    {{ course.description || 'Este curso gamificado te guiará a través de emocionantes desafíos de
+                    ciberseguridad.' }}
                 </p>
 
                 <div class="flex items-center gap-3 mt-2">
-                    <div class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-xl border border-blue-100 dark:border-blue-800/50 shadow-sm">
+                    <div
+                        class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-xl border border-blue-100 dark:border-blue-800/50 shadow-sm">
                         <i class="pi pi-list font-bold"></i>
-                        <span class="font-black text-[10px] uppercase tracking-tighter">{{ course.chapters || 0 }} Capítulos</span>
+                        <span class="font-black text-[10px] uppercase tracking-tighter">{{ course.chapters || 0 }}
+                            Capítulos</span>
                     </div>
                 </div>
 
@@ -203,14 +241,18 @@
                 <!-- Footer de Tarjeta -->
                 <div class="flex items-center justify-between pt-2">
                     <div class="flex gap-0.5">
-                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-info p-button-text hover:bg-info-50/20"
-                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Editar" tooltipPosition="bottom"></button>
-                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text hover:bg-danger-50/20"
+                        <button pButton pRipple icon="pi pi-pencil"
+                            class="p-button-rounded p-button-info p-button-text hover:bg-info-50/20"
+                            [routerLink]="['/admin/courses/builder', course.id]" pTooltip="Editar"
+                            tooltipPosition="bottom"></button>
+                        <button pButton pRipple icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger p-button-text hover:bg-danger-50/20"
                             (click)="confirmDelete(course)" pTooltip="Eliminar" tooltipPosition="bottom"></button>
                     </div>
-                    
-                    <button pButton pRipple label="Gestionar" icon="pi pi-arrow-right" [outlined]="true" severity="primary" size="small"
-                        (click)="navigateToChapters(course)" class="font-bold rounded-xl px-4 py-2 border-primary-500 hover:bg-primary-500 hover:text-white transition-all"></button>
+
+                    <button pButton pRipple label="Gestionar" icon="pi pi-arrow-right" [outlined]="true"
+                        severity="primary" size="small" (click)="navigateToChapters(course)"
+                        class="font-bold rounded-xl px-4 py-2 border-primary-500 hover:bg-primary-500 hover:text-white transition-all"></button>
                 </div>
             </div>
         </div>
@@ -225,14 +267,14 @@
         <p class="text-gray-500 dark:text-gray-400 mb-6 text-center max-w-md">Prueba ajustando los términos de búsqueda
             o comienza creando
             el primer curso de la plataforma.</p>
-        <p-button label="Crear Nuevo Curso" icon="pi pi-plus" [raised]="true" severity="info"
+        <p-button label="Crear nuevo curso" icon="pi pi-plus" [raised]="true" severity="info"
             (click)="showCreateDialog()"></p-button>
     </div>
     }
     }
 </div>
 
-<p-dialog [header]="currentCourseId ? 'Editar Curso' : 'Nuevo Curso'" [(visible)]="dialogVisible"
+<p-dialog [header]="currentCourseId ? 'Editar curso' : 'Nuevo curso'" [(visible)]="dialogVisible"
     [style]="{width: '50vw'}" [modal]="true" [closable]="true" (visibleChange)="onDialogHide($event)"
     class="rounded-lg shadow-xl">
     <form [formGroup]="courseForm" (ngSubmit)="currentCourseId ? updateCourse() : createCourse()"

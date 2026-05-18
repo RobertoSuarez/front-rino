@@ -31,7 +31,7 @@ import { AuthService } from '../../core/services/auth.service';
             <p-toast></p-toast>
 
             <div class="col-span-12">
-                <h1 class="text-3xl font-bold text-900 mb-2">Dashboard del Administrador</h1>
+                <h1 class="text-3xl font-bold text-900 mb-2">Dashboard del administrador</h1>
                 <p class="text-600">Vista general del sistema Cyber Imperium</p>
             </div>
 
@@ -46,7 +46,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card styleClass="h-full bg-blue-500 dark:bg-gradient-to-br dark:from-blue-500 dark:to-blue-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total Usuarios</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total usuarios</div>
                                 <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.users.total }}</div>
                                 <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.users.active }} activos</div>
                             </div>
@@ -61,7 +61,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card styleClass="h-full bg-green-500 dark:bg-gradient-to-br dark:from-green-500 dark:to-green-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total Cursos</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total cursos</div>
                                 <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.content.courses }}</div>
                                 <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.content.chapters }} capítulos</div>
                             </div>
@@ -76,7 +76,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card styleClass="h-full bg-orange-500 dark:bg-gradient-to-br dark:from-orange-500 dark:to-orange-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="font-medium mb-2 text-900 dark:text-white/90">Rutas de Aprendizaje</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Rutas de aprendizaje</div>
                                 <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.content.learningPaths }}</div>
                                 <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.subscriptions.active }} suscripciones</div>
                             </div>
@@ -91,7 +91,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card styleClass="h-full bg-purple-500 dark:bg-gradient-to-br dark:from-purple-500 dark:to-purple-600">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total Actividades</div>
+                                <div class="font-medium mb-2 text-900 dark:text-white/90">Total actividades</div>
                                 <div class="text-4xl font-bold text-900 dark:text-white">{{ stats.content.activities }}</div>
                                 <div class="text-sm mt-2 text-700 dark:text-white/80">{{ stats.content.temas }} temas</div>
                             </div>
@@ -106,7 +106,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card>
                         <ng-template pTemplate="header">
                             <div class="px-6 pt-6">
-                                <h3 class="text-xl font-bold text-900 mb-1">Distribución de Usuarios</h3>
+                                <h3 class="text-xl font-bold text-900 mb-1">Distribución de usuarios</h3>
                                 <p class="text-600 text-sm">Usuarios por tipo en el sistema</p>
                             </div>
                         </ng-template>
@@ -118,7 +118,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card>
                         <ng-template pTemplate="header">
                             <div class="px-6 pt-6">
-                                <h3 class="text-xl font-bold text-900 mb-1">Contenido del Sistema</h3>
+                                <h3 class="text-xl font-bold text-900 mb-1">Contenido del sistema</h3>
                                 <p class="text-600 text-sm">Distribución de contenido educativo</p>
                             </div>
                         </ng-template>
@@ -130,7 +130,7 @@ import { AuthService } from '../../core/services/auth.service';
                     <p-card>
                         <ng-template pTemplate="header">
                             <div class="px-6 pt-6">
-                                <h3 class="text-xl font-bold text-900 mb-1">Rutas Más Populares</h3>
+                                <h3 class="text-xl font-bold text-900 mb-1">Rutas más populares</h3>
                                 <p class="text-600 text-sm">Top 5 rutas con más suscripciones</p>
                             </div>
                         </ng-template>
@@ -161,7 +161,7 @@ import { AuthService } from '../../core/services/auth.service';
                         <ng-template pTemplate="header">
                             <div class="px-6 pt-6 flex justify-between items-center">
                                 <div>
-                                    <h3 class="text-xl font-bold text-900 mb-1">Usuarios Recientes</h3>
+                                    <h3 class="text-xl font-bold text-900 mb-1">Usuarios recientes</h3>
                                     <p class="text-600 text-sm">Últimos usuarios registrados</p>
                                 </div>
                                 <button pButton label="Ver Todos" icon="pi pi-arrow-right" class="p-button-text p-button-sm" (click)="goToUsers()"></button>

@@ -4,25 +4,26 @@
 </div>
 
 <!-- Spinner de carga inicial -->
-<div *ngIf="loading()" class="w-full flex flex-col items-center justify-center" style="height: 80vh;">
+@if (loading()) {
+<div class="w-full flex flex-col items-center justify-center" style="height: 80vh;">
   <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
   <p class="text-gray-500 font-medium">Cargando contenido...</p>
 </div>
+}
 
 <!-- Contenido principal -->
-<div *ngIf="!loading()" class="p-6 min-h-[calc(100vh-64px)]">
-  
+@if (!loading()) {
+<div class="p-6 min-h-[calc(100vh-64px)]">
+
   <!-- Cabecera del capítulo -->
   <div class="mb-8">
     <p-card class="shadow-3 bg-white rounded-xl">
       <ng-template #header>
         <div class="p-6">
           <div class="flex flex-col md:flex-row items-start gap-6">
-            
+
             <!-- Información del capítulo -->
             <div class="flex-1">
-              
-
               <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-3 leading-tight">
                 {{ capituloTitulo() }}
               </h1>
@@ -42,10 +43,9 @@
 
             <!-- Botón de acción -->
             <div class="course-actions">
-              <button pButton type="button" label="Volver atrás" icon="pi pi-arrow-left"
+              <button pButton type="button" label="Volver" icon="pi pi-arrow-left"
                 class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-                pTooltip="Volver a la página anterior" tooltipPosition="bottom" 
-                (click)="volverAtras()"></button>
+                pTooltip="Volver a la página anterior" tooltipPosition="bottom" (click)="volverAtras()"></button>
             </div>
           </div>
         </div>
@@ -57,48 +57,46 @@
   <div class="temas-container">
     <p-card class="shadow-2 rounded-xl border-0 overflow-hidden">
       <div class="p-6">
-        
+
         <!-- Mensaje cuando no hay temas -->
-        <div *ngIf="temas().length === 0" class="text-center py-12">
+        @if (temas().length === 0) {
+        <div class="text-center py-12">
           <i class="pi pi-book text-6xl text-slate-300 mb-4"></i>
           <h3 class="text-2xl font-bold text-slate-600 mb-2">No hay temas disponibles</h3>
           <p class="text-slate-500">Este capítulo aún no tiene temas configurados.</p>
         </div>
+        }
 
         <!-- Lista de temas -->
-        <div *ngIf="temas().length > 0" class="space-y-6">
-          
+        @if (temas().length > 0) {
+        <div class="space-y-6">
+
           <!-- Tema individual -->
-          <div *ngFor="let tema of temas(); let i = index" class="tema-card">
-            <p-card class="shadow-4 rounded-2xl border-0 overflow-hidden transition-all duration-300 hover:shadow-5xl hover:-translate-y-1">
-              
+          @for (tema of temas(); track tema.id; let i = $index) {
+          <div class="tema-card">
+            <p-card
+              class="shadow-4 rounded-2xl border-0 overflow-hidden transition-all duration-300 hover:shadow-5xl hover:-translate-y-1">
+
               <!-- Header del tema -->
               <ng-template #header>
                 <div class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 p-6">
                   <div class="flex flex-col md:flex-row items-start justify-between gap-4">
-                    
+
                     <!-- Información del tema -->
                     <div class="flex items-center gap-4 flex-1">
                       <!-- Círculo de progreso -->
                       <div class="relative">
-                        <p-knob 
-                          [ngModel]="calcularProgreso(tema)" 
-                          [readonly]="true" 
-                          [size]="80" 
-                          [strokeWidth]="8"
+                        <p-knob [ngModel]="calcularProgreso(tema)" [readonly]="true" [size]="80" [strokeWidth]="8"
                           [valueColor]="obtenerEstadoTema(tema) === 'completed' ? '#10b981' : obtenerEstadoTema(tema) === 'in-progress' ? '#3b82f6' : obtenerEstadoTema(tema) === 'ready-to-start' ? '#f59e0b' : '#6b7280'"
-                          valueTemplate="{value}%"
-                          class="drop-shadow-lg">
+                          valueTemplate="{value}%" class="drop-shadow-lg">
                         </p-knob>
-                        
-                        
                       </div>
-                      
+
                       <!-- Información del tema -->
                       <div class="flex-1">
                         <h3 class="text-2xl font-bold text-slate-900 mb-2">{{ tema.title }}</h3>
                         <p class="text-slate-600 text-base mb-3 line-clamp-2">{{ tema.shortDescription }}</p>
-                        
+
                         <!-- Estadísticas de actividades -->
                         <div class="flex items-center gap-4 text-sm text-slate-500">
                           <div class="flex items-center gap-1">
@@ -112,104 +110,102 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <!-- Estado y acciones -->
                     <div class="flex flex-col items-end gap-3">
                       <!-- Tag de estado -->
-                      <p-tag 
-                        [value]="obtenerTextoEstado(obtenerEstadoTema(tema))"
+                      <p-tag [value]="obtenerTextoEstado(obtenerEstadoTema(tema))"
                         [severity]="obtenerSeveridadEstado(obtenerEstadoTema(tema))"
                         class="status-tag rounded-full px-4 py-2 font-bold text-xs uppercase tracking-wider shadow-lg"
                         styleClass="p-tag-rounded">
                       </p-tag>
-                      
+
                       <!-- Botón de acción -->
                       <div class="flex gap-2">
                         <!-- Botón Ver Teoría -->
-                        <button pButton type="button" 
-                                label="Ver Teoría" 
-                                icon="pi pi-book"
-                                class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-1"
-                                pTooltip="Ver la teoría de este tema" tooltipPosition="top"
-                                (click)="abrirTeoria(tema)">
+                        <button pButton type="button" label="Ver teoría" icon="pi pi-book"
+                          class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold rounded-xl px-6 py-3 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-1"
+                          pTooltip="Ver la teoría de este tema" tooltipPosition="top" (click)="abrirTeoria(tema)">
                         </button>
-                        
+
                         <!-- Botón Bloqueado -->
-                        <button *ngIf="obtenerEstadoTema(tema) === 'locked'" 
-                                pButton type="button" 
-                                label="Bloqueado" 
-                                icon="pi pi-lock"
-                                class="bg-slate-100 border-2 border-slate-300 text-slate-500 font-bold rounded-xl px-6 py-3 cursor-not-allowed"
-                                [disabled]="true" 
-                                pTooltip="Complete los temas anteriores para desbloquear" 
-                                tooltipPosition="top">
+                        @if (obtenerEstadoTema(tema) === 'locked') {
+                        <button pButton type="button" label="Bloqueado" icon="pi pi-lock"
+                          class="bg-slate-100 border-2 border-slate-300 text-slate-500 font-bold rounded-xl px-6 py-3 cursor-not-allowed"
+                          [disabled]="true" pTooltip="Complete los temas anteriores para desbloquear"
+                          tooltipPosition="top">
                         </button>
+                        }
                       </div>
                     </div>
                   </div>
                 </div>
               </ng-template>
-              
+
               <!-- Contenido del tema (actividades) -->
-              <div class="p-6" *ngIf="tema.activities && tema.activities.length > 0">
+              @if (tema.activities && tema.activities.length > 0) {
+              <div class="p-6">
                 <h4 class="text-lg font-semibold text-slate-800 mb-4">Actividades del tema</h4>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div *ngFor="let actividad of tema.activities" 
-                       class="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all cursor-pointer"
-                       (click)="iniciarActividad(actividad)">
-                    
+                  @for (actividad of tema.activities; track actividad.id) {
+                  <div
+                    class="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all cursor-pointer"
+                    (click)="iniciarActividad(actividad)">
+
                     <div class="flex items-center justify-between mb-2">
                       <h5 class="font-semibold text-slate-800 truncate">{{ actividad.title }}</h5>
                       <div class="flex items-center gap-1">
-                        <i *ngIf="actividad.completed" class="pi pi-check-circle text-green-500"></i>
-                        <i *ngIf="actividad.started && !actividad.completed" class="pi pi-play-circle text-blue-500"></i>
-                        <i *ngIf="!actividad.started" class="pi pi-circle text-slate-400"></i>
+                        @if (actividad.completed) {
+                        <i class="pi pi-check-circle text-green-500"></i>
+                        }
+                        @if (actividad.started && !actividad.completed) {
+                        <i class="pi pi-play-circle text-blue-500"></i>
+                        }
+                        @if (!actividad.started) {
+                        <i class="pi pi-circle text-slate-400"></i>
+                        }
                       </div>
                     </div>
-                    
+
                     <!-- Barra de progreso de la actividad -->
-                    <p-progressBar 
-                      [value]="actividad.progress" 
-                      [style]="{'height': '6px'}"
+                    <p-progressBar [value]="actividad.progress" [style]="{'height': '6px'}"
                       [styleClass]="'rounded-full'">
                     </p-progressBar>
-                    
+
                     <div class="flex justify-between items-center mt-2">
                       <div class="text-xs text-slate-500">
                         {{ actividad.progress }}% completado
                       </div>
-                      <button pButton type="button" 
-                              icon="pi pi-play" 
-                              class="p-button-rounded p-button-sm p-button-text"
-                              pTooltip="Iniciar actividad" 
-                              tooltipPosition="top"
-                              (click)="$event.stopPropagation(); iniciarActividad(actividad)">
+                      <button pButton type="button" icon="pi pi-play" class="p-button-rounded p-button-sm p-button-text"
+                        pTooltip="Iniciar actividad" tooltipPosition="top"
+                        (click)="$event.stopPropagation(); iniciarActividad(actividad)">
                       </button>
                     </div>
                   </div>
+                  }
                 </div>
               </div>
-              
+              }
+
             </p-card>
           </div>
+          }
         </div>
+        }
       </div>
     </p-card>
   </div>
 </div>
+}
 
 <!-- Modal de Teoría -->
-<p-dialog 
-  [visible]="showTeoriaModal()"
-  (visibleChange)="showTeoriaModal.set($event)"
-  [header]="temaSeleccionado()?.title"
-  [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '900px' }"
-  [maximizable]="true"
-  (onHide)="cerrarTeoria()">
-  
-  <div *ngIf="temaSeleccionado()" class="space-y-6">
+<p-dialog [visible]="showTeoriaModal()" (visibleChange)="showTeoriaModal.set($event)"
+  [header]="temaSeleccionado()?.title" [modal]="true" [style]="{ width: '90vw', maxWidth: '900px' }"
+  [maximizable]="true" (onHide)="cerrarTeoria()">
+
+  @if (temaSeleccionado()) {
+  <div class="space-y-6">
     <!-- Información del tema -->
     <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
       <h3 class="text-2xl font-bold text-slate-900 mb-3">{{ temaSeleccionado()?.title }}</h3>
@@ -219,19 +215,22 @@
     <!-- Contenido de la teoría -->
     <div class="bg-white rounded-lg p-6 border border-slate-200 overflow-hidden">
       <h4 class="text-xl font-semibold text-slate-800 mb-4">📚 Teoría del Tema</h4>
-      
+
       <!-- Mostrar la teoría en HTML -->
-      <div *ngIf="temaSeleccionado()?.theory" 
-           class="prose prose-sm max-w-full text-slate-700 leading-relaxed overflow-x-auto"
-           style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;"
-           [innerHTML]="temaSeleccionado()?.theory">
+      @if (temaSeleccionado()?.theory) {
+      <div class="prose prose-sm max-w-full text-slate-700 leading-relaxed overflow-x-auto"
+        style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;"
+        [innerHTML]="temaSeleccionado()?.theory">
       </div>
-      
+      }
+
       <!-- Si no hay teoría -->
-      <div *ngIf="!temaSeleccionado()?.theory" class="text-center py-8">
+      @if (!temaSeleccionado()?.theory) {
+      <div class="text-center py-8">
         <i class="pi pi-inbox text-4xl text-slate-300 mb-3"></i>
         <p class="text-slate-500">No hay contenido de teoría disponible para este tema.</p>
       </div>
+      }
     </div>
 
     <!-- Estadísticas del tema -->
@@ -245,7 +244,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="bg-green-50 rounded-lg p-4 border border-green-200">
         <div class="flex items-center gap-3">
           <i class="pi pi-check-circle text-2xl text-green-600"></i>
@@ -255,7 +254,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
         <div class="flex items-center gap-3">
           <i class="pi pi-chart-line text-2xl text-purple-600"></i>
@@ -267,14 +266,11 @@
       </div>
     </div>
   </div>
+  }
 
   <!-- Footer del modal -->
   <ng-template #footer>
-    <button pButton type="button" 
-            label="Cerrar" 
-            icon="pi pi-times"
-            class="p-button-secondary"
-            (click)="cerrarTeoria()">
+    <button pButton type="button" label="Cerrar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarTeoria()">
     </button>
   </ng-template>
 </p-dialog>

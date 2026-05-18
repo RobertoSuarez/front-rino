@@ -29,7 +29,7 @@ import { DividerModule } from 'primeng/divider';
         <div class="flex align-items-center">
           <i class="pi pi-lock text-primary text-2xl mr-3"></i>
           <div>
-            <div class="text-900 font-bold text-xl">Cambiar Contraseña</div>
+            <div class="text-900 font-bold text-xl">Cambiar contraseña</div>
             <div class="text-600">Actualiza tu contraseña para mantener tu cuenta segura</div>
           </div>
         </div>
@@ -121,14 +121,14 @@ export class ChangePasswordComponent {
     this.authService.changePassword(currentPassword, newPassword).subscribe({
       next: (response) => {
         this.loading = false;
-        
+
         if (response.statusCode === 200) {
           this.messageService.add({
             severity: 'success',
             summary: 'Contraseña actualizada',
             detail: 'Tu contraseña ha sido actualizada correctamente.'
           });
-          
+
           // Resetear el formulario
           this.passwordForm.reset();
         } else {
@@ -141,15 +141,15 @@ export class ChangePasswordComponent {
       },
       error: (error) => {
         this.loading = false;
-        
+
         const errorMessage = error.error?.message || 'Error al actualizar la contraseña. Por favor, intenta nuevamente.';
-        
+
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: errorMessage
         });
-        
+
         console.error('Error al cambiar contraseña:', error);
       }
     });
@@ -174,7 +174,7 @@ export class ChangePasswordComponent {
 
     // Al menos 8 caracteres, una mayúscula, un número y un carácter especial
     const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
-    
+
     if (!passwordRegex.test(value)) {
       return { weakPassword: true };
     }

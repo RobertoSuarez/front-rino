@@ -9,10 +9,11 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight m-0">
-            {{ currentUserType === 'teacher' ? 'Mis Estudiantes' : 'Gestión de Usuarios' }}
+            {{ currentUserType === 'teacher' ? 'Mis estudiantes' : 'Gestión de usuarios' }}
           </h2>
           <p class="text-slate-500 mt-1 m-0 text-sm">
-            {{ currentUserType === 'teacher' ? 'Visualiza la información de tus estudiantes' : 'Administra todos los usuarios del sistema' }}
+            {{ currentUserType === 'teacher' ? 'Visualiza la información de tus estudiantes' : 'Administra todos los
+            usuarios del sistema' }}
           </p>
         </div>
 
@@ -21,12 +22,12 @@
             <p-inputIcon>
               <i class="pi pi-search"></i>
             </p-inputIcon>
-            <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()"
-              placeholder="Buscar usuarios..." class="w-full p-inputtext-sm" />
+            <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="Buscar usuarios..."
+              class="w-full p-inputtext-sm" />
           </p-iconField>
-          
-          <p-button *ngIf="currentUserType !== 'teacher'" label="Nuevo Usuario" icon="pi pi-plus" 
-            [raised]="true" severity="success" routerLink="/admin/users/new"
+
+          <p-button *ngIf="currentUserType !== 'teacher'" label="Nuevo Usuario" icon="pi pi-plus" [raised]="true"
+            severity="success" routerLink="/admin/users/new"
             styleClass="shadow-sm hover:shadow-md transition-all shrink-0 p-button-sm px-4">
           </p-button>
         </div>
@@ -142,20 +143,17 @@
 
       <!-- Dialog formal para ver detalles del usuario -->
       <!-- Dialog formal para ver detalles del usuario -->
-      <p-dialog 
-        [(visible)]="userDetailDialog" 
-        [modal]="true" 
-        [style]="{ width: '500px', 'max-width': '95vw' }"
-        [contentStyle]="{ padding: '2rem', 'border-radius': '32px' }"
-        [showHeader]="false" [draggable]="false" [resizable]="false" styleClass="user-detail-modern-dialog"
-        [dismissableMask]="true" [closeOnEscape]="true">
+      <p-dialog [(visible)]="userDetailDialog" [modal]="true" [style]="{ width: '500px', 'max-width': '95vw' }"
+        [contentStyle]="{ padding: '2rem', 'border-radius': '32px' }" [showHeader]="false" [draggable]="false"
+        [resizable]="false" styleClass="user-detail-modern-dialog" [dismissableMask]="true" [closeOnEscape]="true">
 
         <ng-container *ngIf="selectedUser as user">
           <div class="flex flex-col bg-white">
 
             <!-- INFORMACIÓN PERSONAL -->
             <div class="mb-6">
-              <div class="text-[11px] font-bold tracking-[0.1em] mb-4 text-slate-400 uppercase">INFORMACIÓN PERSONAL</div>
+              <div class="text-[11px] font-bold tracking-[0.1em] mb-4 text-slate-400 uppercase">INFORMACIÓN PERSONAL
+              </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <!-- Nombre -->
@@ -165,8 +163,10 @@
                     <img [src]="user.urlAvatar" class="w-full h-full object-cover" />
                   </div>
                   <div class="flex flex-col w-full overflow-hidden">
-                    <span class="text-[10px] font-bold mb-1 text-slate-400 uppercase tracking-tight">NOMBRE COMPLETO</span>
-                    <span class="font-bold text-lg text-slate-700 truncate capitalize">{{ user.firstName }} {{ user.lastName }}</span>
+                    <span class="text-[10px] font-bold mb-1 text-slate-400 uppercase tracking-tight">NOMBRE
+                      COMPLETO</span>
+                    <span class="font-bold text-lg text-slate-700 truncate capitalize">{{ user.firstName }} {{
+                      user.lastName }}</span>
                   </div>
                 </div>
 
@@ -177,8 +177,10 @@
                     <i class="pi pi-calendar text-xl"></i>
                   </div>
                   <div class="flex flex-col overflow-hidden text-wrap">
-                    <span class="text-[9px] font-bold mb-0.5 text-slate-400 uppercase tracking-tighter">Nacimiento</span>
-                    <span class="font-bold text-sm text-slate-600 truncate">{{ user.birthday ? (user.birthday | date:'dd/MM/yyyy') : 'No específica' }}</span>
+                    <span
+                      class="text-[9px] font-bold mb-0.5 text-slate-400 uppercase tracking-tighter">Nacimiento</span>
+                    <span class="font-bold text-sm text-slate-600 truncate">{{ user.birthday ? (user.birthday |
+                      date:'dd/MM/yyyy') : 'No específica' }}</span>
                   </div>
                 </div>
 
@@ -189,7 +191,8 @@
                     <i class="pi pi-id-card text-xl"></i>
                   </div>
                   <div class="flex flex-col overflow-hidden">
-                    <span class="text-[9px] font-bold mb-0.5 text-slate-400 uppercase tracking-tighter">ID Sistema</span>
+                    <span class="text-[9px] font-bold mb-0.5 text-slate-400 uppercase tracking-tighter">ID
+                      Sistema</span>
                     <span class="font-bold text-sm text-slate-600 truncate">#{{ user.id }}</span>
                   </div>
                 </div>
@@ -201,7 +204,8 @@
                     <i class="pi pi-envelope text-xl"></i>
                   </div>
                   <div class="flex flex-col w-full overflow-hidden">
-                    <span class="text-[9px] font-bold mb-0.5 text-slate-400 uppercase tracking-tighter">Correo electrónico</span>
+                    <span class="text-[9px] font-bold mb-0.5 text-slate-400 uppercase tracking-tighter">Correo
+                      electrónico</span>
                     <span class="font-bold text-sm text-slate-600 truncate">{{ user.email }}</span>
                   </div>
                 </div>
@@ -215,19 +219,25 @@
               <div class="grid grid-cols-3 gap-3">
                 <!-- Estado -->
                 <div class="flex flex-col items-center justify-center p-3 rounded-2xl text-center"
-                   [ngStyle]="{'background-color': user.status === 'active' ? '#f0fce2' : '#fee2e2', 'border': '2px solid ' + (user.status === 'active' ? '#bce53b' : '#fca5a5')}">
-                  <i class="pi pi-shield text-lg mb-1" [ngStyle]="{'color': user.status === 'active' ? '#58cc02' : '#ef4444'}"></i>
-                  <span class="text-[9px] font-bold mb-1 uppercase" [ngStyle]="{'color': user.status === 'active' ? '#58cc02' : '#ef4444'}">Estado</span>
-                  <span class="font-bold text-xs" [ngStyle]="{'color': user.status === 'active' ? '#58cc02' : '#ef4444'}">{{ user.status === 'active' ? 'Activo' : 'Inactivo' }}</span>
+                  [ngStyle]="{'background-color': user.status === 'active' ? '#f0fce2' : '#fee2e2', 'border': '2px solid ' + (user.status === 'active' ? '#bce53b' : '#fca5a5')}">
+                  <i class="pi pi-shield text-lg mb-1"
+                    [ngStyle]="{'color': user.status === 'active' ? '#58cc02' : '#ef4444'}"></i>
+                  <span class="text-[9px] font-bold mb-1 uppercase"
+                    [ngStyle]="{'color': user.status === 'active' ? '#58cc02' : '#ef4444'}">Estado</span>
+                  <span class="font-bold text-xs"
+                    [ngStyle]="{'color': user.status === 'active' ? '#58cc02' : '#ef4444'}">{{ user.status === 'active'
+                    ? 'Activo' : 'Inactivo' }}</span>
                 </div>
 
-                <div class="flex flex-col items-center justify-center p-3 border border-slate-100 rounded-2xl text-center bg-white shadow-sm">
+                <div
+                  class="flex flex-col items-center justify-center p-3 border border-slate-100 rounded-2xl text-center bg-white shadow-sm">
                   <i class="pi pi-envelope text-lg mb-1" style="color: #fca311;"></i>
                   <span class="text-[9px] font-bold mb-1 uppercase text-slate-400">Verificado</span>
                   <span class="font-bold text-xs text-slate-600">{{ user.isVerified ? 'Sí' : 'No' }}</span>
                 </div>
 
-                <div class="flex flex-col items-center justify-center p-3 border border-slate-100 rounded-2xl text-center bg-white shadow-sm">
+                <div
+                  class="flex flex-col items-center justify-center p-3 border border-slate-100 rounded-2xl text-center bg-white shadow-sm">
                   <i class="pi pi-check-circle text-lg mb-1" style="color: #1cb0f6;"></i>
                   <span class="text-[9px] font-bold mb-1 uppercase text-slate-400">Aprobada</span>
                   <span class="font-bold text-xs text-slate-600">{{ user.approved ? 'Sí' : 'No' }}</span>
@@ -235,7 +245,8 @@
               </div>
 
               <!-- Rol del Sistema -->
-              <div class="flex items-center justify-between p-4 border border-slate-100 rounded-2xl mt-4 bg-white shadow-sm">
+              <div
+                class="flex items-center justify-between p-4 border border-slate-100 rounded-2xl mt-4 bg-white shadow-sm">
                 <div class="flex items-center gap-3">
                   <i class="pi pi-graduation-cap text-xl" style="color: #1cb0f6;"></i>
                   <span class="text-[10px] font-bold uppercase text-slate-400">Rol del sistema</span>
@@ -246,25 +257,16 @@
 
             <!-- Botones de Acción -->
             <div class="grid grid-cols-2 gap-4 mt-6">
-              <button 
-                *ngIf="selectedUser && currentUserType !== 'teacher'"
-                pButton 
-                type="button" 
-                label="EDITAR PERFIL" 
+              <button *ngIf="selectedUser && currentUserType !== 'teacher'" pButton type="button" label="EDITAR PERFIL"
                 class="w-full font-bold text-sm py-4 border-none shadow-[0_4px_0_#1899d6] active:shadow-none active:translate-y-[2px]"
                 style="background-color: #1cb0f6; border-radius: 16px; height: 50px; color: white;"
-                [routerLink]="['/admin/users/edit', selectedUser.id]" 
-                (click)="userDetailDialog = false">
+                [routerLink]="['/admin/users/edit', selectedUser.id]" (click)="userDetailDialog = false">
               </button>
 
-              <button 
-                pButton 
-                type="button" 
-                label="CERRAR VENTANA"
+              <button pButton type="button" label="CERRAR VENTANA"
                 class="w-full font-bold text-sm tracking-wider border-2 border-[#d1d5db] bg-slate-100 shadow-[0_4px_0_#d1d5db] active:shadow-none active:translate-y-[4px] hover:bg-slate-200 transition-all"
                 [class.col-span-2]="currentUserType === 'teacher'"
-                style="color: #374151; border-radius: 16px; height: 54px;"
-                (click)="userDetailDialog = false">
+                style="color: #374151; border-radius: 16px; height: 54px;" (click)="userDetailDialog = false">
               </button>
             </div>
 

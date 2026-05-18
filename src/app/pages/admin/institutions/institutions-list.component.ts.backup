@@ -46,7 +46,7 @@ import { Institution, CreateInstitutionDto, UpdateInstitutionDto } from '../../.
           <p-toolbar styleClass="mb-4 gap-2">
             <ng-template pTemplate="left">
               <div class="my-2">
-                <h2 class="text-2xl font-bold text-900 mb-0">Gestión de Instituciones</h2>
+                <h2 class="text-2xl font-bold text-900 mb-0">Gestión de instituciones</h2>
                 <p class="text-600 mt-1">Administra las instituciones educativas del sistema</p>
               </div>
             </ng-template>

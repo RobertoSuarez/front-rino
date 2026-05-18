@@ -30,8 +30,6 @@ import { TemaConProgreso, ActividadConProgreso } from '@/core/models/tema.interf
     ProgressBarModule,
     KnobModule,
     ToastModule,
-    KnobModule,
-    ToastModule,
     DialogModule,
     BreadcrumbModule
   ],
@@ -40,7 +38,7 @@ import { TemaConProgreso, ActividadConProgreso } from '@/core/models/tema.interf
   styleUrl: './temas-actividad-progreso.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TemasActividadProgresoComponent implements OnInit { 
+export class TemasActividadProgresoComponent implements OnInit {
 
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
@@ -57,7 +55,7 @@ export class TemasActividadProgresoComponent implements OnInit {
   capituloTitulo = signal<string>('');
   cursoId = signal<string>('');
   capituloId = signal<string>('');
-  
+
   // Signals para el modal de teoría
   showTeoriaModal = signal(false);
   temaSeleccionado = signal<TemaConProgreso | null>(null);
@@ -69,23 +67,23 @@ export class TemasActividadProgresoComponent implements OnInit {
   ngOnInit(): void {
     this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
     this.breadcrumbItems = [
-      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+      { label: 'Mis cursos', routerLink: '/estudiante/cursos' }
     ];
-    
+
     const capituloId = this.activatedRoute.snapshot.paramMap.get('capituloId');
     const cursoId = this.activatedRoute.snapshot.paramMap.get('cursoId');
 
     if (capituloId && cursoId) {
       this.capituloId.set(capituloId);
       this.cursoId.set(cursoId);
-      
+
       this.cargarDatosIniciales(cursoId, capituloId);
     }
   }
 
   private cargarDatosIniciales(cursoId: string, capituloId: string): void {
     this.loading.set(true);
-    
+
     // Cargar información del curso
     this.courseService.getCourseById(+cursoId).subscribe({
       next: (response) => {
@@ -131,13 +129,13 @@ export class TemasActividadProgresoComponent implements OnInit {
 
   private actualizarBreadcrumbs(): void {
     const items: MenuItem[] = [
-      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+      { label: 'Mis cursos', routerLink: '/estudiante/cursos' }
     ];
 
     if (this.cursoTitulo()) {
-      items.push({ 
-        label: this.cursoTitulo(), 
-        routerLink: `/estudiante/cursos/${this.cursoId()}/capitulos` 
+      items.push({
+        label: this.cursoTitulo(),
+        routerLink: `/estudiante/cursos/${this.cursoId()}/capitulos`
       });
     }
 
@@ -210,7 +208,7 @@ export class TemasActividadProgresoComponent implements OnInit {
       });
     }
   }
-  
+
   iniciarActividad(actividad: ActividadConProgreso): void {
     // Navegar al componente ActivitySolver con el ID de la actividad
     this.router.navigate(['/estudiante/activity', actividad.id], {

@@ -70,7 +70,7 @@ interface TimelineEvent {
     TooltipModule,
     MarkdownToHtmlPipe,
     BreadcrumbModule
-],
+  ],
   providers: [MessageService],
   templateUrl: './curso-detalle.component.html',
   styleUrls: ['./curso-detalle.component.scss'],
@@ -95,7 +95,7 @@ export class CursoDetalleComponent implements OnInit {
   ngOnInit(): void {
     this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
     this.breadcrumbItems = [
-      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+      { label: 'Mis cursos', routerLink: '/estudiante/cursos' }
     ];
     this.route.params.subscribe(params => {
       this.cursoId = +params['id'];
@@ -210,7 +210,7 @@ export class CursoDetalleComponent implements OnInit {
   }
 
   inicializarCapitulo(chapterId: any) {
-    
+
     this.messageService.add({
       severity: 'info',
       summary: 'Inicializando',
@@ -219,7 +219,7 @@ export class CursoDetalleComponent implements OnInit {
 
     this.cursosService.inicializarCapitulo(chapterId).subscribe({
       next: (response) => {
-        
+
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
@@ -231,7 +231,7 @@ export class CursoDetalleComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al inicializar capítulo:', error);
-        
+
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -248,7 +248,7 @@ export class CursoDetalleComponent implements OnInit {
 
   private actualizarBreadcrumbs(): void {
     this.breadcrumbItems = [
-      { label: 'Mis Cursos', routerLink: '/estudiante/cursos' }
+      { label: 'Mis cursos', routerLink: '/estudiante/cursos' }
     ];
     if (this.curso) {
       this.breadcrumbItems.push({ label: this.curso.title });

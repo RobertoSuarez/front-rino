@@ -81,20 +81,20 @@ export class LearningPathFormComponent implements OnInit, OnDestroy {
     this.availableCourses = [];
     this.selectedCourses = [];
     this.allCourses = [];
-    
+
     // Verificar si estamos en modo edición
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.learningPathId = parseInt(id, 10);
     }
-    
+
     this.breadcrumbItems = [
       { label: 'Administración' },
-      { label: 'Rutas de Aprendizaje', routerLink: '/admin/learning-paths' },
-      { label: this.isEditMode ? 'Editar Ruta' : 'Nueva Ruta' }
+      { label: 'Rutas de aprendizaje', routerLink: '/admin/learning-paths' },
+      { label: this.isEditMode ? 'Editar ruta' : 'Nueva ruta' }
     ];
-    
+
     this.loadCourses();
   }
 
@@ -115,7 +115,7 @@ export class LearningPathFormComponent implements OnInit, OnDestroy {
           code: course.code,
           urlLogo: course.urlLogo
         }));
-        
+
         // Si estamos en modo edición, cargar la ruta después de tener los cursos
         if (this.isEditMode && this.learningPathId) {
           this.loadLearningPath(this.learningPathId);
@@ -123,7 +123,7 @@ export class LearningPathFormComponent implements OnInit, OnDestroy {
           // Si es modo creación, todos los cursos están disponibles
           this.availableCourses = [...this.allCourses];
         }
-        
+
         this.loadingCourses = false;
       },
       error: (error) => {
@@ -142,7 +142,7 @@ export class LearningPathFormComponent implements OnInit, OnDestroy {
     this.learningPathService.getById(id).subscribe({
       next: (response) => {
         const path = response.data;
-        
+
         // Llenar el formulario
         this.learningPathForm.patchValue({
           name: path.name,

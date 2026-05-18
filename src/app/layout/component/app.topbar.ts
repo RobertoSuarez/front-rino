@@ -175,7 +175,7 @@ import { TumisShopModalComponent } from '../../shared/components/tumis-shop-moda
                     </div>
                     <a routerLink="/profile" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-colors">
                         <i class="pi pi-user text-primary"></i>
-                        <span>Mi Perfil</span>
+                        <span>Mi perfil</span>
                     </a>
                     <a routerLink="/profile/change-password" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-colors">
                         <i class="pi pi-lock text-primary"></i>
@@ -184,7 +184,7 @@ import { TumisShopModalComponent } from '../../shared/components/tumis-shop-moda
                     <div class="h-[1px] bg-gray-100 dark:bg-gray-800 my-1"></div>
                     <button (click)="logout()" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
                         <i class="pi pi-sign-out"></i>
-                        <span>Cerrar Sesión</span>
+                        <span>Cerrar sesión</span>
                     </button>
                 </div>
             </div>

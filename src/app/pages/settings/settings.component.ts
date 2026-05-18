@@ -52,10 +52,10 @@ export class SettingsComponent implements OnInit {
   breadcrumbHome: MenuItem | undefined;
 
   themeOptions: ThemeOption[] = [
-    { label: 'Modo Claro', value: 'light', icon: 'pi pi-sun' },
-    { label: 'Modo Oscuro', value: 'dark', icon: 'pi pi-moon' },
+    { label: 'Modo claro', value: 'light', icon: 'pi pi-sun' },
+    { label: 'Modo oscuro', value: 'dark', icon: 'pi pi-moon' },
     { label: 'Sepia', value: 'sepia', icon: 'pi pi-palette' },
-    { label: 'Alto Contraste', value: 'inverted', icon: 'pi pi-circle' }
+    { label: 'Alto contraste', value: 'inverted', icon: 'pi pi-circle' }
   ];
 
   fontOptions: FontOption[] = [
@@ -153,7 +153,7 @@ export class SettingsComponent implements OnInit {
   private loadCurrentSettings() {
     // Load current theme
     const savedTheme = localStorage.getItem('app-theme') || 'light';
-    
+
     // Load font settings from localStorage or defaults
     let savedFontFamily = localStorage.getItem('app-font-family') || 'lato';  // Changed default to 'lato'
 
@@ -179,7 +179,7 @@ export class SettingsComponent implements OnInit {
     // Apply font settings
     this.currentFontSize = savedFontSize;
     this.applyFontSettings(savedFontFamily, savedFontSize);
-    
+
     // Reset unsaved changes flag after loading
     setTimeout(() => {
       this.hasUnsavedChanges = false;
@@ -188,26 +188,26 @@ export class SettingsComponent implements OnInit {
 
   onThemeChange(theme: string) {
     console.log('Theme changed to:', theme);
-    
+
     // Update form control
     this.settingsForm.patchValue({ theme: theme }, { emitEvent: false });
-    
+
     // Apply theme immediately
     this.layoutService.setThemeMode(theme as 'light' | 'dark' | 'sepia' | 'inverted');
-    
+
     // Mark as having unsaved changes
     this.hasUnsavedChanges = true;
   }
 
   onFontFamilyChange(fontFamily: string) {
     console.log('Font family changed to:', fontFamily);
-    
+
     // Update form control
     this.settingsForm.patchValue({ fontFamily: fontFamily }, { emitEvent: false });
-    
+
     // Apply font settings immediately for preview
     this.applyFontSettings(fontFamily, this.currentFontSize);
-    
+
     // Mark as having unsaved changes
     this.hasUnsavedChanges = true;
   }

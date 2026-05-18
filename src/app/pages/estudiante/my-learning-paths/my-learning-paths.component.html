@@ -9,26 +9,25 @@
     </div>
 
     <!-- HERO HEADER - LIGHT PREMIUM -->
-    <header class="hero-header mb-10 p-8 rounded-[40px] relative overflow-hidden shadow-xl bg-white border-2 border-slate-100">
+    <header
+        class="hero-header mb-10 p-8 rounded-[40px] relative overflow-hidden shadow-xl bg-white border-2 border-slate-100">
         <!-- Decoración de fondo suave -->
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-60"></div>
         <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
-        
+
         <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6 z-10">
             <div class="header-text">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-1.5 h-8 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.3)]"></div>
-                    <h1 class="text-4xl md:text-5xl font-black text-slate-800 tracking-tighter uppercase mb-0">Rutas de Aprendizaje</h1>
+                    <h1 class="text-4xl md:text-5xl font-black text-slate-800 tracking-tighter uppercase mb-0">Rutas de
+                        Aprendizaje</h1>
                 </div>
                 <p class="text-slate-500 text-lg font-bold uppercase tracking-widest max-w-2xl leading-relaxed">
                     Gestiona tus misiones y progresa en tu camino a ser un experto en ciberseguridad.
                 </p>
             </div>
-            
-            <button pButton 
-                label="UNIRME A UNA RUTA" 
-                icon="pi pi-plus-circle" 
-                class="premium-add-btn group"
+
+            <button pButton label="UNIRME A UNA RUTA" icon="pi pi-plus-circle" class="premium-add-btn group"
                 (click)="showSubscribeDialog()">
             </button>
         </div>
@@ -36,19 +35,20 @@
 
     <!-- LOADING STATE -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" *ngIf="loading">
-        <div *ngFor="let i of [1,2,3,4,5,6]" class="skeleton-card p-6 bg-white rounded-[32px] border-4 border-slate-50 shadow-sm animate-pulse">
+        <div *ngFor="let i of [1,2,3,4,5,6]"
+            class="skeleton-card p-6 bg-white rounded-[32px] border-4 border-slate-50 shadow-sm animate-pulse">
             <div class="flex justify-between items-start mb-6">
                 <p-skeleton width="70%" height="2rem" styleClass="rounded-xl"></p-skeleton>
                 <p-skeleton width="3rem" height="3rem" styleClass="rounded-2xl"></p-skeleton>
             </div>
             <p-skeleton width="100%" height="1rem" styleClass="mb-3 rounded-lg"></p-skeleton>
             <p-skeleton width="100%" height="1rem" styleClass="mb-8 rounded-lg"></p-skeleton>
-            
+
             <div class="grid grid-cols-2 gap-4 mb-8">
                 <p-skeleton height="4rem" styleClass="rounded-2xl"></p-skeleton>
                 <p-skeleton height="4rem" styleClass="rounded-2xl"></p-skeleton>
             </div>
-            
+
             <div class="flex gap-4">
                 <p-skeleton width="80%" height="3rem" styleClass="rounded-xl"></p-skeleton>
                 <p-skeleton width="20%" height="3rem" styleClass="rounded-xl"></p-skeleton>
@@ -57,66 +57,70 @@
     </div>
 
     <!-- EMPTY STATE -->
-    <div class="empty-state-wrapper py-20 bg-white/50 backdrop-blur-md rounded-[40px] border-4 border-dashed border-slate-100 text-center scalein" 
-         *ngIf="!loading && subscriptions.length === 0">
+    <div class="empty-state-wrapper py-20 bg-white/50 backdrop-blur-md rounded-[40px] border-4 border-dashed border-slate-100 text-center scalein"
+        *ngIf="!loading && subscriptions.length === 0">
         <div class="relative inline-block mb-10">
             <div class="absolute inset-0 bg-emerald-400/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
-            <div class="relative w-40 h-40 bg-gradient-to-tr from-emerald-600 to-teal-500 rounded-[40px] shadow-2xl rotate-12 flex items-center justify-center animate-bounce-slow">
+            <div
+                class="relative w-40 h-40 bg-gradient-to-tr from-emerald-600 to-teal-500 rounded-[40px] shadow-2xl rotate-12 flex items-center justify-center animate-bounce-slow">
                 <i class="pi pi-map text-7xl text-white"></i>
             </div>
-            <div class="absolute -bottom-4 -right-4 w-16 h-16 bg-red-500 rounded-3xl flex items-center justify-center shadow-lg rotate-12 animate-pulse">
+            <div
+                class="absolute -bottom-4 -right-4 w-16 h-16 bg-red-500 rounded-3xl flex items-center justify-center shadow-lg rotate-12 animate-pulse">
                 <i class="pi pi-lock text-3xl text-white"></i>
             </div>
         </div>
-        
-        <h2 class="text-4xl font-black text-slate-800 uppercase tracking-tighter mb-4 px-4">¡Tu aventura aún no comienza!</h2>
+
+        <h2 class="text-4xl font-black text-slate-800 uppercase tracking-tighter mb-4 px-4">¡Tu aventura aún no
+            comienza!</h2>
         <p class="text-xl text-slate-400 font-bold max-w-xl mx-auto mb-10 px-6">
             Ingresa el código que te proporcionó tu instructor para desbloquear tu primera ruta de entrenamiento.
         </p>
 
         <div class="tips-grid flex flex-wrap justify-center gap-4 mb-12 px-6">
-            <div class="tip-chip bg-indigo-50 border-2 border-indigo-100 text-indigo-600 px-6 py-2 rounded-full font-black text-sm uppercase">
+            <div
+                class="tip-chip bg-indigo-50 border-2 border-indigo-100 text-indigo-600 px-6 py-2 rounded-full font-black text-sm uppercase">
                 <i class="pi pi-check-circle mr-2"></i> Código de 12 caracteres
             </div>
-            <div class="tip-chip bg-emerald-50 border-2 border-emerald-100 text-emerald-600 px-6 py-2 rounded-full font-black text-sm uppercase">
+            <div
+                class="tip-chip bg-emerald-50 border-2 border-emerald-100 text-emerald-600 px-6 py-2 rounded-full font-black text-sm uppercase">
                 <i class="pi pi-user-plus mr-2"></i> Unirme al instante
             </div>
         </div>
 
-        <button pButton 
-            label="COMENZAR MI RUTA" 
-            icon="pi pi-bolt" 
-            class="premium-cta-btn px-12 py-5 text-xl"
+        <button pButton label="COMENZAR MI RUTA" icon="pi pi-bolt" class="premium-cta-btn px-12 py-5 text-xl"
             (click)="showSubscribeDialog()">
         </button>
     </div>
 
     <!-- SUBSCRIPTIONS GRID -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" *ngIf="!loading && subscriptions.length > 0">
-        <div *ngFor="let sub of subscriptions" 
-             class="path-card group hover:-translate-y-2 transition-all duration-500">
-            <div class="path-card-inner bg-white rounded-[40px] overflow-hidden border-b-8 border-slate-200 shadow-xl hover:shadow-2xl hover:border-emerald-400/50 flex flex-col h-full relative">
-                
+        <div *ngFor="let sub of subscriptions" class="path-card group hover:-translate-y-2 transition-all duration-500">
+            <div
+                class="path-card-inner bg-white rounded-[40px] overflow-hidden border-b-8 border-slate-200 shadow-xl hover:shadow-2xl hover:border-emerald-400/50 flex flex-col h-full relative">
+
                 <!-- Card Header -->
-                <div class="bg-gradient-to-r from-slate-50 to-white p-8 border-b-2 border-slate-50 relative group-hover:from-emerald-50 group-hover:to-white transition-colors duration-500">
+                <div
+                    class="bg-gradient-to-r from-slate-50 to-white p-8 border-b-2 border-slate-50 relative group-hover:from-emerald-50 group-hover:to-white transition-colors duration-500">
                     <div class="flex justify-between items-start mb-6">
                         <div class="status-wrap flex flex-col gap-2">
-                            <span class="path-code font-black text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-lg w-fit transition-colors group-hover:bg-emerald-100">
+                            <span
+                                class="path-code font-black text-xs text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-lg w-fit transition-colors group-hover:bg-emerald-100">
                                 {{ sub.learningPath.code }}
                             </span>
-                            <p-tag 
-                                [value]="sub.isActive ? 'OPERATIVO' : 'EN ESPERA'" 
-                                [severity]="sub.isActive ? 'success' : 'danger'"
-                                [rounded]="true"
+                            <p-tag [value]="sub.isActive ? 'OPERATIVO' : 'EN ESPERA'"
+                                [severity]="sub.isActive ? 'success' : 'danger'" [rounded]="true"
                                 styleClass="font-black text-[10px] tracking-widest px-3 border-2 border-white shadow-sm">
                             </p-tag>
                         </div>
-                        <div class="icon-box w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-500">
+                        <div
+                            class="icon-box w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-500">
                             <i class="pi pi-map text-white text-2xl"></i>
                         </div>
                     </div>
-                    
-                    <h3 class="text-2xl font-black text-slate-800 uppercase tracking-tighter leading-tight line-clamp-2 min-h-[4rem]">
+
+                    <h3
+                        class="text-2xl font-black text-slate-800 uppercase tracking-tighter leading-tight line-clamp-2 min-h-[4rem]">
                         {{ sub.learningPath.name }}
                     </h3>
                 </div>
@@ -129,27 +133,36 @@
 
                     <!-- Metrics Grid -->
                     <div class="grid grid-cols-2 gap-4 mb-8">
-                        <div class="metric-box bg-blue-50/50 p-4 rounded-3xl border-2 border-blue-50 text-center group-hover:border-blue-100 transition-colors">
+                        <div
+                            class="metric-box bg-blue-50/50 p-4 rounded-3xl border-2 border-blue-50 text-center group-hover:border-blue-100 transition-colors">
                             <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                                 <i class="pi pi-book text-blue-600 font-bold"></i>
                             </div>
-                            <div class="text-2xl font-black text-blue-900 leading-none mb-1">{{ sub.learningPath.coursesCount || 0 }}</div>
+                            <div class="text-2xl font-black text-blue-900 leading-none mb-1">{{
+                                sub.learningPath.coursesCount || 0 }}</div>
                             <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Misiones</div>
                         </div>
-                        <div class="metric-box bg-emerald-50/50 p-4 rounded-3xl border-2 border-emerald-50 text-center group-hover:border-emerald-100 transition-colors">
-                            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                        <div
+                            class="metric-box bg-emerald-50/50 p-4 rounded-3xl border-2 border-emerald-50 text-center group-hover:border-emerald-100 transition-colors">
+                            <div
+                                class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                                 <i class="pi pi-check text-emerald-600 font-bold"></i>
                             </div>
-                            <div class="text-2xl font-black text-emerald-900 leading-none mb-1">{{ sub.completedCourses || 0 }}</div>
-                            <div class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Superadas</div>
+                            <div class="text-2xl font-black text-emerald-900 leading-none mb-1">{{ sub.completedCourses
+                                || 0 }}</div>
+                            <div class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Superadas
+                            </div>
                         </div>
                     </div>
 
                     <!-- Additional Info -->
                     <div class="info-footer flex flex-col gap-3 py-6 border-t border-slate-50 mt-auto">
-                        <div class="flex items-center gap-3 text-slate-500 font-bold text-xs" *ngIf="sub.learningPath.createdBy">
+                        <div class="flex items-center gap-3 text-slate-500 font-bold text-xs"
+                            *ngIf="sub.learningPath.createdBy">
                             <i class="pi pi-user text-emerald-500"></i>
-                            <span class="truncate">PROFESOR: <span class="text-slate-800">{{ sub.learningPath.createdBy.firstName }} {{ sub.learningPath.createdBy.lastName }}</span></span>
+                            <span class="truncate">PROFESOR: <span class="text-slate-800">{{
+                                    sub.learningPath.createdBy.firstName }} {{ sub.learningPath.createdBy.lastName
+                                    }}</span></span>
                         </div>
                         <div class="flex items-center gap-3 text-slate-400 font-bold text-xs">
                             <i class="pi pi-clock"></i>
@@ -160,31 +173,25 @@
                     <!-- Progress Bar -->
                     <div class="progress-section mt-4 mb-8">
                         <div class="flex justify-between items-end mb-3">
-                            <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Nivel de Avance</span>
-                            <span class="text-lg font-black text-emerald-500">{{ getProgressPercentage(sub) || 0 }}%</span>
+                            <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Nivel de
+                                Avance</span>
+                            <span class="text-lg font-black text-emerald-500">{{ getProgressPercentage(sub) || 0
+                                }}%</span>
                         </div>
-                        <p-progressBar 
-                            [value]="getProgressPercentage(sub) || 0" 
-                            [showValue]="false" 
+                        <p-progressBar [value]="getProgressPercentage(sub) || 0" [showValue]="false"
                             styleClass="premium-progress">
                         </p-progressBar>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex gap-4">
-                        <button pButton 
-                            label="CONTINUAR RUTA" 
-                            icon="pi pi-chevron-right" 
-                            iconPos="right"
+                        <button pButton label="CONTINUAR RUTA" icon="pi pi-chevron-right" iconPos="right"
                             class="gamified-action-btn flex-1 !rounded-2xl !py-4"
                             (click)="viewDetails(sub.learningPath.id)">
                         </button>
-                        <button pButton 
-                            icon="pi pi-trash" 
+                        <button pButton icon="pi pi-trash"
                             class="p-button-danger p-button-outlined p-button-sm !rounded-2xl !w-14 !h-14"
-                            (click)="confirmUnsubscribe(sub)"
-                            pTooltip="Detener Misión"
-                            tooltipPosition="top">
+                            (click)="confirmUnsubscribe(sub)" pTooltip="Detener Misión" tooltipPosition="top">
                         </button>
                     </div>
                 </div>
@@ -193,23 +200,20 @@
     </div>
 
     <!-- SUBSCRIBE DIALOG -->
-    <p-dialog 
-        [(visible)]="subscribeDialogVisible" 
-        [modal]="true"
-        [draggable]="false"
-        [resizable]="false"
-        header="Iniciar Nueva Ruta"
-        [style]="{ width: '500px' }"
+    <p-dialog [(visible)]="subscribeDialogVisible" [modal]="true" [draggable]="false" [resizable]="false"
+        header="Iniciar nueva ruta" [style]="{ width: '500px' }"
         styleClass="premium-dialog rounded-[40px] border-4 border-indigo-100 shadow-2xl p-fluid">
-        
+
         <ng-template pTemplate="content">
             <div class="py-6">
                 <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-emerald-50 rounded-3xl border-4 border-emerald-100 flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
+                    <div
+                        class="w-20 h-20 bg-emerald-50 rounded-3xl border-4 border-emerald-100 flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
                         <i class="pi pi-key text-4xl text-emerald-500"></i>
                     </div>
                     <h3 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Acceso de Estudiante</h3>
-                    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Ingresa el código que te dio tu profesor</p>
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Ingresa el código que te dio
+                        tu profesor</p>
                 </div>
 
                 <div class="field mb-8">
@@ -217,19 +221,14 @@
                         Código de Invitación <span class="text-red-500">*</span>
                     </label>
                     <div class="relative">
-                        <input 
-                            id="code"
-                            type="text" 
-                            pInputText 
-                            [(ngModel)]="subscriptionCode"
+                        <input id="code" type="text" pInputText [(ngModel)]="subscriptionCode"
                             placeholder="LP-2025XXXX-XXXX"
                             class="gamified-input !text-2xl font-black !p-6 !tracking-[2px]"
-                            [class.ng-invalid]="codeError"
-                            (input)="onCodeInput()"
-                            (keyup.enter)="subscribe()" />
+                            [class.ng-invalid]="codeError" (input)="onCodeInput()" (keyup.enter)="subscribe()" />
                         <i class="pi pi-lock absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 text-xl"></i>
                     </div>
-                    <small class="text-red-500 font-bold block mt-3 uppercase tracking-wider text-[10px] animate-fadein" *ngIf="codeError">
+                    <small class="text-red-500 font-bold block mt-3 uppercase tracking-wider text-[10px] animate-fadein"
+                        *ngIf="codeError">
                         <i class="pi pi-exclamation-circle mr-1"></i> {{ codeError }}
                     </small>
                 </div>
@@ -245,23 +244,16 @@
                 </div>
             </div>
         </ng-template>
-        
+
         <ng-template pTemplate="footer">
             <div class="flex gap-4 p-2 bg-slate-50 rounded-b-[40px] border-t-2 border-slate-100">
-                <button pButton 
-                    label="CANCELAR" 
-                    icon="pi pi-times" 
+                <button pButton label="CANCELAR" icon="pi pi-times"
                     class="p-button-text !text-slate-400 font-black !rounded-2xl flex-1"
-                    (click)="subscribeDialogVisible = false"
-                    [disabled]="subscribing">
+                    (click)="subscribeDialogVisible = false" [disabled]="subscribing">
                 </button>
-                <button pButton 
-                    label="DESBLOQUEAR TRAYECTO" 
-                    icon="pi pi-bolt" 
-                    class="premium-cta-btn flex-1 !rounded-2xl"
-                    (click)="subscribe()"
-                    [disabled]="!subscriptionCode || subscribing"
-                    [loading]="subscribing">
+                <button pButton label="DESBLOQUEAR TRAYECTO" icon="pi pi-bolt"
+                    class="premium-cta-btn flex-1 !rounded-2xl" (click)="subscribe()"
+                    [disabled]="!subscriptionCode || subscribing" [loading]="subscribing">
                 </button>
             </div>
         </ng-template>

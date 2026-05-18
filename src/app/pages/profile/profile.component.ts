@@ -104,7 +104,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.breadcrumbItems = [
-      { label: 'Mi Cuenta' },
+      { label: 'Mi cuenta' },
       { label: 'Perfil' }
     ];
     this.loadProfileData();

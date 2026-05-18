@@ -61,7 +61,7 @@ export class MyLearningPathsComponent implements OnInit {
   ngOnInit(): void {
     this.breadcrumbHome = { icon: 'pi pi-home', routerLink: '/' };
     this.breadcrumbItems = [
-      { label: 'Mis Rutas' }
+      { label: 'Mis rutas' }
     ];
     this.loadSubscriptions();
   }

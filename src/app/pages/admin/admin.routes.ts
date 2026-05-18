@@ -7,17 +7,17 @@ export const adminRoutes: Routes = [
       {
         path: '',
         loadComponent: () => import('./users/users-list-simple.component').then(m => m.UsersListComponent),
-        title: 'Gestión de Usuarios'
+        title: 'Gestión de usuarios'
       },
       {
         path: 'new',
         loadComponent: () => import('./users/user-form.component').then(m => m.UserFormComponent),
-        title: 'Crear Usuario'
+        title: 'Crear usuario'
       },
       {
         path: 'edit/:id',
         loadComponent: () => import('./users/user-form.component').then(m => m.UserFormComponent),
-        title: 'Editar Usuario'
+        title: 'Editar usuario'
       }
     ]
   },
@@ -27,49 +27,49 @@ export const adminRoutes: Routes = [
       {
         path: '',
         loadComponent: () => import('../../pages/courses/courses.component').then(m => m.CoursesComponent),
-        title: 'Gestión de Cursos'
+        title: 'Gestión de cursos'
       },
       {
         path: 'builder',
         loadComponent: () => import('./courses/course-builder.component').then(m => m.CourseBuilderComponent),
-        title: 'Constructor de Cursos IA'
+        title: 'Constructor de cursos IA'
       },
       {
         path: 'builder/:id',
         loadComponent: () => import('./courses/course-builder.component').then(m => m.CourseBuilderComponent),
-        title: 'Editar Curso IA'
+        title: 'Editar curso IA'
       }
     ]
   },
   {
     path: 'chapters',
     loadComponent: () => import('./chapters/chapters-list.component').then(m => m.ChaptersListComponent),
-    title: 'Gestión de Capítulos'
+    title: 'Gestión de capítulos'
   },
   {
     path: 'temas',
     loadComponent: () => import('./temas/temas-list.component').then(m => m.TemasListComponent),
-    title: 'Gestión de Temas'
+    title: 'Gestión de temas'
   },
   {
     path: 'activities',
     loadComponent: () => import('./activities/activities-list.component').then(m => m.ActivitiesListComponent),
-    title: 'Gestión de Actividades'
+    title: 'Gestión de actividades'
   },
   {
     path: 'exercises/:activityId/sandbox',
     loadComponent: () => import('./exercises/exercise-sandbox.component').then(m => m.ExerciseSandboxComponent),
-    title: 'Sandbox — Vista Previa de Ejercicios'
+    title: 'Sandbox — Vista previa de ejercicios'
   },
   {
     path: 'exercises/:activityId',
     loadComponent: () => import('./exercises/exercises-list.component').then(m => m.ExercisesListComponent),
-    title: 'Gestión de Ejercicios'
+    title: 'Gestión de ejercicios'
   },
   {
     path: 'statistics',
     loadComponent: () => import('./statistics/statistics-dashboard.component').then(m => m.StatisticsDashboardComponent),
-    title: 'Estadísticas de la Plataforma'
+    title: 'Estadísticas de la plataforma'
   },
   {
     path: 'learning-paths',
@@ -77,33 +77,33 @@ export const adminRoutes: Routes = [
       {
         path: '',
         loadComponent: () => import('./learning-paths/learning-paths-list.component').then(m => m.LearningPathsListComponent),
-        title: 'Gestión de Rutas de Aprendizaje'
+        title: 'Gestión de rutas de aprendizaje'
       },
       {
         path: 'new',
         loadComponent: () => import('./learning-paths/learning-path-form.component').then(m => m.LearningPathFormComponent),
-        title: 'Crear Ruta de Aprendizaje'
+        title: 'Crear ruta de aprendizaje'
       },
       {
         path: 'edit/:id',
         loadComponent: () => import('./learning-paths/learning-path-form.component').then(m => m.LearningPathFormComponent),
-        title: 'Editar Ruta de Aprendizaje'
+        title: 'Editar ruta de aprendizaje'
       }
     ]
   },
   {
     path: 'parameters',
     loadComponent: () => import('./parameters/parameters.component').then(m => m.ParametersComponent),
-    title: 'Parámetros del Sistema'
+    title: 'Parámetros del sistema'
   },
   {
     path: 'institutions',
     loadComponent: () => import('./institutions/institutions-list.component').then(m => m.InstitutionsListComponent),
-    title: 'Gestión de Instituciones'
+    title: 'Gestión de instituciones'
   },
   {
     path: 'change-password',
     loadComponent: () => import('../change-password/change-password.component').then(m => m.ChangePasswordComponent),
-    title: 'Cambiar Contraseña'
+    title: 'Cambiar contraseña'
   }
 ];

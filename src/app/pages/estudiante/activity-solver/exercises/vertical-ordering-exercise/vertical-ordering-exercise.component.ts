@@ -23,9 +23,18 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 export class VerticalOrderingExerciseComponent {
   @Input() fragments: string[] = [];
   @Input() orderedFragments: string[] = [];
+  @Input() isVerified: boolean = false;
+  @Input() correctOrder: string[] = [];
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
   currentOrder: string[] = [];
+
+  isItemCorrect(item: string, index: number): boolean {
+    if (this.correctOrder && this.correctOrder.length > 0) {
+      return this.correctOrder[index] === item;
+    }
+    return this.fragments[index] === item;
+  }
 
   ngOnChanges() {
     if (this.orderedFragments && this.orderedFragments.length > 0) {

@@ -93,4 +93,13 @@ export class TemaService {
     formData.append('file', file);
     return this.http.post(`${this.apiUrl}/upload-image`, formData);
   }
+
+  /**
+   * Marca la teoría de un tema como leída por el estudiante
+   * @param temaId ID del tema
+   * @returns Observable con la confirmación
+   */
+  markTheoryRead(temaId: number): Observable<ApiResponse<{ theoryRead: boolean }>> {
+    return this.http.post<ApiResponse<{ theoryRead: boolean }>>(`${this.apiUrl}/${temaId}/mark-theory-read`, {});
+  }
 }

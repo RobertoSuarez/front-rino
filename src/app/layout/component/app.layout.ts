@@ -107,25 +107,33 @@ export class AppLayout implements OnInit, OnDestroy {
         };
     }
 
+    userSubscription?: Subscription;
+
     ngOnInit() {
         // Verificar si hay un usuario autenticado y actualizar el menú
         if (this.authService.isAuthenticated()) {
             this.authService.getCurrentUser();
             
-            // Mostrar onboarding si es el primer login
-            if (this.authService.isFirstLogin()) {
-                setTimeout(() => {
-                    if (this.onboardingModal) {
-                        this.onboardingModal.show();
-                    }
-                }, 500);
-            }
+            // Suscribirse al usuario actual para mostrar el onboarding si no ha completado
+            this.userSubscription = this.authService.currentUser$.subscribe((user) => {
+                if (user && user.typeUser === 'student' && !user.hasCompletedOnboarding) {
+                    setTimeout(() => {
+                        if (this.onboardingModal && !this.onboardingModal.visible) {
+                            this.onboardingModal.show();
+                        }
+                    }, 500);
+                }
+            });
         }
     }
 
     ngOnDestroy() {
         if (this.overlayMenuOpenSubscription) {
             this.overlayMenuOpenSubscription.unsubscribe();
+        }
+
+        if (this.userSubscription) {
+            this.userSubscription.unsubscribe();
         }
 
         if (this.menuOutsideClickListener) {

@@ -210,6 +210,13 @@ export class AuthService {
   }
 
   /**
+   * Obtiene el valor síncrono del usuario actual
+   */
+  getCurrentUserValue(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  /**
    * Actualiza los datos del usuario en localStorage y en el observable
    * @param user Datos actualizados del usuario
    */

@@ -26,6 +26,8 @@ import { ButtonModule } from 'primeng/button';
 export class SingleSelectionExerciseComponent {
   @Input() options: string[] = [];
   @Input() selectedOption: string | undefined;
+  @Input() isVerified: boolean = false;
+  @Input() isCorrect: boolean = false;
   @Output() answerSubmitted = new EventEmitter<string>();
 
   selectedValue: string | undefined;
@@ -55,6 +57,7 @@ export class SingleSelectionExerciseComponent {
   }
 
   onSelectionChange(value: string) {
+    if (this.isVerified) return;
     this.selectedValue = value;
     this.onChange(value);
     this.onTouch();

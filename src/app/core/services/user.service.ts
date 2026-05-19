@@ -171,4 +171,12 @@ export class UserService {
   verifyEmail(token: string): Observable<ApiResponse<any>> {
     return this.apiService.post<ApiResponse<any>>('users/verify-email', { token });
   }
+
+  /**
+   * Reclama el regalo de bienvenida y completa el onboarding
+   * @returns Observable con los indicadores actualizados del estudiante
+   */
+  claimWelcomeGift(): Observable<ApiResponse<any>> {
+    return this.apiService.post<ApiResponse<any>>('users/claim-welcome-gift', {});
+  }
 }

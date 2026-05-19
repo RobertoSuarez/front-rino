@@ -116,20 +116,64 @@
 
 /* Selected State */
 .option-item.selected {
+  border-color: #1cb0f6;
+  background: #ddf4ff;
+  color: #1899d6;
+  box-shadow: 0 3px 0 0 #1899d6;
+}
+
+.option-item.selected:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 #1899d6;
+}
+
+.option-item.selected:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 #1899d6;
+}
+
+/* Verified Correct State */
+.option-item.selected.verified-correct {
+  border-color: #58cc02;
+  background: #eefbe8;
+  color: #46a302;
+  box-shadow: 0 3px 0 0 #46a302;
+}
+
+.option-item.selected.verified-correct:hover {
+  transform: none;
+  box-shadow: 0 3px 0 0 #46a302;
+  background: #eefbe8;
+}
+
+/* Verified Incorrect State */
+.option-item.selected.verified-incorrect {
   border-color: #ff4b4b;
   background: #fff0f0;
   color: #ea2b2b;
   box-shadow: 0 3px 0 0 #ea2b2b;
 }
 
-.option-item.selected:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 #ea2b2b;
+.option-item.selected.verified-incorrect:hover {
+  transform: none;
+  box-shadow: 0 3px 0 0 #ea2b2b;
+  background: #fff0f0;
 }
 
-.option-item.selected:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 0 #ea2b2b;
+/* Disabled hover when verified */
+.option-item.verified {
+  cursor: default;
+}
+
+.option-item.verified:hover {
+  background: var(--bg-surface, #ffffff);
+  transform: none;
+  box-shadow: 0 3px 0 0 var(--border-color, #e5e5e5);
+}
+
+.option-item.verified:active {
+  transform: none;
+  box-shadow: 0 3px 0 0 var(--border-color, #e5e5e5);
 }
 
 /* Number badge */
@@ -149,6 +193,16 @@
 }
 
 .option-item.selected .option-index {
+  background: #1cb0f6;
+  color: #fff;
+}
+
+.option-item.selected.verified-correct .option-index {
+  background: #58cc02;
+  color: #fff;
+}
+
+.option-item.selected.verified-incorrect .option-index {
   background: #ff4b4b;
   color: #fff;
 }
@@ -175,6 +229,18 @@
 }
 
 .option-item.selected .selection-indicator {
+  border-color: #1cb0f6;
+  background: #1cb0f6;
+  color: white;
+}
+
+.option-item.selected.verified-correct .selection-indicator {
+  border-color: #58cc02;
+  background: #58cc02;
+  color: white;
+}
+
+.option-item.selected.verified-incorrect .selection-indicator {
   border-color: #ff4b4b;
   background: #ff4b4b;
   color: white;
@@ -182,13 +248,13 @@
 
 .selection-counter {
   margin: 0;
-  color: #ff4b4b;
+  color: #1899d6;
   font-size: 0.9rem;
   font-weight: 800;
-  background: #fff0f0;
+  background: #ddf4ff;
   padding: 0.3rem 0.8rem;
   border-radius: 999px;
-  border: 2px solid #ffb2b2;
+  border: 2px solid #84d8ff;
   align-self: flex-start;
 }
 
@@ -216,10 +282,29 @@
 }
 
 :host-context(.app-dark) .option-item.selected {
+  background: #0c3b5e;
+  border-color: #1cb0f6;
+  color: #38bdf8;
+  box-shadow: 0 3px 0 0 #0284c7;
+}
+
+:host-context(.app-dark) .option-item.selected.verified-correct {
+  background: #132c13;
+  border-color: #58cc02;
+  color: #84f04d;
+  box-shadow: 0 3px 0 0 #46a302;
+}
+
+:host-context(.app-dark) .option-item.selected.verified-incorrect {
   background: #3b1b22;
   border-color: #ff4b4b;
   color: #ff8585;
   box-shadow: 0 3px 0 0 #ea2b2b;
+}
+
+:host-context(.app-dark) .option-item.verified:hover {
+  background: #1e293b;
+  box-shadow: 0 3px 0 0 #0f172a;
 }
 
 :host-context(.app-dark) .option-index {
@@ -232,7 +317,7 @@
 }
 
 :host-context(.app-dark) .selection-counter {
-  background: #3b1b22;
-  border-color: #5c2020;
-  color: #ff8585;
+  background: #0c3b5e;
+  border-color: #0284c7;
+  color: #38bdf8;
 }

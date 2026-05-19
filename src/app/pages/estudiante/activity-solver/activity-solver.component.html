@@ -73,6 +73,8 @@
                 *ngSwitchCase="'selection_single'"
                 [options]="currentExercise.optionSelectOptions"
                 [selectedOption]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelect : undefined"
+                [isVerified]="answerVerified()"
+                [isCorrect]="currentFeedback() ? currentFeedback()!.qualification >= 7 : false"
                 (answerSubmitted)="onAnswerSubmitted($event)">
               </app-single-selection-exercise>
 
@@ -80,6 +82,9 @@
                 *ngSwitchCase="'selection_multiple'"
                 [options]="currentExercise.optionSelectOptions"
                 [selectedOptions]="answers()[currentExerciseIndex()] ? answers()[currentExerciseIndex()].answerSelects : []"
+                [isVerified]="answerVerified()"
+                [isCorrect]="currentFeedback() ? currentFeedback()!.qualification >= 7 : false"
+                [correctAnswers]="currentExercise.answerSelectsCorrect || []"
                 (answerSubmitted)="onAnswerSubmitted($event)">
               </app-multiple-selection-exercise>
 
@@ -114,6 +119,8 @@
                 *ngSwitchCase="'vertical_ordering'"
                 [fragments]="currentExercise.optionsVerticalOrdering"
                 [orderedFragments]="answers()[currentExerciseIndex()].answerVerticalOrdering || []"
+                [isVerified]="answerVerified()"
+                [correctOrder]="currentExercise.answerVerticalOrdering || []"
                 (answerSubmitted)="onAnswerSubmitted($event)">
               </app-vertical-ordering-exercise>
 
@@ -121,6 +128,8 @@
                 *ngSwitchCase="'horizontal_ordering'"
                 [lines]="currentExercise.optionsHorizontalOrdering"
                 [orderedLines]="answers()[currentExerciseIndex()].answerHorizontalOrdering || []"
+                [isVerified]="answerVerified()"
+                [correctOrder]="currentExercise.answerHorizontalOrdering || []"
                 (answerSubmitted)="onAnswerSubmitted($event)">
               </app-horizontal-ordering-exercise>
 
@@ -130,6 +139,9 @@
                 [selectedOptions]="answers()[currentExerciseIndex()].answerPhishingSelection || []"
                 [phishingContext]="currentExercise.phishingContext"
                 [phishingImageUrl]="currentExercise.phishingImageUrl"
+                [isVerified]="answerVerified()"
+                [isCorrect]="currentFeedback() ? currentFeedback()!.qualification >= 7 : false"
+                [correctAnswers]="currentExercise.answerPhishingSelection || []"
                 (answerSubmitted)="onAnswerSubmitted($event)">
               </app-phishing-selection-multiple-exercise>
 

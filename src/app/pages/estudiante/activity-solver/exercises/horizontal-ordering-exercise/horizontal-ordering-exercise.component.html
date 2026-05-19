@@ -8,7 +8,15 @@
     class="ordering-row"
     role="list"
     aria-label="Lista horizontal para ordenar">
-    <div *ngFor="let item of currentOrder; let i = index" cdkDrag class="ordering-card" role="listitem">
+    <div
+      *ngFor="let item of currentOrder; let i = index"
+      cdkDrag
+      [cdkDragDisabled]="isVerified"
+      class="ordering-card"
+      [class.verified-correct]="isVerified && isItemCorrect(item, i)"
+      [class.verified-incorrect]="isVerified && !isItemCorrect(item, i)"
+      [class.verified]="isVerified"
+      role="listitem">
       <span class="ordering-index">{{ i + 1 }}</span>
       <span class="ordering-text">{{ item }}</span>
       <i class="pi pi-arrows-h drag-handle" aria-hidden="true"></i>

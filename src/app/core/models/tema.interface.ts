@@ -75,6 +75,7 @@ export interface TemaConProgreso {
   index: number;
   completedActivities: number;
   activitiesToComplete: number;
-  nextToStart: boolean,
+  nextToStart: boolean;
+  theoryRead: boolean;
   activities: ActividadConProgreso[];
 }

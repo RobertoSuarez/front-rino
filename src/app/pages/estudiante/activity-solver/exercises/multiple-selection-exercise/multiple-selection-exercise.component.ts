@@ -26,9 +26,16 @@ import { ButtonModule } from 'primeng/button';
 export class MultipleSelectionExerciseComponent {
   @Input() options: string[] = [];
   @Input() selectedOptions: string[] | undefined = [];
+  @Input() isVerified: boolean = false;
+  @Input() isCorrect: boolean = false;
+  @Input() correctAnswers: string[] = [];
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
   selectedValues: string[] = [];
+
+  isOptionCorrect(option: string): boolean {
+    return this.correctAnswers.includes(option);
+  }
 
   ngOnChanges() {
     this.selectedValues = this.selectedOptions || [];
@@ -39,6 +46,7 @@ export class MultipleSelectionExerciseComponent {
   }
 
   toggleSelection(option: string): void {
+    if (this.isVerified) return;
     const index = this.selectedValues.indexOf(option);
     if (index > -1) {
       // Si ya está seleccionado, lo quitamos

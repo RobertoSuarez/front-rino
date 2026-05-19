@@ -2,7 +2,15 @@
   <p class="exercise-instruction">Ordena de arriba hacia abajo arrastrando cada elemento.</p>
 
   <div cdkDropList (cdkDropListDropped)="drop($event)" class="ordering-list" role="list" aria-label="Lista para ordenar">
-    <div *ngFor="let item of currentOrder; let i = index" cdkDrag class="ordering-item" role="listitem">
+    <div
+      *ngFor="let item of currentOrder; let i = index"
+      cdkDrag
+      [cdkDragDisabled]="isVerified"
+      class="ordering-item"
+      [class.verified-correct]="isVerified && isItemCorrect(item, i)"
+      [class.verified-incorrect]="isVerified && !isItemCorrect(item, i)"
+      [class.verified]="isVerified"
+      role="listitem">
       <span class="ordering-index">{{ i + 1 }}</span>
       <span class="ordering-text">{{ item }}</span>
       <i class="pi pi-bars" aria-hidden="true"></i>

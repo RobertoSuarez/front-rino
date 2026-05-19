@@ -14,6 +14,7 @@ export interface User {
   requiredUpdate: boolean;
   isVerified: boolean;
   approved: boolean;
+  hasCompletedOnboarding?: boolean;
   institutionId?: number;
   institution?: {
     id: number;

@@ -206,3 +206,97 @@
     font-size: 0.72rem;
   }
 }
+
+/* Verified Correct State */
+.ordering-card.verified-correct {
+  border-color: #58cc02;
+  background: #eefbe8;
+  color: #46a302;
+  box-shadow: 0 2px 0 0 #46a302;
+}
+
+.ordering-card.verified-correct:hover {
+  border-color: #58cc02;
+  background: #eefbe8;
+  transform: none;
+  box-shadow: 0 2px 0 0 #46a302;
+}
+
+.ordering-card.verified-correct .ordering-index {
+  background: linear-gradient(135deg, #58cc02, #46a302);
+  box-shadow: 0 2px 6px rgba(88, 204, 2, 0.3);
+}
+
+.ordering-card.verified-correct .drag-handle {
+  color: #58cc02;
+}
+
+/* Verified Incorrect State */
+.ordering-card.verified-incorrect {
+  border-color: #ff4b4b;
+  background: #fff0f0;
+  color: #ea2b2b;
+  box-shadow: 0 2px 0 0 #ea2b2b;
+}
+
+.ordering-card.verified-incorrect:hover {
+  border-color: #ff4b4b;
+  background: #fff0f0;
+  transform: none;
+  box-shadow: 0 2px 0 0 #ea2b2b;
+}
+
+.ordering-card.verified-incorrect .ordering-index {
+  background: linear-gradient(135deg, #ff4b4b, #ea2b2b);
+  box-shadow: 0 2px 6px rgba(255, 75, 75, 0.3);
+}
+
+.ordering-card.verified-incorrect .drag-handle {
+  color: #ff4b4b;
+}
+
+/* Verified State General Overrides */
+.ordering-card.verified {
+  cursor: default;
+}
+
+.ordering-card.verified:hover {
+  transform: none;
+}
+
+.ordering-card.verified:active {
+  transform: none;
+}
+
+.ordering-card.verified:hover .ordering-index {
+  transform: none;
+}
+
+/* Dark Mode Verified States */
+:host-context(.app-dark) .ordering-card.verified-correct {
+  background: #132c13;
+  border-color: #58cc02;
+  color: #84f04d;
+  box-shadow: 0 2px 0 0 #46a302;
+}
+
+:host-context(.app-dark) .ordering-card.verified-incorrect {
+  background: #3b1b22;
+  border-color: #ff4b4b;
+  color: #ff8585;
+  box-shadow: 0 2px 0 0 #ea2b2b;
+}
+
+:host-context(.app-dark) .ordering-card.verified:hover {
+  box-shadow: 0 2px 0 0 #0f172a;
+}
+
+:host-context(.app-dark) .ordering-card.verified-correct:hover {
+  box-shadow: 0 2px 0 0 #46a302;
+  background: #132c13;
+}
+
+:host-context(.app-dark) .ordering-card.verified-incorrect:hover {
+  box-shadow: 0 2px 0 0 #ea2b2b;
+  background: #3b1b22;
+}

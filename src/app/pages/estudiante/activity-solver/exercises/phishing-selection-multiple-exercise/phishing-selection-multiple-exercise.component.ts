@@ -24,9 +24,16 @@ export class PhishingSelectionMultipleExerciseComponent {
   @Input() selectedOptions: string[] = [];
   @Input() phishingContext: string = '';
   @Input() phishingImageUrl: string = '';
+  @Input() isVerified: boolean = false;
+  @Input() isCorrect: boolean = false;
+  @Input() correctAnswers: string[] = [];
   @Output() answerSubmitted = new EventEmitter<string[]>();
 
   selectedValues: string[] = [];
+
+  isOptionCorrect(option: string): boolean {
+    return this.correctAnswers.includes(option);
+  }
 
   ngOnChanges() {
     this.selectedValues = this.selectedOptions ? [...this.selectedOptions] : [];
@@ -63,6 +70,7 @@ export class PhishingSelectionMultipleExerciseComponent {
   }
 
   toggleOption(option: string) {
+    if (this.isVerified) return;
     const index = this.selectedValues.indexOf(option);
     if (index > -1) {
       this.selectedValues.splice(index, 1);

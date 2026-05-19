@@ -73,6 +73,11 @@ interface Exercise {
   phishingImageUrl: string;
   optionsMatchPairsLeft: string[];
   optionsMatchPairsRight: string[];
+  answerSelectsCorrect?: string[];
+  answerSelectCorrect?: string;
+  answerPhishingSelection?: string[];
+  answerVerticalOrdering?: string[];
+  answerHorizontalOrdering?: string[];
 }
 
 interface ActivityWithExercises {
@@ -423,7 +428,12 @@ export class ActivitySolverComponent implements OnInit {
             phishingContext: (ex as any).phishingContext || '',
             phishingImageUrl: (ex as any).phishingImageUrl || '',
             optionsMatchPairsLeft: (ex as any).optionsMatchPairsLeft || [],
-            optionsMatchPairsRight: (ex as any).optionsMatchPairsRight || []
+            optionsMatchPairsRight: (ex as any).optionsMatchPairsRight || [],
+            answerSelectsCorrect: (ex as any).answerSelectsCorrect || [],
+            answerSelectCorrect: (ex as any).answerSelectCorrect || '',
+            answerPhishingSelection: (ex as any).answerPhishingSelection || [],
+            answerVerticalOrdering: (ex as any).answerVerticalOrdering || [],
+            answerHorizontalOrdering: (ex as any).answerHorizontalOrdering || []
           }))
         };
         
